@@ -27,7 +27,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`)
 )
 
-2. friends
+2. users_friend_list
 CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
   `friend_id` int NOT NULL,
