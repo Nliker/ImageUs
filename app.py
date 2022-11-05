@@ -5,8 +5,6 @@ from model import UserDao,ImageDao
 from service import UserService,ImageService
 from view import user_router,image_router
 
-import config
-
 class Services:
     pass
 
