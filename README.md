@@ -28,14 +28,12 @@ CREATE TABLE `users` (
 )
 
 2. friends
-CREATE TABLE `friends` (
+CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
   `friend_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`user_id`,`friend_id`),
-  CONSTRAINT `friends_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `friends_friend_id_fkey` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`),
+  PRIMARY KEY(`user_id`,`friend_id`)
 )
 
 3. images
@@ -46,8 +44,9 @@ CREATE TABLE `images` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  CONSTRAINT `images_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  INDEX `user_id` (`user_id`)
 )
+=>유저의 이미지 조회시 인덱스 따로 필요
 
 4. rooms
 CREATE TABLE `rooms` (
@@ -65,9 +64,10 @@ CREATE TABLE `rooms_user_list` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`room_id`,`user_id`),
-  CONSTRAINT `rooms_user_list_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`),
-  CONSTRAINT `rooms_user_list_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  INDEX `user_id` (`user_id`)
 )
+=>방의 유저 조회(pri가 room_id하나에도 적용되기 때문에 인덱스 추가 x)
+=>유저의 방 조회시 인덱스 따로 필요
 
 
 6. images_room_list
@@ -76,11 +76,13 @@ CREATE TABLE `images_room_list` (
   `room_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`,`room_id`),
-  CONSTRAINT `images_room_list_image_id_fkey` FOREIGN KEY (`images_id`) REFERENCES `images` (`id`),
-  CONSTRAINT `images_room_list_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`)
+  INDEX `room_id` (`room_id`)
 )
+=>이미지의 방 조회(pri가 image_id하나에도 적용되기 때문에 인덱스 추가 x)
+=>방에서 이미지 조회시 인덱스 따로 필요
 
-7. albums
+<!-- 아래는 추후 완성 기능 -->
+<!-- 7. albums
 CREATE TABLE `albums` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(300) NOT NULL,
@@ -100,4 +102,4 @@ CREATE TABLE `albums` (
   PRIMARY KEY (`album_id`,`image_id`),
   CONSTRAINT `albums_album_id_fkey` FOREIGN KEY (`album_id`) REFERENCES `albums` (`id`),
   CONSTRAINT `albums_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`)
-)
+) -->
