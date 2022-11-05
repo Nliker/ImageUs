@@ -33,9 +33,9 @@ CREATE TABLE `friends` (
   `friend_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`room_id`,`friend_id`),
+  PRIMARY KEY(`user_id`,`friend_id`),
   CONSTRAINT `friends_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `friends_friend_id_id_fkey` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `friends_friend_id_fkey` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`),
 )
 
 3. images
@@ -60,7 +60,7 @@ CREATE TABLE `rooms` (
 
 5. rooms_user_list
 CREATE TABLE `rooms_user_list` (
-  `room_id` int NOT NULL AUTO_INCREMENT,
+  `room_id` int NOT NULL,
   `user_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
