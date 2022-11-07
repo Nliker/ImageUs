@@ -108,7 +108,7 @@ def user_router(app,services):
     #id가 user_id인 유저의 친구를 생성합니다.
     #input
     # {
-    #     'email':<str>
+    #     'friend_user_id':<str>
     # }
     #output
     # '저장성공'
@@ -116,21 +116,18 @@ def user_router(app,services):
     @login_required
     def user_friend(user_id):
         current_user_id=g.user_id
-        payload=request.json
-        result=None
+        friend_user_id=request.json['friend_user_id']
         
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        if user_service.is_email_exists(payload['email']):
-            friend_user_id=user_service.get_user_id_and_password(payload['email'])
-            result=user_service.create_user_friend(current_user_id,friend_user_id)
-
-        if result:
-            return '저장성공',200
-        else:
-            return '존재하지 않는 유저입니다.',400
+        if not user_service.is_user_exists(friend_user_id):
+            return '해당 유저가 존재하지 않습니다.',400
         
+        user_service.create_user_friend(current_user_id,friend_user_id)
+
+        return '저장성공',200
+
     #id가 user_id인 유저의 친구 리스트를 불러옵니다.
     #input
     #output
@@ -162,16 +159,20 @@ def user_router(app,services):
     
     #id가 user_id인 유저의 친구를 삭제합니다.
     #input
+    # {
+    #     'delete_friend_user_id':<int>
+    # }
     #output
     # '삭제성공'
-    @app.route("/user/<int:user_id>/friend/<int:friend_user_id>",methods=["DELETE"])
-    def user_friend(user_id,friend_user_id):
+    @app.route("/user/<int:user_id>/friend",methods=["DELETE"])
+    def user_friend(user_id):
         current_user_id=g.user_id
 
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        if user_service.is_user_exists(friend_user_id):
+        delete_friend_user_id=request.json['delete_friend_user_id']
+        if user_service.is_user_exists(delete_friend_user_id):
             user_service.delete_user_friend(current_user_id,friend_user_id)
             return '저장 성공',200
         else:
@@ -208,16 +209,20 @@ def user_router(app,services):
         
     #id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
     #input
+    # {
+    #     'delete_room_id':'room_id'
+    # }
     #output
     # '삭제 성공'
-    @app.route("/user/<int:user_id>/room/<int:room_id>",methods=["DELETE"])
-    def user_roomlist(user_id,room_id):
+    @app.route("/user/<int:user_id>/room",methods=["DELETE"])
+    def user_roomlist(user_id):
         current_user_id=g.user_id
         
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        if room_service.is_room_exists(room_id):
+        delete_room_id=request.json['delete_room_id']
+        if room_service.is_room_exists(delete_room_id):
             room_service.delete_user_room(current_user_id,room_id)
             return '삭제 성공'
         
