@@ -52,6 +52,7 @@ CREATE TABLE `images` (
 CREATE TABLE `rooms` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(300) NOT NULL,
+  `host_user_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
