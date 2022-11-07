@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
 from sqlalchemy import create_engine
-from model import UserDao,ImageDao
-from service import UserService,ImageService
-from view import user_router,image_router
+from model import UserDao,ImageDao,RoomDao
+from service import UserService,ImageService,RoomService
+from view import user_router,image_router,room_router
 
 class Services:
     pass
@@ -28,13 +28,16 @@ def create_app(test_config=None):
     
     user_dao=UserDao(database)
     image_dao=ImageDao(database)
+    room_dao=RoomDao(database)
     
     services=Services
 
     services.user_service=UserService(user_dao,app.config)
     services.image_service=ImageService(image_dao,app.config)
+    services.room_service=RoomService(room_dao,app.config)
 
     user_router(app,services)
     image_router(app,services)
+    room_router(app,services)
     
     return app
