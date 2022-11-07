@@ -21,6 +21,8 @@ def user_router(app,services):
     image_service=services.image_service
     
     #room_service.get_user_roomlist(current_user_id)
+    #room_service.is_room_exists(room_id)
+    #room_service.delete_user_room(current_user_id,room_id)
     room_service=services.room_services
     
     #회원가입을 합니다.
