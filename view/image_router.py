@@ -13,6 +13,7 @@ def image_router(app,services):
 
     #room_service.is_room_exists(room_id)
     room_service=services.room_service
+    
     #새로운 사진을 게시합니다.
     #input
     #output
