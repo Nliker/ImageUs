@@ -30,14 +30,6 @@ class UserService:
         new_user['hashed_password']=bcrypt.hashpw(password.encode('utf-8',bcrypt.gensalt()))
         new_user_id=self.user_dao.insert_user(new_user)
         return new_user_id
-        
-    def is_user_exists(self,user_id):
-        user=self.user_dao.get_user_info(user_id)
-
-        if user:
-            return True
-        else:
-            return False
 
     def get_user_info(self,user_id):
         user=self.user_dao.get_user_info(user_id)
@@ -75,7 +67,14 @@ class UserService:
 
     def get_user_friendlist(self,user_id):
         friendlist=self.user_dao.get_user_frinedlist(user_id)
-        return friendlist
+        friend_info_list=[]
+        #실제 존재하는 유저만 정보를 불러 모음
+        for user_id in friendlist:
+            friend_info=self.user_dao.get_user_info(user_id)
+            if friend_info:
+                friend_info_list.append(friend_info)
+
+        return friend_info_list
         
     def delete_user_friend(self,user_id,friend_user_id):
         result=self.user_dao.delete_friend(user_id,friend_user_id)

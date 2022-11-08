@@ -11,7 +11,6 @@ def user_router(app,services):
     #user_service.generate_access_token(user_credential['id'])
     #user_service.get_user_id_and_password(credential['email'])
     #user_service.is_email_exists(new_user['email'])
-    #user_service.is_user_exists(friend_user_id)
     #user_service.create_user_friend(current_user_id,friend_user_id)
     #user_service.get_user_friendlist(current_user_id)
     #user_service.delete_user_friend(current_user_id,friend_user_id)
@@ -61,12 +60,11 @@ def user_router(app,services):
     # }
     @app.route("/user/<int:user_id>",methods=["GET"])
     def user(user_id):
-        if not user_service.is_user_exists(user_id):
-            return '해당 유저가 존재하지 않습니다.',400
-        
         user_info=user_service.get_user_info(user_id)
-        
-        return jsonify({user_info}),200
+        if user_info:
+            return jsonify({user_info}),200
+        else:
+            return '해당 유저가 존재하지 않습니다.',400
     
     #로그인을 합니다.
     #input
@@ -127,7 +125,7 @@ def user_router(app,services):
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        if not user_service.is_user_exists(friend_user_id):
+        if not user_service.get_user_info(friend_user_id):
             return '해당 유저가 존재하지 않습니다.',400
         
         result=user_service.create_user_friend(current_user_id,friend_user_id)
@@ -180,7 +178,7 @@ def user_router(app,services):
             return '권한이 없습니다.',401
         
         delete_friend_user_id=request.json['delete_friend_user_id']
-        if user_service.is_user_exists(delete_friend_user_id):
+        if user_service.get_user_info(delete_friend_user_id):
             user_service.delete_user_friend(current_user_id,delete_friend_user_id)
             return '저장 성공',200
         else:
@@ -195,6 +193,20 @@ def user_router(app,services):
     #           'id':<int>,
     #           'title':<str>,
     #           'host_user_id':<int>
+    #           'userlist':[
+    #               {
+    #                   'id':<int>,
+    #                   'name':<str>,
+    #                   'email':<str>,
+    #                   'profile':<str>
+    #               },
+    #               {
+    #                   'id':<int>,
+    #                   'name':<str>,
+    #                   'email':<str>,
+    #                   'profile':<str>
+    #               }    
+    #           ]
     #          },
     #         {
     #           'id':<int>,
@@ -211,6 +223,14 @@ def user_router(app,services):
             return '권한이 없습니다.',401
         
         roomlist=room_service.get_user_roomlist(current_user_id)
+        for room_info in roomlist:
+            room_info['userlist']=[]
+            room_userlist=room_service.get_room_userlist(room_info['id'])
+            for user_id in room_userlist:
+            #유저가 존재 할 경우에만 불러모은다.
+                user_info=user_service.get_user_info(user_id)
+                if user_info:
+                    room_info['userlist'].append(user_info)
         
         return jsonify({'roomlist':roomlist}),200
         
@@ -230,9 +250,7 @@ def user_router(app,services):
             return '권한이 없습니다.',401
         
         delete_room_id=request.json['delete_room_id']
-        if room_service.is_room_exists(delete_room_id):
-            room_service.delete_user_room(current_user_id,delete_room_id)
-            return '삭제 성공'
-        
-        else:
-            return '존재 하지 않는 방입니다.',400
+
+        room_service.delete_user_room(current_user_id,delete_room_id)
+
+        return '삭제 성공',200 
