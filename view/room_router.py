@@ -36,12 +36,12 @@ def room_router(app,services):
         #존재하지 않는 유저는 배제합니다.
         real_room_userlist=[]
         for user_id in room_userlist:
-            if user_service.is_user_exists(user_id):
+            if user_service.get_user_info(user_id):
                 real_room_userlist.append(user_id)
         
-        room_service.create_room_user(new_room_id,real_room_userlist)
+        result=room_service.create_room_user(new_room_id,real_room_userlist)
 
-        return '방 생성 성공',200
+        return f'방 생성 성공 및 {result}명 초대 성공',200
     
     #id가 room_id인 room의 이미지 리스트를 불러옵니다.
     #input
@@ -62,10 +62,10 @@ def room_router(app,services):
     @login_required
     def room_imagelist(room_id):
         current_user_id=g.user_id
-        if not room_service.is_room_exists(room_id):
+        if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
         
-        if not room_service.is_room_user(current_user_id):
+        if not room_service.is_room_user(room_id,current_user_id):
             return '권한이 없습니다.',401
         
         imagelist=image_service.get_room_imagelist(room_id)
@@ -92,14 +92,22 @@ def room_router(app,services):
     @login_required
     def room_userlist(room_id):
         current_user_id=g.user_id
-        if not room_service.is_room_exists(room_id):
+        if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
         
-        if not room_service.is_room_user(current_user_id):
+        if not room_service.is_room_user(room_id,current_user_id):
             return '권한이 없습니다.',401
         
-        userlist=room_service.get_room_userlist(room_id)
-        return jsonify({'userlist':userlist}),200
+        room_userlist=room_service.get_room_userlist(room_id)
+
+        room_user_info_list=[]
+        for user_id in room_userlist:
+            #유저가 존재 할 경우에만 불러모은다.
+            user_info=user_service.get_user_info(user_id)
+            if user_info:
+                room_user_info_list.append(user_info)
+
+        return jsonify({'userlist':room_user_info_list}),200
     
     #id가 room_id인 room의 id가 user_id인 유저를 강퇴합니다.
     #input
@@ -109,13 +117,13 @@ def room_router(app,services):
     def room_user(room_id,user_id):
         current_user_id=g.user_id
         
-        if not room_service.is_room_exists(room_id):
+        if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
-
-        if not room_service.is_room_host(current_user_id):
+        #방장이 아니라면
+        if user_id!= room_service.get_room_info(room_id)['host_user_id']:
             return '권한이 없습니다.',401
         
-        if not user_service.is_user_exists(user_id):
+        if not user_service.get_user_info(user_id):
             return '해당 유저는 존재하지 않습니다.',400
         
         if not room_service.is_room_user(user_id): 
@@ -135,7 +143,7 @@ def room_router(app,services):
     @app.route("/room/<int:room_id>/user",methods=["post"]) 
     @login_required
     def room_user(room_id):
-        if not room_service.is_room_exists(room_id):
+        if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
         
         current_user_id=g.user_id
@@ -146,7 +154,7 @@ def room_router(app,services):
         invite_userlist=request.json['invite_user_id']
         real_invite_userlist=[]
         for user_id in invite_userlist:
-            if user_service.is_user_exists(user_id) and room_service.is_room_user(user_id): 
+            if user_service.get_user_info(user_id) and not room_service.is_room_user(user_id): 
                 real_invite_userlist.append(user_id)
 
         room_service.create_room_user(room_id,real_invite_userlist)
