@@ -30,7 +30,7 @@ CREATE TABLE `users` (
 2. users_friend_list
 CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
-  `friend_id` int NOT NULL,
+  `friend_user_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`user_id`,`friend_id`)

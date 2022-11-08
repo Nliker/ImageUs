@@ -61,6 +61,9 @@ def user_router(app,services):
     # }
     @app.route("/user/<int:user_id>",methods=["GET"])
     def user(user_id):
+        if not user_service.is_user_exists(user_id):
+            return '해당 유저가 존재하지 않습니다.',400
+        
         user_info=user_service.get_user_info(user_id)
         
         return jsonify({user_info}),200
@@ -78,8 +81,11 @@ def user_router(app,services):
     @app.route("/login",methods=["POST"])
     def login():
         credential=request.json
-        authorized=user_service.login(credential)
          
+        if not user_service.is_email_exists(credential['email']):
+            return '존재하지 않는 이메일 입니다.',400
+        
+        authorized=user_service.login(credential)
         if authorized:
             user_credential=user_service.get_user_id_and_password(credential['email'])
             access_token=user_service.generate_access_token(user_credential['id'])
@@ -124,9 +130,11 @@ def user_router(app,services):
         if not user_service.is_user_exists(friend_user_id):
             return '해당 유저가 존재하지 않습니다.',400
         
-        user_service.create_user_friend(current_user_id,friend_user_id)
-
-        return '저장성공',200
+        result=user_service.create_user_friend(current_user_id,friend_user_id)
+        if result:
+            return '저장성공',200
+        else:
+            return '이미 친구인 유저입니다.',401
 
     #id가 user_id인 유저의 친구 리스트를 불러옵니다.
     #input
