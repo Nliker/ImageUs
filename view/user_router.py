@@ -173,7 +173,7 @@ def user_router(app,services):
         
         delete_friend_user_id=request.json['delete_friend_user_id']
         if user_service.is_user_exists(delete_friend_user_id):
-            user_service.delete_user_friend(current_user_id,friend_user_id)
+            user_service.delete_user_friend(current_user_id,delete_friend_user_id)
             return '저장 성공',200
         else:
             return '존재하지 않는 유저입니다.',400
@@ -223,7 +223,7 @@ def user_router(app,services):
         
         delete_room_id=request.json['delete_room_id']
         if room_service.is_room_exists(delete_room_id):
-            room_service.delete_user_room(current_user_id,room_id)
+            room_service.delete_user_room(current_user_id,delete_room_id)
             return '삭제 성공'
         
         else:
