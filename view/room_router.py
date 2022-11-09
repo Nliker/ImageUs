@@ -43,6 +43,14 @@ def room_router(app,services):
 
         return f'방 생성 성공 및 {result}명 초대 성공',200
     
+    #id가 room_id인 room에 이미지를 업로드 합니다.
+    #input
+    #output
+    @app.route("/room/<int:room_id>/image",methods=["POST"])
+    @login_required
+    def room_image():
+        
+    
     #id가 room_id인 room의 이미지 리스트를 불러옵니다.
     #input
     #output
