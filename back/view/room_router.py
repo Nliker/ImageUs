@@ -62,7 +62,7 @@ def room_router(app,services):
         filename=generate_random_sting(10)+'.'+extender
         image_service.upload_image(image,filename,current_user_id)
         
-        result=image_service.upload_room_image(room_id,filename,image)
+        result=image_service.upload_room_image(room_id,filename,image,current_user_id)
         
         return f'{result}개를 업로드 성공',200
     

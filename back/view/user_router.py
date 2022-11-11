@@ -222,8 +222,8 @@ def user_router(app,services):
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        roomlist=room_service.get_user_roomlist(current_user_id)
-        for room_info in roomlist:
+        room_info_list=room_service.get_user_roomlist(current_user_id)
+        for room_info in room_info_list:
             room_info['userlist']=[]
             room_userlist=room_service.get_room_userlist(room_info['id'])
             for user_id in room_userlist:
@@ -232,7 +232,7 @@ def user_router(app,services):
                 if user_info:
                     room_info['userlist'].append(user_info)
         
-        return jsonify({'roomlist':roomlist}),200
+        return jsonify({'roomlist':room_info_list}),200
         
         
     #id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)

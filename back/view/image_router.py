@@ -2,7 +2,6 @@ from flask import request,jsonify
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
-from tool import generate_random_sting
 from auth import login_required,g
 
 def image_router(app,services):
@@ -26,9 +25,7 @@ def image_router(app,services):
 
         image=request.files['image']
         
-        extender=str(image.split('.')[1])
-        filename=generate_random_sting(10)+'.'+extender
-        image_service.upload_image(image,filename,current_user_id)
+        image_service.upload_image(image,current_user_id)
 
         return '저장 완료',200
     
@@ -43,11 +40,10 @@ def image_router(app,services):
     def image(image_id):
         delete_image_id=request.json['delete_image_id']
 
-        if not image_service.is_image_exists(delete_image_id):
+        if not image_service.get_image_info(delete_image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
         current_user_id=g.user_id
-        image_service.is_user_image(current_user_id,image_id)
         
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400        
@@ -62,11 +58,10 @@ def image_router(app,services):
     @app.route("/image/<int:image_id>",methods=["GET"])
     @login_required
     def image(image_id):
-        if not image_service.is_image_exists(image_id):
+        if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
         
         current_user_id=g.user_id
-        image_service.is_user_image(current_user_id,image_id)
         
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400  
@@ -80,17 +75,16 @@ def image_router(app,services):
     #output
     # {
     #     'roomlist':[
-    #         1,2,3
+    #         {}
     #     ]
     # }
     @app.route("/image/<int:image_id>/roomlist",methods=["GET"])
     @login_required
     def image_roomlist(image_id):
-        if not image_service.is_image_exists(image_id):
+        if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
         current_user_id=g.user_id
-        image_service.is_user_image(current_user_id,image_id)
         
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400 
@@ -101,17 +95,16 @@ def image_router(app,services):
     #id가 image_id 인 사진의 방 리스트를 수정합니다.
     #input
     # {
-    #     'roomlist':[]
+    #     'roomlist':[1,2,3,4]
     # }
     #output
     @app.route("/image/<int:image_id>/roomlist",methods=["POST"])
     @login_required
     def image_roomlist(image_id):
-        if not image_service.is_image_exists(image_id):
+        if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
         current_user_id=g.user_id
-        image_service.is_user_image(current_user_id,image_id)
         
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400
@@ -119,7 +112,7 @@ def image_router(app,services):
         roomlist=request.json['roolmist']
         real_roomlist=[]
         for room_id in roomlist:
-            if room_service.is_room_exists(room_id) and not image_service.is_room_image(image_id,room_id):
+            if room_service.get_image_info(room_id) and not image_service.is_room_image(image_id,room_id):
                 real_roomlist.append(room_id)
         
         image_service.update_image_room(image_id,real_roomlist)
