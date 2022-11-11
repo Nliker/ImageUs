@@ -33,7 +33,7 @@ class RoomService:
         result=self.room_dao.delete_user_room(user_id,room_id)
         return result
 
-    def create_room_user(self,room_id,userlist):
+    def create_room_users(self,room_id,userlist):
         result=0
         for user_id in userlist:
             result+=self.room_dao.insert_room_user(room_id,user_id)
