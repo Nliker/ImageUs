@@ -6,7 +6,7 @@ from tool import generate_random_sting
 from auth import login_required,g
 
 def image_router(app,services):
-    #image_service.save_image(image,filename,current_user_id)
+    #image_service.upload_image(image,filename,current_user_id)
     #image_service.is_image_exists(image_id)
     #image_service.get_image_info(image_id)
     image_service=services.image_service
@@ -28,7 +28,7 @@ def image_router(app,services):
         
         extender=str(image.split('.')[1])
         filename=generate_random_sting(10)+'.'+extender
-        image_service.save_image(image,filename,current_user_id)
+        image_service.upload_image(image,filename,current_user_id)
 
         return '저장 완료',200
     

@@ -2,6 +2,7 @@ from flask import request,jsonify
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
+from tool import generate_random_sting
 from auth import login_required,g
 
 def room_router(app,services):
@@ -12,6 +13,7 @@ def room_router(app,services):
     room_service=services.room_service
 
     #image_service.get_room_imagelist(room_id)
+    #image_service.upload_room_image(room_id,filename,image)
     image_service=services.image_service
     
     #user_service.is_user_exists(invite_user_id):
@@ -20,7 +22,7 @@ def room_router(app,services):
     #room을 생성합니다.
     #input
     # {
-    #     userlist:['user_id']
+    #     userlist:[1,2,3]
     # }
     #output
     @app.route("/room",methods=["POST"])
@@ -39,7 +41,7 @@ def room_router(app,services):
             if user_service.get_user_info(user_id):
                 real_room_userlist.append(user_id)
         
-        result=room_service.create_room_user(new_room_id,real_room_userlist)
+        result=room_service.create_room_users(new_room_id,real_room_userlist)
 
         return f'방 생성 성공 및 {result}명 초대 성공',200
     
@@ -48,8 +50,21 @@ def room_router(app,services):
     #output
     @app.route("/room/<int:room_id>/image",methods=["POST"])
     @login_required
-    def room_image():
+    def room_image(room_id):
+        current_user_id=g.user_id
         
+        if 'image' not in request.files or request.files['image'].filename=='':
+            return 'file is missing',404
+
+        image=request.files['image']
+        
+        extender=str(image.split('.')[1])
+        filename=generate_random_sting(10)+'.'+extender
+        image_service.upload_image(image,filename,current_user_id)
+        
+        result=image_service.upload_room_image(room_id,filename,image)
+        
+        return f'{result}개를 업로드 성공',200
     
     #id가 room_id인 room의 이미지 리스트를 불러옵니다.
     #input
@@ -165,6 +180,6 @@ def room_router(app,services):
             if user_service.get_user_info(user_id) and not room_service.is_room_user(user_id): 
                 real_invite_userlist.append(user_id)
 
-        room_service.create_room_user(room_id,real_invite_userlist)
+        room_service.create_room_users(room_id,real_invite_userlist)
 
         return '초대 성공',200
