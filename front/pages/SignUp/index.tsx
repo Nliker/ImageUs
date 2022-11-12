@@ -1,7 +1,7 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import { InputBox } from '@components/UserInfoInputBox/styles';
 import React, { useCallback, useState } from 'react';
-import { InputContainer, PasswordCheckBox } from './styles';
+import { InputContainer, PasswordCheckBox, SubmitBox } from './styles';
 
 const SignUp = () => {
   const [checked, setChecked] = useState(false);
@@ -12,7 +12,7 @@ const SignUp = () => {
 
   return (
     <div>
-      <UserInfoInputBox>
+      <UserInfoInputBox pageName={'signup'}>
         <InputContainer>
           <InputBox>
             <label htmlFor="email-input">이름을 입력하세요.</label>
@@ -42,6 +42,9 @@ const SignUp = () => {
               </label>
             </PasswordCheckBox>
           </InputBox>
+          <SubmitBox>
+            <button type="submit">제출</button>
+          </SubmitBox>
         </InputContainer>
       </UserInfoInputBox>
     </div>

@@ -9,3 +9,9 @@ export const PasswordInputContainer = styled.div`
   margin-top: 20px;
 `
 
+export const SubmitBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+`;
+
