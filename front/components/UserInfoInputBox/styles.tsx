@@ -15,7 +15,7 @@ export const Wrapper = styled.div`
     position: relative;
     &:before,
     &:after {
-      min-height: 30px;
+      // min-height: 30px;
       flex-grow: 1;
       content: '';
       display: block;
@@ -63,6 +63,10 @@ export const InputBox = styled.div`
   label {
     display: block;
     text-align: left;
+    &:not(.pwcheck-label) {
+      padding-bottom: 10px;
+      color: #d93025;
+    }
   }
 `;
 

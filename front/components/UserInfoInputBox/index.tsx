@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { InnerContainer, OuterContainer, Wrapper } from './styles';
 
 interface InputBoxProps {
@@ -18,7 +17,7 @@ const UserInfoInputBox = ({ children, pageName }: InputBoxProps) => {
   return (
     <Wrapper>
       <OuterContainer>
-        <h1>로그인</h1>
+        <h1>{pageName}</h1>
         <InnerContainer>
           {children}
           {/* {pageName === 'login' ? (
