@@ -11,7 +11,8 @@ const LogIn = () => {
   const [passwordValue, setPwValue] = useState<string>('');
   const [emailFormError, setEmailFormError] = useState<boolean>(false);
   const [pwFormError, setPwFormError] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
+  const [pwErrorMessage, setPwErrorMessage] = useState<string>('');
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const emailRegex = new RegExp(
@@ -22,29 +23,32 @@ const LogIn = () => {
     return setChecked((prev) => !prev);
   }, []);
 
-  const onSubmitLoginInfo = useCallback((e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    // console.log('확인', emailFormError, pwFormError);
-    if (emailFormError && pwFormError) {
-      alert('이메일과 비밀번호를 다시 확인해주세요.');
-    } else if (emailFormError) {
-      alert('이메일을 다시 확인해주세요.');
-    } else if (pwFormError) {
-      alert('비밀번호를 다시 확인해주세요.');
-    } else {
-      // axios.post();
-      // 페이지
-    }
-  }, [emailFormError, pwFormError]);
+  const onSubmitLoginInfo = useCallback(
+    (e: { preventDefault: () => void }) => {
+      e.preventDefault();
+      // console.log('확인', emailFormError, pwFormError);
+      if (emailFormError && pwFormError) {
+        alert('이메일과 비밀번호를 다시 확인해주세요.');
+      } else if (emailFormError) {
+        alert('이메일을 다시 확인해주세요.');
+      } else if (pwFormError) {
+        alert('비밀번호를 다시 확인해주세요.');
+      } else {
+        // axios.post();
+        // 페이지
+      }
+    },
+    [emailFormError, pwFormError],
+  );
 
   const onChangeEmailInput = useCallback((e: { target: { value: string } }) => {
     setEmailValue(e.target.value);
     const inputValue = e.target.value;
     if (!inputValue) {
-      setErrorMessage('이메일을 입력해주세요.');
+      setEmailErrorMessage('이메일을 입력해주세요.');
       setEmailFormError(true);
     } else if (!emailRegex.test(inputValue)) {
-      setErrorMessage('이메일 형식에 맞지 않습니다.');
+      setEmailErrorMessage('이메일 형식에 맞지 않습니다.');
       setEmailFormError(true);
     } else {
       setEmailFormError(false);
@@ -56,10 +60,10 @@ const LogIn = () => {
     setPwValue(e.target.value);
     const inputValue = e.target.value;
     if (!inputValue) {
-      setErrorMessage('비밀번호를 입력해주세요.');
+      setPwErrorMessage('비밀번호를 입력해주세요.');
       setPwFormError(true);
     } else if (inputValue?.length < 8) {
-      setErrorMessage('비밀번호는 8글자 이상입니다.');
+      setPwErrorMessage('비밀번호는 8글자 이상입니다.');
       setPwFormError(true);
     } else {
       setPwFormError(false);
@@ -68,7 +72,7 @@ const LogIn = () => {
 
   return (
     <div>
-      <UserInfoInputBox pageName={'login'}>
+      <UserInfoInputBox pageName={'로그인'}>
         <form onSubmit={onSubmitLoginInfo}>
           <EmailInputContainer>
             <InputBox>
@@ -83,7 +87,7 @@ const LogIn = () => {
                   placeholder="이메일을 입력하세요."
                 />
               </InputDiv>
-              {emailFormError && <p>{errorMessage}</p>}
+              {emailFormError && <p>{emailErrorMessage}</p>}
             </InputBox>
           </EmailInputContainer>
           <PasswordInputContainer>
@@ -99,7 +103,7 @@ const LogIn = () => {
                   placeholder="비밀번호를 입력하세요."
                 />
               </InputDiv>
-              {pwFormError && <p>{errorMessage}</p>}
+              {pwFormError && <p>{pwErrorMessage}</p>}
             </InputBox>
           </PasswordInputContainer>
           <CheckBox>
