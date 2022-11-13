@@ -23,3 +23,7 @@ export const SubmitBox = styled.div`
   justify-content: space-between;
   margin-top: 40px;
 `;
+
+export const ErrorText = styled.p`
+    margin: 0 0 0 30px;
+`;
