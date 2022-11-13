@@ -4,13 +4,40 @@ class RoomService:
         self.room_dao=room_dao
     '''
     roomdao
-    get_user_roomlist(current_user_id)
+    get_user_roomlist(user_id)->[
+        {
+            'id':<int>,
+            'title':<str>,
+            'host_user_id':<int>
+        },
+        {
+            'id':<int>,
+            'title':<str>,
+            'host_user_id':<int>
+        }
+    ]
+    get_room_userlist(self,room_id)->[
+        {
+            'id':<int>,
+            'name':<str>,
+            'email':<str>,
+            'profile':<str>
+        },
+        {
+            'id':<int>,
+            'name':<str>,
+            'email':<str>,
+            'profile':<str>
+        }
+    ]
+    delete_user_room(user_id,room_id)->0 or 1
     is_room_exists(room_id)
     delete_user_room(current_user_id,room_id)
     get_user_roomlist(current_user_id)
     is_room_exists(room_id)
     delete_user_room(current_user_id,room_id)
     '''
+    
     def create_room(self,user_id):
         new_room_id=self.room_dao.insert_room(user_id)
         return new_room_id
@@ -19,13 +46,7 @@ class RoomService:
         return self.room_dao.get_room_info(room_id)
     
     def get_user_roomlist(self,user_id):
-        roomlist=self.room_dao.get_user_roomlist(user_id)
-         #실제로 존재하는 방만 불러모은다.
-        room_info_list=[]
-        for room_id in roomlist:
-            room_info=self.room_dao.get_room_info(room_id)
-            if room_info:
-                room_info_list.append(room_info)
+        room_info_list=self.room_dao.get_user_roomlist(user_id)
 
         return room_info_list
     #한 유저가 방을 나감
