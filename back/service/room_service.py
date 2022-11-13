@@ -16,7 +16,7 @@ class RoomService:
             'host_user_id':<int>
         }
     ]
-    get_room_userlist(self,room_id)->[
+    get_room_userlist(room_id)->[
         {
             'id':<int>,
             'name':<str>,
