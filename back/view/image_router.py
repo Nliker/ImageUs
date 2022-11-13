@@ -111,7 +111,7 @@ def image_router(app,services):
     #id가 image_id 인 사진의 방 리스트를 수정합니다.
     #input
     # {
-    #     'roomlist':[1,2,3,4]
+    #     'update_roomlist':[1,2,3,4]
     # }
     #output
     # {
@@ -131,10 +131,10 @@ def image_router(app,services):
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400
         
-        roomlist=request.json['roolmist']
+        update_roomlist=request.json['update_roomlist']
         real_roomlist=[]
         #실제로 존재하는 방만 추출
-        for room_id in roomlist:
+        for room_id in update_roomlist:
             if room_service.get_room_info(room_id):
                 real_roomlist.append(room_id)
         
