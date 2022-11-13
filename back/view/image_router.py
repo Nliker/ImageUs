@@ -48,9 +48,9 @@ def image_router(app,services):
         if image_service.is_user_image(current_user_id,image_id):
             return '사진에 대한 권한이 없습니다.',400        
         
-        image_service.delete_image(delete_image_id)
+        result=image_service.delete_image(delete_image_id)
         
-        return '삭제 완료',200
+        return f'{result}장 삭제 완료',200
 
     #id가 image_id 인 사진의 정보를 불러옵니다.
     #input
@@ -111,13 +111,14 @@ def image_router(app,services):
         
         roomlist=request.json['roolmist']
         real_roomlist=[]
+        #실제로 존재하는 방만 추출
         for room_id in roomlist:
-            if room_service.get_image_info(room_id) and not image_service.is_room_image(image_id,room_id):
+            if room_service.get_image_info(room_id):
                 real_roomlist.append(room_id)
         
-        image_service.update_image_room(image_id,real_roomlist)
+        result=image_service.update_image_room(image_id,real_roomlist)
 
-        return '권한 수정 완료',200
+        return jsonify(result),200
 
                 
         
