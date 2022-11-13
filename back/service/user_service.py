@@ -8,13 +8,26 @@ class UserService:
         self.user_dao=user_dao
     '''
     userdao
-    get_user_id_and_password(email)
-    insert_user(new_user)
-    get_user_info(user_id)
-    get_user_id_and_password(credential['email'])
-    insert_friend(user_id,friend_user_id)
-    get_user_frinedlist(user_id)
-    delete_friend(user_id,friend_user_id)
+    get_user_id_and_password(email)->{id,password}
+    insert_user(new_user)->(id)
+    get_user_info(user_id)->{id,name,email,profile}
+    insert_friend(user_id,friend_user_id)->0 or 1
+    get_user_friend(user_id,friend_user_id)->true or false
+    get_user_frinedlist(user_id)->[
+        {
+            'id':<int>,
+            'name':<str>,
+            'email':<str>,
+            'profile':<str>
+        },
+        {
+            'id':<int>,
+            'name':<str>,
+            'email':<str>,
+            'profile':<str>
+        }
+    ]
+    delete_friend(user_id,friend_user_id)->0 or 1
     '''
     
     def is_email_exists(self,email):
@@ -60,22 +73,23 @@ class UserService:
 
         return user_credential
 
+    def is_user_friend(self,user_id,friend_user_id):
+        result=self.user_dao.get_user_friend(user_id,friend_user_id)
+        if result:
+            return True
+        else:
+            return False
+    
     def create_user_friend(self,user_id,friend_user_id):
         result=self.user_dao.insert_friend(user_id,friend_user_id)
 
         return result
-
+        
     def get_user_friendlist(self,user_id):
-        friendlist=self.user_dao.get_user_frinedlist(user_id)
-        friend_info_list=[]
-        #실제 존재하는 유저만 정보를 불러 모음
-        for user_id in friendlist:
-            friend_info=self.user_dao.get_user_info(user_id)
-            if friend_info:
-                friend_info_list.append(friend_info)
+        friend_info_list=self.user_dao.get_user_frinedlist(user_id)
 
         return friend_info_list
         
-    def delete_user_friend(self,user_id,friend_user_id):
-        result=self.user_dao.delete_friend(user_id,friend_user_id)
+    def delete_user_friend(self,user_id,delete_friend_user_id):
+        result=self.user_dao.delete_user_friend(user_id,delete_friend_user_id)
         return result

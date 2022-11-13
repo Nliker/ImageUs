@@ -8,7 +8,18 @@ class ImageService:
 
     '''
     insert_image(user_id,link)
-    
+    get_user_imagelist(self,user_id)->[
+        {
+            'id':123,
+            'link':'http://...',
+            'user_id':11
+        },
+        {
+            'id',12,
+            'link':'http://...',
+            'user_id':11
+        }
+    ]
     '''
     
     # image server의 이미지 파일 구조 
