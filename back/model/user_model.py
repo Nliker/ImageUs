@@ -10,7 +10,7 @@ class ImageDao:
 
     def get_user_info(self,user_id):
         
-    def insert_friend(self,user_id,friend_user_id):
+    def insert_user_friend(self,user_id,friend_user_id):
     
     def get_user_friend(self,user_id,friend_user_id):
     
