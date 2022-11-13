@@ -12,7 +12,7 @@ class UserService:
     insert_user(new_user)->(id)
     get_user_info(user_id)->{id,name,email,profile}
     insert_friend(user_id,friend_user_id)->0 or 1
-    get_user_friend(user_id,friend_user_id)->true or false
+    get_user_friend(user_id,friend_user_id)->'id':<int>,'friend_user_info':<int> or None
     get_user_frinedlist(user_id)->[
         {
             'id':<int>,
