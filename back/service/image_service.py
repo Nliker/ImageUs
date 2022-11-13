@@ -72,13 +72,45 @@ class ImageService:
 
         return image_info_list
 
-        pre[1,4,9]
-        after[1,4,11,14]
-        =>[1,4,9,11,14]
-    
     def update_image_room(self,image_id,roomlist):
-        image_roomlist=self.image_dao.get_image_roomlist(image_id)
-
-        self.image_dao.update_image_room()
-    def delete_image(self,delete_image_id):
+        image_roomlist=set(self.image_dao.get_image_roomlist(image_id))
+        update_roomlist=set(roomlist)
         
+        update_list=sorted(set(image_roomlist+update_roomlist))
+
+        deletelist=[]
+        addlist=[]
+        continuelist=[]
+        
+        for room_id in update_list:
+            if (room_id in image_roomlist) and (room_id in update_roomlist):
+                continuelist.append(room_id)
+            if (room_id in image_roomlist) and (room_id not in update_roomlist):
+                deletelist.append(room_id)
+            if (room_id not in image_roomlist) and (room_id in update_roomlist):
+                addlist.append(room_id)
+                
+        delete_result=0        
+        for room_id in deletelist:
+            delete_result+=self.image_dao.delete_room_image(room_id,image_id)
+
+        add_result=0
+        for room_id in addlist:
+            add_result+=self.image_dao.insert_room_image(room_id,image_id)
+
+        return {
+                    'addlist':addlist,
+                    'deletelist':deletelist,
+                    'add_result':add_result,
+                    'delete_result':delete_result
+                }
+
+            
+    
+    def delete_room_image(self,image_id,room_id):
+        result=self.image_dao.delete_room_image(room_id,image_id)
+        return result
+    
+    def delete_image(self,delete_image_id):
+        result=self.image_dao.delete_image(delete_image_id)
+        return result

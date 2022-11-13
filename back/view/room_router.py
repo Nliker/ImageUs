@@ -7,7 +7,7 @@ from auth import login_required,g
 
 def room_router(app,services):
     #room_service.create_room(current_user_id)
-    #room_service.is_room_exists(room_id)
+
     #room_service.get_room_userlist(room_id)
     #room_service.delete_room_user(room_id,user_id)
     room_service=services.room_service
@@ -66,6 +66,21 @@ def room_router(app,services):
         
         return f'{result}개를 업로드 성공',200
     
+    @app.route("/room/<int:room_id>/image/<int:image_id>")
+    @login_required
+    def room_image(room_id,image_id):
+        current_user_id=g.user_id
+
+        if not image_service.get_image_info(image_id):
+            return '이미지가 존재하지 않습니다.',400
+        
+        if not image_service.is_user_image(current_user_id,image_id):
+            return '권한이 없습니다.',401
+
+        result=image_service.delete_room_image(room_id,image_id)
+        
+        return f"{result}장 삭제 완료",200
+            
     #id가 room_id인 room의 이미지 리스트를 불러옵니다.
     #input
     #output
