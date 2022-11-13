@@ -7,7 +7,7 @@ class ImageService:
         self.image_dao=image_dao
         
     '''
-    get_user_imagelist(self,user_id)->[
+    get_user_imagelist(user_id)->[
         {
             'id':123,
             'link':'http://...',
