@@ -5,17 +5,17 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 from auth import login_required,g
 
 def image_router(app,services):
-    #image_service.upload_image(image,filename,current_user_id)
-    #image_service.is_image_exists(image_id)
-    #image_service.get_image_info(image_id)
     image_service=services.image_service
-
-    #room_service.is_room_exists(room_id)
     room_service=services.room_service
     
     #새로운 사진을 게시합니다.
     #input
     #output
+    # {
+    #     'id':<int>,
+    #     'link':<str>,
+    #     'user_id':<int>
+    # }
     @app.route("/image",methods=["POST"])
     @login_required
     def image():
@@ -25,9 +25,11 @@ def image_router(app,services):
 
         image=request.files['image']
         
-        image_service.upload_image(image,current_user_id)
+        new_image_id=image_service.upload_image(image,current_user_id)
 
-        return '저장 완료',200
+        image_info=image_service.get_image_info(new_image_id)
+
+        return jsonify(image_info),200
     
     #id가 image_id인 사진을 삭제합니다.
     #input
@@ -55,6 +57,11 @@ def image_router(app,services):
     #id가 image_id 인 사진의 정보를 불러옵니다.
     #input
     #output
+    # {
+    #     'id':<int>,
+    #     'link':<str>,
+    #     'user_id':<int>
+    # }
     @app.route("/image/<int:image_id>",methods=["GET"])
     @login_required
     def image(image_id):
@@ -75,7 +82,16 @@ def image_router(app,services):
     #output
     # {
     #     'roomlist':[
-    #         {}
+    #         {
+    #             'id':<int>,
+    #             'title':<str>,
+    #             'host_user_id':<int>
+    #         },
+    #         {
+    #             'id':<int>,
+    #             'title':<str>,
+    #             'host_user_id':<int>
+    #         }
     #     ]
     # }
     @app.route("/image/<int:image_id>/roomlist",methods=["GET"])
@@ -98,6 +114,12 @@ def image_router(app,services):
     #     'roomlist':[1,2,3,4]
     # }
     #output
+    # {
+    #     'addlist':addlist,
+    #     'deletelist':deletelist,
+    #     'add_result':add_result,
+    #     'delete_result':delete_result
+    # }
     @app.route("/image/<int:image_id>/roomlist",methods=["POST"])
     @login_required
     def image_roomlist(image_id):
@@ -113,13 +135,9 @@ def image_router(app,services):
         real_roomlist=[]
         #실제로 존재하는 방만 추출
         for room_id in roomlist:
-            if room_service.get_image_info(room_id):
+            if room_service.get_room_info(room_id):
                 real_roomlist.append(room_id)
         
         result=image_service.update_image_room(image_id,real_roomlist)
 
         return jsonify(result),200
-
-                
-        
-        

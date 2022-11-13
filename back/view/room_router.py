@@ -6,17 +6,8 @@ from tool import generate_random_sting
 from auth import login_required,g
 
 def room_router(app,services):
-    #room_service.create_room(current_user_id)
-
-    #room_service.get_room_userlist(room_id)
-    #room_service.delete_room_user(room_id,user_id)
     room_service=services.room_service
-
-    #image_service.get_room_imagelist(room_id)
-    #image_service.upload_room_image(room_id,filename,image)
     image_service=services.image_service
-    
-    #user_service.is_user_exists(invite_user_id):
     user_service=services.user_service
 
     #room을 생성합니다.
@@ -25,6 +16,7 @@ def room_router(app,services):
     #     userlist:[1,2,3]
     # }
     #output
+    # '방 생성 성공 및 {result}명 초대 성공',200
     @app.route("/room",methods=["POST"])
     @login_required
     def room():
@@ -47,7 +39,13 @@ def room_router(app,services):
     
     #id가 room_id인 room에 이미지를 업로드 합니다.
     #input
+    # {
+    #     'files':{
+    #         'image':file
+    #     }
+    # }
     #output
+    # '{result}개를 업로드 성공'
     @app.route("/room/<int:room_id>/image",methods=["POST"])
     @login_required
     def room_image(room_id):
@@ -58,15 +56,17 @@ def room_router(app,services):
 
         image=request.files['image']
         
-        extender=str(image.split('.')[1])
-        filename=generate_random_sting(10)+'.'+extender
-        image_service.upload_image(image,filename,current_user_id)
-        
-        result=image_service.upload_room_image(room_id,filename,image,current_user_id)
+        result=image_service.upload_room_image(room_id,image,current_user_id)
         
         return f'{result}개를 업로드 성공',200
-    
-    @app.route("/room/<int:room_id>/image/<int:image_id>")
+    #id가 room_id인 room의 id가 image_id인 image의 권한을 삭제합니다.
+    #input
+    # {
+    #     'delete_room_image_id':<int>
+    # }
+    #output
+    # "{result}장 삭제 완료"
+    @app.route("/room/<int:room_id>/image",methods=["DELETE"])
     @login_required
     def room_image(room_id,image_id):
         current_user_id=g.user_id
@@ -76,8 +76,8 @@ def room_router(app,services):
         
         if not image_service.is_user_image(current_user_id,image_id):
             return '권한이 없습니다.',401
-
-        result=image_service.delete_room_image(room_id,image_id)
+        delete_room_image_id=request.json['delete_room_image_id']
+        result=image_service.delete_room_image(room_id,delete_room_image_id)
         
         return f"{result}장 삭제 완료",200
             
@@ -87,12 +87,14 @@ def room_router(app,services):
     # {
     #     'imagelist':[
     #         {
-    #             'image_id':<int>,
-    #             'room_id':<int>
+    #             'id':<int>,
+    #             'link':<str>,
+    #             'user_id':<int>
     #         },
     #         {
-    #             'image_id':<int>,
-    #             'room_id':<int>
+    #             'id':<int>,
+    #             'link':<str>,
+    #             'user_id':<int>
     #         }
     #     ]
     # }
@@ -117,12 +119,16 @@ def room_router(app,services):
     # {
     #     'userlist':[
     #         {
-    #             'user_id':<int>,
-    #             'room_id':<int>
+    #             'id':<int>,
+    #             'email':<str>,
+    #             'name':<str>,
+    #             'profile':<str>
     #         },
     #         {
-    #             'user_id':<int>,
-    #             'room_id':<int>
+    #             'id':<int>,
+    #             'email':<str>,
+    #             'name':<str>,
+    #             'profile':<str>
     #         }
     #     ]
     # }
@@ -136,21 +142,18 @@ def room_router(app,services):
         if not room_service.is_room_user(room_id,current_user_id):
             return '권한이 없습니다.',401
         
-        room_userlist=room_service.get_room_userlist(room_id)
-
-        room_user_info_list=[]
-        for user_id in room_userlist:
-            #유저가 존재 할 경우에만 불러모은다.
-            user_info=user_service.get_user_info(user_id)
-            if user_info:
-                room_user_info_list.append(user_info)
+        room_user_info_list=room_service.get_room_userlist(room_id)
 
         return jsonify({'userlist':room_user_info_list}),200
     
     #id가 room_id인 room의 id가 user_id인 유저를 강퇴합니다.
     #input
+    # {
+    #     'delete_room_user_id':<int>
+    # }
     #output
-    @app.route("/room/<int:room_id>/user/<int:user_id>",methods=["delete"]) 
+    #'{result}명 강퇴 성공'
+    @app.route("/room/<int:room_id>/user",methods=["DELETE"]) 
     @login_required
     def room_user(room_id,user_id):
         current_user_id=g.user_id
@@ -167,9 +170,10 @@ def room_router(app,services):
         if not room_service.is_room_user(user_id): 
             return '해당 유저가 방에 존재하지 않습니다.',400
         
-        room_service.delete_room_user(room_id,user_id)
+        delete_room_user_id=request.json['delete_room_user_id']
+        result=room_service.delete_room_user(room_id,delete_room_user_id)
         
-        return '강퇴 성공',200
+        return f'{result}명 강퇴 성공',200
     
     #id가 room_id인 room의 id가 user_id인 유저를 초대합니다.
     #input
@@ -177,7 +181,7 @@ def room_router(app,services):
     #     'invite_userlist':[1,2,]
     # }
     #output
-    #'초대 성공',200
+    #'{result}명 초대 성공'
     @app.route("/room/<int:room_id>/user",methods=["post"]) 
     @login_required
     def room_user(room_id):
@@ -195,6 +199,6 @@ def room_router(app,services):
             if user_service.get_user_info(user_id) and not room_service.is_room_user(user_id): 
                 real_invite_userlist.append(user_id)
 
-        room_service.create_room_users(room_id,real_invite_userlist)
+        result=room_service.create_room_users(room_id,real_invite_userlist)
 
-        return '초대 성공',200
+        return f'{result}명 초대 성공',200

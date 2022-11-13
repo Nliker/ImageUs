@@ -5,9 +5,8 @@ class ImageService:
     def __init__(self,image_dao,config):
         self.config=config
         self.image_dao=image_dao
-
+        
     '''
-    insert_image(user_id,link)
     get_user_imagelist(self,user_id)->[
         {
             'id':123,
@@ -18,6 +17,39 @@ class ImageService:
             'id',12,
             'link':'http://...',
             'user_id':11
+        }
+    ]
+    insert_image(user_id,link)->new_image_id
+    get_image_info(image_id)->{
+        'id':<int>,
+        'link':<str>,
+        'user_id':<int>
+    }
+    delete_image(delete_image_id)->0 or 1
+    get_image_roomlist(image_id)->[
+        {
+            'id':<int>,
+            'title':<str>,
+            'host_user_id':<int>
+        },
+        {
+            'id':<int>,
+            'title':<str>,
+            'host_user_id':<int>
+        }
+    ]
+    insert_room_image(room_id,new_image_id)->0 or 1
+    delete_room_image(room_id,image_id)->0 or 1
+    get_room_imagelist(room_id)->[
+        {
+            'id':<int>,
+            'link':<str>,
+            'user_id':<int>
+        },
+        {
+            'id':<int>,
+            'link':<str>,
+            'user_id':<int>
         }
     ]
     '''
@@ -37,7 +69,7 @@ class ImageService:
         }
         res = requests.post(f"{self.config['IMAGE_URL']}", data=json.dumps(params),files=upload)
         link=res.text
-        new_image_id=self.image_dao.create_image(user_id,link)
+        new_image_id=self.image_dao.insert_image(user_id,link)
         return new_image_id
     
     def upload_room_image(self,room_id,image,user_id):
@@ -75,11 +107,7 @@ class ImageService:
         return image_info_list
 
     def get_room_imagelist(self,room_id):
-        image_list=self.image_dao.get_room_imagelist(room_id)
-        image_info_list=[]
-        for image_id in image_list:
-            image_info=self.image_dao.get_image_info(image_id)
-            image_info_list.append(image_info)
+        image_info_list=self.image_dao.get_room_imagelist(room_id)
 
         return image_info_list
 
@@ -118,8 +146,8 @@ class ImageService:
 
             
     
-    def delete_room_image(self,image_id,room_id):
-        result=self.image_dao.delete_room_image(room_id,image_id)
+    def delete_room_image(self,room_id,delete_room_image_id):
+        result=self.image_dao.delete_room_image(room_id,delete_room_image_id)
         return result
     
     def delete_image(self,delete_image_id):

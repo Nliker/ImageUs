@@ -240,7 +240,7 @@ def user_router(app,services):
     #id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
     #input
     # {
-    #     'delete_room_id':'room_id'
+    #     'delete_user_room_id':'room_id'
     # }
     #output
     # '삭제 성공'
@@ -251,8 +251,8 @@ def user_router(app,services):
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        delete_room_id=request.json['delete_room_id']
+        delete_user_room_id=request.json['delete_user_room_id']
 
-        result=room_service.delete_user_room(current_user_id,delete_room_id)
+        result=room_service.delete_user_room(current_user_id,delete_user_room_id)
 
         return f"{result}개 방 삭제 성공",200 

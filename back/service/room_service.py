@@ -30,12 +30,10 @@ class RoomService:
             'profile':<str>
         }
     ]
-    delete_user_room(user_id,room_id)->0 or 1
-    is_room_exists(room_id)
-    delete_user_room(current_user_id,room_id)
-    get_user_roomlist(current_user_id)
-    is_room_exists(room_id)
-    delete_user_room(current_user_id,room_id)
+    insert_room(user_id)->new_room_id
+    insert_room_user(room_id,user_id)->0 or 1
+    delete_room_user(room_id,user_id)->0 or 1
+    
     '''
     
     def create_room(self,user_id):
@@ -50,8 +48,8 @@ class RoomService:
 
         return room_info_list
     #한 유저가 방을 나감
-    def delete_user_room(self,user_id,room_id):
-        result=self.room_dao.delete_user_room(user_id,room_id)
+    def delete_user_room(self,user_id,delete_user_room_id):
+        result=self.room_dao.delete_user_room(user_id,delete_user_room_id)
         return result
 
     def create_room_users(self,room_id,userlist):
@@ -72,6 +70,6 @@ class RoomService:
         userlist=self.room_dao.get_room_userlist(room_id)
         return userlist
     
-    def delete_room_user(self,room_id,user_id):
-        result=self.room_dao.delete_room_user(room_id,user_id)
+    def delete_room_user(self,room_id,delete_room_user_id):
+        result=self.room_dao.delete_room_user(room_id,delete_room_user_id)
         return result
