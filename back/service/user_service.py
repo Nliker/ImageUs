@@ -81,7 +81,7 @@ class UserService:
             return False
     
     def create_user_friend(self,user_id,friend_user_id):
-        result=self.user_dao.insert_friend(user_id,friend_user_id)
+        result=self.user_dao.insert_user_friend(user_id,friend_user_id)
 
         return result
         
