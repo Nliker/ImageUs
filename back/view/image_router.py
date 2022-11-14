@@ -132,12 +132,12 @@ def image_router(app,services):
             return '사진에 대한 권한이 없습니다.',400
         
         update_roomlist=request.json['update_roomlist']
-        real_roomlist=[]
+        exist_roomlist=[]
         #실제로 존재하는 방만 추출
         for room_id in update_roomlist:
             if room_service.get_room_info(room_id):
-                real_roomlist.append(room_id)
+                exist_roomlist.append(room_id)
         
-        result=image_service.update_image_room(image_id,real_roomlist)
+        result=image_service.update_image_room(image_id,exist_roomlist)
 
         return jsonify(result),200
