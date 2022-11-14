@@ -84,7 +84,7 @@ class ImageDao:
     def get_user_frinedlist(self,user_id):
         rows=self.db.execute(text("""
             select
-                f.friend_user_id,
+                f.friend_user_id as id,
                 u.name,
                 u.email,
                 u.profile
