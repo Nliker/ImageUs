@@ -17,7 +17,7 @@ class ImageDao:
                 :profile,
                 :hashed_password
             )
-        """),new_user).lastrowid
+            """),new_user).lastrowid
         return row
 
     def get_user_id_and_password(self,email):
@@ -90,8 +90,8 @@ class ImageDao:
                 u.profile
             from users_friend_list as f
             left join users as u
-            on f.friend_user_id=u.id
-            and f.user_id=:user_id
+            on f.user_id=:user_id
+            and f.friend_user_id=u.id
             """),{'user_id':user_id}).fetchall()
 
         user_friend_info_list=[
