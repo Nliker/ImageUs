@@ -74,7 +74,8 @@ class UserService:
         return user_credential
 
     def is_user_friend(self,user_id,friend_user_id):
-        result=self.user_dao.get_user_friend(user_id,friend_user_id)
+        result=self.user_dao.get_user_friend(user_id,friend_user_id) and self.user_dao.get_user_friend(friend_user_id,user_id) 
+        
         if result:
             return True
         else:
