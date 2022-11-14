@@ -196,11 +196,7 @@ def room_router(app,services):
         
         #방에 존재하지 않는 멤버이며 실제 존재 유저이면 초대 가능 유저로 선정
         invite_userlist=request.json['invite_user_id']
-        real_invite_userlist=[]
-        for user_id in invite_userlist:
-            if user_service.get_user_info(user_id) and not room_service.is_room_user(user_id): 
-                real_invite_userlist.append(user_id)
 
-        result=room_service.create_room_users(room_id,real_invite_userlist)
+        result=room_service.create_room_users(room_id,invite_userlist)
 
         return f'{result}명 초대 성공',200

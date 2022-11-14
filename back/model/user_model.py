@@ -27,7 +27,7 @@ class UserDao:
                 hashed_password
             from users
             where email=:email
-            """),{email:email}).fetchone()
+            """),{'email':email}).fetchone()
         user_id_and_password={
             'id':row['id'],
             'hashed_password':row['hashed_password']
