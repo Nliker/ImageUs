@@ -13,7 +13,8 @@ def room_router(app,services):
     #room을 생성합니다.
     #input
     # {
-    #     userlist:[1,2,3]
+    #     userlist:[1,2,3],
+    #     title:<str>
     # }
     #output
     # '방 생성 성공 및 {result}명 초대 성공',200
@@ -21,9 +22,10 @@ def room_router(app,services):
     @login_required
     def room():
         room_userlist=request.json['userlist']
+        title=request.json['title']
         current_user_id=g.user_id
         
-        new_room_id=room_service.create_room(current_user_id)
+        new_room_id=room_service.create_room(current_user_id,title)
 
         room_userlist.append(current_user_id)
 
