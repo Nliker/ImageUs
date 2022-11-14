@@ -112,7 +112,7 @@ class ImageService:
         return image_info_list
 
     def update_image_room(self,image_id,update_roomlist):
-        image_roomlist=set(self.image_dao.get_image_roomlist(image_id))
+        image_roomlist=set([image_room_info['id'] for image_room_info in self.image_dao.get_image_roomlist(image_id)])
         update_roomlist=set(update_roomlist)
         
         update_list=sorted(set(image_roomlist+update_roomlist))
