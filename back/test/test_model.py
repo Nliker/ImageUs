@@ -247,8 +247,33 @@ def get_user_info(user_id):
             'profile':row['profile']
         }
     return user_info
+
+def get_user_frinedlist(user_id):
+        rows=database.execute(text("""
+            select
+                f.friend_user_id as id,
+                u.name,
+                u.email,
+                u.profile
+            from users_friend_list as f
+            left join users as u
+            on f.user_id=:user_id
+            and f.friend_user_id=u.id
+            """),{'user_id':user_id}).fetchall()
+
+        user_friend_info_list=[
+            {
+                'id':user_friend_info['id'],
+                'name':user_friend_info['name'],
+                'email':user_friend_info['email'],
+                'profile':user_friend_info['profile']
+            } for user_friend_info in rows
+        ]
+        
+        return user_friend_info_list
+
 def get_room_info(room_id):
-        row=self.db.execute(text("""
+        row=database.execute(text("""
             select
                 id,
                 title,
@@ -264,6 +289,7 @@ def get_room_info(room_id):
             'host_user_id':row['host_user_id']
         }
         return room_info
+    
 def get_image_info(image_id):
         row=database.execute(text("""
             select
@@ -283,10 +309,11 @@ def get_image_info(image_id):
         }
 
         return image_info
-
+    
 def test_setup():
     assert True
 
+#새로운 유저 가입 검증
 def test_insert_user(user_dao):
     new_user={
         'name':'test4',
@@ -294,22 +321,42 @@ def test_insert_user(user_dao):
         'profile':'testuser4',
         'password':'test_password'
     }
+    hashed_password=bcrypt.hashpw(new_user['password'].encode('utf-8'),bcrypt.gensalt())
+    new_user['hashed_password']=hashed_password
+    
     new_user_id=user_dao.insert_user(new_user)
     user=get_user_info(new_user_id)
     
     assert user=={
         'id':new_user_id,
         'name':new_user['name'],
-        'emai':new_user['email'],
+        'email':new_user['email'],
         'profile':new_user['profile']
     }
-    
-# def test_get_user_id_and_password(user_dao):
-    
-# def test_get_user_info(user_dao):
-    
-# def test_insert_user_friend(user_dao):
 
+#1번 유저의 민감 정보 검증
+def test_get_user_id_and_password(user_dao):
+    sample_email='test1@naver.com'
+
+    user_credential=user_dao.get_user_id_and_password(sample_email)
+
+    assert user_credential['id']==1
+    authorized=bcrypt.checkpw('test_password'.encode('utf-8'),user_credential['hashed_password'].encode('utf-8'))
+    assert authorized
+    
+#2번 유저의 정보 검증
+def test_get_user_info(user_dao):
+    user=user_dao.get_user_info(2)
+    assert user=={
+        'id':2,
+        'name':'test2',
+        'email':'test2@naver.com',
+        'profile':'testuser2'
+    }
+
+#1번 유저의 친구 삽입 검증    
+def test_insert_user_friend(user_dao):
+    
 # def test_get_user_friend(user_dao):
 
 # def test_get_user_frinedlist(user_dao):
