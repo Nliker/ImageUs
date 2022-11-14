@@ -1,6 +1,6 @@
 from sqlalchemy import text
 
-class RoomModel:
+class RoomDao:
     def __init__(self,database):
         self.db=database
         

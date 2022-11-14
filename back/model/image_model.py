@@ -1,6 +1,6 @@
 from sqlalchemy import text
 
-class ImageService:
+class ImageDao:
     def __init__(self,database):
         self.db=database
 
@@ -135,7 +135,7 @@ class ImageService:
             """),{
                     'room_id':room_id
                 }).fetchall()
-                
+
         room_image_info_list=[{
             'id':room_image_info['id'],
             'link':room_image_info['link'],
