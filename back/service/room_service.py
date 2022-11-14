@@ -30,6 +30,11 @@ class RoomService:
             'profile':<str>
         }
     ]
+    get_room_info(room_id)->{
+        'id':<int>,
+        'title':<str>,
+        'host_user_id':<int>
+    }
     insert_room(user_id,title)->new_room_id
     insert_room_user(room_id,user_id)->0 or 1
     delete_room_user(room_id,user_id)->0 or 1

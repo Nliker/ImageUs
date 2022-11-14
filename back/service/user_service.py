@@ -27,7 +27,7 @@ class UserService:
             'profile':<str>
         }
     ]
-    delete_friend(user_id,friend_user_id)->0 or 1
+    delete_user_friend(user_id,delete_friend_user_id)->0 or 1
     '''
     
     def is_email_exists(self,email):

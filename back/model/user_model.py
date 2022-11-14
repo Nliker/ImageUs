@@ -61,9 +61,17 @@ class UserDao:
                 :user_id,
                 :friend_user_id
             )
-            """),{'user_id':user_id,'friend_user_id':friend_user_id}).rowcount
-        
-        return row
+            """),[{
+                    'user_id':user_id,
+                    'friend_user_id':friend_user_id
+                },{
+                    'user_id':friend_user_id,
+                    'friend_user_id':user_id
+                }]).rowcount
+        if row>=1:
+            return 1
+        else: 
+            return 0
     
     def get_user_friend(self,user_id,friend_user_id):
         row=self.db.execute(text("""
@@ -104,3 +112,17 @@ class UserDao:
         ]
         
         return user_friend_info_list
+    
+    def delete_user_friend(self,user_id,delete_friend_user_id):
+        row=self.db.execute(text("""
+            delete from users_friend_list
+            where (user_id=:user_id and friend_user_id=:delete_friend_user_id)
+            or (user_id=:delete_friend_user_id and friend_user_id=:delete_friend_user_id) 
+            """),{
+                    'user_id':user_id,
+                    'delete_user_id':delete_friend_user_id
+                }).rowcount    
+        if row>=1:
+            return 1
+        else:
+            return 0

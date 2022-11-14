@@ -20,7 +20,24 @@ class RoomDao:
         new_room_id=row
 
         return new_room_id
-    
+    def get_room_info(self,room_id):
+        row=self.db.execute(text("""
+            select
+                id,
+                title,
+                host_user_id
+            from rooms
+            where id=:room_id
+            """),{
+                    'room_id':room_id
+                }).fetchone()
+        room_info={
+            'id':row['id'],
+            'title':row['title'],
+            'host_user_id':row['host_user_id']
+        }
+        return room_info
+        
     def get_user_roomlist(self,user_id):
         rows=self.db.execute(text("""
             select
