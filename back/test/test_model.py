@@ -469,4 +469,17 @@ def test_delete_user_friend(user_dao):
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
     assert user_friend_id_list==[2]
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
-    assert user_friend_id_list==[1,3]    
+    assert user_friend_id_list==[1,3]
+
+
+def test_insert_room(user_id,title):
+
+def test_get_room_info(room_id):
+
+def test_get_roomlist(user_id):
+
+def test_get_room_userlist(room_id):
+
+def test_insert_room_user(room_id,user_id):
+
+def test_delete_room_user(room_id,user_id):
