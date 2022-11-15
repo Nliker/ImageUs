@@ -309,7 +309,71 @@ def get_image_info(image_id):
         }
 
         return image_info
+
+def get_room_userlist(room_id):
+    rows=database.execute(text("""
+            select
+                r_u.user_id as id,
+                u.name,
+                u.email,
+                u.profile
+            from rooms_user_list as r_u
+            left join users as u
+            on r_u.user_id=u.id
+            where r_u.room_id=:room_id              
+            """),{
+                'room_id':room_id
+            }).fetchall()
+        
+    room_user_info_list=[{
+            'id':room_user_info['id'],
+            'name':room_user_info['name'],
+            'email':room_user_info['email'],
+            'profile':room_user_info['profile']
+        } for room_user_info in rows]
+
+    return room_user_info_list
     
+def get_room_info(room_id):
+    row=database.execute(text("""
+            select
+                id,
+                title,
+                host_user_id
+            from rooms
+            where id=:room_id
+            """),{
+                    'room_id':room_id
+                }).fetchone()
+    room_info={
+            'id':row['id'],
+            'title':row['title'],
+            'host_user_id':row['host_user_id']
+    }
+    return room_info
+
+def get_user_roomlist(user_id):
+    rows=database.execute(text("""
+            select
+                r_u.room_id as id,
+                r.title,
+                r.host_user_id
+            from rooms_user_list as r_u
+            left join rooms as r
+            on r_u.room_id=r.id 
+            where r_u.user_id=:user_id
+            """),{
+                    'user_id':user_id
+                }).fetchall()
+        
+    user_room_info_list=[{
+            'id':user_room_info['id'],
+            'title':user_room_info['title'],
+            'host_user_id':user_room_info['host_user_id']    
+        } for user_room_info in rows]
+
+    return user_room_info_list
+
 def test_setup():
     assert True
 
@@ -346,13 +410,15 @@ def test_get_user_id_and_password(user_dao):
     
 #2번 유저의 정보 검증
 def test_get_user_info(user_dao):
-    user=user_dao.get_user_info(2)
-    assert user=={
+    user_info=user_dao.get_user_info(2)
+    assert user_info=={
         'id':2,
         'name':'test2',
         'email':'test2@naver.com',
         'profile':'testuser2'
     }
+    user_info=user_dao.get_user_info(100)
+    assert user_info==None
 
 #1번 유저의 친구 삽입 검증
 def test_insert_user_friend(user_dao):
@@ -463,23 +529,118 @@ def test_delete_user_friend(user_dao):
     #친구 삭제 실패 확인
     result=user_dao.delete_user_friend(1,2)
     assert result==0
-    #친구 추가 후 삭제 확인
-    result=user_dao.insert_user_friend(1,2)
-    result==1
-    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
-    assert user_friend_id_list==[2]
-    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
-    assert user_friend_id_list==[1,3]
 
-
-def test_insert_room(user_id,title):
-
-def test_get_room_info(room_id):
-
-def test_get_roomlist(user_id):
-
-def test_get_room_userlist(room_id):
-
-def test_insert_room_user(room_id,user_id):
-
-def test_delete_room_user(room_id,user_id):
+def test_insert_room(room_dao):
+    new_room={
+        'title':'testroom1',
+        'user_id':1
+    }
+    new_room_id=room_dao.insert_room(new_room)
+    room_info=get_room_info(new_room_id)
+    #기존 방은 2개 였음
+    assert new_room_id==3
+    assert room_info=={
+        'id':new_room_id,
+        'title':new_room['title'],
+        'host_user_id':new_room['user_id']
+    }
+    
+def test_get_room_info(room_dao):
+    room_info=room_dao.get_room_info(1)
+    assert room_info=={
+        'id':1,
+        'title':'testroom1',
+        'host_user_id':1,
+    }
+    room_info=room_dao.get_room_info(3)
+    assert room_info==None
+    
+def test_get_user_roomlist(room_dao):
+    #1번 유저가 속한 룸들의 정보 확인
+    user_room_info_list=room_dao.get_user_roomlist(1)
+    assert user_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+    ]
+    #2번 유저가 속한 룸들의 정보 확인
+    user_room_info_list=room_dao.get_user_roomlist(2)
+    assert user_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    
+def test_get_room_userlist(room_dao):
+    #1번방의 유저 리스트 확인
+    room_user_info_list=room_dao.get_room_userlist(1)
+    assert room_user_info_list==[
+        {
+            'id':1,
+            'name':'test1',
+            'email':'test1@naver.com',
+            'profile':'testuser1'
+        },{
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2',
+        }
+    ]
+    #2번방의 유저 리스트 확인
+    room_user_info_list=room_dao.get_room_userlist(2)
+    assert room_user_info_list==[
+        {
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2'
+        },{
+            'id':3,
+            'name':'test3',
+            'email':'test3@naver.com',
+            'profile':'testuser3',
+        }
+    ]
+    
+def test_insert_room_user(room_dao):
+     #기존 1번 방의 유저정보와 3번 유저의 방정보 확인
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+    assert user_roomlist==[2]
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2]
+    #1번 방에 3번 유저를 초대
+    result=room_dao.insert_room_user(1,3)
+    assert result==1
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+    assert user_roomlist==[1,2]
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2,3]
+    
+    result=room_dao.insert_room_user(1,3)
+    assert result==0
+    
+def test_delete_room_user(room_dao):
+    #기존 1번 방의 유저정보와 2번 유저의 방정보 확인
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1,2]
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2]
+    #1번방의 2번 유저를 강퇴하고 1번방의 유저정보와 2번유저의 방 정보 확인
+    result=room_dao.delete_room_user(1,2)
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[2]
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1]
+    #1번방에서 이미 강퇴당한 2번 유저의 강퇴 실패 확인
+    result=room_dao.delete_room_user(1,2)
+    assert result==0

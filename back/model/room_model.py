@@ -1,10 +1,11 @@
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
 class RoomDao:
     def __init__(self,database):
         self.db=database
         
-    def insert_room(self,user_id,title):
+    def insert_room(self,new_room):
         row=self.db.execute(text("""
             insert into rooms(
                 title,
@@ -13,13 +14,11 @@ class RoomDao:
                 :title,
                 :user_id
             )
-            """),{
-                    'user_id':user_id,
-                    'title':title
-                }).lastrowid
+            """),new_room).lastrowid
         new_room_id=row
 
         return new_room_id
+    
     def get_room_info(self,room_id):
         row=self.db.execute(text("""
             select
@@ -35,19 +34,19 @@ class RoomDao:
             'id':row['id'],
             'title':row['title'],
             'host_user_id':row['host_user_id']
-        }
+        } if row else None
         return room_info
         
     def get_user_roomlist(self,user_id):
         rows=self.db.execute(text("""
             select
-                r_u.id,
+                r_u.room_id as id,
                 r.title,
                 r.host_user_id
             from rooms_user_list as r_u
             left join rooms as r
-            on r_u.user_id=:user_id
-            and r_u.id=r.id
+            on r_u.room_id=r.id 
+            where r_u.user_id=:user_id
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -69,8 +68,8 @@ class RoomDao:
                 u.profile
             from rooms_user_list as r_u
             left join users as u
-            on r_u.id=:room_id
-            and r_u.user_id=u.id                    
+            on r_u.user_id=u.id
+            where r_u.room_id=:room_id                    
             """),{
                 'room_id':room_id
             }).fetchall()
@@ -85,7 +84,8 @@ class RoomDao:
         return room_user_info_list
 
     def insert_room_user(self,room_id,user_id):
-        row=self.db.execute(text("""
+        try:
+            row=self.db.execute(text("""
                 insert into rooms_user_list(
                     room_id,
                     user_id
@@ -97,8 +97,9 @@ class RoomDao:
                     'room_id':room_id,
                     'user_id':user_id
                 }).rowcount
-
-        return row
+            return 1
+        except IntegrityError as e:
+            return 0
 
     def delete_room_user(self,room_id,user_id):
         row=self.db.execute(text("""
