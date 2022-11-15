@@ -1,4 +1,6 @@
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
+
 
 class UserDao:
     def __init__(self,database):
@@ -53,53 +55,53 @@ class UserDao:
         return user_info
 
     def insert_user_friend(self,user_id,friend_user_id):
-        row=self.db.execute(text("""
-            insert into users_friend_list(
-                user_id,
-                friend_user_id
-            ) values (
-                :user_id,
-                :friend_user_id
-            )
-            """),[{
-                    'user_id':user_id,
-                    'friend_user_id':friend_user_id
-                },{
-                    'user_id':friend_user_id,
-                    'friend_user_id':user_id
-                }]).rowcount
-        if row>=1:
+        try:
+            row=self.db.execute(text("""
+                insert into users_friend_list(
+                    user_id,
+                    friend_user_id
+                ) values (
+                    :user_id,
+                    :friend_user_id
+                )
+                """),[{
+                        'user_id':user_id,
+                        'friend_user_id':friend_user_id
+                    },{
+                        'user_id':friend_user_id,
+                        'friend_user_id':user_id
+                    }]).rowcount
             return 1
-        else: 
+        except IntegrityError as e:
             return 0
     
     def get_user_friend(self,user_id,friend_user_id):
         row=self.db.execute(text("""
             select
                 user_id,
-                frined_user_id
+                friend_user_id
             from users_friend_list
-            where id=:user_id and friend_user_id=:friend_user_id
+            where user_id=:user_id and friend_user_id=:friend_user_id
             """),{'user_id':user_id,'friend_user_id':friend_user_id}).fetchone()
 
         user_friend={
             'user_id':row['user_id'],
-            'frined_user_id':row['friend_user_id']
+            'friend_user_id':row['friend_user_id']
         }
         
         return user_friend
     
-    def get_user_frinedlist(self,user_id):
+    def get_user_friendlist(self,user_id):
         rows=self.db.execute(text("""
             select
-                f.friend_user_id as id,
+                u_f.friend_user_id as id,
                 u.name,
                 u.email,
                 u.profile
-            from users_friend_list as f
+            from users_friend_list as u_f
             left join users as u
-            on f.user_id=:user_id
-            and f.friend_user_id=u.id
+            on u_f.friend_user_id=u.id
+            where u_f.user_id=:user_id
             """),{'user_id':user_id}).fetchall()
 
         user_friend_info_list=[
@@ -117,10 +119,10 @@ class UserDao:
         row=self.db.execute(text("""
             delete from users_friend_list
             where (user_id=:user_id and friend_user_id=:delete_friend_user_id)
-            or (user_id=:delete_friend_user_id and friend_user_id=:delete_friend_user_id) 
+            or (user_id=:delete_friend_user_id and friend_user_id=:user_id) 
             """),{
                     'user_id':user_id,
-                    'delete_user_id':delete_friend_user_id
+                    'delete_friend_user_id':delete_friend_user_id
                 }).rowcount    
         if row>=1:
             return 1
