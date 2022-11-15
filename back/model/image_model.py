@@ -1,10 +1,11 @@
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
 class ImageDao:
     def __init__(self,database):
         self.db=database
 
-    def insert_image(self,user_id,link):
+    def insert_image(self,new_image):
         row=self.db.execute(text("""
             insert into images(
                 user_id,
@@ -13,23 +14,18 @@ class ImageDao:
                 :user_id,
                 :link
             )
-            """),{
-                    'user_id':user_id,
-                    'link':link
-                }).lastrowid
+            """),new_image).lastrowid
         new_image_id=row
         return new_image_id
     
     def get_user_imagelist(self,user_id):
         rows=self.db.execute(text("""
             select
-                i.id,
-                i.link,
-                i.user_id
-            from images as i
-            left join users as u
-            on i.user_id=:user_id
-            and i.user_id=u.id
+                id,
+                link,
+                user_id
+            from images
+            where user_id=:user_id
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -60,7 +56,7 @@ class ImageDao:
             'id':row['id'],
             'link':row['link'],
             'user_id':row['user_id']
-        }
+        } if row else None
 
         return image_info
     
@@ -71,7 +67,8 @@ class ImageDao:
             """),{
                     'delete_image_id':delete_image_id
                 }).rowcount
-
+        return row
+    
     def get_image_roomlist(self,image_id):
         rows=self.db.execute(text("""
             select
@@ -80,8 +77,8 @@ class ImageDao:
                 host_user_id
             from images_room_list as i_r
             left join rooms as r
-            on i_r.image_id=:image_id
-            and i_r.room_id=r.id
+            on i_r.room_id=r.id
+            where i_r.image_id=:image_id
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -95,7 +92,8 @@ class ImageDao:
         return image_room_info_list
     
     def insert_room_image(self,room_id,image_id):
-        row=self.db.execute(text("""
+        try:
+            row=self.db.execute(text("""
             insert into images_room_list(
                 image_id,
                 room_id
@@ -107,8 +105,9 @@ class ImageDao:
                     'image_id':image_id,
                     'room_id':room_id
                 }).rowcount
-
-        return row
+            return 1
+        except IntegrityError as e:
+            return 0
 
     def delete_room_image(self,room_id,image_id):
         row=self.db.execute(text("""
@@ -130,8 +129,8 @@ class ImageDao:
                 i.user_id
             from images_room_list as i_r
             left join images as i
-            on i_r.room_id=:room_id
-            and i_r.image_id=i.id
+            on i_r.image_id=i.id
+            where i_r.room_id=:room_id
             """),{
                     'room_id':room_id
                 }).fetchall()

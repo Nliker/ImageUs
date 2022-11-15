@@ -19,7 +19,7 @@ class ImageService:
             'user_id':11
         }
     ]
-    insert_image(user_id,link)->new_image_id
+    insert_image(new_image)->new_image_id
     get_image_info(image_id)->{
         'id':<int>,
         'link':<str>,
@@ -59,28 +59,38 @@ class ImageService:
     #     images>image.pngs
     # 이미지 서버에 요청시 이미 쿠키에 유저정보가 있음.
     
-    def upload_image(self,image,user_id):
-        files=image
+    def upload_image(self,new_image):
+        files=new_image['image']
         
         upload={'image':files}
         
         params = {
-            "user_id": user_id,
+            "user_id":new_image['user_id'],
         }
         res = requests.post(f"{self.config['IMAGE_URL']}", data=json.dumps(params),files=upload)
         link=res.text
-        new_image_id=self.image_dao.insert_image(user_id,link)
+        new_image={
+            'link':link,
+            'user_id':new_image['user_id']
+        }
+        
+        new_image_id=self.image_dao.insert_image(new_image)
         return new_image_id
     
-    def upload_room_image(self,room_id,image,user_id):
-        files=image
+    def upload_room_image(self,room_id,new_image):
+        files=new_image['image']
         upload={'image':files}
         params = {
             "user_id": user_id,
         }
         res = requests.post(f"{self.config['IMAGE_URL']}", data=json.dumps(params),files=upload)
         link=res.text
-        new_image_id=self.image_dao.insert_image(user_id,link)
+        new_image={
+            'link':link,
+            'user_id':new_image['user_id']
+        }
+        
+        new_image_id=self.image_dao.insert_image(new_image)
         result=self.image_dao.insert_room_image(room_id,new_image_id)
 
         return result

@@ -123,7 +123,7 @@ def setup_function():
         'user_id':3
     },{
         'id':4,
-        'link':'testlink14',
+        'link':'testlink4',
         'user_id':3
     }]
     new_images_room_list=[{
@@ -245,7 +245,7 @@ def get_user_info(user_id):
             'name':row['name'],
             'email':row['email'],
             'profile':row['profile']
-        }
+        } if row else None
     return user_info
 
 def get_user_friendlist(user_id):
@@ -287,7 +287,7 @@ def get_room_info(room_id):
             'id':row['id'],
             'title':row['title'],
             'host_user_id':row['host_user_id']
-        }
+        } if row else None
         return room_info
     
 def get_image_info(image_id):
@@ -306,7 +306,7 @@ def get_image_info(image_id):
             'id':row['id'],
             'link':row['link'],
             'user_id':row['user_id']
-        }
+        } if row else None
 
         return image_info
 
@@ -333,24 +333,6 @@ def get_room_userlist(room_id):
         } for room_user_info in rows]
 
     return room_user_info_list
-    
-def get_room_info(room_id):
-    row=database.execute(text("""
-            select
-                id,
-                title,
-                host_user_id
-            from rooms
-            where id=:room_id
-            """),{
-                    'room_id':room_id
-                }).fetchone()
-    room_info={
-            'id':row['id'],
-            'title':row['title'],
-            'host_user_id':row['host_user_id']
-    }
-    return room_info
 
 def get_user_roomlist(user_id):
     rows=database.execute(text("""
@@ -377,13 +359,11 @@ def get_user_roomlist(user_id):
 def get_user_imagelist(user_id):
     rows=database.execute(text("""
             select
-                i.id,
-                i.link,
-                i.user_id
-            from images as i
-            left join users as u
-            on i.user_id=:user_id
-            and i.user_id=u.id
+                id,
+                link,
+                user_id
+            from images
+            where user_id=:user_id
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -426,8 +406,8 @@ def get_image_roomlist(image_id):
                 host_user_id
             from images_room_list as i_r
             left join rooms as r
-            on i_r.image_id=:image_id
-            and i_r.room_id=r.id
+            on i_r.room_id=r.id
+            where i_r.image_id=:image_id
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -448,8 +428,8 @@ def get_room_imagelist(room_id):
                 i.user_id
             from images_room_list as i_r
             left join images as i
-            on i_r.room_id=:room_id
-            and i_r.image_id=i.id
+            on i_r.image_id=i.id
+            where i_r.room_id=:room_id
             """),{
                     'room_id':room_id
                 }).fetchall()
@@ -713,7 +693,7 @@ def test_insert_room_user(room_dao):
     assert user_roomlist==[1,2]
     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
     assert room_userlist==[1,2,3]
-    
+    #이미 추가한 뒤 추가 확인
     result=room_dao.insert_room_user(1,3)
     assert result==0
     
@@ -734,17 +714,161 @@ def test_delete_room_user(room_dao):
     assert result==0
 
 def test_insert_image(image_dao):
+    new_image={
+        'link':'testlink5',
+        'user_id':1
+    }
+    new_image_id=image_dao.insert_image(new_image)
+    image_info=get_image_info(new_image_id)
+    assert image_info=={
+        'id':new_image_id,
+        'link':new_image['link'],
+        'user_id':new_image['user_id']
+    }
 
 def test_get_user_imagelist(image_dao):
-
+    #1유저의 이미지 정보 확인
+    user_image_info_list=image_dao.get_user_imagelist(1)
+    assert user_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+    ]
+    #3번 유저의 이미지 정보 확인
+    user_image_info_list=image_dao.get_user_imagelist(3)
+    assert user_image_info_list==[
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        },
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+    
 def test_get_image_info(image_dao):
-
+    #1번 이미지 정보 확인
+    image_info=image_dao.get_image_info(1)
+    assert image_info=={
+        'id':1,
+        'link':'testlink1',
+        'user_id':1
+    }
+    #4번 이미지 정보 확인
+    image_info=image_dao.get_image_info(4)
+    assert image_info=={
+        'id':4,
+        'link':'testlink4',
+        'user_id':3
+    }
+    #존재하지 않는 이미지 정보 확인
+    image_info=image_dao.get_image_info(100)
+    assert image_info==None
+    
 def test_delete_image(image_dao):
-
+    #1번 이미지 삭제 후 유저의 이미지 리스트 확인
+    result=image_dao.delete_image(1)
+    assert result==1
+    image_info=image_dao.get_image_info(1)
+    assert image_info==None
+    user_image_info_list=get_user_imagelist(1)
+    assert user_image_info_list==[]
+    #이미 삭제한 1번 이미지를 다시 삭제 확인
+    result=image_dao.delete_image(1)
+    assert result==0
+    
 def test_get_image_roomlist(image_dao):
+    #1번 이미지의 방 정보 확인
+    image_room_info_list=image_dao.get_image_roomlist(1)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        }
+    ]
+    #2번 이미지의 방 정보 확인
+    image_room_info_list=image_dao.get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #4번 이미지의 방 정보 확인
+    image_room_info_list=image_dao.get_image_roomlist(4)
+    assert image_room_info_list==[]
 
 def test_insert_room_image(image_dao):
+    #기존 1번방의 이미지 정보와 3번 이미지의 방 정보 확인
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    image_roomist=[room_info['id'] for room_info in get_image_roomlist(3)]
+    assert image_roomist==[2]
+    #1번방에 3번 이미지를 추가 후 정보 확인
+    result=image_dao.insert_room_image(1,3)
+    assert result==1
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2,3]
+    image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
+    assert image_roomlist==[1,2]
+    #이미 추가한 뒤 추가 확인
+    result=image_dao.insert_room_image(1,3)
+    assert result==0
 
 def test_delete_room_image(image_dao):
-
+    #기존 1번방의 이미지 정보와 2번 이미지의 방 정보 확인
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    image_roomist=[room_info['id'] for room_info in get_image_roomlist(2)]
+    assert image_roomist==[1,2]
+    #1번 방에서 2번 이미지 삭제 후 확인
+    result=image_dao.delete_room_image(1,2)
+    assert result==1
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1]
+    image_roomlist=[room_info['id'] for room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+    #이미 삭제 후 삭제 확인
+    result=image_dao.delete_room_image(1,2)
+    assert result==0
+    
 def test_get_room_imagelist(image_dao):
+    #1번방의 이미지 정보 확인
+    room_image_info_list=image_dao.get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        }
+    ]
+    room_image_info_list=image_dao.get_room_imagelist(2)
+    assert room_image_info_list==[
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        },
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        }
+    ]
