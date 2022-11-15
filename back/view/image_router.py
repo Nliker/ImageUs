@@ -24,8 +24,11 @@ def image_router(app,services):
             return 'file is missing',404
 
         image=request.files['image']
-        
-        new_image_id=image_service.upload_image(image,current_user_id)
+        new_image={
+            'image':image,
+            'user_id':current_user_id
+        }
+        new_image_id=image_service.upload_image(new_image)
 
         image_info=image_service.get_image_info(new_image_id)
 

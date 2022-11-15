@@ -61,8 +61,11 @@ def room_router(app,services):
             return 'file is missing',404
 
         image=request.files['image']
-        
-        result=image_service.upload_room_image(room_id,image,current_user_id)
+        new_image={
+            'image':image,
+            'user_id':current_user_id
+        }
+        result=image_service.upload_room_image(room_id,new_image)
         
         return f'{result}개를 업로드 성공',200
     #id가 room_id인 room의 id가 image_id인 image의 권한을 삭제합니다.
