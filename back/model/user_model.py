@@ -51,7 +51,7 @@ class UserDao:
             'name':row['name'],
             'email':row['email'],
             'profile':row['profile']
-        }
+        } if row else None
         return user_info
 
     def insert_user_friend(self,user_id,friend_user_id):

@@ -35,14 +35,14 @@ class RoomService:
         'title':<str>,
         'host_user_id':<int>
     }
-    insert_room(user_id,title)->new_room_id
+    insert_room(new_room)->new_room_id
     insert_room_user(room_id,user_id)->0 or 1
     delete_room_user(room_id,user_id)->0 or 1
     
     '''
     
-    def create_room(self,user_id,title):
-        new_room_id=self.room_dao.insert_room(user_id,title)
+    def create_room(self,new_room):
+        new_room_id=self.room_dao.insert_room(new_room)
         return new_room_id
     
     def get_room_info(self,room_id):
