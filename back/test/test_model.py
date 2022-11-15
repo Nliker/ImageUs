@@ -374,6 +374,94 @@ def get_user_roomlist(user_id):
 
     return user_room_info_list
 
+def get_user_imagelist(user_id):
+    rows=database.execute(text("""
+            select
+                i.id,
+                i.link,
+                i.user_id
+            from images as i
+            left join users as u
+            on i.user_id=:user_id
+            and i.user_id=u.id
+            """),{
+                    'user_id':user_id
+                }).fetchall()
+
+    user_image_info_list=[
+            {
+                'id':user_image_info['id'],
+                'link':user_image_info['link'],
+                'user_id':user_image_info['user_id']
+            } for user_image_info in rows
+        ]
+        
+    return user_image_info_list
+
+def get_image_info(image_id):
+    row=database.execute(text("""
+            select
+                id,
+                link,
+                user_id
+            from images
+            where id=:image_id
+            """),{
+                    'image_id':image_id
+                }).fetchone()
+
+    image_info={
+            'id':row['id'],
+            'link':row['link'],
+            'user_id':row['user_id']
+        }
+
+    return image_info
+
+def get_image_roomlist(image_id):
+    rows=database.execute(text("""
+            select
+                i_r.room_id as id,
+                title,
+                host_user_id
+            from images_room_list as i_r
+            left join rooms as r
+            on i_r.image_id=:image_id
+            and i_r.room_id=r.id
+            """),{
+                    'image_id':image_id
+                }).fetchall()
+
+    image_room_info_list=[{
+            'id':image_room_info['id'],
+            'title':image_room_info['title'],
+            'host_user_id':image_room_info['host_user_id']
+        } for image_room_info in rows]
+
+    return image_room_info_list
+
+def get_room_imagelist(room_id):
+    rows=database.execute(text("""
+            select
+                i_r.image_id as id,
+                i.link,
+                i.user_id
+            from images_room_list as i_r
+            left join images as i
+            on i_r.room_id=:room_id
+            and i_r.image_id=i.id
+            """),{
+                    'room_id':room_id
+                }).fetchall()
+
+    room_image_info_list=[{
+            'id':room_image_info['id'],
+            'link':room_image_info['link'],
+            'user_id':room_image_info['user_id']
+        } for room_image_info in rows]
+
+    return room_image_info_list
+    
 def test_setup():
     assert True
 
@@ -442,7 +530,7 @@ def test_insert_user_friend(user_dao):
     #같은 유저를 친구추가 하면 삽입 안됨
     result=user_dao.insert_user_friend(1,3)
     assert result==0
-    
+
 def test_get_user_friend(user_dao):
     user_friend=user_dao.get_user_friend(1,2)
     assert user_friend=={
@@ -644,3 +732,19 @@ def test_delete_room_user(room_dao):
     #1번방에서 이미 강퇴당한 2번 유저의 강퇴 실패 확인
     result=room_dao.delete_room_user(1,2)
     assert result==0
+
+def test_insert_image(image_dao):
+
+def test_get_user_imagelist(image_dao):
+
+def test_get_image_info(image_dao):
+
+def test_delete_image(image_dao):
+
+def test_get_image_roomlist(image_dao):
+
+def test_insert_room_image(image_dao):
+
+def test_delete_room_image(image_dao):
+
+def test_get_room_imagelist(image_dao):
