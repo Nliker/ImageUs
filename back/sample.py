@@ -26,15 +26,17 @@
 # print(f"삭제방:{deletelist}")
 # print(f"유지방:{continuelist}")
 
-a=[
-    {
-        'testa':"123",
-        'testb':"456"
-    },{
-        'testa':"789",
-        'testb':"101112"
-    }
-]
-for info in a:
-    info['testc']="153151513"
-print(a)
+# a=[
+#     {
+#         'testa':"123",
+#         'testb':"456"
+#     },{
+#         'testa':"789",
+#         'testb':"101112"
+#     }
+# ]
+# for info in a:
+#     info['testc']="153151513"
+# print(a)
+
+# print([1,2]==[2,1])

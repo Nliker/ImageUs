@@ -248,17 +248,17 @@ def get_user_info(user_id):
         }
     return user_info
 
-def get_user_frinedlist(user_id):
+def get_user_friendlist(user_id):
         rows=database.execute(text("""
             select
-                f.friend_user_id as id,
+                u_f.friend_user_id as id,
                 u.name,
                 u.email,
                 u.profile
-            from users_friend_list as f
+            from users_friend_list as u_f
             left join users as u
-            on f.user_id=:user_id
-            and f.friend_user_id=u.id
+            on u_f.friend_user_id=u.id
+            where u_f.user_id=:user_id
             """),{'user_id':user_id}).fetchall()
 
         user_friend_info_list=[
@@ -354,11 +354,119 @@ def test_get_user_info(user_dao):
         'profile':'testuser2'
     }
 
-#1번 유저의 친구 삽입 검증    
+#1번 유저의 친구 삽입 검증
 def test_insert_user_friend(user_dao):
+    #1번유저의 기존 친구 목록 확인
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friend_id_list==[2]
+    #3번유저의 기존 친구 목록 확인
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
+    assert user_friend_id_list==[2]
     
-# def test_get_user_friend(user_dao):
+    #1번이 3번유저한테 친구 추가 후 확인
+    result=user_dao.insert_user_friend(1,3)
+    assert result==1
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friend_id_list==[2,3]
 
-# def test_get_user_frinedlist(user_dao):
+    #3번유저의 친구록목 확인
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
+    assert user_friend_id_list==[1,2]
+
+    #같은 유저를 친구추가 하면 삽입 안됨
+    result=user_dao.insert_user_friend(1,3)
+    assert result==0
     
-# def test_delete_user_friend(user_dao):
+def test_get_user_friend(user_dao):
+    user_friend=user_dao.get_user_friend(1,2)
+    assert user_friend=={
+        'user_id':1,
+        'friend_user_id':2
+    }
+    user_friend=user_dao.get_user_friend(3,2)
+    assert user_friend=={
+        'user_id':3,
+        'friend_user_id':2
+    }
+
+    #친구 추가후 확인
+    user_dao.insert_user_friend(1,3)
+    user_friend=user_dao.get_user_friend(1,3)
+    assert user_friend=={
+        'user_id':1,
+        'friend_user_id':3
+    }
+    user_friend=user_dao.get_user_friend(3,1)
+    assert user_friend=={
+        'user_id':3,
+        'friend_user_id':1
+    }
+    
+def test_get_user_friendlist(user_dao):
+    #1번 유저의 기존 친구 정보 확인 
+    user_friend_info_list=user_dao.get_user_friendlist(1)
+    assert user_friend_info_list==[
+        {
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2'
+        },
+    ]
+    #1번에서 3번을 친구 추가 후 1번과 3번의 친구 정보 확인
+    user_dao.insert_user_friend(1,3)
+    user_friend_info_list=user_dao.get_user_friendlist(1)
+    assert user_friend_info_list==[
+        {
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2'
+        },
+        {
+            'id':3,
+            'name':'test3',
+            'email':'test3@naver.com',
+            'profile':'testuser3'
+        },
+    ]
+    user_friend_info_list=user_dao.get_user_friendlist(3)
+    assert user_friend_info_list==[
+        {
+            'id':1,
+            'name':'test1',
+            'email':'test1@naver.com',
+            'profile':'testuser1'
+        },
+        {
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2'
+        },
+    ]
+
+def test_delete_user_friend(user_dao):  
+    #기존 친구 유저 확인
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friend_id_list==[2]
+    #3번유저의 기존 친구 목록 확인
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friend_id_list==[1,3]
+    #친구 삭제 후 확인
+    result=user_dao.delete_user_friend(1,2)
+    assert result==1
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friend_id_list==[]
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friend_id_list==[3]
+    #친구 삭제 실패 확인
+    result=user_dao.delete_user_friend(1,2)
+    assert result==0
+    #친구 추가 후 삭제 확인
+    result=user_dao.insert_user_friend(1,2)
+    result==1
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friend_id_list==[2]
+    user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friend_id_list==[1,3]    
