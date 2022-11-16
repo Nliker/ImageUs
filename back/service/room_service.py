@@ -38,7 +38,10 @@ class RoomService:
     insert_room(new_room)->new_room_id
     insert_room_user(room_id,user_id)->0 or 1
     delete_room_user(room_id,user_id)->0 or 1
-    
+    get_room_user(room_id,user_id)->{
+        'room_id':<int>,
+        'user_id':<int>
+    }
     '''
     
     def create_room(self,new_room):
@@ -53,8 +56,9 @@ class RoomService:
 
         return room_info_list
     #한 유저가 방을 나감
-    def delete_user_room(self,user_id,delete_user_room_id):
-        result=self.room_dao.delete_user_room(user_id,delete_user_room_id)
+    def delete_user_room(self,user_id,delete_room_id):
+        result=self.room_dao.delete_room_user(delete_room_id,user_id)
+
         return result
 
     def create_room_users(self,room_id,userlist):

@@ -142,3 +142,14 @@ class ImageDao:
         } for room_image_info in rows]
 
         return room_image_info_list
+    def delete_room_user_image(self,room_id,user_id):
+        row=self.db.execute(text("""
+            delete i_r
+            from images_room_list as i_r
+            join images as i
+            on i_r.image_id=i.id
+            where i.user_id=:user_id 
+            and i_r.room_id=:room_id
+            """),{'room_id':room_id,'user_id':user_id}).rowcount
+        return row
+        
