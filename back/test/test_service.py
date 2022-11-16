@@ -695,8 +695,26 @@ def test_delete_room_user(room_service):
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
     assert user_roomlist==[2]
 
+#이미지 업로드 확인
+def test_upload_image(image_service):
+    
+def test_upload_room_image(image_service):
+    
+def test_is_user_image(image_service):
+    
+def test_get_image_roomlist(image_service):
+    
+def test_get_image_info(image_service):
+    
+def test_get_user_imagelist(image_service):
+    
+def test_update_image_room(image_service):
+    
+def test_delete_room_image(image_service):
 
+def test_delete_image(image_service):
 
+def test_delete_room_user_image():
 
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
