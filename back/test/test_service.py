@@ -582,7 +582,23 @@ def test_delete_user_friend(user_service):
     assert user_friendlist==[]
     user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
     assert user_friendlist==[3]
+
+def test_create_room(room_service):
+
+def test_get_room_info(room_service):
     
+def test_get_user_roomlist(room_service):
+    
+def test_delelte_user_room(room_service):
+    
+def test_create_room_users(room_service):
+    
+def test_is_room_user(room_service):
+    
+def test_get_room_userlist(room_service):
+    
+def test_delete_room_user(room_service):
+
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
