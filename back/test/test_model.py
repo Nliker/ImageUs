@@ -497,7 +497,7 @@ def test_insert_user_friend(user_dao):
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
     assert user_friend_id_list==[2]
     
-    #1번이 3번유저한테 친구 추가 후 확인
+    #1번이 3번유저한테 친구 추가 후 1번의 친구 목록 확인
     result=user_dao.insert_user_friend(1,3)
     assert result==1
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
@@ -511,6 +511,7 @@ def test_insert_user_friend(user_dao):
     result=user_dao.insert_user_friend(1,3)
     assert result==0
 
+#친구데이터 삽입 확인
 def test_get_user_friend(user_dao):
     user_friend=user_dao.get_user_friend(1,2)
     assert user_friend=={
@@ -536,8 +537,9 @@ def test_get_user_friend(user_dao):
         'friend_user_id':1
     }
     
+#유저의 친구 목록 확인
 def test_get_user_friendlist(user_dao):
-    #1번 유저의 기존 친구 정보 확인 
+    #1번 유저의 기존 친구 목록 정보 확인 
     user_friend_info_list=user_dao.get_user_friendlist(1)
     assert user_friend_info_list==[
         {
@@ -547,7 +549,7 @@ def test_get_user_friendlist(user_dao):
             'profile':'testuser2'
         },
     ]
-    #1번에서 3번을 친구 추가 후 1번과 3번의 친구 정보 확인
+    #1번에서 3번을 친구 추가 후 1번과 3번의 친구 목록 정보 확인
     user_dao.insert_user_friend(1,3)
     user_friend_info_list=user_dao.get_user_friendlist(1)
     assert user_friend_info_list==[
@@ -580,24 +582,26 @@ def test_get_user_friendlist(user_dao):
         },
     ]
 
+#친구 삭제 확인
 def test_delete_user_friend(user_dao):  
-    #기존 친구 유저 확인
+    #1번 유저의 기존 친구 유저 확인
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
     assert user_friend_id_list==[2]
-    #3번유저의 기존 친구 목록 확인
+    #2번 유저의 기존 친구 목록 확인
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
     assert user_friend_id_list==[1,3]
-    #친구 삭제 후 확인
+    #친구 삭제 후 1번과 2번 유저 확인
     result=user_dao.delete_user_friend(1,2)
     assert result==1
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
     assert user_friend_id_list==[]
     user_friend_id_list=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
     assert user_friend_id_list==[3]
-    #친구 삭제 실패 확인
+    #이미 삭제한 친구를 친구삭제 실패 확인
     result=user_dao.delete_user_friend(1,2)
     assert result==0
 
+#방 삽입 확인
 def test_insert_room(room_dao):
     new_room={
         'title':'testroom1',
@@ -612,19 +616,23 @@ def test_insert_room(room_dao):
         'title':new_room['title'],
         'host_user_id':new_room['user_id']
     }
-    
+
+#방의 정보 확인
 def test_get_room_info(room_dao):
+    #1번 방의 정보 확인
     room_info=room_dao.get_room_info(1)
     assert room_info=={
         'id':1,
         'title':'testroom1',
         'host_user_id':1,
     }
+    #존재하지 않는 방 정보 확인
     room_info=room_dao.get_room_info(3)
     assert room_info==None
-    
+
+#유저의 방의 정보 록목 확인
 def test_get_user_roomlist(room_dao):
-    #1번 유저가 속한 룸들의 정보 확인
+    #1번 유저의 룸의 정보 목록 확인
     user_room_info_list=room_dao.get_user_roomlist(1)
     assert user_room_info_list==[
         {
@@ -633,7 +641,7 @@ def test_get_user_roomlist(room_dao):
             'host_user_id':1
         },
     ]
-    #2번 유저가 속한 룸들의 정보 확인
+    #2번 유저의 방의 정보 목록 확인
     user_room_info_list=room_dao.get_user_roomlist(2)
     assert user_room_info_list==[
         {
@@ -647,9 +655,10 @@ def test_get_user_roomlist(room_dao):
             'host_user_id':2
         }
     ]
-    
+
+#방의 유저 정보 목록 확인
 def test_get_room_userlist(room_dao):
-    #1번방의 유저 리스트 확인
+    #1번방의 유저 정보 목록 확인
     room_user_info_list=room_dao.get_room_userlist(1)
     assert room_user_info_list==[
         {
@@ -664,7 +673,7 @@ def test_get_room_userlist(room_dao):
             'profile':'testuser2',
         }
     ]
-    #2번방의 유저 리스트 확인
+    #2번방의 유저 정보 목록 확인
     room_user_info_list=room_dao.get_room_userlist(2)
     assert room_user_info_list==[
         {
@@ -679,40 +688,43 @@ def test_get_room_userlist(room_dao):
             'profile':'testuser3',
         }
     ]
-    
+
+#방에 유저 삽입 확인
 def test_insert_room_user(room_dao):
-     #기존 1번 방의 유저정보와 3번 유저의 방정보 확인
+     #3번 유저의 방 정보 목록 확인 및 1번 방의 유저 정보 목록 확인
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
     assert user_roomlist==[2]
     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
     assert room_userlist==[1,2]
-    #1번 방에 3번 유저를 초대
+    #1번 방에 3번 유저 삽입 및 3번 유저의 방 정보 목록 확인 및 1번 방의 유저 정보 목록 확인
     result=room_dao.insert_room_user(1,3)
     assert result==1
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
     assert user_roomlist==[1,2]
     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
     assert room_userlist==[1,2,3]
-    #이미 추가한 뒤 추가 확인
+    #이미 방에 삽입한 유저의 중복 삽입 확인
     result=room_dao.insert_room_user(1,3)
     assert result==0
-    
+
+#방의 유저 삭제 확인
 def test_delete_room_user(room_dao):
-    #기존 1번 방의 유저정보와 2번 유저의 방정보 확인
+    #2번 유저의 방 정보 및 1번 방의 유저 정보 확인
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
     assert user_roomlist==[1,2]
     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
     assert room_userlist==[1,2]
-    #1번방의 2번 유저를 강퇴하고 1번방의 유저정보와 2번유저의 방 정보 확인
+    #1번방의 2번 유저를 삭제 후 2번 유저의 방 정보 및 1번 방의 유저 정보 확인
     result=room_dao.delete_room_user(1,2)
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
     assert user_roomlist==[2]
     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
     assert room_userlist==[1]
-    #1번방에서 이미 강퇴당한 2번 유저의 강퇴 실패 확인
+    #방에서 삭제된 유저 중복 삭제 확인
     result=room_dao.delete_room_user(1,2)
     assert result==0
 
+#이미지 삽입 확인
 def test_insert_image(image_dao):
     new_image={
         'link':'testlink5',
@@ -726,8 +738,9 @@ def test_insert_image(image_dao):
         'user_id':new_image['user_id']
     }
 
+#유저의 이미지 정보 목록 확인
 def test_get_user_imagelist(image_dao):
-    #1유저의 이미지 정보 확인
+    #1유저의 이미지 정보 목록 확인
     user_image_info_list=image_dao.get_user_imagelist(1)
     assert user_image_info_list==[
         {
@@ -736,7 +749,7 @@ def test_get_user_imagelist(image_dao):
             'user_id':1
         },
     ]
-    #3번 유저의 이미지 정보 확인
+    #3번 유저의 이미지 정보 목록 확인
     user_image_info_list=image_dao.get_user_imagelist(3)
     assert user_image_info_list==[
         {
@@ -750,7 +763,8 @@ def test_get_user_imagelist(image_dao):
             'user_id':3
         }
     ]
-    
+
+#이미지 정보 확인
 def test_get_image_info(image_dao):
     #1번 이미지 정보 확인
     image_info=image_dao.get_image_info(1)
@@ -769,21 +783,27 @@ def test_get_image_info(image_dao):
     #존재하지 않는 이미지 정보 확인
     image_info=image_dao.get_image_info(100)
     assert image_info==None
-    
+
+#이미지 삭제 확인
 def test_delete_image(image_dao):
-    #1번 이미지 삭제 후 유저의 이미지 리스트 확인
-    result=image_dao.delete_image(1)
+    #3번 유저의 이미지 정보 목록 확인
+    user_image_info_list=[user_image_info['id'] for user_image_info in get_user_imagelist(3)]
+    assert user_image_info_list==[3,4]
+    #1번 이미지 삭제 및 유저의 이미지 리스트 확인
+    result=image_dao.delete_image(3)
     assert result==1
-    image_info=image_dao.get_image_info(1)
+    user_image_info_list=[user_image_info['id'] for user_image_info in get_user_imagelist(3)]
+    assert user_image_info_list==[4]
+    #이미 삭제된 이미지 정보 확인
+    image_info=image_dao.get_image_info(3)
     assert image_info==None
-    user_image_info_list=get_user_imagelist(1)
-    assert user_image_info_list==[]
-    #이미 삭제한 1번 이미지를 다시 삭제 확인
-    result=image_dao.delete_image(1)
+    #이미 삭제한 1번 이미지를 중복 삭제 및 삭제된 사진의 방 목록 확인
+    result=image_dao.delete_image(3)
     assert result==0
-    
+
+#사진의 방 정보 목록 확인
 def test_get_image_roomlist(image_dao):
-    #1번 이미지의 방 정보 확인
+    #1번 이미지의 방 정보 목록 확인
     image_room_info_list=image_dao.get_image_roomlist(1)
     assert image_room_info_list==[
         {
@@ -792,7 +812,7 @@ def test_get_image_roomlist(image_dao):
             'host_user_id':1
         }
     ]
-    #2번 이미지의 방 정보 확인
+    #2번 이미지의 방 정보 목록 확인
     image_room_info_list=image_dao.get_image_roomlist(2)
     assert image_room_info_list==[
         {
@@ -806,46 +826,57 @@ def test_get_image_roomlist(image_dao):
             'host_user_id':2
         }
     ]
-    #4번 이미지의 방 정보 확인
+    #4번 이미지의 방 정보 목록 확인
     image_room_info_list=image_dao.get_image_roomlist(4)
     assert image_room_info_list==[]
 
+#방에 이미지 삽입 확인
 def test_insert_room_image(image_dao):
-    #기존 1번방의 이미지 정보와 3번 이미지의 방 정보 확인
+    #1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
     room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
     assert room_imagelist==[1,2]
     image_roomist=[room_info['id'] for room_info in get_image_roomlist(3)]
     assert image_roomist==[2]
-    #1번방에 3번 이미지를 추가 후 정보 확인
+    #1번방에 3번 이미지를 추가 후 1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
     result=image_dao.insert_room_image(1,3)
     assert result==1
     room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
     assert room_imagelist==[1,2,3]
     image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
     assert image_roomlist==[1,2]
-    #이미 추가한 뒤 추가 확인
+    #방에 이미 삽입된 사진 중복 삽입 확인
     result=image_dao.insert_room_image(1,3)
     assert result==0
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2,3]
+    image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
+    assert image_roomlist==[1,2]
 
+#방의 이미지 삭제 확인
 def test_delete_room_image(image_dao):
-    #기존 1번방의 이미지 정보와 2번 이미지의 방 정보 확인
+    #1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
     room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
     assert room_imagelist==[1,2]
     image_roomist=[room_info['id'] for room_info in get_image_roomlist(2)]
     assert image_roomist==[1,2]
-    #1번 방에서 2번 이미지 삭제 후 확인
+    #1번 방에서 2번 이미지 삭제 후 1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
     result=image_dao.delete_room_image(1,2)
     assert result==1
     room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
     assert room_imagelist==[1]
     image_roomlist=[room_info['id'] for room_info in get_image_roomlist(2)]
     assert image_roomlist==[2]
-    #이미 삭제 후 삭제 확인
+    #방에서 이미 삭제한 이미지 중복 삭제 확인
     result=image_dao.delete_room_image(1,2)
     assert result==0
-    
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1]
+    image_roomlist=[room_info['id'] for room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+
+#방의 이미지 정보 목록 확인
 def test_get_room_imagelist(image_dao):
-    #1번방의 이미지 정보 확인
+    #1번방의 이미지 정보 정보 확인
     room_image_info_list=image_dao.get_room_imagelist(1)
     assert room_image_info_list==[
         {
