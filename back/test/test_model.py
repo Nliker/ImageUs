@@ -289,26 +289,6 @@ def get_room_info(room_id):
             'host_user_id':row['host_user_id']
         } if row else None
         return room_info
-    
-def get_image_info(image_id):
-        row=database.execute(text("""
-            select
-                id,
-                link,
-                user_id
-            from images
-            where id=:image_id
-            """),{
-                    'image_id':image_id
-                }).fetchone()
-
-        image_info={
-            'id':row['id'],
-            'link':row['link'],
-            'user_id':row['user_id']
-        } if row else None
-
-        return image_info
 
 def get_room_userlist(room_id):
     rows=database.execute(text("""
