@@ -49,11 +49,6 @@ def setup_function():
         "test_password".encode('utf-8'),
         bcrypt.gensalt()
     )
-    '''
-    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
-    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
-    이미지 1(유저 1),2(유저 2),3,4(유저 3)
-    '''
     new_users=[{
         'id':1,
         'name':'test1',
@@ -886,3 +881,23 @@ def test_get_room_imagelist(image_dao):
             'user_id':3
         }
     ]
+
+def test_delete_room_user_image(image_dao):
+    room_imagelist=[room_image_info ['id']for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+
+    result=image_dao.delete_room_user_image(1,2)
+    assert result==1
+    room_imagelist=[room_image_info ['id']for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1]
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2] 
+
+
+'''
+    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
+    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
+    이미지 1(유저 1),2(유저 2),3,4(유저 3)
+    '''
