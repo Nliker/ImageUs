@@ -33,7 +33,7 @@ class UserDao:
         user_id_and_password={
             'id':row['id'],
             'hashed_password':row['hashed_password']
-        }
+        } if row else None
         return user_id_and_password
     
     def get_user_info(self,user_id):
@@ -87,7 +87,7 @@ class UserDao:
         user_friend={
             'user_id':row['user_id'],
             'friend_user_id':row['friend_user_id']
-        }
+        } if row else None
         
         return user_friend
     
