@@ -428,22 +428,163 @@ def get_image_roomlist(image_id):
 
     return image_room_info_list
 
+#이메일의 존재 확인
 def test_is_email_exists(user_service):
+    # {
+    #     'id':1,
+    #     'name':'test1',
+    #     'email':'test1@naver.com',
+    #     'profile':'testuser1',
+    #     'hashed_password':hashed_password
+    # }
+    #존재하는 이메일의 존재를 확인
+    result=user_service.is_email_exists('test1@naver.com')
+    assert result==True
+    #존재하지 않는 이메일의 존재를 확인
+    result=user_service.is_email_exists('test100@naver.com')
+    assert result==False
 
+#새로운 유저를 생성
 def test_create_new_user(user_service):
+    new_user={
+        'name':'test4',
+        'email':'test4@naver.com',
+        'profile':'testuser4',
+        'password':'test_password'
+    }
+    #새로운 유저를 만들고 정보를 확인
+    new_user_id=user_service.create_new_user(new_user)
+    new_user=get_user_info(new_user_id)
+    
+    assert new_user=={
+        'id':new_user_id,
+        'name':new_user['name'],
+        'email':new_user['email'],
+        'profile':new_user['profile']
+    }
 
+#유저의 정보 확인
 def test_get_user_info(user_service):
+    #1번 유저 정보 확인
+    user_info=user_service.get_user_info(1)
+    assert user_info==get_user_info(1)
+    #존재하지 않는 유저 정보 확인
+    user_info=user_service.get_user_info(100)
+    assert user_info==None
 
+#로그인 확인
 def test_login(user_service):
-
+    #1번 유저의 로그인 확인
+    credential={
+        'email':'test1@naver.com',
+        'password':'test_password'
+    }
+    authorized=user_service.login(credential)
+    assert authorized==True
+    #1번 유저의 잘못된 로그인 확인
+    credential={
+        'email':'test1@naver.com',
+        'password':'wrong_password'
+    }
+    authorized=user_service.login(credential)
+    assert authorized==False
+    #존재하지 않는 유저의 로그인 확인
+    credential={
+        'email':'test100@naver.com',
+        'password':'wrong_password'
+    }
+    authorized=user_service.login(credential)
+    assert authorized==None
+    
+#토큰 생성 확인
 def test_generate_access_token(user_service):
+    user_id=1
+    #토큰을 생성하고 토큰의 정보를 확인합니다.
+    access_token=user_service.generate_access_token(user_id)
+    assert type(access_token)==type('asd')
+    payload=jwt.decode(access_token,config.test_config['JWT_SECRET_KEY'],'HS256')
+    assert ('user_id' in payload) and ('exp' in payload) and ('iat' in payload)
+    assert payload['user_id']==1
 
+#유저의 민감 정보 확인
 def test_get_user_id_and_password(user_service):
+    #1번 유저의 민감 정보 확인
+    user_credential=user_service.get_user_id_and_password('test1@naver.com')
+    assert ('id' in user_credential) and ('hashed_password' in user_credential)
+    password='test_password'
+    authrized=bcrypt.checkpw(password.encode('utf-8'),user_credential['hashed_password'].encode('utf-8'))
+    assert authrized
+    #존재하지 않는 유저의 민감 정보 확인
+    user_credential=user_service.get_user_id_and_password('test100@naver.com')
+    assert user_credential==None
 
+#유저의 친구 관계 확인
 def test_is_user_friend(user_service):
+    #1번과 2번의 친구 관계 확인
+    result=user_service.is_user_friend(1,2)
+    assert result==True
+    result=user_service.is_user_friend(2,1)
+    assert result==True
+    #1번과 3번의 친구 관계 확인
+    result=user_service.is_user_friend(1,3)
+    assert result==False
+    result=user_service.is_user_friend(3,1)
+    assert result==False
 
+#유저의 친구 생성
 def test_create_user_friend(user_service):
+    #1번 유저와 3번 유저의 친구 목록 확인
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[2]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
+    assert user_friendlist==[2]
+    #1번유저와 3번유저의 친구 생성 후 친구 목록 확인
+    result=user_service.create_user_friend(1,3)
+    assert result==1
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[2,3]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
+    assert user_friendlist==[1,2]
+    #중복 친구추가 확인
+    result=user_service.create_user_friend(1,3)
+    assert result==0
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[2,3]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(3)]
+    assert user_friendlist==[1,2]
 
+#유저의 친구 목록 정보 확인
 def test_get_user_friendlist(user_service):
+    #1번 유저와 3번 유저의 친구 목록 정보 확인
+    user_friend_info_list=user_service.get_user_friendlist(1)
+    assert user_friend_info_list==get_user_friendlist(1)
+    user_friend_info_list=user_service.get_user_friendlist(3)
+    assert user_friend_info_list==get_user_friendlist(3)
 
+#유저의 친구 삭제
 def test_delete_user_friend(user_service):
+    #1번 유저와 2번 유저의 친구 목록 확인
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[2]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friendlist==[1,3]
+    #1번 유저와 2번 유저의 친구 삭제 및 친구 목록 확인
+    result=user_service.delete_user_friend(1,2)
+    assert result==1
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friendlist==[3]
+    #중복 친구 삭제 확인
+    result=user_service.delete_user_friend(1,2)
+    assert result==0
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(1)]
+    assert user_friendlist==[]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friendlist==[3]
+    
+'''
+    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
+    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
+    이미지 1(유저 1),2(유저 2),3,4(유저 3)
+'''

@@ -448,13 +448,16 @@ def test_insert_user(user_dao):
 
 #1번 유저의 민감 정보 검증
 def test_get_user_id_and_password(user_dao):
+    #1번 유저의 민감 정보 확인
     sample_email='test1@naver.com'
-
     user_credential=user_dao.get_user_id_and_password(sample_email)
-
-    assert user_credential['id']==1
+    assert 'id' in user_credential and 'hashed_password' in user_credential
     authorized=bcrypt.checkpw('test_password'.encode('utf-8'),user_credential['hashed_password'].encode('utf-8'))
     assert authorized
+    #존재하지 않는 유저 민감 정보 확인
+    user_credential=user_dao.get_user_id_and_password('test100@naver.com')
+    assert user_credential==None
+    
     
 #2번 유저의 정보 검증
 def test_get_user_info(user_dao):

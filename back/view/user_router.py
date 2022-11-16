@@ -163,8 +163,8 @@ def user_router(app,services):
         if current_user_id != user_id:
             return '권한이 없습니다.',401
         
-        friendlist=user_service.get_user_friendlist(current_user_id)
-        return jsonify({'friendlist':friendlist}),200
+        user_friend_info_list=user_service.get_user_friendlist(current_user_id)
+        return jsonify({'friendlist':user_friend_info_list}),200
     
     #id가 user_id인 유저의 친구를 삭제합니다.
     #input
