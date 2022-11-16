@@ -170,11 +170,12 @@ def room_router(app,services):
         if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
         #방장이 아니라면
-        if user_id!= room_service.get_room_info(room_id)['host_user_id']:
+        if current_user_id!= room_service.get_room_info(room_id)['host_user_id']:
             return '권한이 없습니다.',401
         
         if not user_service.get_user_info(user_id):
             return '해당 유저는 존재하지 않습니다.',400
+
         
         delete_room_user_id=request.json['delete_room_user_id']
         result=room_service.delete_room_user(room_id,delete_room_user_id)
