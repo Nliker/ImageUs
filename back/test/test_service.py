@@ -696,25 +696,148 @@ def test_delete_room_user(room_service):
     assert user_roomlist==[2]
 
 #이미지 업로드 확인
-def test_upload_image(image_service):
+# def test_upload_image(image_service):
     
-def test_upload_room_image(image_service):
+# def test_upload_room_image(image_service):
     
+#유저의 이미지 관계 확인
 def test_is_user_image(image_service):
-    
+    #2번 유저의 2번 사진 관계 확인
+    result=image_service.is_user_image(2,2)
+    assert result==True
+    #2번 유저의 3번 사진 관계 확인
+    result=image_service.is_user_image(2,3)
+    assert result==False
+
+#이미지의 방 정보 목록 확인
 def test_get_image_roomlist(image_service):
-    
+    #2번 이미지의 방 정보 목록 확인
+    image_room_info_list=image_service.get_image_roomlist(2)
+    assert image_room_info_list==get_image_roomlist(2)
+    #4번 이미지의 방 정보 목록 확인
+    image_room_info_list=image_service.get_image_roomlist(4)
+    assert image_room_info_list==[]
+
+#이미지의 정보 확인
 def test_get_image_info(image_service):
-    
+    #1번 이미지의 정보 확인
+    image_info=image_service.get_image_info(1)
+    assert image_info==get_image_info(1)
+    #존재하지 않는 이미지의 정보 확인
+    image_info=image_service.get_image_info(100)
+    assert image_info==None
+
+#유저의 이미지 정보 목록 확인
 def test_get_user_imagelist(image_service):
-    
+    #3번 유저의 이미지 정보 목록 확인
+    user_image_info_list=image_service.get_user_imagelist(3)
+    assert user_image_info_list==get_user_imagelist(3)
+
+#방의 이미지 정보 목록 확인
+def test_get_room_imagelist(image_service):
+    #1번 방의 이미지 정보 목록 확인
+    room_image_info_list=image_service.get_room_imagelist(1)
+    assert room_image_info_list==get_room_imagelist(1)
+
+#이미지의 방 업데이트 확인
 def test_update_image_room(image_service):
-    
+    #2번 이미지의 방 목록 확인
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+    #2번 이미지의 방 목록 업데이트 확인 
+    update_roomlist=[2]
+    result=image_service.update_image_room(2,update_roomlist)
+    assert result=={
+                    'addlist':[],
+                    'deletelist':[1],
+                    'add_result':0,
+                    'delete_result':1
+                    }
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+
+    #4번 이미지의 방 목록 확인
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(4)]
+    assert image_roomlist==[]
+    #2번 이미지의 방 목록 업데이트 확인 
+    update_roomlist=[1,2]
+    result=image_service.update_image_room(4,update_roomlist)
+    assert result=={
+                    'addlist':[1,2],
+                    'deletelist':[],
+                    'add_result':2,
+                    'delete_result':0
+                    }
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+
+#방의 사진 삭제 확인
 def test_delete_room_image(image_service):
+    #2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    #1번방의 2번 이미지 삭제 후 2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
+    result=image_service.delete_room_image(1,2)
+    assert result==1
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1]
+    #1번방의 2번 사진 중복 삭제 확인
+    result=image_service.delete_room_image(1,2)
+    assert result==0
 
+#이미지를 삭제합니다.
 def test_delete_image(image_service):
+    #2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
+    user_imagelist=[user_image_info['id'] for user_image_info in get_user_imagelist(2)]
+    assert user_imagelist==[2]
+    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    #2번 이미지 삭제 후 2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
+    result=image_service.delete_image(2)
+    assert result==1
+    user_imagelist=[user_image_info['id'] for user_image_info in get_user_imagelist(2)]
+    assert user_imagelist==[]
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None
+        }
+    ]
 
-def test_delete_room_user_image():
+    image_info=get_image_info(2)
+    assert image_info==None
+    #이미 삭제된 이미지의 중복 삭제 확인
+    result=image_service.delete_image(2)
+    assert result==0
+    
+#방에 속한 유저의 모든 이미지 제거
+def test_delete_room_user_image(image_service):
+    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1,2]
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+
+    result=image_service.delete_room_user_image(1,2)
+    assert result==1
+    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
+    assert room_imagelist==[1]
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[2]
+    
+    #1번 방에 속한 2번 유저의 모든 이미지 중복 삭제 확인
+    result=image_service.delete_room_user_image(1,2)
+    assert result==0
 
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
