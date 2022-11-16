@@ -124,8 +124,8 @@ class ImageService:
     def update_image_room(self,image_id,update_roomlist):
         image_roomlist=set([image_room_info['id'] for image_room_info in self.image_dao.get_image_roomlist(image_id)])
         update_roomlist=set(update_roomlist)
-        
-        update_list=sorted(set(image_roomlist+update_roomlist))
+
+        update_list=sorted(image_roomlist.union(update_roomlist))
 
         deletelist=[]
         addlist=[]
@@ -162,6 +162,7 @@ class ImageService:
     
     def delete_image(self,delete_image_id):
         result=self.image_dao.delete_image(delete_image_id)
+
         return result
     
     def delete_room_user_image(self,room_id,user_id):

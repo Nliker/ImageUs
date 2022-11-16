@@ -44,7 +44,7 @@ def image_router(app,services):
     @login_required
     def image(image_id):
         delete_image_id=request.json['delete_image_id']
-
+        
         if not image_service.get_image_info(delete_image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
