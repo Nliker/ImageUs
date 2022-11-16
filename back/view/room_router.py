@@ -176,9 +176,6 @@ def room_router(app,services):
         if not user_service.get_user_info(user_id):
             return '해당 유저는 존재하지 않습니다.',400
         
-        if not room_service.is_room_user(user_id): 
-            return '해당 유저가 방에 존재하지 않습니다.',400
-        
         delete_room_user_id=request.json['delete_room_user_id']
         result=room_service.delete_room_user(room_id,delete_room_user_id)
         

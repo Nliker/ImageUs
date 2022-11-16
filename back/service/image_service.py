@@ -163,3 +163,8 @@ class ImageService:
     def delete_image(self,delete_image_id):
         result=self.image_dao.delete_image(delete_image_id)
         return result
+    
+    def delete_room_user_image(self,room_id,user_id):
+        result=self.image_dao.delete_room_user_image(room_id,user_id)
+
+        return result
