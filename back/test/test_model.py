@@ -702,6 +702,19 @@ def test_delete_room_user(room_dao):
     result=room_dao.delete_room_user(1,2)
     assert result==0
 
+#방의 유저 확인
+def test_get_room_user(room_dao):
+    #1번방의 2번 유저 확인
+    room_user=room_dao.get_room_user(1,2)
+    assert room_user=={
+        'room_id':1,
+        'user_id':2
+    }
+    #1번방의 존재하지 않는 유저 확인
+    room_user=room_dao.get_room_user(1,100)
+    assert room_user==None
+
+
 #이미지 삽입 확인
 def test_insert_image(image_dao):
     new_image={
@@ -882,20 +895,22 @@ def test_get_room_imagelist(image_dao):
         }
     ]
 
+#방의 특정 유저의 이미지 모두 삭제 확인
 def test_delete_room_user_image(image_dao):
+    #1번 방의 이미지 목록과 2번 유저의 방 목록 확인
     room_imagelist=[room_image_info ['id']for room_image_info in get_room_imagelist(1)]
     assert room_imagelist==[1,2]
     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
     assert image_roomlist==[1,2]
 
+    #1번방의 2번 유저 사진 삭제 확인
     result=image_dao.delete_room_user_image(1,2)
     assert result==1
     room_imagelist=[room_image_info ['id']for room_image_info in get_room_imagelist(1)]
     assert room_imagelist==[1]
     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
     assert image_roomlist==[2] 
-
-
+    
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)

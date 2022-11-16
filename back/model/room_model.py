@@ -112,3 +112,20 @@ class RoomDao:
                 }).rowcount
 
         return row
+    
+    def get_room_user(self,room_id,user_id):
+        row=self.db.execute(text("""
+            select
+                room_id,
+                user_id
+            from rooms_user_list
+            where room_id=:room_id
+            and user_id=:user_id
+            """),{'room_id':room_id,'user_id':user_id}).fetchone()
+
+        room_user={
+            'room_id':row['room_id'],
+            'user_id':row['user_id']
+        }if row else None
+
+        return room_user
