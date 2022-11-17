@@ -178,7 +178,7 @@ def room_router(app,services):
 
         
         delete_room_user_id=request.json['delete_room_user_id']
-        result=room_service.delete_room_user(room_id,delete_room_user_id)
+        result=room_service.delete_room_user_image(room_id,delete_room_user_id)
         
         return f'{result}명 강퇴 성공',200
     
