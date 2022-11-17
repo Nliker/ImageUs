@@ -28,8 +28,8 @@ const ChannelList = () => {
   const toggleChannelCollapse = useCallback(() => setChannelCollapse((prev) => !prev), []);
   return (
     <>
-      <Subtitle>
-        <Collapse collapse={channelCollapse} onClick={toggleChannelCollapse}>
+      <Subtitle onClick={toggleChannelCollapse}>
+        <Collapse collapse={channelCollapse}>
           <IoMdArrowDropright />
         </Collapse>
         <span>Channels</span>

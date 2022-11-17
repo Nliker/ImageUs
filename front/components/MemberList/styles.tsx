@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 
-export const Subtitle = styled.h2`
-  display: flex;
+export const Subtitle = styled.div`
+  display: inline-flex;
   align-items: center;
+  cursor: pointer;
 `;
 
 export const Collapse = styled.span<{ collapse: boolean }>`
   width: 32px;
   height: 32px;
-//   margin-right: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
