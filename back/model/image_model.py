@@ -156,12 +156,13 @@ class ImageDao:
     
     def delete_room_user_image(self,room_id,user_id):
         row=self.db.execute(text("""
-            update from images_room_list as i_r
+            update images_room_list as i_r
             left join images as i
             on i_r.image_id=i.id
             set i_r.deleted=1
             where i.user_id=:user_id
             and room_id=:room_id
+            and i_r.deleted=0
             """),{'room_id':room_id,'user_id':user_id}).rowcount
         return row
     
