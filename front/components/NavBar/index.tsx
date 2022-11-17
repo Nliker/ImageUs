@@ -95,8 +95,9 @@ const NavBar = () => {
                 </NavLink>
               </MobileNavItem>
               <MobileNavItem>
-                <NavLink to={'/room_list'}>
-                  <BsListUl />방 목록
+                <NavLink to={'/'}>
+                  {/* <BsListUl /> */}
+                  홈 버튼
                 </NavLink>
               </MobileNavItem>
               <MobileNavItem>
