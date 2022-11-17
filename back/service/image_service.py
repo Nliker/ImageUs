@@ -24,7 +24,7 @@ class ImageService:
         'id':<int>,
         'link':<str>,
         'user_id':<int>
-    }
+    } or None
     delete_image(delete_image_id)->0 or 1
     get_image_roomlist(image_id)->[
         {
