@@ -27,6 +27,7 @@ class RoomDao:
                 host_user_id
             from rooms
             where id=:room_id
+            and deleted=0
             """),{
                     'room_id':room_id
                 }).fetchone()
@@ -47,6 +48,8 @@ class RoomDao:
             left join rooms as r
             on r_u.room_id=r.id 
             where r_u.user_id=:user_id
+            and r.deleted=0
+            and r_u.deleted=0
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -69,7 +72,9 @@ class RoomDao:
             from rooms_user_list as r_u
             left join users as u
             on r_u.user_id=u.id
-            where r_u.room_id=:room_id                    
+            where r_u.room_id=:room_id
+            and u.deleted=0
+            and r_u.deleted=0
             """),{
                 'room_id':room_id
             }).fetchall()
@@ -103,9 +108,11 @@ class RoomDao:
 
     def delete_room_user(self,room_id,user_id):
         row=self.db.execute(text("""
-            delete from rooms_user_list
-            where room_id=:room_id
-            and user_id=:user_id
+            update rooms_user_list
+            set deleted=1
+            where (room_id=:room_id
+            and user_id=:user_id)
+            and deleted=0
             """),{
                     'room_id':room_id,
                     'user_id':user_id

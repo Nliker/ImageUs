@@ -45,6 +45,7 @@ class UserDao:
                 profile
             from users
             where id=:user_id
+            and deleted=0
             """),{'user_id':user_id}).fetchone()
         user_info={
             'id':row['id'],
@@ -81,7 +82,9 @@ class UserDao:
                 user_id,
                 friend_user_id
             from users_friend_list
-            where user_id=:user_id and friend_user_id=:friend_user_id
+            where user_id=:user_id 
+            and friend_user_id=:friend_user_id
+            and deleted=0
             """),{'user_id':user_id,'friend_user_id':friend_user_id}).fetchone()
 
         user_friend={
@@ -102,6 +105,8 @@ class UserDao:
             left join users as u
             on u_f.friend_user_id=u.id
             where u_f.user_id=:user_id
+            and u.deleted=0
+            and u_f.deleted=0
             """),{'user_id':user_id}).fetchall()
 
         user_friend_info_list=[
@@ -117,14 +122,18 @@ class UserDao:
     
     def delete_user_friend(self,user_id,delete_friend_user_id):
         row=self.db.execute(text("""
-            delete from users_friend_list
-            where (user_id=:user_id and friend_user_id=:delete_friend_user_id)
-            or (user_id=:delete_friend_user_id and friend_user_id=:user_id) 
+            update users_friend_list
+            set deleted=1
+            where (user_id=:user_id
+            and friend_user_id=:delete_friend_user_id)
+            or (user_id=:delete_friend_user_id
+            and friend_user_id=:user_id)
+            and deleted=0
             """),{
                     'user_id':user_id,
                     'delete_friend_user_id':delete_friend_user_id
-                }).rowcount    
-        if row>=1:
+                }).rowcount
+        if row>=2:
             return 1
         else:
             return 0

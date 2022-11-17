@@ -26,6 +26,7 @@ class ImageDao:
                 user_id
             from images
             where user_id=:user_id
+            and deleted=0
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -48,6 +49,7 @@ class ImageDao:
                 user_id
             from images
             where id=:image_id
+            and deleted=0
             """),{
                     'image_id':image_id
                 }).fetchone()
@@ -62,8 +64,10 @@ class ImageDao:
     
     def delete_image(self,delete_image_id):
         row=self.db.execute(text("""
-            delete from images
+            update images
+            set deleted=1
             where id=:delete_image_id
+            and deleted=0
             """),{
                     'delete_image_id':delete_image_id
                 }).rowcount
@@ -73,12 +77,14 @@ class ImageDao:
         rows=self.db.execute(text("""
             select
                 i_r.room_id as id,
-                title,
-                host_user_id
+                r.title,
+                r.host_user_id
             from images_room_list as i_r
             left join rooms as r
             on i_r.room_id=r.id
             where i_r.image_id=:image_id
+            and r.deleted=0
+            and i_r.deleted=0
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -111,9 +117,11 @@ class ImageDao:
 
     def delete_room_image(self,room_id,image_id):
         row=self.db.execute(text("""
-            delete from images_room_list
+            update images_room_list
+            set deleted=1
             where image_id=:image_id
             and room_id=:room_id
+            and deleted=0
             """),{
                     'image_id':image_id,
                     'room_id':room_id
@@ -128,9 +136,12 @@ class ImageDao:
                 i.link,
                 i.user_id
             from images_room_list as i_r
-            left join images as i
-            on i_r.image_id=i.id
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0) 
             where i_r.room_id=:room_id
+            order by id asc
             """),{
                     'room_id':room_id
                 }).fetchall()
@@ -142,14 +153,15 @@ class ImageDao:
         } for room_image_info in rows]
 
         return room_image_info_list
+    
     def delete_room_user_image(self,room_id,user_id):
         row=self.db.execute(text("""
-            delete i_r
-            from images_room_list as i_r
-            join images as i
+            update from images_room_list as i_r
+            left join images as i
             on i_r.image_id=i.id
-            where i.user_id=:user_id 
-            and i_r.room_id=:room_id
+            set i_r.deleted=1
+            where i.user_id=:user_id
+            and room_id=:room_id
             """),{'room_id':room_id,'user_id':user_id}).rowcount
         return row
-        
+    
