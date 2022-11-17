@@ -245,6 +245,7 @@ def get_user_info(user_id):
                 profile
             from users
             where id=:user_id
+            and deleted=0
             """),{'user_id':user_id}).fetchone()
     user_info={
             'id':row['id'],
@@ -265,6 +266,8 @@ def get_user_friendlist(user_id):
             left join users as u
             on u_f.friend_user_id=u.id
             where u_f.user_id=:user_id
+            and u.deleted=0
+            and u_f.deleted=0
             """),{'user_id':user_id}).fetchall()
 
         user_friend_info_list=[
@@ -277,7 +280,7 @@ def get_user_friendlist(user_id):
         ]
         
         return user_friend_info_list
-    
+
 def get_room_info(room_id):
         row=database.execute(text("""
             select
@@ -286,6 +289,7 @@ def get_room_info(room_id):
                 host_user_id
             from rooms
             where id=:room_id
+            and deleted=0
             """),{
                     'room_id':room_id
                 }).fetchone()
@@ -295,7 +299,7 @@ def get_room_info(room_id):
             'host_user_id':row['host_user_id']
         } if row else None
         return room_info
-    
+
 def get_room_userlist(room_id):
     rows=database.execute(text("""
             select
@@ -306,7 +310,9 @@ def get_room_userlist(room_id):
             from rooms_user_list as r_u
             left join users as u
             on r_u.user_id=u.id
-            where r_u.room_id=:room_id              
+            where r_u.room_id=:room_id
+            and u.deleted=0
+            and r_u.deleted=0         
             """),{
                 'room_id':room_id
             }).fetchall()
@@ -330,6 +336,8 @@ def get_user_roomlist(user_id):
             left join rooms as r
             on r_u.room_id=r.id 
             where r_u.user_id=:user_id
+            and r.deleted=0
+            and r_u.deleted=0
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -350,6 +358,7 @@ def get_user_imagelist(user_id):
                 user_id
             from images
             where user_id=:user_id
+            and deleted=0
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -364,58 +373,39 @@ def get_user_imagelist(user_id):
         
     return user_image_info_list
 
-def get_room_imagelist(room_id):
-    rows=database.execute(text("""
-            select
-                i_r.image_id as id,
-                i.link,
-                i.user_id
-            from images_room_list as i_r
-            left join images as i
-            on i_r.image_id=i.id
-            where i_r.room_id=:room_id
-            """),{
-                    'room_id':room_id
-                }).fetchall()
-
-    room_image_info_list=[{
-            'id':room_image_info['id'],
-            'link':room_image_info['link'],
-            'user_id':room_image_info['user_id']
-        } for room_image_info in rows]
-
-    return room_image_info_list
-
 def get_image_info(image_id):
-        row=database.execute(text("""
+    row=database.execute(text("""
             select
                 id,
                 link,
                 user_id
             from images
             where id=:image_id
+            and deleted=0
             """),{
                     'image_id':image_id
                 }).fetchone()
 
-        image_info={
+    image_info={
             'id':row['id'],
             'link':row['link'],
             'user_id':row['user_id']
         } if row else None
 
-        return image_info
+    return image_info
 
 def get_image_roomlist(image_id):
     rows=database.execute(text("""
             select
                 i_r.room_id as id,
-                title,
-                host_user_id
+                r.title,
+                r.host_user_id
             from images_room_list as i_r
             left join rooms as r
             on i_r.room_id=r.id
             where i_r.image_id=:image_id
+            and r.deleted=0
+            and i_r.deleted=0
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -427,6 +417,32 @@ def get_image_roomlist(image_id):
         } for image_room_info in rows]
 
     return image_room_info_list
+
+def get_room_imagelist(room_id):
+    rows=database.execute(text("""
+            select
+                i_r.image_id as id,
+                i.link,
+                i.user_id
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0) 
+            where i_r.room_id=:room_id
+            order by id asc
+            """),{
+                    'room_id':room_id
+                }).fetchall()
+
+    room_image_info_list=[{
+            'id':room_image_info['id'],
+            'link':room_image_info['link'],
+            'user_id':room_image_info['user_id']
+        } for room_image_info in rows]
+
+    return room_image_info_list
+    
 
 #이메일의 존재 확인
 def test_is_email_exists(user_service):
@@ -774,17 +790,56 @@ def test_update_image_room(image_service):
 #방의 사진 삭제 확인
 def test_delete_room_image(image_service):
     #2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[1,2]
-    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-    assert room_imagelist==[1,2]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1,
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2,
+        },
+    ]
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        }
+    ]
     #1번방의 2번 이미지 삭제 후 2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
     result=image_service.delete_room_image(1,2)
     assert result==1
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[2]
-    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-    assert room_imagelist==[1]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2,
+        },
+    ]
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None
+        }
+    ]
     #1번방의 2번 사진 중복 삭제 확인
     result=image_service.delete_room_image(1,2)
     assert result==0
@@ -792,15 +847,32 @@ def test_delete_room_image(image_service):
 #이미지를 삭제합니다.
 def test_delete_image(image_service):
     #2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
-    user_imagelist=[user_image_info['id'] for user_image_info in get_user_imagelist(2)]
-    assert user_imagelist==[2]
-    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-    assert room_imagelist==[1,2]
+    user_image_info_list=get_user_imagelist(2)
+    assert user_image_info_list==[
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        }
+    ]
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        }
+    ]
     #2번 이미지 삭제 후 2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
     result=image_service.delete_image(2)
     assert result==1
-    user_imagelist=[user_image_info['id'] for user_image_info in get_user_imagelist(2)]
-    assert user_imagelist==[]
+    user_image_info_list=get_user_imagelist(2)
+    assert user_image_info_list==[]
     room_image_info_list=get_room_imagelist(1)
     assert room_image_info_list==[
         {
@@ -823,20 +895,66 @@ def test_delete_image(image_service):
     
 #방에 속한 유저의 모든 이미지 제거
 def test_delete_room_user_image(image_service):
-    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-    assert room_imagelist==[1,2]
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[1,2]
-
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1,
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2,
+        },
+    ]
     result=image_service.delete_room_user_image(1,2)
     assert result==1
-    room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-    assert room_imagelist==[1]
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[2]
+    room_image_info_list=get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2,
+        },
+    ]
     
     #1번 방에 속한 2번 유저의 모든 이미지 중복 삭제 확인
     result=image_service.delete_room_user_image(1,2)
+    assert result==0
+    result=image_service.delete_room_user_image(2,100)
+    assert result==0
+    result=image_service.delete_room_user_image(2,3)
+    assert result==1
+    result=image_service.delete_room_user_image(2,3)
+    assert result==0
+    result=image_service.delete_room_user_image(100,3)
     assert result==0
 
 '''
