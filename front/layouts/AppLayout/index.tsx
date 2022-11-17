@@ -1,25 +1,27 @@
 import React, { useCallback, useState } from 'react';
 import NavBar from '@components/NavBar';
 import ToolBar from '@components/ToolBar';
-import RoomList from '@components/SideBar';
+import SideBar from '@components/SideBar';
+import { ContentWrapper } from './styles';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const [showRoomList, setShowRoomList] = useState<boolean>(false);
+  const [showSideBar, setshowSideBar] = useState<boolean>(false);
   const handleRoomListBtn = useCallback(() => {
-    console.log(showRoomList);
-    setShowRoomList(prev => !prev);
-  }, [showRoomList]);
+    console.log(showSideBar);
+    setshowSideBar((prev) => !prev);
+  }, [showSideBar]);
 
   return (
     <div>
       <NavBar />
-      <ToolBar handleRoomListBtn={handleRoomListBtn}/>
-      {showRoomList && <RoomList />}
-      {children}
+      <ToolBar handleRoomListBtn={handleRoomListBtn} />
+      <SideBar show={showSideBar} />
+      {/* {showSideBar && <SideBar />} */}
+      <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       {/* <Footer /> */}
     </div>
   );

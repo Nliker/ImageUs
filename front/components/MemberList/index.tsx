@@ -28,8 +28,8 @@ const MemberList = () => {
   const toggleMemberCollapse = useCallback(() => setMemberCollapse((prev) => !prev), []);
   return (
     <>
-      <Subtitle>
-        <Collapse collapse={memberCollapse} onClick={toggleMemberCollapse}>
+      <Subtitle onClick={toggleMemberCollapse}>
+        <Collapse collapse={memberCollapse}>
           <IoMdArrowDropright />
         </Collapse>
         <span>Members</span>
