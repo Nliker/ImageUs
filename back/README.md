@@ -32,6 +32,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `hashed_password` varchar(255) NOT NULL,
   `profile` varchar(255) NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `name` varchar(255) NOT NULL,
@@ -43,6 +44,7 @@ CREATE TABLE `users` (
 CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
   `friend_user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`user_id`,`friend_id`)
@@ -53,6 +55,7 @@ CREATE TABLE `images` (
   `id` int NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
   `user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -65,6 +68,7 @@ CREATE TABLE `rooms` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(300) NOT NULL,
   `host_user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -74,6 +78,7 @@ CREATE TABLE `rooms` (
 CREATE TABLE `rooms_user_list` (
   `room_id` int NOT NULL,
   `user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`room_id`,`user_id`),
@@ -87,7 +92,8 @@ CREATE TABLE `rooms_user_list` (
 CREATE TABLE `images_room_list` (
   `image_id` int NOT NULL,
   `room_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` boolean not null DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT, CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`,`room_id`),
   INDEX `room_id` (`room_id`)
 )
