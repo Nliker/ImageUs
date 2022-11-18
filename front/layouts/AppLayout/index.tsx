@@ -15,7 +15,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
 
   const handleRoomListBtn = useCallback(() => {
-    console.log(showSideBar);
+    // console.log(showSideBar);
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
@@ -24,7 +24,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <TopNavBar />
       {isMobile && <BottomNavBar />}
       <ToolBar handleRoomListBtn={handleRoomListBtn} />
-      <SideBar show={showSideBar} />
+      <SideBar show={showSideBar} isMobile={isMobile}/>
       {/* {showSideBar && <SideBar />} */}
       <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       {/* <Footer /> */}

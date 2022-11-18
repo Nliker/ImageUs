@@ -6,10 +6,15 @@ import { ChannelListBox, ContentWrapper, Wrapper } from './styles';
 // 현재 구상 중인 것은 모바일 버전일 경우 토글 버튼으로 왼쪽에서 나오고
 // PC버전일 경우 왼쪽부분에 그대로 붙어있는 모양이다.
 
-const SideBar = ({show}: {show: boolean}) => {
-  
+interface SidebarProps {
+  show: boolean;
+  isMobile: boolean;
+}
+
+const SideBar = ({ show, isMobile }: SidebarProps) => {
+  console.log(isMobile);
   return (
-    <Wrapper show={show}>
+    <Wrapper show={show} isMobile={isMobile}>
       {/* <MemberList /> */}
       {/* <div>
         <h1>방 이름</h1>
