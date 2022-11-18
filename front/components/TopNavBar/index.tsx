@@ -2,11 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { DesktopContainer, NavItem, NavList, Wrapper } from './pc_styles';
 import { HiOutlineHome } from 'react-icons/hi';
-import { BsPeople, BsListUl } from 'react-icons/bs';
-import { RiFilter2Line } from 'react-icons/ri';
-import { IoPeopleCircleSharp } from 'react-icons/io5';
+import { BsPeople } from 'react-icons/bs';
 import { MdOutlineManageAccounts } from 'react-icons/md';
-import { MobileBtnDiv, MobileButton, MobileContainer, TopContainer } from './mobile_styles';
 import { useMediaQuery } from 'react-responsive';
 
 const TopNavBar = () => {
