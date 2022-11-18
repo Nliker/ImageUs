@@ -4,6 +4,7 @@ import SideBar from '@components/SideBar';
 import { ContentWrapper } from './styles';
 import TopNavBar from '@components/TopNavBar';
 import BottomNavBar from '@components/BottomNavBar';
+import { useMediaQuery } from 'react-responsive';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -11,6 +12,8 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
+  const isMobile = useMediaQuery({ maxWidth: 1023 });
+
   const handleRoomListBtn = useCallback(() => {
     console.log(showSideBar);
     setshowSideBar((prev) => !prev);
@@ -19,7 +22,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div>
       <TopNavBar />
-      <BottomNavBar />
+      {isMobile && <BottomNavBar />}
       <ToolBar handleRoomListBtn={handleRoomListBtn} />
       <SideBar show={showSideBar} />
       {/* {showSideBar && <SideBar />} */}

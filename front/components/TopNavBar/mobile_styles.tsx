@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 export const MobileContainer = styled.div`
+  box-shadow: 0 2px 4px 0 hsl(0deg 0% 81% / 50%);
   a {
     text-decoration: none;
     color: #47443e;
