@@ -1,5 +1,7 @@
 import requests
 import json
+import jwt
+
 
 class ImageService:
     def __init__(self,image_dao,config):
@@ -64,10 +66,16 @@ class ImageService:
         
         upload={'image':files}
         
-        params = {
-            "user_id":new_image['user_id'],
+        payload={
+            'user_id':new_image['user_id'],
         }
-        res = requests.post(f"{self.config['IMAGE_URL']}", data=json.dumps(params),files=upload)
+        
+        image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
+
+        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
+                files=upload,
+                headers = {'upload_token':image_upload_token})
+    
         link=res.text
         new_image={
             'link':link,
@@ -80,10 +88,16 @@ class ImageService:
     def upload_room_image(self,room_id,new_image):
         files=new_image['image']
         upload={'image':files}
-        params = {
-            "user_id": user_id,
+
+        payload={
+            'user_id':new_image['user_id'],
         }
-        res = requests.post(f"{self.config['IMAGE_URL']}", data=json.dumps(params),files=upload)
+        
+        image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
+
+        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
+                files=upload,
+                headers = {'upload_token':image_upload_token})
         link=res.text
         new_image={
             'link':link,
