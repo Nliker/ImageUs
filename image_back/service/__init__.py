@@ -1,5 +1,5 @@
-from .image_service import Image_Service
+from .image_service import ImageService
 
 __all__=[
-    'Image_Service'
+    'ImageService'
 ]
