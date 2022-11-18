@@ -12,7 +12,7 @@ interface SidebarProps {
 }
 
 const SideBar = ({ show, isMobile }: SidebarProps) => {
-  console.log(isMobile);
+  // console.log(isMobile);
   return (
     <Wrapper show={show} isMobile={isMobile}>
       {/* <MemberList /> */}
