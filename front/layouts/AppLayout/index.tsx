@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import NavBar from '@components/NavBar';
 import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
 import { ContentWrapper } from './styles';
+import TopNavBar from '@components/TopNavBar';
+import BottomNavBar from '@components/BottomNavBar';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -17,7 +18,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div>
-      <NavBar />
+      <TopNavBar />
+      <BottomNavBar />
       <ToolBar handleRoomListBtn={handleRoomListBtn} />
       <SideBar show={showSideBar} />
       {/* {showSideBar && <SideBar />} */}
