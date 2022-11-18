@@ -895,6 +895,31 @@ def test_delete_image(image_service):
     
 #방에 속한 유저의 모든 이미지 제거
 def test_delete_room_user_image(image_service):
+    #2번 유저의 5번 이미지 생성 및 1번방에 업로드
+    database.execute(text("""
+        insert into images (
+            id,
+            link,
+            user_id
+        ) values (
+            :id,
+            :link,
+            :user_id
+        )
+    """),{
+        'id':5,
+        'link':'testlink5',
+        'user_id':2
+    })
+    database.execute(text("""
+        insert into images_room_list (
+            image_id,
+            room_id
+        ) values (
+            :image_id,
+            :room_id
+        )
+    """),{'image_id':5,'room_id':1})
     room_image_info_list=get_room_imagelist(1)
     assert room_image_info_list==[
         {
@@ -905,6 +930,11 @@ def test_delete_room_user_image(image_service):
         {
             'id':2,
             'link':'testlink2',
+            'user_id':2
+        },
+        {
+            'id':5,
+            'link':'testlink5',
             'user_id':2
         }
     ]
@@ -921,8 +951,23 @@ def test_delete_room_user_image(image_service):
             'host_user_id':2,
         },
     ]
+    user_room_info_list=get_user_roomlist(2)
+    assert user_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1,
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2,
+        }
+    ]
+    
     result=image_service.delete_room_user_image(1,2)
-    assert result==1
+    assert result==2
+    
     room_image_info_list=get_room_imagelist(1)
     assert room_image_info_list==[
         {
@@ -932,6 +977,11 @@ def test_delete_room_user_image(image_service):
         },
         {
             'id':2,
+            'link':None,
+            'user_id':None
+        },
+        {
+            'id':5,
             'link':None,
             'user_id':None
         }
@@ -944,6 +994,8 @@ def test_delete_room_user_image(image_service):
             'host_user_id':2,
         },
     ]
+    image_room_info_list=get_image_roomlist(5)
+    assert image_room_info_list==[]
     
     #1번 방에 속한 2번 유저의 모든 이미지 중복 삭제 확인
     result=image_service.delete_room_user_image(1,2)
@@ -962,8 +1014,3 @@ def test_delete_room_user_image(image_service):
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
     이미지 1(유저 1),2(유저 2),3,4(유저 3)
 '''
-
-# room_imagelist=[room_image_info['id'] for room_image_info in get_room_imagelist(1)]
-#     assert room_imagelist==[1,2]
-#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-#     assert image_roomlist==[1,2]
