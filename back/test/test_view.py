@@ -442,4 +442,27 @@ def test_delete_user_friend(api):
 
 def test_get_user_roomlist(api):
     
-def delete_user_room(api):
+def test_delete_user_room(api):
+
+
+def test_post_room(api):
+
+def test_post_room_image(api):
+    
+def test_delete_room_image(api):
+    
+def test_get_room_imagelist(api):
+
+def test_get_room_userlist(api):
+
+def test_room_user(api):
+
+def test_post_room_user(api):
+    
+
+
+'''
+    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
+    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
+    이미지 1(유저 1),2(유저 2),3,4(유저 3)
+'''
