@@ -458,7 +458,19 @@ def test_get_room_userlist(api):
 def test_room_user(api):
 
 def test_post_room_user(api):
+
+
+def test_post_image(api):
+
+def test_delete_image(api):
     
+def test_get_image(api):
+    
+def test_get_image_roomlist(api):
+
+def test_post_image_roomlist(api):
+    
+
 
 
 '''
