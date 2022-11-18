@@ -15,7 +15,7 @@ export const Wrapper = styled.div<{ show: boolean, isMobile: boolean }>`
   transform: translateX(-215px);
 
   ${({ show, isMobile }) =>
-    (show || isMobile) &&
+    (show || !isMobile) &&
     `
     // display: none;
     visibility: visible;
