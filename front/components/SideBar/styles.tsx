@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div<{ show: boolean }>`
+export const Wrapper = styled.div<{ show: boolean, isMobile: boolean }>`
   width: 215px;
   height: calc(100vh - 80px);
   box-sizing: border-box;
@@ -14,8 +14,8 @@ export const Wrapper = styled.div<{ show: boolean }>`
   transition: transform 0.5s;
   transform: translateX(-215px);
 
-  ${({ show }) =>
-    show &&
+  ${({ show, isMobile }) =>
+    (show || isMobile) &&
     `
     // display: none;
     visibility: visible;

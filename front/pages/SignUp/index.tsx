@@ -125,7 +125,7 @@ const SignUp = () => {
       e.preventDefault();
       const hasError = checkErrorValue();
       // setHasError(checkErrorValue());
-      console.log(hasError, errorMessage);
+      // console.log(hasError, errorMessage);
       if (hasError) {
         alert('양식을 다시 확인해 주세요.');
         return;
