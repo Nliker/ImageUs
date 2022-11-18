@@ -1,5 +1,5 @@
-from .image_model import Image_Model
+from .image_model import ImageDao
 
 __all__=[
-    'Image_Model'
+    'ImageDao'
 ]
