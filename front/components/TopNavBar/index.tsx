@@ -36,12 +36,6 @@ const TopNavBar = () => {
             </NavLink>
           </h1>
           <NavList>
-            {/* <NavItem>
-              <NavLink to={'/main_page'}>
-                <HiOutlineHome />
-                메인 페이지
-              </NavLink>
-            </NavItem> */}
             <NavItem>
               <NavLink to={'/my_page'}>
                 <MdOutlineManageAccounts />
@@ -63,15 +57,9 @@ const TopNavBar = () => {
           </ProfileIconWrapper> */}
         </DesktopContainer>
       </DesktopNav>
-      <MobileNav>
+      {/* <MobileNav>
         <MobileContainer>
           <TopContainer>
-            <MobileBtnDiv>
-              <MobileButton>
-                <IoPeopleCircleSharp />
-                {/* 현재 방의 제목이 들어감 */}
-              </MobileButton>
-            </MobileBtnDiv>
             <div>
               <h1>
                 <NavLink to={'/main_page'}>
@@ -80,35 +68,9 @@ const TopNavBar = () => {
                 </NavLink>
               </h1>
             </div>
-            <MobileBtnDiv>
-              <MobileButton>
-                <RiFilter2Line />
-              </MobileButton>
-            </MobileBtnDiv>
           </TopContainer>
-          {/* <BottomContainer>
-            <MobileNavList>
-              <MobileNavItem>
-                <NavLink to={'/my_page'}>
-                  <MdOutlineManageAccounts />
-                  마이 페이지
-                </NavLink>
-              </MobileNavItem>
-              <MobileNavItem>
-                <NavLink to={'/'}>
-                  홈 버튼
-                </NavLink>
-              </MobileNavItem>
-              <MobileNavItem>
-                <NavLink to={'/magnagement_page'}>
-                  <BsPeople />
-                  친구목록 관리
-                </NavLink>
-              </MobileNavItem>
-            </MobileNavList>
-          </BottomContainer> */}
         </MobileContainer>
-      </MobileNav>
+      </MobileNav> */}
     </Wrapper>
   );
 };
