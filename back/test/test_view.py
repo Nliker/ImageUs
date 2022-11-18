@@ -426,7 +426,9 @@ def get_room_imagelist(room_id):
 
     return room_image_info_list
     
-def test__sign_up(api):
+    
+def test_sign_up(api):
+
 
 def test_login(api):
 
