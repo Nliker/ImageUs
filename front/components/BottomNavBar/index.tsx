@@ -1,5 +1,6 @@
 import React from 'react';
 import { BsPeople } from 'react-icons/bs';
+import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
 import { NavLink } from 'react-router-dom';
 import { BottomContainer, MobileNavItem, MobileNavList, Wrapper } from './styles';
@@ -16,7 +17,12 @@ const BottomNavBar = () => {
             </NavLink>
           </MobileNavItem>
           <MobileNavItem>
-            <NavLink to={'/'}>{/* <BsListUl /> */}홈 버튼</NavLink>
+            <h1>
+              <NavLink to={'/main_page'}>
+                <HiOutlineHome />
+                Cloudy
+              </NavLink>
+            </h1>
           </MobileNavItem>
           <MobileNavItem>
             <NavLink to={'/magnagement_page'}>

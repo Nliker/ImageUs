@@ -36,7 +36,7 @@ export const MobileNavItem = styled.li`
   list-style: none;
   box-sizing: border-box;
   padding: 0.5rem 1rem;
-  a {
+  &>a {
     border-radius: 5px;
     svg {
       display: block;
@@ -47,5 +47,9 @@ export const MobileNavItem = styled.li`
     &:hover {
       background-color: #d6d6d6;
     }
+  }
+
+  h1 {
+    margin: 0;
   }
 `;
