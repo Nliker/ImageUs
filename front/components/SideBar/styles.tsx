@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const Wrapper = styled.div<{ show: boolean, isMobile: boolean }>`
   width: 215px;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 85px);
   box-sizing: border-box;
   position: fixed;
   z-index: 100;
