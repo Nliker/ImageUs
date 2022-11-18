@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { DesktopContainer, NavItem, NavList, Wrapper } from './pc_styles';
+import { DesktopContainer, NavItem, NavList, Wrapper } from './styles';
 import { HiOutlineHome } from 'react-icons/hi';
 import { BsPeople } from 'react-icons/bs';
 import { MdOutlineManageAccounts } from 'react-icons/md';
