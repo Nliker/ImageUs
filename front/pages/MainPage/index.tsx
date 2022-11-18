@@ -25,7 +25,7 @@ const MainPage = () => {
     //     toast.error(error.response?.data, { position: 'bottom-center' });
     //   });
   }, []);
-  console.log(showUserMenu);
+  // console.log(showUserMenu);
   return (
     <AppLayout>
       <Wrappper>
