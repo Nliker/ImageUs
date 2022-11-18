@@ -10,7 +10,7 @@ export const Wrapper = styled.nav`
 `;
 
 export const BottomContainer = styled.div`
-  height: 66px;
+  height: 55px;
   width: 100%;
   box-shadow: 0 -2px 4px 0 rgb(33 37 41 / 8%);
   background-color: #fff;
