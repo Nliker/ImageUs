@@ -27,7 +27,7 @@ export const DesktopContainer = styled.nav`
     margin: 0;
     color: black;
     a {
-      display: flex;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
     }

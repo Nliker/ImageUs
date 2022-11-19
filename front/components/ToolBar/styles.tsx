@@ -6,6 +6,7 @@ export const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  box-shadow: rgb(0 0 0 / 10%) 2px 0px 2px;
   div {
     display: flex;
     align-items: center;
