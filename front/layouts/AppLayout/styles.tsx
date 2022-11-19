@@ -4,7 +4,7 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
   // 임시
   height: calc(100vh - 80px);
-  background-color: brown;
+  background-color: rgb(237, 241, 245);
 
   transition: transform 0.5s;
   transform: translateX(0px);
