@@ -53,7 +53,7 @@ def image_router(app,services):
             else:
                 return '접근이 잘못 되었습니다.',401
 
-        if not image_service.is_public_image(user_id,image_id):
+        if not image_service.is_public_image(image_id):
             return '공용 권한이 없는 사진으로 다운로드가 불가합니다.'
         
         return send_file(image_path),200
