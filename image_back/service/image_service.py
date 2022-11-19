@@ -11,7 +11,7 @@ class ImageService:
         try:
             payload=jwt.decode(upload_token,self.config['IMAGE_UPLOAD_KEY'],'HS256')
         except:
-            return False,401
+            return False
         #로그인 된 유저와 저장하려는 유저의 공간이 다를 경우
         if 'user_id' in payload and payload['user_id']==user_id:
             return True
@@ -37,10 +37,29 @@ class ImageService:
         
         save_image_path_and_filename=f"{image_save_dir}/{image_filename}"
         image.save(save_image_path_and_filename)
-        download_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{self.config['IMAGE_PATH']}/{user_id}/{image_filename}"
-        return image_filename
+        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{self.config['IMAGE_PATH']}/{user_id}/{image_filename}"
+        return image_link
 
-    def is_image_room_member(self,user_id,image_id):
+    def decode_access_code(self,access_token):
+        try:
+            payload=jwt.decode(access_token,self.config['JWT_SECRET_KEY'],'HS256')
+            if 'user_id' in payload:
+                return payload['user_id']
+            else:
+                False
+        except:
+            return False
 
-    def is_public_image(user_id,image_id):
-        
+    def is_user_image_room_member(self,user_id,image_id):
+        image_room_userlist=self.image_dao.image_room_userlist(image_id)
+        if user_id in image_room_userlist:
+            return True
+        else:
+            return False
+
+    def is_public_image(self,user_id,image_id):
+        image_info=self.image_dao.get_image_info(image_ids)
+        if image_info['public']==1:
+            return True
+        else:
+            return False
