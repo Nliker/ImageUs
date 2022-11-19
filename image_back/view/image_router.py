@@ -8,14 +8,14 @@ def image_router(app,services):
     
     @app.route("upload/<int:user_id>",methods=["POST"])
     def image(user_id):
-        upload_token=request.headers['access_token']
+        upload_token=request.headers['upload_token']
 
         authorized=image_service.authorize_upload_token(upload_token,user_id)
 
         if not authorized:
             return '업로드 할 수 있는 권한이 없습니다.'
         
-        if 'profile_pic' not in request.files:
+        if 'image' not in request.files:
             return 'File is missing',404
         
         
@@ -28,22 +28,32 @@ def image_router(app,services):
         
         return f"{image_link}",200
 
-    @app.route("album/<int:user_id>/<int:image_id>",methods=["GET"])
-    def image(user_id,image_id):
+    @app.route("/image-download//<int:user_id>/<int:image_filename>",methods=["GET"])
+    def image(user_id,image_filename):
         access_token=request.headers['access_token']
 
-        image_path=f'./images/{user_id}/{image_id}'
+        image_path=f'./images/{user_id}/{image_filename}'
+        image_link=request.url
+        #만약 토큰이 있을 경우 이미지에 대한 권한 확인
 
         if access_token:
             user_id=image_service.decode_access_code(access_token)
-            is_image_room_member=image_service.is_image_room_member(user_id,image_id):
-            
-            if is_image_room_member:
-                return send_file(image_path),200
+            if user_id:
+                image_info=image_service.get_image_info(user_id,image_link)
+                if not image_info:
+                    return '사진이 존재하지 않습니다.',404
+
+                image_id=image_info['id']
+                is_user_image_room_member=image_service.is_user_image_room_member(user_id,image_id)
+
+                if is_user_image_room_member:
+                    return send_file(image_path),200
+                else:
+                    return '사진에 대한 권한이 없습니다.',401
             else:
-                return '사진에 대한 접근 권한이 없습니다.'
-    
-        if not image_service.is_public_image(user_id,image_id)
+                return '접근이 잘못 되었습니다.',401
+
+        if not image_service.is_public_image(user_id,image_id):
             return '공용 권한이 없는 사진으로 다운로드가 불가합니다.'
         
         return send_file(image_path),200
