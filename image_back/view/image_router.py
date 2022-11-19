@@ -18,12 +18,13 @@ def image_router(app,services):
         if 'profile_pic' not in request.files:
             return 'File is missing',404
         
-        profile_pic=request.files['profile_pic']
+        
+        image=request.files['image']
 
-        if profile_pic.filename=='':
+        if image.filename=='':
             return 'File is missing',404
-    
-        image_link=image_service.save_profile_picture(user_id,profile_pic)
+
+        image_link=image_service.save_profile_picture(user_id,image)
         
         return f"{image_link}",200
 
