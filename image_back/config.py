@@ -20,10 +20,11 @@ DB_URL=f"mysql+mysqlconnector://{db['user']}:{db['password']}@{db['host']}:{db['
 
 TEST_DB_URL=f"mysql+mysqlconnector://{test_db['user']}:{test_db['password']}@{test_db['host']}:{test_db['port']}/{test_db['database']}?charset=utf8",
 
-IMAGE_PATH="./images/"
+IMAGE_PATH="images"
 
 IMAGE_DOWNLOAD_URL="http://127.0.0.1:5001/image-download/"
 
+IMAGE_UPLOAD_KEY="codakimage"
 
 test_config={
     'DB_URL':f"mysql+mysqlconnector://{test_db['user']}:{test_db['password']}@{test_db['host']}:{test_db['port']}/{test_db['database']}?charset=utf8",
