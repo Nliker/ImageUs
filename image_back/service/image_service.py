@@ -2,6 +2,8 @@ import jwt
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
+parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+
 class ImageService:
     def __init__(self,image_dao,config):
         self.image_dao=image_dao
@@ -20,7 +22,7 @@ class ImageService:
 
     def save_profile_picture(self,user_id,image):
         image_filename=image.filename
-        image_save_dir=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{self.config['IMAGE_PATH']}/{user_id}"
+        image_save_dir=f"{parent_path}/{self.config['IMAGE_PATH']}/{user_id}"
 
         is_user_dir_exists=os.path.isdir(f"{image_save_dir}")
         if not is_user_dir_exists:
@@ -50,20 +52,31 @@ class ImageService:
             if 'user_id' in payload:
                 return payload['user_id']
             else:
-                False
+                return False
         except:
             return False
 
     def is_user_image_room_member(self,user_id,image_id):
-        image_room_userlist=self.image_dao.image_room_userlist(image_id)
-        if user_id in image_room_userlist:
+        image_info=self.image_dao.get_image_info_by_id(image_id)
+        if image_info['user_id']==user_id:
             return True
-        else:
-            return False
 
-    def is_public_image(self,user_id,image_id):
-        image_info=self.image_dao.get_image_info(image_id)
+        image_room_userlist=self.image_dao.image_room_userlist(image_id)
+        for room_userlist in image_room_userlist:
+            if room_userlist['user_id']==user_id:
+                return True
+        return False
+
+    def is_public_image(self,image_id):
+        image_info=self.image_dao.get_image_info_by_id(image_id)
         if image_info['public']==1:
             return True
         else:
             return False
+
+    def get_image_path(self,user_id,image_filename):
+        file_path=f"{parent_path}/{self.config['IMAGE_PATH']}/{user_id}/{image_filename}"
+        if os.path.isfile(file_path):
+            return file_path
+        else:
+            return None
