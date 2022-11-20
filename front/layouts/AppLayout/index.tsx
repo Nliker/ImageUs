@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
-import { ContentWrapper } from './styles';
+import { ContentWrapper, Wrapper } from './styles';
 import TopNavBar from '@components/TopNavBar';
 import BottomNavBar from '@components/BottomNavBar';
 import { useMediaQuery } from 'react-responsive';
@@ -26,7 +26,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const onCloseModal = useCallback(() => setshowUploadModal(false), []);
 
   return (
-    <div>
+    <Wrapper>
       <TopNavBar />
       {isMobile && <BottomNavBar showModal={showModal} />}
       <ToolBar handleRoomListBtn={handleRoomListBtn} />
@@ -34,7 +34,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* {showSideBar && <SideBar />} */}
       <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       {showUploadModal && <UploadModal onCloseModal={onCloseModal} />}
-    </div>
+    </Wrapper>
   );
 };
 
