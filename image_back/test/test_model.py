@@ -265,7 +265,21 @@ def test_get_image_info(image_dao):
         'link':'testlink2',
         'user_id':2
     }
-    
+
+def test_get_image_info_by_id(image_dao):
+    image_info=image_dao.get_image_info_by_id(1)
+    assert image_info=={
+        'id':1,
+        'link':'testlink1',
+        'user_id':1
+    }
+    image_info=image_dao.get_image_info_by_id(4)
+    assert image_info=={
+        'id':4,
+        'link':'testlink4',
+        'user_id':3
+    }
+  
 def test_image_room_userlist(image_dao):
     image_room_userlist=get_image_room_userlist(1)
     assert image_room_userlist==[
