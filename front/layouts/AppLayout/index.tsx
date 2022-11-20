@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
-import { ContentWrapper, Wrapper } from './styles';
+import { Container, ContentWrapper, Wrapper } from './styles';
 import TopNavBar from '@components/TopNavBar';
 import BottomNavBar from '@components/BottomNavBar';
 import { useMediaQuery } from 'react-responsive';
@@ -17,22 +17,27 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
 
   const handleRoomListBtn = useCallback(() => {
-    // console.log(showSideBar);
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
-  const showModal = useCallback(() => setshowUploadModal(true), [showUploadModal]);
+  const showModal = useCallback(() => {
+    setshowUploadModal(true);
+  }, [showUploadModal]);
 
-  const onCloseModal = useCallback(() => setshowUploadModal(false), []);
+  const onCloseModal = useCallback(() => {
+    setshowUploadModal(false);
+  }, []);
 
   return (
     <Wrapper>
-      <TopNavBar />
-      {isMobile && <BottomNavBar showModal={showModal} />}
-      <ToolBar handleRoomListBtn={handleRoomListBtn} />
-      <SideBar show={showSideBar} isMobile={isMobile} />
-      {/* {showSideBar && <SideBar />} */}
-      <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
+      <Container showModal={showUploadModal}>
+        <TopNavBar />
+        {isMobile && <BottomNavBar showModal={showModal} />}
+        <ToolBar handleRoomListBtn={handleRoomListBtn} />
+        <SideBar show={showSideBar} isMobile={isMobile} />
+        {/* {showSideBar && <SideBar />} */}
+        <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
+      </Container>
       {showUploadModal && <UploadModal onCloseModal={onCloseModal} />}
     </Wrapper>
   );
