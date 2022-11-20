@@ -26,19 +26,19 @@ class ImageService:
         if not is_user_dir_exists:
             os.makedirs(image_save_dir)
             
-        is_file_exists=os.path.isdir(f"{image_save_dir}/{image_filename}")
-
+        is_file_exists=os.path.isfile(f"{image_save_dir}/{image_filename}")
+        count=0
         if  is_file_exists:
             folder_list = os.listdir(f"{image_save_dir}")
 
-            count=0
             for file_name in folder_list:
                 if file_name==image_filename:
                     count+=1
 
+        if count!=0:
             image_filename_list=image_filename.split(sep='.')
-            image_filename=image_filename_list[0]+f"({count})"+image_filename_list[1]
-        
+            image_filename=image_filename_list[0]+f"({count})."+image_filename_list[1]
+
         save_image_path_and_filename=f"{image_save_dir}/{image_filename}"
         image.save(save_image_path_and_filename)
         image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{self.config['IMAGE_PATH']}/{user_id}/{image_filename}"
