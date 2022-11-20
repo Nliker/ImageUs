@@ -36,7 +36,7 @@ export const MobileNavItem = styled.li`
   list-style: none;
   box-sizing: border-box;
   padding: 0.5rem 1rem;
-  &>a {
+  &>a, &>.upload_btn {
     border-radius: 5px;
     svg {
       display: block;
@@ -48,8 +48,13 @@ export const MobileNavItem = styled.li`
       background-color: #d6d6d6;
     }
   }
-
+  .upload_btn {
+    cursor: pointer;
+  }
   h1 {
     margin: 0;
   }
+`;
+
+export const UploadBtn = styled.div`
 `;

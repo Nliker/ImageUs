@@ -1,4 +1,3 @@
-import RoomList from '@components/SideBar';
 import AppLayout from '@layouts/AppLayout';
 import React, { useCallback, useState } from 'react';
 import { ContentWrappper, Wrappper } from './styles';
@@ -29,7 +28,8 @@ const MainPage = () => {
   return (
     <AppLayout>
       <Wrappper>
-        <ContentWrappper></ContentWrappper>
+        <ContentWrappper>
+        </ContentWrappper>
       </Wrappper>
     </AppLayout>
   );

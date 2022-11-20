@@ -1,9 +1,10 @@
 import React from 'react';
 import { BsPeople } from 'react-icons/bs';
+import { SlCloudUpload } from 'react-icons/sl';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
 import { NavLink } from 'react-router-dom';
-import { BottomContainer, MobileNavItem, MobileNavList, Wrapper } from './styles';
+import { BottomContainer, MobileNavItem, MobileNavList, UploadBtn, Wrapper } from './styles';
 
 const BottomNavBar = () => {
   return (
@@ -29,6 +30,12 @@ const BottomNavBar = () => {
               <BsPeople />
               친구목록 관리
             </NavLink>
+          </MobileNavItem>
+          <MobileNavItem>
+            <div className={"upload_btn"}>
+              <SlCloudUpload />
+              <span>업로드</span>
+            </div>
           </MobileNavItem>
         </MobileNavList>
       </BottomContainer>
