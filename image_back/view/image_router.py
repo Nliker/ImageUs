@@ -31,21 +31,24 @@ def image_router(app,services):
         
         return f"{image_link}",200
 
-    @app.route("/image-download//<int:user_id>/<int:image_filename>",methods=["GET"])
+    @app.route("/image-download//<int:user_id>/<str:image_filename>",methods=["GET"])
     def image(user_id,image_filename):
-        access_token=request.headers['access_token']
+        access_token=request.headers['access_token'] if 'access_token' in request.headers else None
 
-        image_path=f'./images/{user_id}/{image_filename}'
+        image_path=image_service.get_image_link_path(user_id,image_filename)
+        if not image_path:
+            return '저장된 사진이 없습니다.',404
+            
         image_link=request.url
         #만약 토큰이 있을 경우 이미지에 대한 권한 확인
-
+        
+        image_info=image_service.get_image_info(user_id,image_link)
+        if not image_info:
+            return '사진이 존재하지 않습니다.',404
+        
         if access_token:
             user_id=image_service.decode_access_code(access_token)
             if user_id:
-                image_info=image_service.get_image_info(user_id,image_link)
-                if not image_info:
-                    return '사진이 존재하지 않습니다.',404
-
                 image_id=image_info['id']
                 is_user_image_room_member=image_service.is_user_image_room_member(user_id,image_id)
 
@@ -58,7 +61,6 @@ def image_router(app,services):
 
         if not image_service.is_public_image(image_id):
             return '공용 권한이 없는 사진으로 다운로드가 불가합니다.'
-        
         return send_file(image_path),200
         
         
