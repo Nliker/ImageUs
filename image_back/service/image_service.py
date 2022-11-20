@@ -22,6 +22,10 @@ class ImageService:
         image_filename=image.filename
         image_save_dir=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{self.config['IMAGE_PATH']}/{user_id}"
 
+        is_user_dir_exists=os.path.isdir(f"{image_save_dir}")
+        if not is_user_dir_exists:
+            os.makedirs(image_save_dir)
+            
         is_file_exists=os.path.isdir(f"{image_save_dir}/{image_filename}")
 
         if  is_file_exists:
