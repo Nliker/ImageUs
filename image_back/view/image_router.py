@@ -1,7 +1,8 @@
 from flask import request,jsonify,send_file
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
+from PIL import Image
+from io import BytesIO
 
 def image_router(app,services):
     image_service=services.image_service
@@ -23,7 +24,9 @@ def image_router(app,services):
 
         if image.filename=='':
             return 'File is missing',404
-
+            
+        image = Image.open(BytesIO(image))
+        
         image_link=image_service.save_profile_picture(user_id,image)
         
         return f"{image_link}",200
