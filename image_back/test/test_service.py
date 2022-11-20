@@ -3,7 +3,8 @@ import sys,os
 import bcrypt
 import jwt
 from PIL import Image
-import shutill
+from io import BytesIO
+import shutil
 
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 import config
@@ -14,7 +15,7 @@ from sqlalchemy import create_engine,text
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
-image_dir=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{self.config['IMAGE_PATH']}"
+image_dir=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{config.test_config['IMAGE_PATH']}"
 
 @pytest.fixture
 def image_service():
@@ -199,7 +200,9 @@ def setup_function():
     print("샘플 기입 완료")
     print("======================")
     print("샘플 폴더 생성")
-    os.makedirs(f"{image_dir}/{1}")
+    if not os.path.isdir(f"{image_dir}"):
+        os.makedirs(f"{image_dir}")
+        os.makedirs(f"{image_dir}/1")
     print("샘플 폴더 생성 완료")
     print("======================")
 
@@ -227,7 +230,8 @@ def teardown_function():
     print("초기화 완료")
     print("======================")
     print("샘플 폴더 삭제")
-    shutill.rmtree(f"{image_dir}/{1}")
+    if os.path.isdir(f"{image_dir}"):
+        shutil.rmtree(f"{image_dir}")
     print("샘플 폴더 삭제 완료")
     print("======================")
     
@@ -257,11 +261,36 @@ def test_authorize_upload_token(image_service):
     authorized=image_service.authorize_upload_token(upload_token,2)
     assert authorized==False
 
-# def test_save_profile_picture(image_service):
-#     filename='sample_image.JPG'
-#     test_image_path=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{self.config['TEST_IMAGE_PATH']}/{filename}"
-#     image=Image.open(test_image_path)
-#     save_profile_picture(image)
+def test_save_profile_picture(image_service):
+    filename='sample_image.JPG'
+    test_image_path=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+
+    with open(test_image_path, 'rb') as f:
+        byte_image = f.read()
+    image=Image.open(BytesIO(byte_image))
+    image.filename=filename
+    user_id=2
+    
+    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+    assert is_dir_exists==False
+
+    image_link=image_service.save_profile_picture(user_id,image)
+    assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
+
+    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+    assert is_dir_exists==True
+
+    is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
+    assert is_file_exists==True
+
+    image_link=image_service.save_profile_picture(user_id,image)
+    filename='sample_image(1).JPG'
+    assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
+    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+    assert is_dir_exists==True
+
+    is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
+    assert is_file_exists==True
     
 # def test_decode_access_code(image_service):
     
