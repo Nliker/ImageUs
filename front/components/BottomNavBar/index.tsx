@@ -6,7 +6,11 @@ import { MdOutlineManageAccounts } from 'react-icons/md';
 import { NavLink } from 'react-router-dom';
 import { BottomContainer, MobileNavItem, MobileNavList, UploadBtn, Wrapper } from './styles';
 
-const BottomNavBar = () => {
+interface Props {
+  showModal: (e: any) => void;
+}
+
+const BottomNavBar = ({ showModal }: Props) => {
   return (
     <Wrapper>
       <BottomContainer>
@@ -32,7 +36,7 @@ const BottomNavBar = () => {
             </NavLink>
           </MobileNavItem>
           <MobileNavItem>
-            <div className={"upload_btn"}>
+            <div className={"upload_btn"} onClick={showModal}>
               <SlCloudUpload />
               <span>업로드</span>
             </div>
