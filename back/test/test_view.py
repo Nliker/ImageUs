@@ -427,50 +427,50 @@ def get_room_imagelist(room_id):
     return room_image_info_list
     
     
-def test_sign_up(api):
+# def test_sign_up(api):
 
 
-def test_login(api):
+# def test_login(api):
 
-def test_get_user(api):
+# def test_get_user(api):
 
-def test_get_user_imagelist(api):
+# def test_get_user_imagelist(api):
     
-def test_post_user_friend(api):
+# def test_post_user_friend(api):
     
-def test_get_user_friendlist(api):
+# def test_get_user_friendlist(api):
 
-def test_delete_user_friend(api):
+# def test_delete_user_friend(api):
 
-def test_get_user_roomlist(api):
+# def test_get_user_roomlist(api):
     
-def test_delete_user_room(api):
+# def test_delete_user_room(api):
 
 
-def test_post_room(api):
+# def test_post_room(api):
 
-def test_post_room_image(api):
+# def test_post_room_image(api):
     
-def test_delete_room_image(api):
+# def test_delete_room_image(api):
     
-def test_get_room_imagelist(api):
+# def test_get_room_imagelist(api):
 
-def test_get_room_userlist(api):
+# def test_get_room_userlist(api):
 
-def test_room_user(api):
+# def test_room_user(api):
 
-def test_post_room_user(api):
+# def test_post_room_user(api):
 
 
-def test_post_image(api):
+# def test_post_image(api):
 
-def test_delete_image(api):
+# def test_delete_image(api):
     
-def test_get_image(api):
+# def test_get_image(api):
     
-def test_get_image_roomlist(api):
+# def test_get_image_roomlist(api):
 
-def test_post_image_roomlist(api):
+# def test_post_image_roomlist(api):
     
 
 
