@@ -2,7 +2,17 @@ import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
   height: 100%;
-`
+`;
+
+export const Container = styled.div<{ showModal: boolean }>`
+  height: 100%;
+  width: 100%;
+  ${({ showModal }) =>
+    showModal &&
+    `
+    position: fixed;
+  `}
+`;
 
 export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
@@ -12,7 +22,9 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
 
   transition: transform 0.5s;
   transform: translateX(0px);
-  ${({ show }) => show && `
+  ${({ show }) =>
+    show &&
+    `
   transition: transform 0.5s;
   transform: translate3d(215px, 0, 0);
   `}
