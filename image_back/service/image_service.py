@@ -58,7 +58,7 @@ class ImageService:
             return False
 
     def is_public_image(self,user_id,image_id):
-        image_info=self.image_dao.get_image_info(image_ids)
+        image_info=self.image_dao.get_image_info(image_id)
         if image_info['public']==1:
             return True
         else:
