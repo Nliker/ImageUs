@@ -15,11 +15,13 @@ from sqlalchemy import create_engine,text
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
-image_dir=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{config.test_config['IMAGE_PATH']}"
+parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+
+image_dir=f"{parent_path}/{config.test_config['IMAGE_PATH']}"
 
 @pytest.fixture
 def image_service():
-    return ImageService(database,config.test_config)
+    return ImageService(ImageDao(database),config.test_config)
 
 def setup_function():
     print("============setup_func============")
@@ -203,6 +205,17 @@ def setup_function():
     if not os.path.isdir(f"{image_dir}"):
         os.makedirs(f"{image_dir}")
         os.makedirs(f"{image_dir}/1")
+        
+    
+    filename='sample_image.JPG'
+    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+
+    with open(test_image_path, 'rb') as f:
+        byte_image = f.read()
+    image=Image.open(BytesIO(byte_image))
+    image.filename=filename
+    image.save(f"{image_dir}/1/{filename}")
+    
     print("샘플 폴더 생성 완료")
     print("======================")
 
@@ -235,11 +248,6 @@ def teardown_function():
     print("샘플 폴더 삭제 완료")
     print("======================")
     
-'''
-    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
-    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
-    이미지 1(유저 1),2(유저 2),3,4(유저 3)
-'''
 
 def test_authorize_upload_token(image_service):
     user_id=2
@@ -263,7 +271,7 @@ def test_authorize_upload_token(image_service):
 
 def test_save_profile_picture(image_service):
     filename='sample_image.JPG'
-    test_image_path=f"{os.path.dirname(os.path.abspath(os.path.dirname(__file__)))}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
 
     with open(test_image_path, 'rb') as f:
         byte_image = f.read()
@@ -292,8 +300,99 @@ def test_save_profile_picture(image_service):
     is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
     assert is_file_exists==True
     
-# def test_decode_access_code(image_service):
-    
-# def test_is_user_image_room_member(image_service):
+def test_decode_access_code(image_service):
+    payload={
+        'user_id':2
+    }
+    access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
+    user_id= image_service.decode_access_code(access_token)
+    assert user_id==2
+    payload={
+        'user':2
+    }
+    access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
+    user_id= image_service.decode_access_code(access_token)
+    assert user_id==False
+    payload={
+        'user_id':2
+    }   
+    access_token=jwt.encode(payload,'wrong_jwt_key','HS256')
+    user_id= image_service.decode_access_code(access_token)
+    assert user_id==False
 
-# def test_is_public_image(image_service):
+def test_is_user_image_room_member(image_service):
+    is_user_image_room_member=image_service.is_user_image_room_member(3,4)
+    assert is_user_image_room_member==True
+    is_user_image_room_member=image_service.is_user_image_room_member(3,2)
+    assert is_user_image_room_member==True
+    
+    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+    assert is_user_image_room_member==True
+    is_user_image_room_member=image_service.is_user_image_room_member(1,3)
+    assert is_user_image_room_member==False
+
+    row=database.execute(text("""
+        update rooms_user_list
+        set deleted=1
+        where room_id=1
+        and user_id=1
+        and deleted=0
+        """)).rowcount
+    assert row==1
+    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+    assert is_user_image_room_member==False
+
+def test_is_public_image(image_service):
+    is_public=image_service.is_public_image(1)
+    assert is_public==False
+    is_public=image_service.is_public_image(2)
+    assert is_public==False
+    is_public=image_service.is_public_image(3)
+    assert is_public==False
+    
+    row=database.execute(text("""
+        update images
+        set public=1
+        where id=1
+        and public=0
+    """)).rowcount
+    assert row==1
+    is_public=image_service.is_public_image(1)
+    assert is_public==True
+    is_public=image_service.is_public_image(2)
+    assert is_public==False
+    is_public=image_service.is_public_image(3)
+    assert is_public==False
+
+    row=database.execute(text("""
+        update images
+        set public=1
+        where id=2
+        and public=0
+    """)).rowcount
+    assert row==1
+    is_public=image_service.is_public_image(1)
+    assert is_public==True
+    is_public=image_service.is_public_image(2)
+    assert is_public==True
+    is_public=image_service.is_public_image(3)
+    assert is_public==False
+
+def test_get_image_path(image_service):
+    image_filename='sample_image.JPG'
+    image_path=image_service.get_image_path(1,image_filename)
+    assert image_path==f"{image_dir}/1/{image_filename}"
+
+    image_filename='sample_image(1).JPG'
+    image_path=image_service.get_image_path(1,image_filename)
+    assert image_path==None
+    
+    image_filename='sample_image.JPG'
+    image_path=image_service.get_image_path(2,image_filename)
+    assert image_path==None
+
+'''
+    유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
+    룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
+    이미지 1(유저 1 공용),2(유저 2),3,4(유저 3)
+'''
