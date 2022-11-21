@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
   height: 100%;
+  overflow-x: hidden;
 `;
 
 export const Container = styled.div<{ showModal: boolean }>`
@@ -16,8 +17,7 @@ export const Container = styled.div<{ showModal: boolean }>`
 
 export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
-  // 임시
-  height: calc(100vh - 80px);
+  height: calc(100vh - 30px);
   background-color: rgb(237, 241, 245);
 
   transition: transform 0.5s;
