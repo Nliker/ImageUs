@@ -1009,6 +1009,56 @@ def test_delete_room_user_image(image_service):
     result=image_service.delete_room_user_image(100,3)
     assert result==0
 
+def test_upload_image(image_service):
+    filename='sample_image.JPG'
+    parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+    with open(test_image_path, 'rb') as f:
+        byte_image = f.read()
+    #request 의 file클래스 구현
+    class image:
+        file=None
+        filename=None
+        def __init__(self,file,filename):
+            self.file=file
+            self.filename=filename
+        def read(self):
+            return self.file
+        
+    request_image=image(byte_image,filename)
+
+    new_image={
+        'image':request_image,
+        'user_id':1
+    }
+    new_image_id=image_service.upload_image(new_image)
+    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    new_image_info=image_service.get_image_info(new_image_id)
+    assert new_image_info=={
+        'id':5,
+        'link':new_image_link,
+        'user_id':1
+    }
+    #같은 사진을 두 번 올렸을 경우
+    
+    new_image={
+        'image':request_image,
+        'user_id':1
+    }
+    new_image_id=image_service.upload_image(new_image)
+    filename='sample_image(1).JPG'
+    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    new_image_info=image_service.get_image_info(new_image_id)
+    assert new_image_info=={
+        'id':6,
+        'link':new_image_link,
+        'user_id':1
+    }
+    
+# def test_unauthorize_upload_image(image_service):
+    
+# def test_upload_room_image(image_service):
+
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)

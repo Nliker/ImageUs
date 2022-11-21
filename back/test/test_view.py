@@ -218,7 +218,7 @@ def teardown_function():
     """))
     print("초기화 완료")
     print("======================")
-
+    
 def get_user_info(user_id):
     row=database.execute(text("""
             select
