@@ -234,17 +234,42 @@ def teardown_function():
     이미지 1(유저 1 공용),2(유저 2),3,4(유저 3)
 '''
 
+def test_post_upload(api):
+    filename='sample_image.JPG'
+    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+
+    with open(test_image_path, 'rb') as f:
+        image=f.read()
+    image=image
+
+    payload={
+        'user_id':2,
+        }
+
+    upload_token=jwt.encode(payload,config.test_config['IMAGE_UPLOAD_KEY'],'HS256')
+    resp=api.post('/upload/2',
+            headers={
+                'Authorization':upload_token
+            },
+            data={'image':(BytesIO(image),filename)},
+            content_type='multipart/form-data')
+
+    assert resp.status_code==200
+    image_url=f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/2/{filename}"
+    assert resp.text==image_url
+
+    #기존의 업로드 된 사진의 크기와 저장된 사진의 크기가 같은지 확인
+    image_link=f"{image_dir}/2/{filename}"
+    assert os.path.isfile(image_link)
+    im=Image.open(image_link)    
+    assert im.size==Image.open(BytesIO(image)).size
+
 def test_post_unauthorize_upload(api):
     filename='sample_image.JPG'
     test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
 
     with open(test_image_path, 'rb') as f:
         image=f.read()
-
-    class byte_image:
-        image=None
-        def __init__(self,image):
-            self.image=image
     image=image
 
     payload={
@@ -256,7 +281,7 @@ def test_post_unauthorize_upload(api):
             headers={
                 'wrong_headers':upload_token
             },
-            data={'image':(image,filename)},
+            data={'image':(BytesIO(image),filename)},
             content_type='multipart/form-data')
         
     assert resp.status_code==401
@@ -266,7 +291,7 @@ def test_post_unauthorize_upload(api):
             headers={
                 'Authorization':upload_token
             },
-            data={'wrong_key':(image,filename)},
+            data={'wrong_key':(BytesIO(image),filename)},
             content_type='multipart/form-data')
         
     assert resp.status_code==404
@@ -276,7 +301,7 @@ def test_post_unauthorize_upload(api):
             headers={
                 'Authorization':upload_token
             },
-            data={'wrong_image':(image,None)},
+            data={'wrong_image':(BytesIO(image),None)},
             content_type='multipart/form-data')
         
     assert resp.status_code==404
@@ -292,13 +317,11 @@ def test_post_unauthorize_upload(api):
             headers={
                 'Authorization':upload_token
             },
-            data={'image':(image,filename)},
+            data={'image':(BytesIO(image),filename)},
             content_type='multipart/form-data')
         
     assert resp.status_code==401
     assert resp.text=='업로드 할 수 있는 권한이 없습니다.'
     
-# def test_post_upload(api):
-    
-    
 # def test_get_image_download(api):
+
