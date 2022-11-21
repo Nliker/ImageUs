@@ -275,14 +275,18 @@ def test_save_profile_picture(image_service):
 
     with open(test_image_path, 'rb') as f:
         byte_image = f.read()
+    
+    #request 의 file클래스 구현
     class image:
         file=None
         filename=None
         def __init__(self,file,filename):
             self.file=file
             self.filename=filename
+        def read(self):
+            return self.file
 
-    request_image=image(BytesIO(byte_image),filename)
+    request_image=image(byte_image,filename)
 
     user_id=2
     
