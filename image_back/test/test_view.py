@@ -231,7 +231,7 @@ def test_post_upload(api):
             content_type='multipart/form-data')
 
     assert resp.status_code==200
-    image_url=f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/2/{filename}"
+    image_url=f"{config.test_config['IMAGE_DOWNLOAD_URL']}2/{filename}"
     assert resp.text==image_url
 
     #기존의 업로드 된 사진의 크기와 저장된 사진의 크기가 같은지 확인
