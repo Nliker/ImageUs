@@ -25,7 +25,7 @@ class ImageService:
 
     def save_profile_picture(self,user_id,image):
         image_filename=image.filename
-        image=Image.open(BytesIO(image.file))
+        image=Image.open(image.file)
     
         image_save_dir=f"{parent_path}/{self.config['IMAGE_PATH']}/{user_id}"
 
