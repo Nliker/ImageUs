@@ -282,7 +282,7 @@ def test_save_profile_picture(image_service):
             self.file=file
             self.filename=filename
 
-    request_image=image(byte_image,filename)
+    request_image=image(BytesIO(byte_image),filename)
 
     user_id=2
     
