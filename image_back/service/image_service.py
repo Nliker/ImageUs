@@ -2,6 +2,9 @@ import jwt
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
+from PIL import Image
+from io import BytesIO
+
 parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 class ImageService:
@@ -22,6 +25,8 @@ class ImageService:
 
     def save_profile_picture(self,user_id,image):
         image_filename=image.filename
+        image=Image.open(BytesIO(image.file))
+    
         image_save_dir=f"{parent_path}/{self.config['IMAGE_PATH']}/{user_id}"
 
         is_user_dir_exists=os.path.isdir(f"{image_save_dir}")
