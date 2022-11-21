@@ -275,14 +275,21 @@ def test_save_profile_picture(image_service):
 
     with open(test_image_path, 'rb') as f:
         byte_image = f.read()
-    image=Image.open(BytesIO(byte_image))
-    image.filename=filename
+    class image:
+        file=None
+        filename=None
+        def __init__(self,file,filename):
+            self.file=file
+            self.filename=filename
+
+    request_image=image(byte_image,filename)
+
     user_id=2
     
     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
     assert is_dir_exists==False
 
-    image_link=image_service.save_profile_picture(user_id,image)
+    image_link=image_service.save_profile_picture(user_id,request_image)
     assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
 
     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
@@ -291,7 +298,7 @@ def test_save_profile_picture(image_service):
     is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
     assert is_file_exists==True
 
-    image_link=image_service.save_profile_picture(user_id,image)
+    image_link=image_service.save_profile_picture(user_id,request_image)
     filename='sample_image(1).JPG'
     assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
