@@ -1,20 +1,21 @@
 from flask import request,jsonify,send_file
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-from PIL import Image
-from io import BytesIO
 
 def image_router(app,services):
     image_service=services.image_service
     
-    @app.route("upload/<int:user_id>",methods=["POST"])
-    def image(user_id):
-        upload_token=request.headers['upload_token']
+    @app.route("/upload/<int:user_id>",methods=["POST"])
+    def upload(user_id):
+        if 'Authorization' not in request.headers:
+            return '업로드 토큰이 없습니다.',401
+
+        upload_token=request.headers['Authorization']
 
         authorized=image_service.authorize_upload_token(upload_token,user_id)
 
         if not authorized:
-            return '업로드 할 수 있는 권한이 없습니다.'
+            return '업로드 할 수 있는 권한이 없습니다.',401
         
         if 'image' not in request.files:
             return 'File is missing',404
@@ -24,15 +25,13 @@ def image_router(app,services):
 
         if image.filename=='':
             return 'File is missing',404
-            
-        image = Image.open(BytesIO(image))
         
         image_link=image_service.save_profile_picture(user_id,image)
         
         return f"{image_link}",200
 
-    @app.route("/image-download//<int:user_id>/<str:image_filename>",methods=["GET"])
-    def image(user_id,image_filename):
+    @app.route("/image-download/<int:user_id>/<string:image_filename>",methods=["GET"])
+    def image_download(user_id,image_filename):
         access_token=request.headers['access_token'] if 'access_token' in request.headers else None
 
         image_path=image_service.get_image_link_path(user_id,image_filename)
