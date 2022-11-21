@@ -49,7 +49,7 @@ class ImageService:
 
         save_image_path_and_filename=f"{image_save_dir}/{image_filename}"
         image.save(save_image_path_and_filename)
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{self.config['IMAGE_PATH']}/{user_id}/{image_filename}"
+        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{image_filename}"
         return image_link
 
     def decode_access_code(self,access_token):

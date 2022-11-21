@@ -269,127 +269,127 @@ def test_authorize_upload_token(image_service):
     authorized=image_service.authorize_upload_token(upload_token,2)
     assert authorized==False
 
-def test_save_profile_picture(image_service):
-    filename='sample_image.JPG'
-    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+# def test_save_profile_picture(image_service):
+#     filename='sample_image.JPG'
+#     test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
 
-    with open(test_image_path, 'rb') as f:
-        byte_image = f.read()
+#     with open(test_image_path, 'rb') as f:
+#         byte_image = f.read()
     
-    #request 의 file클래스 구현
-    class image:
-        file=None
-        filename=None
-        def __init__(self,file,filename):
-            self.file=file
-            self.filename=filename
-        def read(self):
-            return self.file
+#     #request 의 file클래스 구현
+#     class image:
+#         file=None
+#         filename=None
+#         def __init__(self,file,filename):
+#             self.file=file
+#             self.filename=filename
+#         def read(self):
+#             return self.file
 
-    request_image=image(byte_image,filename)
+#     request_image=image(byte_image,filename)
 
-    user_id=2
+#     user_id=2
     
-    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
-    assert is_dir_exists==False
+#     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+#     assert is_dir_exists==False
 
-    image_link=image_service.save_profile_picture(user_id,request_image)
-    assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
+#     image_link=image_service.save_profile_picture(user_id,request_image)
+#     assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{user_id}/{filename}"
 
-    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
-    assert is_dir_exists==True
+#     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+#     assert is_dir_exists==True
 
-    is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
-    assert is_file_exists==True
+#     is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
+#     assert is_file_exists==True
 
-    image_link=image_service.save_profile_picture(user_id,request_image)
-    filename='sample_image(1).JPG'
-    assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{config.test_config['IMAGE_PATH']}/{user_id}/{filename}"
-    is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
-    assert is_dir_exists==True
+#     image_link=image_service.save_profile_picture(user_id,request_image)
+#     filename='sample_image(1).JPG'
+#     assert image_link==f"{config.test_config['IMAGE_DOWNLOAD_URL']}{user_id}/{filename}"
+#     is_dir_exists=os.path.isdir(f"{image_dir}/{user_id}")
+#     assert is_dir_exists==True
 
-    is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
-    assert is_file_exists==True
+#     is_file_exists=os.path.isfile(f"{image_dir}/{user_id}/{filename}")
+#     assert is_file_exists==True
     
-def test_decode_access_code(image_service):
-    payload={
-        'user_id':2
-    }
-    access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
-    user_id= image_service.decode_access_code(access_token)
-    assert user_id==2
-    payload={
-        'user':2
-    }
-    access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
-    user_id= image_service.decode_access_code(access_token)
-    assert user_id==False
-    payload={
-        'user_id':2
-    }   
-    access_token=jwt.encode(payload,'wrong_jwt_key','HS256')
-    user_id= image_service.decode_access_code(access_token)
-    assert user_id==False
+# def test_decode_access_code(image_service):
+#     payload={
+#         'user_id':2
+#     }
+#     access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
+#     user_id= image_service.decode_access_code(access_token)
+#     assert user_id==2
+#     payload={
+#         'user':2
+#     }
+#     access_token=jwt.encode(payload,config.test_config['JWT_SECRET_KEY'],'HS256')
+#     user_id= image_service.decode_access_code(access_token)
+#     assert user_id==False
+#     payload={
+#         'user_id':2
+#     }   
+#     access_token=jwt.encode(payload,'wrong_jwt_key','HS256')
+#     user_id= image_service.decode_access_code(access_token)
+#     assert user_id==False
 
-def test_is_user_image_room_member(image_service):
-    is_user_image_room_member=image_service.is_user_image_room_member(3,4)
-    assert is_user_image_room_member==True
-    is_user_image_room_member=image_service.is_user_image_room_member(3,2)
-    assert is_user_image_room_member==True
+# def test_is_user_image_room_member(image_service):
+#     is_user_image_room_member=image_service.is_user_image_room_member(3,4)
+#     assert is_user_image_room_member==True
+#     is_user_image_room_member=image_service.is_user_image_room_member(3,2)
+#     assert is_user_image_room_member==True
     
-    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
-    assert is_user_image_room_member==True
-    is_user_image_room_member=image_service.is_user_image_room_member(1,3)
-    assert is_user_image_room_member==False
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+#     assert is_user_image_room_member==True
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,3)
+#     assert is_user_image_room_member==False
 
-    row=database.execute(text("""
-        update rooms_user_list
-        set deleted=1
-        where room_id=1
-        and user_id=1
-        and deleted=0
-        """)).rowcount
-    assert row==1
-    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
-    assert is_user_image_room_member==False
+#     row=database.execute(text("""
+#         update rooms_user_list
+#         set deleted=1
+#         where room_id=1
+#         and user_id=1
+#         and deleted=0
+#         """)).rowcount
+#     assert row==1
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+#     assert is_user_image_room_member==False
 
-def test_is_public_image(image_service):
-    is_public=image_service.is_public_image(1)
-    assert is_public==False
-    is_public=image_service.is_public_image(2)
-    assert is_public==False
-    is_public=image_service.is_public_image(3)
-    assert is_public==False
+# def test_is_public_image(image_service):
+#     is_public=image_service.is_public_image(1)
+#     assert is_public==False
+#     is_public=image_service.is_public_image(2)
+#     assert is_public==False
+#     is_public=image_service.is_public_image(3)
+#     assert is_public==False
     
-    row=database.execute(text("""
-        update images
-        set public=1
-        where id=1
-        and public=0
-    """)).rowcount
-    assert row==1
-    is_public=image_service.is_public_image(1)
-    assert is_public==True
-    is_public=image_service.is_public_image(2)
-    assert is_public==False
-    is_public=image_service.is_public_image(3)
-    assert is_public==False
+#     row=database.execute(text("""
+#         update images
+#         set public=1
+#         where id=1
+#         and public=0
+#     """)).rowcount
+#     assert row==1
+#     is_public=image_service.is_public_image(1)
+#     assert is_public==True
+#     is_public=image_service.is_public_image(2)
+#     assert is_public==False
+#     is_public=image_service.is_public_image(3)
+#     assert is_public==False
 
-    row=database.execute(text("""
-        update images
-        set public=1
-        where id=2
-        and public=0
-    """)).rowcount
-    assert row==1
-    is_public=image_service.is_public_image(1)
-    assert is_public==True
-    is_public=image_service.is_public_image(2)
-    assert is_public==True
-    is_public=image_service.is_public_image(3)
-    assert is_public==False
+#     row=database.execute(text("""
+#         update images
+#         set public=1
+#         where id=2
+#         and public=0
+#     """)).rowcount
+#     assert row==1
+#     is_public=image_service.is_public_image(1)
+#     assert is_public==True
+#     is_public=image_service.is_public_image(2)
+#     assert is_public==True
+#     is_public=image_service.is_public_image(3)
+#     assert is_public==False
 
-def test_get_image_path(image_service):
+# def test_get_image_path(image_service):
     image_filename='sample_image.JPG'
     image_path=image_service.get_image_path(1,image_filename)
     assert image_path==f"{image_dir}/1/{image_filename}"
