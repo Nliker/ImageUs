@@ -23,7 +23,7 @@ export const CloseBtn = styled.div`
   top: 10px;
   right: 10px;
   padding: 8px;
-  &>div {
+  & > div {
     display: flex;
   }
   svg {
@@ -77,6 +77,46 @@ export const ModalTitle = styled.div`
   }
 `;
 
-export const ImageBox = styled.div`
+export const ModalImageBox = styled.div`
+  position: relative;
+  width: 100%;
+  height: calc(100% - 43px);
+  // height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 `;
 
+export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
+  // 이미지에 따라 width 와 height를 동적으로 변환시켜 주어야 한다.
+  ${({ image }) => {
+    console.log(image?.height);
+    const ratio = image && 348 / image?.height;
+    return `
+    width: ${ratio && image?.width * ratio}px;
+    `;
+  }};
+  height: 348px;
+  background-image: url(image_test.png);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+  transform: none;
+`;
+
+export const ImageCover = styled.div`
+  bottom: 0;
+  cursor: grab;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  touch-action: none;
+  -webkit-user-select: none;
+  width: 100%;
+  z-index: 2;
+`;
