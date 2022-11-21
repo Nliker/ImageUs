@@ -86,3 +86,11 @@ class ImageService:
             return file_path
         else:
             return None
+        
+    def get_image_info(self,user_id,image_link):
+        image_info=self.image_dao.get_image_info(user_id,image_link)
+        return image_info
+
+    def get_image_link(self,user_id,image_filename):
+        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{image_filename}"
+        return image_link
