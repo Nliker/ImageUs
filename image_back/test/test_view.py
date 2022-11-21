@@ -260,6 +260,7 @@ def test_post_unauthorize_upload(api):
             content_type='multipart/form-data')
         
     assert resp.status_code==401
+    assert resp.text=='업로드 토큰이 없습니다.'
         
     resp=api.post('/upload/1',
             headers={
@@ -269,6 +270,7 @@ def test_post_unauthorize_upload(api):
             content_type='multipart/form-data')
         
     assert resp.status_code==404
+    assert resp.text=='File is missing'
         
     resp=api.post('/upload/1',
             headers={
@@ -278,7 +280,8 @@ def test_post_unauthorize_upload(api):
             content_type='multipart/form-data')
         
     assert resp.status_code==404
-    
+    assert resp.text=='File is missing'
+
     payload={
             'worng_key':1,
         }
@@ -293,6 +296,7 @@ def test_post_unauthorize_upload(api):
             content_type='multipart/form-data')
         
     assert resp.status_code==401
+    assert resp.text=='업로드 할 수 있는 권한이 없습니다.'
     
 # def test_post_upload(api):
     
