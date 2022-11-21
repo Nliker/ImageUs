@@ -222,6 +222,7 @@ def teardown_function():
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
     이미지 1(유저 1),2(유저 2),3,4(유저 3)
 '''
+
 def get_image_info(user_id,image_link):
         row=database.execute(text("""
             select id,user_id,link
@@ -271,13 +272,15 @@ def test_get_image_info_by_id(image_dao):
     assert image_info=={
         'id':1,
         'link':'testlink1',
-        'user_id':1
+        'user_id':1,
+        'public':0
     }
     image_info=image_dao.get_image_info_by_id(4)
     assert image_info=={
         'id':4,
         'link':'testlink4',
-        'user_id':3
+        'user_id':3,
+        'public':0
     }
   
 def test_image_room_userlist(image_dao):
