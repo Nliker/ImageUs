@@ -1,5 +1,4 @@
 import requests
-import json
 import jwt
 
 
@@ -64,7 +63,7 @@ class ImageService:
     def upload_image(self,new_image):
         files=new_image['image']
         
-        upload={'image':files}
+        upload={'image':(files.filename,files.read())}
         
         payload={
             'user_id':new_image['user_id'],
@@ -74,7 +73,7 @@ class ImageService:
 
         res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
                 files=upload,
-                headers = {'upload_token':image_upload_token})
+                headers = {'Authorization':image_upload_token})
     
         link=res.text
         new_image={
