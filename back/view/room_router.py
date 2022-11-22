@@ -67,7 +67,13 @@ def room_router(app,services):
         }
         result=image_service.upload_room_image(room_id,new_image)
         if 'message' not in result:
-            return f"{result['new_image_id']}번 이미지 {result['result']}개를 업로드 성공",200
+            new_image_id=result['new_image_id']
+            image_info=image_service.get_image_info(new_image_id)
+            return jsonify(
+                {
+                    'image_info':image_info,
+                    'success':result['result']
+                }),200
         else:
             return result['message'],result['status_code']
     #id가 room_id인 room의 id가 image_id인 image의 권한을 삭제합니다.
