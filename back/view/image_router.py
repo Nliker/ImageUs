@@ -118,10 +118,25 @@ def image_router(app,services):
     # }
     #output
     # {
-    #     'addlist':addlist,
-    #     'deletelist':deletelist,
-    #     'add_result':add_result,
-    #     'delete_result':delete_result
+    #     'result':
+    #         {
+    #             'addlist':addlist,
+    #             'deletelist':deletelist,
+    #             'add_result':add_result,
+    #             'delete_result':delete_result
+    #         },
+    #     'roomlist':[
+    #         {
+    #             'id':1,
+    #             'title':'testroom1',
+    #             'host_user_id':1
+    #         },
+    #         {
+    #             'id':2,
+    #             'title':'testroom2',
+    #             'host_user_id':2
+    #         }
+    #     ]
     # }
     @app.route("/image/<int:image_id>/roomlist",methods=["POST"])
     @login_required
@@ -142,5 +157,7 @@ def image_router(app,services):
                 exist_roomlist.append(room_id)
         
         result=image_service.update_image_room(image_id,exist_roomlist)
+        image_room_info_list=image_service.get_image_roomlist(image_id)
 
-        return jsonify(result),200
+        return jsonify({'result':result,
+                        'roomlist':image_room_info_list}),200
