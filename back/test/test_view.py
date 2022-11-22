@@ -5,12 +5,19 @@ from app import create_app
 import pytest
 from sqlalchemy import create_engine,text
 import config
+import shutil
+import bcrypt
+import jwt
 
 database=database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
-pytest.fixture()
+parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+projects_dir=os.path.dirname(os.path.abspath(parent_path))
+image_dir=f"{projects_dir}/image_back/{config.test_config['IMAGE_PATH']}"
+
+@pytest.fixture()
 def api():
-    app=create_engine(test_config=config.tesst_config)
+    app=create_app(test_config=config.test_config)
     app.config['TEST']=True
     api=app.test_client()
 
@@ -217,6 +224,10 @@ def teardown_function():
         truncate images_room_list
     """))
     print("초기화 완료")
+    print("이미지 폴더 초기화")
+    if os.path.isdir(f"{image_dir}"):
+        shutil.rmtree(f"{image_dir}")
+    print("이미지 폴더 초기화 완료")
     print("======================")
     
 def get_user_info(user_id):
@@ -425,22 +436,285 @@ def get_room_imagelist(room_id):
         } for room_image_info in rows]
 
     return room_image_info_list
+
+def generate_access_token(user_id):
+    return jwt.encode({'user_id':user_id},config.test_config['JWT_SECRET_KEY'],'HS256')
+
+#새로운 유저 생성 
+def test_sign_up(api):
+    #새로운 유저 생성 확인
+    new_user={
+        'name':'test4',
+        'email':'testuser4@naver.com',
+        'password':'test_password',
+        'profile':'testuser4'
+    }
+    resp=api.post('/sign-up',
+            data=json.dumps(new_user),
+            content_type='application/json')
+    assert resp.status_code==200
+
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'user_info':
+        {
+            'id':4,
+            'name':new_user['name'],
+            'email':new_user['email'],
+            'profile':new_user['profile'],
+        }
+    }
+
+#정상적인 유저의 권한 검사
+def test_login(api):
+    #정상적인 유저의 권한 확인
+    credential={
+        'email':'test1@naver.com',
+        'password':'test_password'
+    }
+    resp=api.post('/login',
+        data=json.dumps(credential),
+        content_type='application/json')
+
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert 'access_token' in resp_json
+    access_token=resp_json['access_token']
+
+    try:
+        payload=jwt.decode(access_token,config.test_config['JWT_SECRET_KEY'],'HS256')
+        assert 'user_id' in payload and payload['user_id']==1
+    except:
+        assert False
+
+#권한이 없는 유저 검사
+def test_unauthorize_login(api):
+    #비밀번호가 다른 유저의 권한 검사
+    credential={
+        'email':'test1@naver.com',
+        'password':'wrong_password'
+
+    }
     
+    resp=api.post('/login',
+        data=json.dumps(credential),
+        content_type='application/json')
     
-# def test_sign_up(api):
+    assert resp.status_code==401
+    #존재하지 않는 이메일의 유저 검사
+    credential={
+        'email':'wrongemail',
+        'password':'test_password'
 
-
-# def test_login(api):
-
-# def test_get_user(api):
-
-# def test_get_user_imagelist(api):
+    }
     
-# def test_post_user_friend(api):
+    resp=api.post('/login',
+        data=json.dumps(credential),
+        content_type='application/json')
     
-# def test_get_user_friendlist(api):
+    assert resp.status_code==404
 
-# def test_delete_user_friend(api):
+#유저의 정보 불러오기
+def test_get_user(api): 
+    #존재하는 유저 정보 확인
+    user_id=1
+    resp=api.get(f"/user/{user_id}")
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'user_info':
+        {
+            'id':1,
+            'name':'test1',
+            'email':'test1@naver.com',
+            'profile':'testuser1'
+        }
+    }
+
+    #존재하지 않는 유저 정보 확인
+    user_id=100
+    resp=api.get(f"/user/{user_id}")
+    assert resp.status_code==404
+
+#유저의 이미지 목록 불러오기
+def test_get_user_imagelist(api):
+    #1번 유저의 이미지 목록 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    resp=api.get(f"/user/{user_id}/imagelist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+
+    
+    assert resp_json=={
+        'imagelist':[
+            {
+                'id':1,
+                'link':'testlink1',
+                'user_id':1
+            },
+        ]
+    }
+
+    #2번 유저의 이미지 목록 확인
+    user_id=2
+    access_token=generate_access_token(user_id)
+    resp=api.get(f"/user/{user_id}/imagelist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+
+    
+    assert resp_json=={
+        'imagelist':[
+            {
+                'id':2,
+                'link':'testlink2',
+                'user_id':2
+            }
+        ]
+    }
+    #로그인한 유저와 조회하는 이미지 목록의 유저가 다를 경우 확인
+    user_id=1
+    access_token=generate_access_token(3)
+    resp=api.get(f"/user/{user_id}/imagelist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==401
+
+#친구 생성
+def test_post_user_friend(api):
+    #1번 유저가 3번 유저를 친구 추가 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    friend={'friend_user_id':3}
+    resp=api.post(f"/user/{user_id}/friend",
+            data=json.dumps(friend),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==200
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(user_id)]
+    assert user_friendlist==[2,3]
+    #1번 유저가 이미 친구인 유저를 친구 추가 확인
+    friend={'friend_user_id':2}
+    resp=api.post(f"/user/{user_id}/friend",
+            data=json.dumps(friend),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==401
+    #1번 유저가 존재하지 않은 유저에게 친구 추가 확인
+    friend={'friend_user_id':100}
+    resp=api.post(f"/user/{user_id}/friend",
+            data=json.dumps(friend),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==404
+    #로그인한 유저와 신청하는 유저가 다를 경우 확인
+    access_token=generate_access_token(3)
+    friend={'friend_user_id':1}
+    resp=api.post(f"/user/{user_id}/friend",
+            data=json.dumps(friend),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    assert resp.status_code==401
+    
+#유저의 친구 목록 가져오기
+def test_get_user_friendlist(api):
+    #1번 유저의 친구 목록 정보 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    resp=api.get(f"/user/{user_id}/friendlist",
+            headers={'Authorization':access_token})
+
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'friendlist':[
+        {
+            'id':2,
+            'name':'test2',
+            'email':'test2@naver.com',
+            'profile':'testuser2',
+        }
+    ]
+        }
+    #2번 유저의 친구 목록 정보 확인
+    user_id=2
+    access_token=generate_access_token(user_id)
+    resp=api.get(f"/user/{user_id}/friendlist",
+            headers={'Authorization':access_token})
+
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'friendlist':[
+        {
+            'id':1,
+            'name':'test1',
+            'email':'test1@naver.com',
+            'profile':'testuser1',
+        },
+        {
+            'id':3,
+            'name':'test3',
+            'email':'test3@naver.com',
+            'profile':'testuser3',
+        }
+    ]}
+    #로그인한 유저와 조회하려는 유저가 다른 경우 확인
+    user_id=1
+    access_token=generate_access_token(3)
+    resp=api.get(f"/user/{user_id}/friendlist",
+            headers={'Authorization':access_token})
+
+    assert resp.status_code==401
+
+#유저의 친구 삭제
+def test_delete_user_friend(api):
+    #1번 유저의 친구 2번 유저를 친구 삭제 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    delete_frined={
+        'delete_friend_user_id':2
+    }
+    resp=api.delete(f"user/{user_id}/friend",
+            data=json.dumps(delete_frined),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+
+    assert resp.status_code==200
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(user_id)]
+    assert user_friendlist==[]
+    user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
+    assert user_friendlist==[3]
+    #로그인한 유저와 삭제 하려는 유저가 다를 때
+    user_id=3
+    access_token=generate_access_token(1)
+    delete_frined={
+        'delete_friend_user_id':2
+    }
+    resp=api.delete(f"user/{user_id}/friend",
+            data=json.dumps(delete_frined),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+
+    assert resp.status_code==401
+    #존재하지 않는 유저를 삭제하려 할때
+    user_id=1
+    access_token=generate_access_token(user_id)
+    delete_frined={
+        'delete_friend_user_id':100
+    }
+    resp=api.delete(f"user/{user_id}/friend",
+            data=json.dumps(delete_frined),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==404
+
 
 # def test_get_user_roomlist(api):
     
