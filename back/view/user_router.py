@@ -225,10 +225,12 @@ def user_router(app,services):
     #           'id':<int>,
     #           'title':<str>,
     #           'host_user_id':<int>
+    #           ...
     #          }
     #     ]
     # }
     @app.route("/user/<int:user_id>/roomlist",methods=["GET"])
+    @login_required
     def get_user_roomlist(user_id):
         current_user_id=g.user_id
         
@@ -253,6 +255,7 @@ def user_router(app,services):
     #output
     # '삭제 성공'
     @app.route("/user/<int:user_id>/room",methods=["DELETE"])
+    @login_required
     def delete_user_roomlist(user_id):
         current_user_id=g.user_id
         
