@@ -715,11 +715,69 @@ def test_delete_user_friend(api):
     
     assert resp.status_code==404
 
+#유저의 방 목록 불러오기
+def test_get_user_roomlist(api):
+    #1번 유저의 방 목록 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    resp=api.get(f"/user/{user_id}/roomlist",
+                headers={'Authorization':access_token})
+    assert resp.status_code==200    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'roomlist':[
+            {
+                'id':1,
+                'title':'testroom1',
+                'host_user_id':1,
+                'userlist':[
+                    {
+                        'id':1,
+                        'name':'test1',
+                        'email':'test1@naver.com',
+                        'profile':'testuser1'
+                    },
+                    {
+                        'id':2,
+                        'name':'test2',
+                        'email':'test2@naver.com',
+                        'profile':'testuser2'
+                    }
+                ]
+            }
+        ]
+    }
+    #로그인한 유저와 불러오려는 유저가 다른경우
+    user_id=1
+    access_token=generate_access_token(3)
+    resp=api.get(f"/user/{user_id}/roomlist",
+                headers={'Authorization':access_token})
+    assert resp.status_code==401
 
-# def test_get_user_roomlist(api):
+#유저가 방을 나가기
+def test_delete_user_room(api):
+    #1번 유저가 1번 방을 나감을 확인
+    delete_user_room={
+        'delete_user_room_id':1
+    }
+    user_id=1
+    access_token=generate_access_token(1)
+    resp=api.delete(f"/user/{user_id}/room",
+        data=json.dumps(delete_user_room),
+        headers={'Authorization':access_token},
+        content_type='application/json')
+    assert resp.status_code==200
     
-# def test_delete_user_room(api):
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(user_id)]
+    assert user_roomlist==[]
 
+    user_id=1
+    access_token=generate_access_token(3)
+    resp=api.delete(f"/user/{user_id}/room",
+        data=json.dumps(delete_user_room),
+        headers={'Authorization':access_token},
+        content_type='application/json')
+    assert resp.status_code==401
 
 # def test_post_room(api):
 
