@@ -20,7 +20,7 @@ def room_router(app,services):
     # '방 생성 성공 및 {result}명 초대 성공',200
     @app.route("/room",methods=["POST"])
     @login_required
-    def room():
+    def post_room():
         room_userlist=request.json['userlist']
         current_user_id=g.user_id
         
@@ -54,7 +54,7 @@ def room_router(app,services):
     # '{result}개를 업로드 성공'
     @app.route("/room/<int:room_id>/image",methods=["POST"])
     @login_required
-    def room_image(room_id):
+    def post_room_image(room_id):
         current_user_id=g.user_id
         
         if 'image' not in request.files or request.files['image'].filename=='':
@@ -85,7 +85,7 @@ def room_router(app,services):
     # "{result}장 삭제 완료"
     @app.route("/room/<int:room_id>/image",methods=["DELETE"])
     @login_required
-    def room_image(room_id,image_id):
+    def delete_room_image(room_id,image_id):
         current_user_id=g.user_id
 
         if not image_service.get_image_info(image_id):
@@ -117,7 +117,7 @@ def room_router(app,services):
     # }
     @app.route("/room/<int:room_id>/imagelist",methods=["GET"])
     @login_required
-    def room_imagelist(room_id):
+    def get_room_imagelist(room_id):
         current_user_id=g.user_id
         if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
@@ -151,7 +151,7 @@ def room_router(app,services):
     # }
     @app.route("/room/<int:room_id>/userlist",methods=["GET"]) 
     @login_required
-    def room_userlist(room_id):
+    def get_room_userlist(room_id):
         current_user_id=g.user_id
         if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
@@ -172,7 +172,7 @@ def room_router(app,services):
     #'{result}명 강퇴 성공'
     @app.route("/room/<int:room_id>/user",methods=["DELETE"]) 
     @login_required
-    def room_user(room_id,user_id):
+    def delete_room_user(room_id,user_id):
         current_user_id=g.user_id
         
         if not room_service.get_room_info(room_id):
@@ -199,7 +199,7 @@ def room_router(app,services):
     #'{result}명 초대 성공'
     @app.route("/room/<int:room_id>/user",methods=["post"]) 
     @login_required
-    def room_user(room_id):
+    def post_room_user(room_id):
         if not room_service.get_room_info(room_id):
             return '방이 존재하지 않습니다.',400
         

@@ -7,7 +7,7 @@ from auth import login_required,g
 def user_router(app,services):
     user_service=services.user_service
     image_service=services.image_service
-    room_service=services.room_services
+    room_service=services.room_service
     
     #회원가입을 합니다.
     #input
@@ -19,13 +19,16 @@ def user_router(app,services):
     # }
     #output
     # {
-    #     'id':<int>,
-    #     'name':<str>,
-    #     'email':<str>,
-    #     'profile':<str>,
+    #     'user_info':
+    #     {
+    #             'id':<int>,
+    #             'name':<str>,
+    #             'email':<str>,
+    #             'profile':<str>,
+    #     }
     # }
     @app.route("/sign-up",methods=["POST"])
-    def sign_up():
+    def post_sign_up():
         new_user=request.json
 
         if user_service.is_email_exists(new_user['email']):
@@ -34,24 +37,27 @@ def user_router(app,services):
         new_user_id=user_service.create_new_user(new_user)
         user_info=user_service.get_user_info(new_user_id)
         
-        return jsonify({user_info}),200
+        return jsonify({'user_info':user_info}),200
 
     #id가 user_id인 유저의 정보를 불러옵니다.
     #input
     #output
     # {
-    #     'id':<int>,
-    #     'name':<str>,
-    #     'email':<str>,
-    #     'profile':<str>,
+    #     'user_info':
+    #     {
+    #         'id':<int>,
+    #         'name':<str>,
+    #         'email':<str>,
+    #         'profile':<str>,
+    #     }
     # }
     @app.route("/user/<int:user_id>",methods=["GET"])
-    def user(user_id):
+    def get_user(user_id):
         user_info=user_service.get_user_info(user_id)
         if user_info:
-            return jsonify({user_info}),200
+            return jsonify({'user_info':user_info}),200
         else:
-            return '해당 유저가 존재하지 않습니다.',400
+            return '해당 유저가 존재하지 않습니다.',404
     
     #로그인을 합니다.
     #input
@@ -68,7 +74,7 @@ def user_router(app,services):
         credential=request.json
          
         if not user_service.is_email_exists(credential['email']):
-            return '존재하지 않는 이메일 입니다.',400
+            return '존재하지 않는 이메일 입니다.',404
         
         authorized=user_service.login(credential)
         if authorized:
@@ -98,7 +104,7 @@ def user_router(app,services):
     # }
     @app.route("/user/<int:user_id>/imagelist",methods=["GET"])
     @login_required
-    def user_imagelist(user_id):
+    def get_user_imagelist(user_id):
         current_user_id=g.user_id
         
         #current_usre_id와 user_id를 따로 받으면 추후 누가 조회 했는지 알 수 있음
@@ -120,7 +126,7 @@ def user_router(app,services):
     # '친구 저장 실패'
     @app.route("/user/<int:user_id>/friend",methods=["POST"])
     @login_required
-    def user_friend(user_id):
+    def post_user_friend(user_id):
         current_user_id=g.user_id
         friend_user_id=request.json['friend_user_id']
         
@@ -128,7 +134,7 @@ def user_router(app,services):
             return '권한이 없습니다.',401
         
         if not user_service.get_user_info(friend_user_id):
-            return '해당 유저가 존재하지 않습니다.',400
+            return '해당 유저가 존재하지 않습니다.',404
         
         if user_service.is_user_friend(current_user_id,friend_user_id):
             return '이미 친구인 유저입니다.',401
@@ -157,7 +163,8 @@ def user_router(app,services):
     #     ]
     # }
     @app.route("/user/<int:user_id>/friendlist",methods=["GET"])
-    def user_friendlist(user_id):
+    @login_required
+    def get_user_friendlist(user_id):
         current_user_id=g.user_id
         
         if current_user_id != user_id:
@@ -175,7 +182,8 @@ def user_router(app,services):
     # {result}명 삭제 성공
     # '존재하지 않는 유저입니다.'
     @app.route("/user/<int:user_id>/friend",methods=["DELETE"])
-    def user_friend(user_id):
+    @login_required
+    def delete_user_friend(user_id):
         current_user_id=g.user_id
 
         if current_user_id != user_id:
@@ -184,7 +192,7 @@ def user_router(app,services):
         delete_friend_user_id=request.json['delete_friend_user_id']
 
         if not user_service.get_user_info(delete_friend_user_id):
-            return '존재하지 않는 유저입니다.',400
+            return '존재하지 않는 유저입니다.',404
             
         result=user_service.delete_user_friend(current_user_id,delete_friend_user_id)
         return f"{result}명 삭제 성공"
@@ -221,7 +229,7 @@ def user_router(app,services):
     #     ]
     # }
     @app.route("/user/<int:user_id>/roomlist",methods=["GET"])
-    def user_roomlist(user_id):
+    def get_user_roomlist(user_id):
         current_user_id=g.user_id
         
         if current_user_id != user_id:
@@ -245,7 +253,7 @@ def user_router(app,services):
     #output
     # '삭제 성공'
     @app.route("/user/<int:user_id>/room",methods=["DELETE"])
-    def user_roomlist(user_id):
+    def delete_user_roomlist(user_id):
         current_user_id=g.user_id
         
         if current_user_id != user_id:

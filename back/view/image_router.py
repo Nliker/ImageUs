@@ -27,7 +27,7 @@ def image_router(app,services):
     # }
     @app.route("/image",methods=["POST"])
     @login_required
-    def image():
+    def post_image():
         current_user_id=g.user_id
         if 'image' not in request.files or request.files['image'].filename=='':
             return 'file is missing',404
@@ -55,7 +55,7 @@ def image_router(app,services):
     #output
     @app.route("/image",methods=["DETETE"])
     @login_required
-    def image(image_id):
+    def delete_image(image_id):
         delete_image_id=request.json['delete_image_id']
         
         if not image_service.get_image_info(delete_image_id):
@@ -80,7 +80,7 @@ def image_router(app,services):
     # }
     @app.route("/image/<int:image_id>",methods=["GET"])
     @login_required
-    def image(image_id):
+    def get_image(image_id):
         if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
         
@@ -112,7 +112,7 @@ def image_router(app,services):
     # }
     @app.route("/image/<int:image_id>/roomlist",methods=["GET"])
     @login_required
-    def image_roomlist(image_id):
+    def get_image_roomlist(image_id):
         if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
@@ -153,7 +153,7 @@ def image_router(app,services):
     # }
     @app.route("/image/<int:image_id>/roomlist",methods=["POST"])
     @login_required
-    def image_roomlist(image_id):
+    def post_image_roomlist(image_id):
         if not image_service.get_image_info(image_id):
             return '해당 이미지는 존재하지 않습니다.',400
 
