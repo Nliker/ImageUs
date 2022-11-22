@@ -83,7 +83,9 @@ export const ModalHeader = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  .left_btn, .right_btn {
+  user-select: none;
+  .left_btn,
+  .right_btn {
     display: flex;
     justify-content: center;
     position: relative;
@@ -115,11 +117,14 @@ export const ModalTitle = styled.div`
   }
 `;
 
+export const ContentBox = styled.div`
+  user-select: none;
+`
+
 export const ModalImageBox = styled.div`
   position: relative;
   width: 100%;
   height: calc(100% - 43px);
-  // height: 360px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -159,3 +164,18 @@ export const ImageCover = styled.div`
   z-index: 2;
 `;
 
+export const ChannelListBox = styled.div`
+  position: relative;
+  width: 100%;
+  height: calc(100% - 43px);
+  ul li {
+    cursor: pointer;
+    list-style: none;
+  }
+`;
+
+export const ResultBox = styled.div`
+  position: relative;
+  width: 100%;
+  height: calc(100% - 43px);
+`;
