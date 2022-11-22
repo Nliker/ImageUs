@@ -25,6 +25,7 @@ import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
     선택된 항목의 아이콘 색 변경
     선택된 방의 다시 선택 못하게 변경
+    체크 해제 할 때 channel명이 아니라 id로 고유한 값으로 필터링해야함
 */
 
 interface Props {
@@ -32,37 +33,44 @@ interface Props {
 }
 
 interface ChannelProps {
-  id: number,
-  name: string,
-  check: boolean
+  id: number;
+  name: string;
+  check: boolean;
 }
 
-const dummyData = [{
-  id: 1,
-  name: '채널1',
-  check: false
-}, {
-  id: 2,
-  name: '채널2',
-  check: false
-}, {
-  id: 3,
-  name: '채널3',
-  check: false
-}, {
-  id: 4,
-  name: '채널4',
-  check: false
-}, {
-  id: 5,
-  name: '채널5',
-  check: false
-}];
+const dummyData = [
+  {
+    id: 1,
+    name: '채널1',
+    check: false,
+  },
+  {
+    id: 2,
+    name: '채널2',
+    check: false,
+  },
+  {
+    id: 3,
+    name: '채널3',
+    check: false,
+  },
+  {
+    id: 4,
+    name: '채널4',
+    check: false,
+  },
+  {
+    id: 5,
+    name: '채널5',
+    check: false,
+  },
+];
 
 const UploadModal = ({ onCloseModal }: Props) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
   const [uploadStep, setUploadStep] = useState<number>(0);
+  // 백에서 정보를 받아서 check 키값을 추가해서 channelList 객체로 만든다.
   const [channelList, setChannelList] = useState<Array<ChannelProps>>(dummyData);
   const [selectedChannels, setSelectedChannels] = useState<Array<string>>([]);
 
@@ -123,14 +131,42 @@ const UploadModal = ({ onCloseModal }: Props) => {
     });
   }, []);
 
+  console.log(channelList);
+  const checkChannelItem = (id: number) => {
+    const newChannelList = channelList.map((channelItem) => {
+      if (channelItem.id === id) {
+        // channelItem.check = !channelItem.check;
+        // 불변성을 유지하기 위해서 아래처럼 새로운 변수에 값을 넣어서 리턴해야 한다.
+        // 그렇지 않고 위와 같이 쓰면 원래 state의 값이 변경된다. 객체의 참초값을 쓰게 됨으로
+        const newChannelItem = {...channelItem, check: !channelItem.check};
+        return newChannelItem;
+      }
+      return channelItem;
+    });
+    setChannelList([...newChannelList]);
+  };
+
   const inputChannel = useCallback(
     (data: ChannelProps) => () => {
-      setSelectedChannels((prev) => {
-        if (data.check) return [...prev]
-        else return [...prev, data?.name]
-      });
+      console.log(data, channelList);
+      if (data.check) {
+        checkChannelItem(data.id);
+        setSelectedChannels((prev) => {
+          // channel명이 아니라 id로 고유한 값으로 필터링해야함
+          const newData = prev.filter((channel) => {
+            return channel !== data.name;
+          });
+          console.log(newData);
+          return [...newData];
+        });
+      } else {
+        checkChannelItem(data.id);
+        setSelectedChannels((prev) => {
+          return [...prev, data?.name];
+        });
+      }
     },
-    [],
+    [channelList, selectedChannels],
   );
 
   return (
@@ -174,7 +210,7 @@ const UploadModal = ({ onCloseModal }: Props) => {
                 {uploadStep === 1 && (
                   <ChannelListBox>
                     <ul>
-                      {dummyData.map((data, i) => {
+                      {channelList.map((data, i) => {
                         return (
                           <li onClick={inputChannel(data)} key={i + data.name}>
                             {data.check ? <AiFillCheckCircle /> : <AiOutlineCheckCircle />}
