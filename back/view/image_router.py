@@ -10,11 +10,20 @@ def image_router(app,services):
     
     #새로운 사진을 게시합니다.
     #input
+    # {
+    #     'files':{
+    #         'image':binary
+    #     }
+    # }
     #output
     # {
-    #     'id':<int>,
-    #     'link':<str>,
-    #     'user_id':<int>
+    #     'image_info':
+    #     {
+    #         'id':<int>,
+    #         'link':<str>,
+    #         'user_id':<int>
+    #     }
+    #     'success':1
     # }
     @app.route("/image",methods=["POST"])
     @login_required
@@ -28,11 +37,15 @@ def image_router(app,services):
             'image':image,
             'user_id':current_user_id
         }
-        new_image_id=image_service.upload_image(new_image)
+        result=image_service.upload_image(new_image)
+        if 'message' in result:
+            return result['message'],result['status_code']
+
+        new_image_id=result['new_image_id']
 
         image_info=image_service.get_image_info(new_image_id)
 
-        return jsonify(image_info),200
+        return jsonify({'image_info':image_info}),200
     
     #id가 image_id인 사진을 삭제합니다.
     #input
