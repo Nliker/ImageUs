@@ -252,6 +252,7 @@ def test_post_unauthorize_upload(api):
         'user_id':1,
         }
         
+    #토큰이 없을 경우 확인
     upload_token=jwt.encode(payload,config.test_config['IMAGE_UPLOAD_KEY'],'HS256')
     resp=api.post('/upload/1',
             headers={
@@ -262,7 +263,8 @@ def test_post_unauthorize_upload(api):
         
     assert resp.status_code==401
     assert resp.text=='업로드 토큰이 없습니다.'
-        
+    
+    #이미지 파일이 없을 경우 확인
     resp=api.post('/upload/1',
             headers={
                 'Authorization':upload_token
@@ -272,7 +274,8 @@ def test_post_unauthorize_upload(api):
         
     assert resp.status_code==404
     assert resp.text=='File is missing'
-        
+    
+    #이미지 이름이 없을 경우 확인
     resp=api.post('/upload/1',
             headers={
                 'Authorization':upload_token
