@@ -1,8 +1,10 @@
 import React, { useCallback, DragEvent, useState } from 'react';
 import {
   Background,
+  ChannelListBox,
   CloseBtn,
   Container,
+  ContentBox,
   HeaderContainer,
   ImageCover,
   ImageDiv,
@@ -13,17 +15,58 @@ import {
   ModalHeaderWrapper,
   ModalImageBox,
   ModalTitle,
+  ResultBox,
   Wrapper,
 } from './styles';
 import { CgCloseO } from 'react-icons/cg';
+import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
+
+/*
+    백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
+    선택된 항목의 아이콘 색 변경
+    선택된 방의 다시 선택 못하게 변경
+*/
 
 interface Props {
   onCloseModal: (e: any) => void;
 }
 
+interface ChannelProps {
+  id: number,
+  name: string,
+  check: boolean
+}
+
+const dummyData = [{
+  id: 1,
+  name: '채널1',
+  check: false
+}, {
+  id: 2,
+  name: '채널2',
+  check: false
+}, {
+  id: 3,
+  name: '채널3',
+  check: false
+}, {
+  id: 4,
+  name: '채널4',
+  check: false
+}, {
+  id: 5,
+  name: '채널5',
+  check: false
+}];
+
 const UploadModal = ({ onCloseModal }: Props) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
+  const [uploadStep, setUploadStep] = useState<number>(0);
+  const [channelList, setChannelList] = useState<Array<ChannelProps>>(dummyData);
+  const [selectedChannels, setSelectedChannels] = useState<Array<string>>([]);
+
+  const headerName = ['사진 업로드', '채널 선택', '결과물'];
 
   const onDropData = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -60,6 +103,36 @@ const UploadModal = ({ onCloseModal }: Props) => {
     setDragOver(true);
   }, []);
 
+  const onClickPrevStep = useCallback(() => {
+    setUploadStep((prev) => {
+      if (prev <= 0) {
+        return 0;
+      } else {
+        return prev - 1;
+      }
+    });
+  }, []);
+
+  const onClickNextStep = useCallback(() => {
+    setUploadStep((prev) => {
+      if (prev >= 2) {
+        return 2;
+      } else {
+        return prev + 1;
+      }
+    });
+  }, []);
+
+  const inputChannel = useCallback(
+    (data: ChannelProps) => () => {
+      setSelectedChannels((prev) => {
+        if (data.check) return [...prev]
+        else return [...prev, data?.name]
+      });
+    },
+    [],
+  );
+
   return (
     <Wrapper>
       <Background />
@@ -76,21 +149,50 @@ const UploadModal = ({ onCloseModal }: Props) => {
                 <ModalHeaderWrapper>
                   <ModalHeader>
                     <ModalTitle>
-                      <h1>사진 업로드</h1>
+                      <h1>{headerName[uploadStep]}</h1>
+                      {/* <h1>채널 선택</h1>
+                      <h1>결과물</h1> */}
                     </ModalTitle>
-                    <div className="left_btn">
-                      <button>이전</button>
-                    </div>
-                    <div className="right_btn">
+                    {uploadStep !== 0 && (
+                      <div className="left_btn" onClick={onClickPrevStep}>
+                        <button>이전</button>
+                      </div>
+                    )}
+                    <div className="right_btn" onClick={onClickNextStep}>
                       <button>다음</button>
                     </div>
                   </ModalHeader>
                 </ModalHeaderWrapper>
               </HeaderContainer>
-              <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
-                <ImageDiv image={imageData}></ImageDiv>
-                <ImageCover />
-              </ModalImageBox>
+              <ContentBox>
+                {uploadStep === 0 && (
+                  <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
+                    <ImageDiv image={imageData}></ImageDiv>
+                    <ImageCover />
+                  </ModalImageBox>
+                )}
+                {uploadStep === 1 && (
+                  <ChannelListBox>
+                    <ul>
+                      {dummyData.map((data, i) => {
+                        return (
+                          <li onClick={inputChannel(data)} key={i + data.name}>
+                            {data.check ? <AiFillCheckCircle /> : <AiOutlineCheckCircle />}
+                            <span>{data.name}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div>
+                      <p>현재 선택한 방들</p>
+                      {selectedChannels.map((channel, i) => {
+                        return <span key={i + channel}>{channel}</span>;
+                      })}
+                    </div>
+                  </ChannelListBox>
+                )}
+                {uploadStep === 2 && <ResultBox></ResultBox>}
+              </ContentBox>
             </Modal>
           </ModalBox>
         </ModalContainer>
