@@ -53,27 +53,65 @@ export const ModalBox = styled.div`
 
 export const Modal = styled.div`
   width: 495px;
-  max-width: 354px;
+  max-width: 360px;
   min-width: 348px;
   min-height: 391px;
-  max-height: 397px;
+  max-height: 403px;
   border-radius: 12px;
   background-color: white;
+  overflow: hidden;
+`;
+
+export const ModalHeaderWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+  align-items: center;
+  border-bottom: 1px solid rgb(219, 219, 219);
+  width: 100%;
+  height: 43px;
+  box-sizing: border-box;
+`;
+
+export const HeaderContainer = styled.div`
+  display: flex;
+  padding: 0 3px;
 `;
 
 export const ModalHeader = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
+  .left_btn, .right_btn {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    flex-basis: 48px;
+    height: 100%;
+    &.left_btn {
+      float: left;
+    }
+    &.right_btn {
+      float: right;
+      margin-left: auto;
+    }
+  }
 `;
 
 export const ModalTitle = styled.div`
+  position: absolute;
   display: flex;
+  justify-content: center;
   align-items: center;
+  width: 100%;
+  height: 100%;
   height: 43px;
   h1 {
+    width: 100%;
     margin: 0;
     font-size: 16px;
+    text-align: center;
   }
 `;
 
@@ -86,14 +124,14 @@ export const ModalImageBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 `;
 
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지에 따라 width 와 height를 동적으로 변환시켜 주어야 한다.
   ${({ image }) => {
-    console.log(image?.height);
+    console.log(image?.height, image?.width);
     const ratio = image && 348 / image?.height;
+    console.log(ratio);
     return `
     width: ${ratio && image?.width * ratio}px;
     `;
@@ -120,3 +158,4 @@ export const ImageCover = styled.div`
   width: 100%;
   z-index: 2;
 `;
+

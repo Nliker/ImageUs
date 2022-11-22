@@ -3,12 +3,14 @@ import {
   Background,
   CloseBtn,
   Container,
+  HeaderContainer,
   ImageCover,
   ImageDiv,
   Modal,
   ModalBox,
   ModalContainer,
   ModalHeader,
+  ModalHeaderWrapper,
   ModalImageBox,
   ModalTitle,
   Wrapper,
@@ -56,8 +58,8 @@ const UploadModal = ({ onCloseModal }: Props) => {
   const onDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(true);
-  }, [])
-  
+  }, []);
+
   return (
     <Wrapper>
       <Background />
@@ -70,11 +72,21 @@ const UploadModal = ({ onCloseModal }: Props) => {
         <ModalContainer>
           <ModalBox>
             <Modal>
-              <ModalHeader>
-                <ModalTitle>
-                  <h1>사진 업로드</h1>
-                </ModalTitle>
-              </ModalHeader>
+              <HeaderContainer>
+                <ModalHeaderWrapper>
+                  <ModalHeader>
+                    <ModalTitle>
+                      <h1>사진 업로드</h1>
+                    </ModalTitle>
+                    <div className="left_btn">
+                      <button>이전</button>
+                    </div>
+                    <div className="right_btn">
+                      <button>다음</button>
+                    </div>
+                  </ModalHeader>
+                </ModalHeaderWrapper>
+              </HeaderContainer>
               <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
                 <ImageDiv image={imageData}></ImageDiv>
                 <ImageCover />
