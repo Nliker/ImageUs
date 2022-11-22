@@ -4,13 +4,17 @@ import pytest
 import config
 import bcrypt
 import jwt
-
+import shutil
 from model import UserDao,RoomDao,ImageDao
 from service import UserService,RoomService,ImageService
 from sqlalchemy import create_engine,text
 import config
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
+
+parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+projects_dir=os.path.dirname(os.path.abspath(parent_path))
+image_dir=f"{projects_dir}/image_back/{config.test_config['IMAGE_PATH']}"
 
 @pytest.fixture
 def user_service():
@@ -231,6 +235,10 @@ def teardown_function():
         truncate images_room_list
     """))
     print("초기화 완료")
+    print("이미지 폴더 초기화")
+    if os.path.isdir(f"{image_dir}"):
+        shutil.rmtree(f"{image_dir}")
+    print("이미지 폴더 초기화 완료")
     print("======================")
 
 def test_setup():
@@ -1031,8 +1039,9 @@ def test_upload_image(image_service):
         'image':request_image,
         'user_id':1
     }
-    new_image_id=image_service.upload_image(new_image)
+    result=image_service.upload_image(new_image)
     new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    new_image_id=result['new_image_id']
     new_image_info=image_service.get_image_info(new_image_id)
     assert new_image_info=={
         'id':5,
@@ -1045,7 +1054,8 @@ def test_upload_image(image_service):
         'image':request_image,
         'user_id':1
     }
-    new_image_id=image_service.upload_image(new_image)
+    result=image_service.upload_image(new_image)
+    new_image_id=result['new_image_id']
     filename='sample_image(1).JPG'
     new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
     new_image_info=image_service.get_image_info(new_image_id)
@@ -1055,9 +1065,80 @@ def test_upload_image(image_service):
         'user_id':1
     }
     
-# def test_unauthorize_upload_image(image_service):
+def test_upload_room_image(image_service):
+    filename='sample_image.JPG'
+    parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+    with open(test_image_path, 'rb') as f:
+        byte_image = f.read()
+    #request 의 file클래스 구현
+    class image:
+        file=None
+        filename=None
+        def __init__(self,file,filename):
+            self.file=file
+            self.filename=filename
+        def read(self):
+            return self.file
+        
+    request_image=image(byte_image,filename)
+
+    new_image={
+        'image':request_image,
+        'user_id':1
+    }
+    #1번 유저가 1번방에 사진 업로드 확인
+    result=image_service.upload_room_image(1,new_image)
+    new_image_id=result['new_image_id']
+    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    new_image_info=image_service.get_image_info(new_image_id)
+    assert new_image_info=={
+        'id':5,
+        'link':new_image_link,
+        'user_id':1
+    }
+    image_room_info_list=image_service.get_image_roomlist(1)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1,
+        }
+    ]
+
+    room_image_info_list=image_service.get_room_imagelist(1)
+    assert room_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2
+        },
+        {
+            'id':5,
+            'link':new_image_link,
+            'user_id':1
+        }
+    ]
     
-# def test_upload_room_image(image_service):
+    user_image_info_list=image_service.get_user_imagelist(1)
+    assert user_image_info_list==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+        {
+            'id':5,
+            'link':new_image_link,
+            'user_id':1
+        }
+    ]
+
 
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
