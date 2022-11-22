@@ -75,18 +75,23 @@ class ImageService:
                 files=upload,
                 headers = {'Authorization':image_upload_token})
     
-        link=res.text
-        new_image={
-            'link':link,
-            'user_id':new_image['user_id']
-        }
-        
-        new_image_id=self.image_dao.insert_image(new_image)
-        return new_image_id
+        if res.status_code==200:
+            new_image={
+                'link':res.text,
+                'user_id':new_image['user_id']
+            }
+            
+            new_image_id=self.image_dao.insert_image(new_image)
+            return {'new_image_id':new_image_id}
+        else:
+            return {'message':res.text,
+                    'status_code':res.status_code}
+
     
     def upload_room_image(self,room_id,new_image):
         files=new_image['image']
-        upload={'image':files}
+        
+        upload={'image':(files.filename,files.read())}
 
         payload={
             'user_id':new_image['user_id'],
@@ -96,17 +101,22 @@ class ImageService:
 
         res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
                 files=upload,
-                headers = {'upload_token':image_upload_token})
-        link=res.text
-        new_image={
-            'link':link,
-            'user_id':new_image['user_id']
-        }
-        
-        new_image_id=self.image_dao.insert_image(new_image)
-        result=self.image_dao.insert_room_image(room_id,new_image_id)
+                headers = {'Authorization':image_upload_token})
+        if res.status_code==200:
+            new_image={
+                'link':res.text,
+                'user_id':new_image['user_id']
+            }
+            
+            new_image_id=self.image_dao.insert_image(new_image)
+            result=self.image_dao.insert_room_image(room_id,new_image_id)
 
-        return result
+            return {'new_image_id':new_image_id,
+                    'result':result}
+        else:
+            return {'message':res.text,
+                    'status_code':res.status_code}
+                
     
     def is_user_image(self,user_id,image_id):
         image_info=self.image_dao.get_image_info(image_id)
@@ -116,9 +126,9 @@ class ImageService:
             return False
         
     def get_image_roomlist(self,image_id):
-        image_roomlist=self.image_dao.get_image_roomlist(image_id)
+        image_room_info_list=self.image_dao.get_image_roomlist(image_id)
 
-        return image_roomlist
+        return image_room_info_list
         
     def get_image_info(self,image_id):
         image_info=self.image_dao.get_image_info(image_id)
