@@ -71,7 +71,7 @@ class ImageService:
         
         image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
 
-        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
+        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}{new_image['user_id']}",
                 files=upload,
                 headers = {'Authorization':image_upload_token})
     
@@ -99,7 +99,7 @@ class ImageService:
         
         image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
 
-        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}/{new_image['user_id']}",
+        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}{new_image['user_id']}",
                 files=upload,
                 headers = {'Authorization':image_upload_token})
         if res.status_code==200:
