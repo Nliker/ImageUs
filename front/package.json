@@ -20,6 +20,7 @@
     "@emotion/styled": "^11.10.5",
     "@jjordy/swr-devtools": "^2.2.0",
     "@loadable/component": "^5.15.2",
+    "@types/lodash": "^4.14.189",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "@types/react-icons": "^3.0.0",
