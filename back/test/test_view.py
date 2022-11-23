@@ -8,12 +8,15 @@ import config
 import shutil
 import bcrypt
 import jwt
+from io import BytesIO
 
 database=database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
 parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 projects_dir=os.path.dirname(os.path.abspath(parent_path))
 image_dir=f"{projects_dir}/image_back/{config.test_config['IMAGE_PATH']}"
+test_image_dir=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}"
+save_image_dir=f"{config.test_config['IMAGE_DOWNLOAD_URL']}"
 
 @pytest.fixture()
 def api():
@@ -779,20 +782,258 @@ def test_delete_user_room(api):
         content_type='application/json')
     assert resp.status_code==401
 
-# def test_post_room(api):
+def test_post_room(api):
+    user_id=1
+    access_token=generate_access_token(user_id)
+    new_room={
+        'userlist':[1,2,3],
+        'title':'testroom3'
+    }
+    resp=api.post(f"/room",
+        data=json.dumps(new_room),
+        headers={'Authorization':access_token},
+        content_type='application/json')
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    new_room_id=resp_json['room_info']['id']
+    assert resp_json=={
+        'room_info':{
+            'id':new_room_id,
+            'title':new_room['title'],
+            'host_user_id':user_id
+        },
+        'success':3
+    }
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(new_room_id)]
+    assert room_userlist==[1,2,3]
 
-# def test_post_room_image(api):
+#방에 사진 업로드
+def test_post_room_image(api):
+    #1번유저가 1번 반에서 사진을 업로드
+    filename="sample_image.JPG"
+    test_file_path=f"{test_image_dir}/{filename}"
+    with open(test_file_path,'rb') as f:
+        image=f.read()
+    image=image
     
-# def test_delete_room_image(api):
+    user_id=1
+    access_token=generate_access_token(user_id)
+    room_id=1
     
-# def test_get_room_imagelist(api):
+    resp=api.post(f"/room/{room_id}/image",
+            data={'image':(BytesIO(image),filename)},
+            headers={'Authorization':access_token},
+            content_type='multipart/form-data')
+    
+    assert resp.status_code==200
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    must_be_image_link=f"{save_image_dir}{user_id}/{filename}"
+    assert resp_json=={
+        'image_info':{
+            'id':5,
+            'user_id':user_id,
+            'link':must_be_image_link
+        },
+        'success':1
+    }
+    
+    new_image_id=resp_json['image_info']['id']
+    image_info=get_image_info(new_image_id)
+    assert image_info == {
+        'id':new_image_id,
+        'user_id':user_id,
+        'link':must_be_image_link
+    }
+    
+    room_image_info_list=[room_image_info['id'] for room_image_info in get_room_imagelist(room_id)]
+    assert room_image_info_list==[1,2,new_image_id]
 
-# def test_get_room_userlist(api):
+#방의 사진을 삭제합니다.
+def test_delete_room_image(api):
+    #2번 사진의 주인인 2번 유저가 2번 사진을 1번방에서 삭제 합니다.
+    delete_image={
+        'delete_room_image_id':2
+    }
+    
+    user_id=2
+    access_token=generate_access_token(user_id)
+    room_id=1
 
-# def test_room_user(api):
+    resp=api.delete(f"/room/{room_id}/image",
+        data=json.dumps(delete_image),
+        headers={'Authorization':access_token},
+        content_type='application/json')
+    
+    assert resp.status_code==200
+    room_image_info_list=get_room_imagelist(room_id)
+    assert room_image_info_list==[
+        {
+        'id':1,
+        'link':'testlink1',
+        'user_id':1
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None
+        }
+    ]
+    #자신이 주인이 아닌 1번 이미지를 1번방에서 삭제합니다.
+    delete_image={
+        'delete_room_image_id':1
+    }
+    resp=api.delete(f"/room/{room_id}/image",
+        data=json.dumps(delete_image),
+        headers={'Authorization':access_token},
+        content_type='application/json')
+    
+    assert resp.status_code==401
 
-# def test_post_room_user(api):
+#방의 이미지 정보 목록을 불러옵니다.
+def test_get_room_imagelist(api):
+    #1번 유저가 자신의 방인 1번 방의 사진 정보 목록을 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    room_id=1
+    resp=api.get(f"/room/{room_id}/imagelist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'imagelist':[
+            {
+                'id':1,
+                'link':'testlink1',
+                'user_id':1
+            },
+            {
+                'id':2,
+                'link':'testlink2',
+                'user_id':2
+            }
+        ]
+    }
+    
+    #방에 속하지 않은 3번 유저가 1번 방의 이미지 정보 목록을 불러옵니다.
+    access_token=generate_access_token(3)
+    resp=api.get(f"/room/{room_id}/imagelist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==401
 
+#방의 유저 정보 목록을 불러 옵니다.
+def test_get_room_userlist(api):
+    #방에 속한 유저인 1번 유저가 1번 방의 유저 목록 정보를 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    room_id=1
+    resp=api.get(f"/room/{room_id}/userlist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'userlist':[
+            {
+                'id':1,
+                'name':'test1',
+                'email':'test1@naver.com',
+                'profile':'testuser1'
+            },
+            {
+                'id':2,
+                'name':'test2',
+                'email':'test2@naver.com',
+                'profile':'testuser2'
+            }
+        ] 
+    }
+    #방에 속하지 않은 3번 유저가 방의 정보 목록을 확인
+    access_token=generate_access_token(3)
+    resp=api.get(f"/room/{room_id}/userlist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==401
+
+#방의 유저를 초대
+def test_delete_room_user(api):
+    #1번방의 방장이 2번 유저를 강퇴 확인
+    user_id=1
+    access_token=generate_access_token(user_id)
+    room_id=1
+    delete_room_user={
+        'delete_room_user_id':2
+    }
+    resp=api.delete(f"/room/{room_id}/user",
+            data=json.dumps(delete_room_user),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    assert resp.status_code==200
+    
+    #방장이 아닌 2번 유저가 다른 유저를 강퇴 확인
+    access_token=generate_access_token(3)
+    delete_room_user={
+        'delete_room_user_id':2
+    }
+    room_id=2
+    resp=api.delete(f"/room/{room_id}/user",
+            data=json.dumps(delete_room_user),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    assert resp.status_code==401
+
+#방의 유저를 초대
+def test_post_room_user(api):
+    #새로운 유저를 생성합니다.
+    resp=api.post(f"/sign-up",
+            data=json.dumps(
+                {
+                    'name':'test4',
+                    'email':'test4@naver.com',
+                    'profile':'testuser4',
+                    'password':'test_password'
+
+                }),
+            content_type='application/json')
+        
+    assert resp.status_code==200
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'user_info':
+            {
+                'id':4,
+                'name':'test4',
+                'email':'test4@naver.com',
+                'profile':'testuser4'
+            }
+    }
+
+    user_id=1
+    access_token=generate_access_token(user_id)
+    room_id=1
+    invite_user={
+        'invite_userlist':[3,4]
+    }
+    resp=api.post(f"/room/{room_id}/user",
+                  data=json.dumps(invite_user),
+                  headers={'Authorization':access_token},
+                  content_type='application/json')
+    
+    assert resp.status_code==200
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(room_id)]
+    assert room_userlist==[1,2,3,4]
+    
+    #2번방에 속하지 않은 유저 1번이 1번과 4번 유저를 방으로 초대 확인
+    room_id=2
+    invite_user={
+        'invite_userlist':[1,4]
+    }
+    resp=api.post(f"/room/{room_id}/user",
+                  data=json.dumps(invite_user),
+                  headers={'Authrization':access_token},
+                  content_type='application/json')
+    
+    assert resp.status_code==401
+    
 
 # def test_post_image(api):
 
