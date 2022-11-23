@@ -195,8 +195,9 @@ def room_router(app,services):
         
         delete_room_user_id=request.json['delete_room_user_id']
         result=room_service.delete_room_user(room_id,delete_room_user_id)
-        
-        return f'{result}명 강퇴 성공',200
+        delete_image_result=image_service.delete_room_user_image(room_id,delete_room_user_id)
+
+        return f'{result}명 강퇴 및 {delete_image_result}장 관련 사진 삭제 성공',200
     
     #id가 room_id인 room의 id가 user_id인 유저를 초대합니다.
     #input
