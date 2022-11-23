@@ -53,45 +53,49 @@ def image_router(app,services):
     #     'delete_image_id':<int>
     # }
     #output
-    @app.route("/image",methods=["DETETE"])
+    # 1장 삭제 및 2개의 관련 방 권한 삭제 완료
+    @app.route("/image",methods=["DELETE"])
     @login_required
-    def delete_image(image_id):
+    def delete_image():
         delete_image_id=request.json['delete_image_id']
         
         if not image_service.get_image_info(delete_image_id):
-            return '해당 이미지는 존재하지 않습니다.',400
+            return '해당 이미지는 존재하지 않습니다.',404
 
         current_user_id=g.user_id
         
-        if image_service.is_user_image(current_user_id,image_id):
-            return '사진에 대한 권한이 없습니다.',400        
+        if not image_service.is_user_image(current_user_id,delete_image_id):
+            return '사진에 대한 권한이 없습니다.',401        
         
-        result=image_service.delete_image(delete_image_id)
+        delete_image_result,delete_image_room_result=image_service.delete_image(delete_image_id)
         
-        return f'{result}장 삭제 완료',200
+        return f'{delete_image_result}장 삭제 및 {delete_image_room_result}개의 관련 방 권한 삭제 완료',200
 
     #id가 image_id 인 사진의 정보를 불러옵니다.
     #input
     #output
     # {
-    #     'id':<int>,
-    #     'link':<str>,
-    #     'user_id':<int>
+    #     'image_info':
+    #         {
+    #             'id':<int>,
+    #             'link':<str>,
+    #             'user_id':<int>
+    #         }
     # }
     @app.route("/image/<int:image_id>",methods=["GET"])
     @login_required
     def get_image(image_id):
         if not image_service.get_image_info(image_id):
-            return '해당 이미지는 존재하지 않습니다.',400
+            return '해당 이미지는 존재하지 않습니다.',404
         
         current_user_id=g.user_id
         
-        if image_service.is_user_image(current_user_id,image_id):
-            return '사진에 대한 권한이 없습니다.',400  
+        if not image_service.is_user_image_room_member(current_user_id,image_id):
+            return '사진에 대한 권한이 없습니다.',401  
         
         image_info=image_service.get_image_info(image_id)
 
-        return jsonify(image_info),200
+        return jsonify({'image_info':image_info}),200
     
     #id가 image_id 인 사진의 방 리스트를 불러옵니다.
     #input
@@ -114,12 +118,12 @@ def image_router(app,services):
     @login_required
     def get_image_roomlist(image_id):
         if not image_service.get_image_info(image_id):
-            return '해당 이미지는 존재하지 않습니다.',400
+            return '해당 이미지는 존재하지 않습니다.',404
 
         current_user_id=g.user_id
         
-        if image_service.is_user_image(current_user_id,image_id):
-            return '사진에 대한 권한이 없습니다.',400 
+        if not image_service.is_user_image(current_user_id,image_id):
+            return '사진에 대한 권한이 없습니다.',401
         
         image_roomlist=image_service.get_image_roomlist(image_id)
         return jsonify({'roomlist':image_roomlist}),200
@@ -155,12 +159,12 @@ def image_router(app,services):
     @login_required
     def post_image_roomlist(image_id):
         if not image_service.get_image_info(image_id):
-            return '해당 이미지는 존재하지 않습니다.',400
+            return '해당 이미지는 존재하지 않습니다.',404
 
         current_user_id=g.user_id
         
-        if image_service.is_user_image(current_user_id,image_id):
-            return '사진에 대한 권한이 없습니다.',400
+        if not image_service.is_user_image(current_user_id,image_id):
+            return '사진에 대한 권한이 없습니다.',401
         
         update_roomlist=request.json['update_roomlist']
         exist_roomlist=[]
