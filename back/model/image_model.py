@@ -166,3 +166,32 @@ class ImageDao:
             """),{'room_id':room_id,'user_id':user_id}).rowcount
         return row
     
+    def delete_image_room(self,image_id):
+        row=self.db.execute(text("""
+            update images_room_list
+            set deleted=1
+            where image_id=:image_id
+            and deleted=0
+            """),{'image_id':image_id}).rowcount
+        
+        return row
+
+    def image_room_userlist(self,image_id):
+        rows=self.db.execute(text("""
+            select
+                i_r.room_id as room_id,
+                r_u.user_id as user_id
+            from images_room_list as i_r
+            join rooms_user_list as r_u
+            on (i_r.room_id=r_u.room_id
+            and i_r.deleted=0
+            and r_u.deleted=0)
+            where i_r.image_id=:image_id
+            """),{'image_id':image_id}).fetchall()
+
+        image_room_userlist=[{
+            'room_id':row['room_id'],
+            'user_id':row['user_id']
+        } for row in rows]
+
+        return image_room_userlist
