@@ -456,6 +456,26 @@ def test_insert_user(user_dao):
         'profile':new_user['profile']
     }
 
+def get_image_room_userlist(image_id):
+        rows=database.execute(text("""
+            select
+                i_r.room_id as room_id,
+                r_u.user_id as user_id
+            from images_room_list as i_r
+            join rooms_user_list as r_u
+            on (i_r.room_id=r_u.room_id
+            and i_r.deleted=0
+            and r_u.deleted=0)
+            where i_r.image_id=:image_id
+            """),{'image_id':image_id}).fetchall()
+
+        image_room_userlist=[{
+            'room_id':row['room_id'],
+            'user_id':row['user_id']
+        } for row in rows]
+
+        return image_room_userlist
+
 #1번 유저의 민감 정보 검증
 def test_get_user_id_and_password(user_dao):
     #1번 유저의 민감 정보 확인
@@ -1235,6 +1255,103 @@ def test_delete_room_user_image(image_dao):
     result=image_dao.delete_room_user_image(1,2)
     assert result==0
     
+    
+def test_delete_image_room(image_dao):
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+    result=image_dao.delete_image_room(2)
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[]
+    
+def test_image_room_userlist(image_dao):
+    image_room_userlist=get_image_room_userlist(1)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':1,
+            'user_id':2
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(2)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':1,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(3)
+    assert image_room_userlist==[
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(4)
+    assert image_room_userlist==[]
+    
+    row=database.execute(text("""
+        update rooms_user_list
+        set deleted=1
+        where room_id=1
+        and user_id=2
+        """)).rowcount
+    assert row==1
+    
+    
+    image_room_userlist=get_image_room_userlist(1)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(2)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(3)
+    assert image_room_userlist==[
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(4)
+    assert image_room_userlist==[]
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
