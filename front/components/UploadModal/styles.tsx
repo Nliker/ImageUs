@@ -51,15 +51,22 @@ export const ModalBox = styled.div`
   margin: 20px;
 `;
 
-export const Modal = styled.div`
-  width: 495px;
-  max-width: 360px;
+export const Modal = styled.div<{ currentStep: number; currentWidth: number | null }>`
+  ${({ currentStep }) => (currentStep === 2 ? `width: 845px;` : `width: 495px;`)}
+  // width: 495px;
+  // max-width: 360px;
+  max-width: calc(100vw - 40px);
   min-width: 348px;
   min-height: 391px;
   max-height: 403px;
   border-radius: 12px;
   background-color: white;
-  overflow: hidden;
+  ${({ currentWidth }) =>
+    currentWidth !== null && currentWidth < 688
+      ? `
+  overflow: auto;
+  `
+      : `overflow: hidden;`}
 `;
 
 export const ModalHeaderWrapper = styled.div`
@@ -119,7 +126,7 @@ export const ModalTitle = styled.div`
 
 export const ContentBox = styled.div`
   user-select: none;
-`
+`;
 
 export const ModalImageBox = styled.div`
   position: relative;
@@ -134,9 +141,7 @@ export const ModalImageBox = styled.div`
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지에 따라 width 와 height를 동적으로 변환시켜 주어야 한다.
   ${({ image }) => {
-    console.log(image?.height, image?.width);
     const ratio = image && 348 / image?.height;
-    console.log(ratio);
     return `
     width: ${ratio && image?.width * ratio}px;
     `;
@@ -178,4 +183,21 @@ export const ResultBox = styled.div`
   position: relative;
   width: 100%;
   height: calc(100% - 43px);
+`;
+
+export const BoxContainer = styled.div<{ currentWidth: number | null }>`
+  display: flex;
+  ${({ currentWidth }) =>
+    currentWidth !== null && currentWidth < 688
+      && `
+  flex-direction: column;
+  `}
+`;
+
+export const ImageBox = styled.div`
+  width: calc(100% - 340px);
+`;
+
+export const ListBox = styled.div`
+  width: 340px;
 `;

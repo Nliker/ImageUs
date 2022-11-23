@@ -1,13 +1,17 @@
-import React, { useCallback, DragEvent, useState } from 'react';
+import React, { useCallback, DragEvent, useState, useRef, useEffect } from 'react';
+import { debounce } from 'lodash';
 import {
   Background,
+  BoxContainer,
   ChannelListBox,
   CloseBtn,
   Container,
   ContentBox,
   HeaderContainer,
+  ImageBox,
   ImageCover,
   ImageDiv,
+  ListBox,
   Modal,
   ModalBox,
   ModalContainer,
@@ -73,8 +77,31 @@ const UploadModal = ({ onCloseModal }: Props) => {
   // 백에서 정보를 받아서 check 키값을 추가해서 channelList 객체로 만든다.
   const [channelList, setChannelList] = useState<Array<ChannelProps>>(dummyData);
   const [selectedChannels, setSelectedChannels] = useState<Array<string>>([]);
+  const [currentModalWidth, setCurrentModalWidth] = useState<number | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const headerName = ['사진 업로드', '채널 선택', '결과물'];
+
+  // 맨 처음 실행과 화면 리사이즈를 하거나 다음 버튼을 누를 때 handleResize 실행 
+  const handleResize = debounce(() => {
+    if (!modalRef) return;
+    if (modalRef.current) {
+      console.log(modalRef.current.offsetWidth);
+      setCurrentModalWidth(modalRef.current.offsetWidth);
+    }
+  }, 300);
+  
+  useEffect(() => {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // const getContentOffsetWidth = useCallback(() => {
+
+  // }, []);
 
   const onDropData = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -98,7 +125,6 @@ const UploadModal = ({ onCloseModal }: Props) => {
     const image = new Image();
     image.src = 'image_test.png';
     if (image) setImageData(image);
-    console.log(typeof image);
 
     // 이미지 테스트
     // for (const entries of formData.values()) {
@@ -112,6 +138,8 @@ const UploadModal = ({ onCloseModal }: Props) => {
   }, []);
 
   const onClickPrevStep = useCallback(() => {
+    // 버튼을 누를 때 리사이즈 함수 실행
+    handleResize();
     setUploadStep((prev) => {
       if (prev <= 0) {
         return 0;
@@ -122,6 +150,7 @@ const UploadModal = ({ onCloseModal }: Props) => {
   }, []);
 
   const onClickNextStep = useCallback(() => {
+    handleResize();
     setUploadStep((prev) => {
       if (prev >= 2) {
         return 2;
@@ -131,14 +160,13 @@ const UploadModal = ({ onCloseModal }: Props) => {
     });
   }, []);
 
-  console.log(channelList);
   const checkChannelItem = (id: number) => {
     const newChannelList = channelList.map((channelItem) => {
       if (channelItem.id === id) {
         // channelItem.check = !channelItem.check;
         // 불변성을 유지하기 위해서 아래처럼 새로운 변수에 값을 넣어서 리턴해야 한다.
         // 그렇지 않고 위와 같이 쓰면 원래 state의 값이 변경된다. 객체의 참초값을 쓰게 됨으로
-        const newChannelItem = {...channelItem, check: !channelItem.check};
+        const newChannelItem = { ...channelItem, check: !channelItem.check };
         return newChannelItem;
       }
       return channelItem;
@@ -148,7 +176,7 @@ const UploadModal = ({ onCloseModal }: Props) => {
 
   const inputChannel = useCallback(
     (data: ChannelProps) => () => {
-      console.log(data, channelList);
+      // console.log(data, channelList);
       if (data.check) {
         checkChannelItem(data.id);
         setSelectedChannels((prev) => {
@@ -156,7 +184,6 @@ const UploadModal = ({ onCloseModal }: Props) => {
           const newData = prev.filter((channel) => {
             return channel !== data.name;
           });
-          console.log(newData);
           return [...newData];
         });
       } else {
@@ -180,7 +207,7 @@ const UploadModal = ({ onCloseModal }: Props) => {
         </CloseBtn>
         <ModalContainer>
           <ModalBox>
-            <Modal>
+            <Modal currentStep={uploadStep} currentWidth={currentModalWidth} ref={modalRef}>
               <HeaderContainer>
                 <ModalHeaderWrapper>
                   <ModalHeader>
@@ -227,7 +254,24 @@ const UploadModal = ({ onCloseModal }: Props) => {
                     </div>
                   </ChannelListBox>
                 )}
-                {uploadStep === 2 && <ResultBox></ResultBox>}
+                {uploadStep === 2 && (
+                  <ResultBox>
+                    <BoxContainer currentWidth={currentModalWidth}>
+                      <ImageBox>
+                        <h2>업로드 사진</h2>
+                        <ImageDiv image={imageData}></ImageDiv>
+                      </ImageBox>
+                      <ListBox>
+                        <p>업로드할 채널목록</p>
+                        <ul>
+                          {selectedChannels.map((channel, i) => {
+                            return <li key={i + channel}>{channel}</li>;
+                          })}
+                        </ul>
+                      </ListBox>
+                    </BoxContainer>
+                  </ResultBox>
+                )}
               </ContentBox>
             </Modal>
           </ModalBox>
