@@ -184,11 +184,23 @@ class ImageService:
         return result
     
     def delete_image(self,delete_image_id):
-        result=self.image_dao.delete_image(delete_image_id)
-
-        return result
+        image_delete_result=self.image_dao.delete_image(delete_image_id)
+        image_room_delete_result=self.image_dao.delete_image_room(delete_image_id)        
+        return {'delete_image':image_delete_result,
+                'delete_image_room':image_room_delete_result}
     
     def delete_room_user_image(self,room_id,user_id):
         result=self.image_dao.delete_room_user_image(room_id,user_id)
 
         return result
+    
+    def is_user_image_room_member(self,user_id,image_id):
+        image_info=self.image_dao.get_image_info(image_id)
+        if image_info['user_id']==user_id:
+            return True
+
+        image_room_userlist=self.image_dao.image_room_userlist(image_id)
+        for room_userlist in image_room_userlist:
+            if room_userlist['user_id']==user_id:
+                return True
+        return False
