@@ -1033,18 +1033,187 @@ def test_post_room_user(api):
                   content_type='application/json')
     
     assert resp.status_code==401
-    
 
-# def test_post_image(api):
+#사진 업로드
+def test_post_image(api):
+    #1번 유저가 사진 업로드
+    filename="sample_image.JPG"
+    test_file_path=f"{test_image_dir}/{filename}"
+    with open(test_file_path,'rb') as f:
+        image=f.read()
+    image=image
 
-# def test_delete_image(api):
+    user_id=1
+    access_token=generate_access_token(user_id)
+    resp=api.post(f"/image",
+            data={'image':(BytesIO(image),filename)},
+            headers={'Authorization':access_token},
+            content_type='multipart/form-data')
     
-# def test_get_image(api):
+    assert resp.status_code==200
     
-# def test_get_image_roomlist(api):
+    must_be_image_link=f"{save_image_dir}{user_id}/{filename}"
 
-# def test_post_image_roomlist(api):
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'image_info':{
+            'id':5,
+            'link':must_be_image_link,
+            'user_id':user_id
+        }
+    }
+    image_info=get_image_info(5)
+    assert image_info=={
+        'id':5,
+        'link':must_be_image_link,
+        'user_id':user_id
+    }
     
+    resp=api.post(f"/image",
+            data={'image':(BytesIO(image),None)},
+            headers={'Authorization':access_token},
+            content_type='multipart/form-data')
+    assert resp.status_code==404
+
+#사진 삭제 =>image삭제,images_room_list 삭제,
+def test_delete_image(api):
+    #2번 유저가 자신의 사진인 2번사진을 삭제 확인
+    user_id=2
+    access_token=generate_access_token(user_id)
+    delete_image={
+        'delete_image_id':2
+    }
+
+    resp=api.delete(f"/image",
+            data=json.dumps(delete_image),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==200
+    
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[]
+    #자신의 사진이 아닌 사진을 삭제 확인
+    delete_image={
+        'delete_image_id':1
+    }
+    
+    resp=api.delete(f"/image",
+            data=json.dumps(delete_image),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==401
+    #존재하지 않는 사진에 대해 삭제 확인
+    delete_image={
+        'delete_image_id':100
+    }
+    
+    resp=api.delete(f"/image",
+            data=json.dumps(delete_image),
+            headers={'Authorization':access_token},
+            content_type='application/json')
+    
+    assert resp.status_code==404
+    
+def test_get_image(api):
+    user_id=1
+    access_token=generate_access_token(user_id)
+    image_id=1
+    resp=api.get(f"/image/{image_id}",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'image_info':
+            {
+                'id':1,
+                'link':'testlink1',
+                'user_id':1
+            }
+    }
+    #사진의 방에 속하지 않은 사람이 불러옵니다.
+    access_token=generate_access_token(3)
+    image_id=1
+    resp=api.get(f"/image/{image_id}",
+            headers={'Authorization':access_token})
+    assert resp.status_code==401
+    #존재하지 않는 사진을 불러옵니다.
+    access_token=generate_access_token(3)
+    image_id=100
+    resp=api.get(f"/image/{image_id}",
+            headers={'Authorization':access_token})
+    assert resp.status_code==404
+
+#사진의 방 권한 목록을 불러옵니다.
+def test_get_image_roomlist(api):
+    #사진의 주인인 2번 유저가 사진의 방 권한 확인
+    user_id=2
+    access_token=generate_access_token(user_id)
+    image_id=2
+    resp=api.get(f"/image/{image_id}/roomlist",
+            headers={'Authorization':access_token})
+    assert resp.status_code==200
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert resp_json=={
+        'roomlist':[
+            {
+                'id':1,
+                'title':'testroom1',
+                'host_user_id':1,
+            },
+            {
+                'id':2,
+                'title':'testroom2',
+                'host_user_id':2,
+            }
+            
+        ]
+    }
+    #사진의 주인이 아닌 3번 유저가 사진의 방 권한 확인
+    access_token=generate_access_token(3)
+    resp=api.get(f"/image/{image_id}/roomlist",
+                headers={'Authorization':access_token})
+    assert resp.status_code==401
+    #존재하지 않는 사진에 대한 방 권한 확인
+    image_id=100
+    access_token=generate_access_token(3)
+    resp=api.get(f"/image/{image_id}/roomlist",
+                headers={'Authorization':access_token})
+    assert resp.status_code==404
+
+#사진의 방 권한 목록 업데이트
+def test_post_image_roomlist(api):
+    #사진의 주인인 2번 유저가 2번 사진의 방 권한 목록을 업데이트합니다.
+    user_id=2
+    access_token=generate_access_token(user_id)
+    image_id=2
+    update_roomlist={'update_roomlist':[1]}
+
+    resp=api.post(f"/image/{image_id}/roomlist",
+                data=json.dumps(update_roomlist),
+                headers={'Authorization':access_token},
+                content_type='application/json')
+    assert resp.status_code==200
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(image_id)]
+    assert image_roomlist==[1]
+    #사진의 주인이 아닌 3번 유저가 사진의 방 권한 목록을 업데이트 확인
+    access_token=generate_access_token(3)
+    resp=api.post(f"/image/{image_id}/roomlist",
+                data=json.dumps(update_roomlist),
+                headers={'Authorization':access_token},
+                content_type='application/json')
+    assert resp.status_code==401
+    #존재하지 않는 사진에 대한 사진의 방 권한 목록 확인
+    image_id=100
+    resp=api.post(f"/image/{image_id}/roomlist",
+                data=json.dumps(update_roomlist),
+                headers={'Authorization':access_token},
+                content_type='application/json')
+    assert resp.status_code==404
+
 
 
 
