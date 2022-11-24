@@ -49,24 +49,39 @@ export const ModalContainer = styled.div`
 export const ModalBox = styled.div`
   display: flex;
   margin: 20px;
+  h1,
+  h2 {
+    font-size: 16px;
+    margin: 0;
+  }
 `;
 
-export const Modal = styled.div<{ currentStep: number; currentWidth: number | null }>`
+export const Modal = styled.div<{ currentStep: number }>`
   ${({ currentStep }) => (currentStep === 2 ? `width: 845px;` : `width: 495px;`)}
-  // width: 495px;
-  // max-width: 360px;
   max-width: calc(100vw - 40px);
   min-width: 348px;
   min-height: 391px;
   max-height: 403px;
   border-radius: 12px;
   background-color: white;
-  ${({ currentWidth }) =>
-    currentWidth !== null && currentWidth < 688
-      ? `
-  overflow: auto;
-  `
-      : `overflow: hidden;`}
+  overflow: hidden;
+  user-select: none;
+  .content_box {
+    position: relative;
+    width: 100%;
+    height: 360px;
+  }
+  .result_box {
+    display: flex;
+  }
+  @media screen and (max-width: 688px) {
+    .content_box {
+      overflow: auto;
+    }
+    .result_box {
+      flex-direction: column;
+    }
+  }
 `;
 
 export const ModalHeaderWrapper = styled.div`
@@ -113,25 +128,19 @@ export const ModalTitle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: calc(100% - 120px);
   height: 100%;
   height: 43px;
   h1 {
     width: 100%;
     margin: 0;
-    font-size: 16px;
+    // font-size: 16px;
     text-align: center;
   }
 `;
 
-export const ContentBox = styled.div`
-  user-select: none;
-`;
-
 export const ModalImageBox = styled.div`
   position: relative;
-  width: 100%;
-  height: calc(100% - 43px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,12 +150,12 @@ export const ModalImageBox = styled.div`
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지에 따라 width 와 height를 동적으로 변환시켜 주어야 한다.
   ${({ image }) => {
-    const ratio = image && 348 / image?.height;
+    const ratio = image && 360 / image?.height;
     return `
     width: ${ratio && image?.width * ratio}px;
     `;
   }};
-  height: 348px;
+  height: 360px;
   background-image: url(image_test.png);
   background-position: center center;
   background-repeat: no-repeat;
@@ -172,32 +181,27 @@ export const ImageCover = styled.div`
 export const ChannelListBox = styled.div`
   position: relative;
   width: 100%;
-  height: calc(100% - 43px);
+  height: 100%;
+  ul {
+    margin: 0;
+  }
   ul li {
     cursor: pointer;
     list-style: none;
   }
 `;
 
-export const ResultBox = styled.div`
-  position: relative;
-  width: 100%;
-  height: calc(100% - 43px);
-`;
-
-export const BoxContainer = styled.div<{ currentWidth: number | null }>`
-  display: flex;
-  ${({ currentWidth }) =>
-    currentWidth !== null && currentWidth < 688
-      && `
-  flex-direction: column;
-  `}
-`;
-
 export const ImageBox = styled.div`
-  width: calc(100% - 340px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  // width: calc(100% - 340px);
+  text-align: center;
 `;
 
 export const ListBox = styled.div`
-  width: 340px;
+  // width: 340px;
+  display: flex;
+  justify-content: center;
 `;
