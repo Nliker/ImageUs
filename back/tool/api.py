@@ -2,13 +2,14 @@ from flask_restx import reqparse
 from werkzeug.datastructures import FileStorage
 
 class ParserModule:
+    parser=reqparse.RequestParser()
+    
     def __init__(self,args):
-        self.parser=reqparse.RequestParser()
 
         if 'Authorization in args':
             self.parser.add_argument('Authorization',type=str,
                         location='headers',
-                        helsp='access_token',
+                        help='access_token',
                         required=False)
         
         if 'name' in args:
@@ -48,7 +49,7 @@ class ParserModule:
                         required=False)
         
         if 'delete_user_room_id' in args:
-            self.parser.add_argument('delete_user_room_id',tpye=int,
+            self.parser.add_argument('delete_user_room_id',type=int,
                         location='json',
                         help='int_delete_user_room_id',
                         required=False)
@@ -106,6 +107,6 @@ class ParserModule:
                         help='int_array_update_roomlist',
                         required=False)
             
+    def get_parser(self):
         return self.parser
-            
         
