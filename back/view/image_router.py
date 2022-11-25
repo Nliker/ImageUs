@@ -4,7 +4,9 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
 
-def image_router(app,services):
+
+
+def image_router(api,services):
     image_service=services.image_service
     room_service=services.room_service
     
