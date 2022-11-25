@@ -8,7 +8,7 @@ from flask_restx import Resource,Namespace
 
 from tool import ParserModule
 
-user_namespace=Namespace('',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
+user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
 def user_router(api,services):
     user_service=services.user_service
@@ -118,7 +118,7 @@ def user_router(api,services):
     #     ]
     # }
     get_user_imagelist_parser=ParserModule(['Authorization']).get_parser()
-    @user_namespace.route("/user/<int:user_id>/imagelist")
+    @user_namespace.route("/<int:user_id>/imagelist")
     class user_imagelist(Resource):
         @api.doc(parser=get_user_imagelist_parser)
         @login_required
@@ -143,7 +143,7 @@ def user_router(api,services):
     # '친구 저장 성공'
     # '친구 저장 실패'
     post_user_friend_parser=ParserModule(['Authorization','friend_user_id']).get_parser()   
-    @user_namespace.route("/user/<int:user_id>/friend")
+    @user_namespace.route("/<int:user_id>/friend")
     class user_friend(Resource):
         @api.doc(parser=post_user_friend_parser)
         @login_required
@@ -206,7 +206,7 @@ def user_router(api,services):
     # {result}명 삭제 성공
     # '존재하지 않는 유저입니다.'
     delete_user_friend_parser=ParserModule(['Authorization','delete_friend_user_id']).get_parser()   
-    @user_namespace.route("/user/<int:user_id>/friend")
+    @user_namespace.route("/<int:user_id>/friend")
     class user_friend(Resource):
         @api.doc(parser=delete_user_friend_parser)
         @login_required
@@ -257,7 +257,7 @@ def user_router(api,services):
     #     ]
     # }
     get_user_roomlist_parser=ParserModule(['Authorization']).get_parser()
-    @user_namespace.route("/user/<int:user_id>/roomlist")
+    @user_namespace.route("/<int:user_id>/roomlist")
     class user_roomlist(Resource):
         @api.doc(parser=get_user_roomlist_parser)
         @login_required
@@ -285,7 +285,7 @@ def user_router(api,services):
     #output
     # '삭제 성공'
     delete_user_room_parser=ParserModule(['Authorization','delete_user_room_id']).get_parser()   
-    @user_namespace.route("/user/<int:user_id>/room")
+    @user_namespace.route("/<int:user_id>/room")
     class user_room(Resource):
         @api.doc(parser=delete_user_room_parser)
         @login_required
