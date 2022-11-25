@@ -32,9 +32,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     <Wrapper>
       <Container showModal={showUploadModal}>
         <TopNavBar />
-        {isMobile && <BottomNavBar showModal={showModal} />}
+        {/* {isMobile && <BottomNavBar showModal={showModal} />} */}
+        <BottomNavBar showModal={showModal} />
         <ToolBar handleRoomListBtn={handleRoomListBtn} />
-        <SideBar show={showSideBar} isMobile={isMobile} />
+        <SideBar show={showSideBar} />
         {/* {showSideBar && <SideBar />} */}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
