@@ -3,6 +3,8 @@ import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 from werkzeug.datastructures import FileStorage
 from flask_restx import Resource,Namespace,reqparse
+from werkzeug.datastructures import CombinedMultiDict
+from validator import UploadForm
 
 namespace=Namespace('',description='이미지를 다운 및 업로드합니다.')
 
@@ -31,21 +33,24 @@ def image_router(image_api,services):
                 return make_response('업로드 토큰이 없습니다.',401)
 
             upload_token=request.headers['Authorization']
-
+            
             authorized=image_service.authorize_upload_token(upload_token,user_id)
 
             if not authorized:
                 return make_response('업로드 할 수 있는 권한이 없습니다.',401)
-            
-            if 'image' not in request.files:
-                return make_response('File is missing',404)
-            
+                
+            upload_form = UploadForm(CombinedMultiDict((request.files, request.args)),meta={"csrf": False})
+
+            if not upload_form.validate():
+                # return make_response('file is missing',404)
+                message={}
+                for fieldName, errorMessages in upload_form.errors.items():
+                    message[fieldName]=errorMessages
+                        
+                return make_response(message,404)
             
             image=request.files['image']
-
-            if image.filename=='':
-                return make_response('File is missing',404)
-            
+        
             image_link=image_service.save_profile_picture(user_id,image)
             
             return make_response(image_link,200)
