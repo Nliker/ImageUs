@@ -2,8 +2,7 @@ from flask_restx import reqparse
 from werkzeug.datastructures import FileStorage
 
 class ParserModule:
-    def __init__(self,api,args):
-        self.api=api
+    def __init__(self,args):
         self.parser=reqparse.RequestParser()
 
         if 'Authorization in args':
@@ -106,5 +105,7 @@ class ParserModule:
                         loacation='json',
                         help='int_array_update_roomlist',
                         required=False)
+            
+        return self.parser
             
         
