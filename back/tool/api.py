@@ -2,11 +2,9 @@ from flask_restx import reqparse
 from werkzeug.datastructures import FileStorage
 
 class ParserModule:
-    parser=reqparse.RequestParser()
-    
     def __init__(self,args):
-
-        if 'Authorization in args':
+        self.parser=reqparse.RequestParser()
+        if 'Authorization' in args:
             self.parser.add_argument('Authorization',type=str,
                         location='headers',
                         help='access_token',

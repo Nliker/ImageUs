@@ -15,6 +15,8 @@ def user_router(api,services):
     image_service=services.image_service
     room_service=services.room_service
 
+    api.add_namespace(user_namespace,'')
+
     #회원가입을 합니다.ss
     #input
     # {
@@ -33,12 +35,10 @@ def user_router(api,services):
     #             'profile':<str>,
     #     }
     # }
-    api.add_namespace(user_namespace,'')
-    
     post_sign_up_parser=ParserModule(['name','email','password','profile']).get_parser()   
     @user_namespace.route("/sign-up")
     class sign_up(Resource):
-        @api.doc(paser=post_sign_up_parser)
+        @api.doc(parser=post_sign_up_parser)
         def post(self):
             new_user=request.json
 
@@ -81,7 +81,7 @@ def user_router(api,services):
     # {
     #     'access_token':<str>
     # }
-    post_login_parser=ParserModule(['email','password'])
+    post_login_parser=ParserModule(['email','password']).get_parser()
     @user_namespace.route("/login")
     class login(Resource):
         @api.doc(parser=post_login_parser)
@@ -117,8 +117,10 @@ def user_router(api,services):
     #         }
     #     ]
     # }
+    get_user_imagelist_parser=ParserModule(['Authorization']).get_parser()
     @user_namespace.route("/user/<int:user_id>/imagelist")
     class user_imagelist(Resource):
+        @api.doc(parser=get_user_imagelist_parser)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -140,7 +142,7 @@ def user_router(api,services):
     #output
     # '친구 저장 성공'
     # '친구 저장 실패'
-    post_user_friend_parser=ParserModule(['friend_user_id']).get_parser()   
+    post_user_friend_parser=ParserModule(['Authorization','friend_user_id']).get_parser()   
     @user_namespace.route("/user/<int:user_id>/friend")
     class user_friend(Resource):
         @api.doc(parser=post_user_friend_parser)
@@ -181,8 +183,10 @@ def user_router(api,services):
     #         }        
     #     ]
     # }
+    get_user_friendlist_parser=ParserModule(['Authorization']).get_parser()
     @user_namespace.route("/user/<int:user_id>/friendlist")
     class user_friendlist(Resource):
+        @api.doc(parser=get_user_friendlist_parser)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -201,7 +205,7 @@ def user_router(api,services):
     #output
     # {result}명 삭제 성공
     # '존재하지 않는 유저입니다.'
-    delete_user_friend_parser=ParserModule(['delete_friend_user_id']).get_parser()   
+    delete_user_friend_parser=ParserModule(['Authorization','delete_friend_user_id']).get_parser()   
     @user_namespace.route("/user/<int:user_id>/friend")
     class user_friend(Resource):
         @api.doc(parser=delete_user_friend_parser)
@@ -252,8 +256,10 @@ def user_router(api,services):
     #          }
     #     ]
     # }
+    get_user_roomlist_parser=ParserModule(['Authorization']).get_parser()
     @user_namespace.route("/user/<int:user_id>/roomlist")
     class user_roomlist(Resource):
+        @api.doc(parser=get_user_roomlist_parser)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -278,7 +284,7 @@ def user_router(api,services):
     # }
     #output
     # '삭제 성공'
-    delete_user_room_parser=ParserModule(['delete_user_room_id']).get_parser()   
+    delete_user_room_parser=ParserModule(['Authorization','delete_user_room_id']).get_parser()   
     @user_namespace.route("/user/<int:user_id>/room")
     class user_room(Resource):
         @api.doc(parser=delete_user_room_parser)
