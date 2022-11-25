@@ -53,7 +53,9 @@ class ParserModule:
                         required=False)
         
         if 'userlist' in args:
-            self.parser.add_argument('userlist[]',type=int,action='append',
+            self.parser.add_argument('userlist[]',
+                        type=int,
+                        action='append',
                         location='json',
                         help='int_array_userlist',
                         required=False)
