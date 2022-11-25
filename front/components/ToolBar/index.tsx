@@ -14,7 +14,8 @@ const ToolBar = ({ handleRoomListBtn }: Props) => {
   return (
     <Wrapper>
       <div>
-        <SideBarButton>{isMobile && <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />}</SideBarButton>
+        {/* <SideBarButton>{isMobile && <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />}</SideBarButton> */}
+        <SideBarButton><MdOutlineSpaceDashboard onClick={handleRoomListBtn} /></SideBarButton>
       </div>
       {/* <BtnDiv>
         <BtnSpan>
