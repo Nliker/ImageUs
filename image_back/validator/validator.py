@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from wtforms import StringField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired,ValidationError
 import config
@@ -17,3 +18,4 @@ class UploadForm(FlaskForm):
         FileAllowed(config.IMAGE_EXTENTIONS, f"only {config.IMAGE_EXTENTIONS} extension can be uploaded"),
         FileSizeLimit(config.IMAGE_SIZE_LIMIT)
     ])
+    Authorization=StringField('Authorization',validators=[DataRequired()])
