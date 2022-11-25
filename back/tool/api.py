@@ -91,5 +91,20 @@ class ParserModule:
                         location='json',
                         help='int_array_invite_userlist',
                         required=False)
+
+        if 'delete_image_id' in args:
+            self.parser.add_argument('delete_image_id',
+                        type=int,
+                        location='json',
+                        help='int_delete_image_id',
+                        required=False)
+        
+        if 'update_roomlist' in args:
+            self.parser.add_argument('update_roomlist',
+                        type=int,
+                        action='append',
+                        loacation='json',
+                        help='int_array_update_roomlist',
+                        required=False)
             
         
