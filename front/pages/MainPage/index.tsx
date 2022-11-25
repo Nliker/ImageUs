@@ -1,3 +1,4 @@
+import ContentImageModal from '@components/ContentImageModal';
 import ContentSection from '@components/ContentSection';
 import AppLayout from '@layouts/AppLayout';
 import React, { useCallback, useState } from 'react';
@@ -5,6 +6,7 @@ import { ContentWrappper, Wrappper } from './styles';
 
 const MainPage = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   // const onClickUserProfile = useCallback((e: { stopPropagation: () => void }) => {
   //   e.stopPropagation();
   //   setShowUserMenu((prev) => !prev);
@@ -25,14 +27,23 @@ const MainPage = () => {
     //     toast.error(error.response?.data, { position: 'bottom-center' });
     //   });
   }, []);
-  // console.log(showUserMenu);
+  
+  const onShowImageModal = useCallback(() => {
+    setShowImageModal(true);
+  }, []);
+  
+  const onCloseImageModal = useCallback(() => {
+    setShowImageModal(false);
+  }, []);
+  
   return (
     <AppLayout>
       <Wrappper>
         <ContentWrappper>
-          <ContentSection />
+          <ContentSection onShowModal={onShowImageModal}/>
         </ContentWrappper>
       </Wrappper>
+      {showImageModal && <ContentImageModal onCloseModal={onCloseImageModal} />}
     </AppLayout>
   );
 };
