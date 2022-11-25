@@ -18,13 +18,17 @@ const dummyImages = [
     인피니티 스크롤링을 고려한다.
 */
 
-const ContentSection = () => {
+interface Props {
+  onShowModal: (e: any) => void;
+}
+
+const ContentSection = ({ onShowModal }: Props) => {
   return (
     <Wrapper>
       <MainContainer>
         {dummyImages.map((data) => {
           return (
-            <ContentBox>
+            <ContentBox key={data.id} onClick={onShowModal}>
               <div>
                 <Link to="#">
                   <ImageCard>
