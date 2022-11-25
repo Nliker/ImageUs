@@ -1,3 +1,4 @@
+import ContentSection from '@components/ContentSection';
 import AppLayout from '@layouts/AppLayout';
 import React, { useCallback, useState } from 'react';
 import { ContentWrappper, Wrappper } from './styles';
@@ -29,6 +30,7 @@ const MainPage = () => {
     <AppLayout>
       <Wrappper>
         <ContentWrappper>
+          <ContentSection />
         </ContentWrappper>
       </Wrappper>
     </AppLayout>
