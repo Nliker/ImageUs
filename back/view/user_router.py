@@ -1,13 +1,20 @@
-from flask import request,jsonify
+from flask import request,jsonify,make_response
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
 
-def user_router(app,services):
+from flask_restx import Resource,Namespace,reqparse
+
+def user_router(api,services):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
+    
+    parser=reqparse.RequestParser()
+    parser.add_argument('Authorization',type=str,
+                        location='headers',
+                        help='access_token')
     
     #회원가입을 합니다.
     #input
@@ -27,7 +34,7 @@ def user_router(app,services):
     #             'profile':<str>,
     #     }
     # }
-    @app.route("/sign-up",methods=["POST"])
+    @api.route("/sign-up",methods=["POST"])
     def post_sign_up():
         new_user=request.json
 
