@@ -31,25 +31,25 @@ class ImageService:
         image_save_dir=f"{parent_path}/{self.config['IMAGE_PATH']}/{user_id}"
 
         is_user_dir_exists=os.path.isdir(f"{image_save_dir}")
+
         if not is_user_dir_exists:
             os.makedirs(image_save_dir)
-            
-        is_file_exists=os.path.isfile(f"{image_save_dir}/{image_filename}")
-        count=0
-        if  is_file_exists:
-            folder_list = os.listdir(f"{image_save_dir}")
 
-            for file_name in folder_list:
-                if file_name==image_filename:
-                    count+=1
+        image_path_and_name=f"{image_save_dir}/{image_filename}"
+        
+        image_dir_and_name,image_ext=os.path.splitext(image_path_and_name)
 
-        if count!=0:
-            image_filename_list=image_filename.split(sep='.')
-            image_filename=image_filename_list[0]+f"({count})."+image_filename_list[1]
+        uniq=1
 
-        save_image_path_and_filename=f"{image_save_dir}/{image_filename}"
-        image.save(save_image_path_and_filename)
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{image_filename}"
+        output_path=image_path_and_name
+        while os.path.exists(output_path):
+            print("이미지 이름 처리중")
+            output_path=f"{image_dir_and_name}({uniq}){image_ext}"
+            uniq+=1
+
+        print(output_path)
+        image.save(output_path)
+        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{output_path.split('/')[-1]}"
         return image_link
 
     def decode_access_code(self,access_token):
