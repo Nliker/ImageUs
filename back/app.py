@@ -5,6 +5,8 @@ from model import UserDao,ImageDao,RoomDao
 from service import UserService,ImageService,RoomService
 from view import user_router,image_router,room_router
 
+from flask_restx import Api
+
 class Services:
     pass
 
@@ -13,6 +15,8 @@ def create_app(test_config=None):
 
     CORS(app)
 
+    api=Api(app,title='cloudy back-server api docs',doc='/api-docs')
+    
     if test_config is None:
         app.config.from_pyfile("config.py")
     else:
@@ -36,8 +40,8 @@ def create_app(test_config=None):
     services.image_service=ImageService(image_dao,app.config)
     services.room_service=RoomService(room_dao,app.config)
 
-    user_router(app,services)
-    image_router(app,services)
-    room_router(app,services)
+    user_router(api,services)
+    image_router(api,services)
+    room_router(api,services)
     
     return app
