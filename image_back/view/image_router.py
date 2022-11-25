@@ -28,9 +28,15 @@ def image_router(image_api,services):
         @image_api.doc(parser=parser)
         def post(self,user_id):
             """files의 image에 담긴 이미지를 업로드 합니다."""
-
-            if 'Authorization' not in request.headers:
-                return make_response('업로드 토큰이 없습니다.',401)
+            upload_form = UploadForm(CombinedMultiDict((request.files, request.headers)),meta={"csrf": False})
+            
+            if not upload_form.validate():
+                # return make_response('file is missing',404)
+                message={}
+                for fieldName, errorMessages in upload_form.errors.items():
+                    message[fieldName]=errorMessages
+                        
+                return make_response(message,401)
 
             upload_token=request.headers['Authorization']
             
@@ -38,17 +44,7 @@ def image_router(image_api,services):
 
             if not authorized:
                 return make_response('업로드 할 수 있는 권한이 없습니다.',401)
-                
-            upload_form = UploadForm(CombinedMultiDict((request.files, request.args)),meta={"csrf": False})
 
-            if not upload_form.validate():
-                # return make_response('file is missing',404)
-                message={}
-                for fieldName, errorMessages in upload_form.errors.items():
-                    message[fieldName]=errorMessages
-                        
-                return make_response(message,404)
-            
             image=request.files['image']
         
             image_link=image_service.save_profile_picture(user_id,image)
