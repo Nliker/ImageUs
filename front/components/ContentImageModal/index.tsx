@@ -5,9 +5,9 @@ interface Props {
   onCloseModal: (e: any) => void;
 }
 
-const ContentImageModal = ({ onCloseModal }: Props) => {
+const ContentImageModal = () => {
   return (
-    <ModalLayout onCloseModal={onCloseModal}>
+    <ModalLayout modalName={'image_modal'}>
       <div></div>
     </ModalLayout>
   );
