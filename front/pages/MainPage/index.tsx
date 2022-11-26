@@ -6,7 +6,6 @@ import { ContentWrappper, Wrappper } from './styles';
 
 const MainPage = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
   // const onClickUserProfile = useCallback((e: { stopPropagation: () => void }) => {
   //   e.stopPropagation();
   //   setShowUserMenu((prev) => !prev);
@@ -28,22 +27,13 @@ const MainPage = () => {
     //   });
   }, []);
   
-  const onShowImageModal = useCallback(() => {
-    setShowImageModal(true);
-  }, []);
-  
-  const onCloseImageModal = useCallback(() => {
-    setShowImageModal(false);
-  }, []);
-  
   return (
     <AppLayout>
       <Wrappper>
         <ContentWrappper>
-          <ContentSection onShowModal={onShowImageModal}/>
+          <ContentSection/>
         </ContentWrappper>
       </Wrappper>
-      {showImageModal && <ContentImageModal onCloseModal={onCloseImageModal} />}
     </AppLayout>
   );
 };

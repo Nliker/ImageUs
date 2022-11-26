@@ -21,6 +21,7 @@ import {
 } from './styles';
 import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
+import useSWR from 'swr';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
@@ -67,7 +68,11 @@ const dummyData = [
   },
 ];
 
-const UploadModal = ({ onCloseModal }: Props) => {
+const UploadModal = () => {
+  const { mutate: uploadModalMutate } = useSWR('showUploadModal');
+  const onClickCloseModal = () => {
+    uploadModalMutate(false, false);
+  };
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
   const [uploadStep, setUploadStep] = useState<number>(0);
@@ -200,7 +205,7 @@ const UploadModal = ({ onCloseModal }: Props) => {
       <Background />
       <Container>
         <CloseBtn>
-          <div onClick={onCloseModal}>
+          <div onClick={onClickCloseModal}>
             <CgCloseO />
           </div>
         </CloseBtn>
