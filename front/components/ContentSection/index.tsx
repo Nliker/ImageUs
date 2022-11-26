@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import useSWR from 'swr';
 import { ContentBox, ImageCard, ImageInfo, InfoItem, MainContainer, Wrapper } from './styles';
 
 const dummyImages = [
@@ -22,13 +23,18 @@ interface Props {
   onShowModal: (e: any) => void;
 }
 
-const ContentSection = ({ onShowModal }: Props) => {
+const ContentSection = () => {
+  const { mutate: imageModalMutate } = useSWR('showImageModal');
+  const onShowImageModal = () => {
+    imageModalMutate(true, false);
+  };
+
   return (
     <Wrapper>
       <MainContainer>
         {dummyImages.map((data) => {
           return (
-            <ContentBox key={data.id} onClick={onShowModal}>
+            <ContentBox key={data.id} onClick={onShowImageModal}>
               <div>
                 <Link to="#">
                   <ImageCard>

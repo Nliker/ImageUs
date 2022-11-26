@@ -5,12 +5,19 @@ import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
 import { NavLink } from 'react-router-dom';
 import { BottomContainer, MobileNavItem, MobileNavList, UploadBtn, Wrapper } from './styles';
+import useSWR from 'swr';
 
-interface Props {
-  showModal: (e: any) => void;
-}
+// interface Props {
+//   showModal: (e: any) => void;
+// }
 
-const BottomNavBar = ({ showModal }: Props) => {
+const BottomNavBar = () => {
+  const { mutate: uploadModalMutate } = useSWR('showUploadModal');
+
+  const onClickUploadModal = () => {
+    uploadModalMutate(true, false);
+  }
+  
   return (
     <Wrapper>
       <BottomContainer>
@@ -36,7 +43,7 @@ const BottomNavBar = ({ showModal }: Props) => {
             </NavLink>
           </MobileNavItem>
           <MobileNavItem>
-            <div className={"upload_btn"} onClick={showModal}>
+            <div className={"upload_btn"} onClick={onClickUploadModal}>
               <SlCloudUpload />
               <span>업로드</span>
             </div>

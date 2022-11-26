@@ -7,7 +7,7 @@ export const Wrapper = styled.div`
   user-select: none;
 `;
 
-export const Container = styled.div<{ showModal: boolean }>`
+export const Container = styled.div<{ showModal: boolean | undefined }>`
   height: 100%;
   width: 100%;
   ${({ showModal }) =>
