@@ -41,8 +41,12 @@
 
 # print([1,2]==[2,1])
 
-image_roomlist=set([1,2,10,9])
-update_roomlist=set([2,3,4,4,5,6])
+# image_roomlist=set([1,2,10,9])
+# update_roomlist=set([2,3,4,4,5,6])
 
-update_list=sorted(image_roomlist.union(update_roomlist))
-print(update_list)
+# update_list=sorted(image_roomlist.union(update_roomlist))
+# print(update_list)
+
+a={}
+a['name']=1
+print(a)
