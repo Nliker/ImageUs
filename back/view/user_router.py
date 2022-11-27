@@ -6,7 +6,7 @@ from auth import login_required,g
 
 from flask_restx import Resource,Namespace
 
-from tool import ParserModule
+from tool import ParserModule,ApiModel
 
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
@@ -35,10 +35,10 @@ def user_router(api,services):
     #             'profile':<str>,
     #     }
     # }
-    post_sign_up_parser=ParserModule(['name','email','password','profile']).get_parser()   
+    post_sign_up_model=ApiModel(['name','email','password','profile']).get_model(user_namespace,"post_sign_up_model")
     @user_namespace.route("/sign-up")
     class sign_up(Resource):
-        @api.doc(parser=post_sign_up_parser)
+        @user_namespace.expect(post_sign_up_model,validate=False)
         def post(self):
             new_user=request.json
 
@@ -62,7 +62,7 @@ def user_router(api,services):
     #         'profile':<str>,
     #     }
     # }
-    @user_namespace.route("/user/<int:user_id>")
+    @user_namespace.route("/<int:user_id>")
     class user(Resource):
         def get(self,user_id):
             user_info=user_service.get_user_info(user_id)
@@ -81,10 +81,10 @@ def user_router(api,services):
     # {
     #     'access_token':<str>
     # }
-    post_login_parser=ParserModule(['email','password']).get_parser()
+    post_login_model=ApiModel(['email','password']).get_model(user_namespace,"post_login_model")
     @user_namespace.route("/login")
     class login(Resource):
-        @api.doc(parser=post_login_parser)
+        @user_namespace.expect(post_login_model,validate=False)
         def post(self):
             credential=request.json
             
@@ -120,7 +120,7 @@ def user_router(api,services):
     get_user_imagelist_parser=ParserModule(['Authorization']).get_parser()
     @user_namespace.route("/<int:user_id>/imagelist")
     class user_imagelist(Resource):
-        @api.doc(parser=get_user_imagelist_parser)
+        @user_namespace.expect(get_user_imagelist_parser,validate=False)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -133,37 +133,6 @@ def user_router(api,services):
 
             return make_response(jsonify({'imagelist':image_list}))
     
-    
-    #id가 user_id인 유저의 친구를 생성합니다.
-    #input
-    # {
-    #     'friend_user_id':<int>
-    # }
-    #output
-    # '친구 저장 성공'
-    # '친구 저장 실패'
-    post_user_friend_parser=ParserModule(['Authorization','friend_user_id']).get_parser()   
-    @user_namespace.route("/<int:user_id>/friend")
-    class user_friend(Resource):
-        @api.doc(parser=post_user_friend_parser)
-        @login_required
-        def post(self,user_id):
-            current_user_id=g.user_id
-            friend_user_id=request.json['friend_user_id']
-            
-            if current_user_id != user_id:
-                return make_response('권한이 없습니다.',401)
-            
-            if not user_service.get_user_info(friend_user_id):
-                return make_response('해당 유저가 존재하지 않습니다.',404)
-            
-            if user_service.is_user_friend(current_user_id,friend_user_id):
-                return make_response('이미 친구인 유저입니다.',401)
-            
-            result=user_service.create_user_friend(current_user_id,friend_user_id)
-
-            return make_response(f"{result}명 친구 생성 성공")
-
     #id가 user_id인 유저의 친구 리스트를 불러옵니다.
     #input
     #output
@@ -184,9 +153,9 @@ def user_router(api,services):
     #     ]
     # }
     get_user_friendlist_parser=ParserModule(['Authorization']).get_parser()
-    @user_namespace.route("/user/<int:user_id>/friendlist")
+    @user_namespace.route("/<int:user_id>/friendlist")
     class user_friendlist(Resource):
-        @api.doc(parser=get_user_friendlist_parser)
+        @user_namespace.expect(get_user_friendlist_parser,validate=False)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -197,6 +166,12 @@ def user_router(api,services):
             user_friend_info_list=user_service.get_user_friendlist(current_user_id)
             return make_response(jsonify({'friendlist':user_friend_info_list}),200)
     
+    post_user_friend_parser=ParserModule(['Authorization']).get_parser()   
+    post_user_friend_model=ApiModel(['friend_user_id']).get_model(user_namespace,'post_user_friend_model')
+    
+    delete_user_friend_parser=ParserModule(['Authorization']).get_parser()   
+    delete_user_friend_model=ApiModel(['delete_friend_user_id']).get_model(user_namespace,"delete_user_friend_model")
+    
     #id가 user_id인 유저의 친구를 삭제합니다.
     #input
     # {
@@ -205,10 +180,9 @@ def user_router(api,services):
     #output
     # {result}명 삭제 성공
     # '존재하지 않는 유저입니다.'
-    delete_user_friend_parser=ParserModule(['Authorization','delete_friend_user_id']).get_parser()   
     @user_namespace.route("/<int:user_id>/friend")
     class user_friend(Resource):
-        @api.doc(parser=delete_user_friend_parser)
+        @user_namespace.expect(delete_user_friend_parser,delete_user_friend_model,validate=False)
         @login_required
         def delete(self,user_id):
             current_user_id=g.user_id
@@ -223,6 +197,33 @@ def user_router(api,services):
                 
             result=user_service.delete_user_friend(current_user_id,delete_friend_user_id)
             return make_response(f"{result}명 삭제 성공")
+            
+    #id가 user_id인 유저의 친구를 생성합니다.
+    #input
+    # {
+    #     'friend_user_id':<int>
+    # }
+    #output
+    # '친구 저장 성공'
+    # '친구 저장 실패'
+        @user_namespace.expect(post_user_friend_parser,post_user_friend_model,validate=False)
+        @login_required
+        def post(self,user_id):
+            current_user_id=g.user_id
+            friend_user_id=request.json['friend_user_id']
+            
+            if current_user_id != user_id:
+                return make_response('권한이 없습니다.',401)
+            
+            if not user_service.get_user_info(friend_user_id):
+                return make_response('해당 유저가 존재하지 않습니다.',404)
+            
+            if user_service.is_user_friend(current_user_id,friend_user_id):
+                return make_response('이미 친구인 유저입니다.',401)
+            
+            result=user_service.create_user_friend(current_user_id,friend_user_id)
+
+            return make_response(f"{result}명 친구 생성 성공")
     
     #id가 user_id인 유저의 방 리스트를 불러옵니다.
     #input
@@ -259,7 +260,7 @@ def user_router(api,services):
     get_user_roomlist_parser=ParserModule(['Authorization']).get_parser()
     @user_namespace.route("/<int:user_id>/roomlist")
     class user_roomlist(Resource):
-        @api.doc(parser=get_user_roomlist_parser)
+        @user_namespace.expect(get_user_roomlist_parser,validate=False)
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -284,10 +285,11 @@ def user_router(api,services):
     # }
     #output
     # '삭제 성공'
-    delete_user_room_parser=ParserModule(['Authorization','delete_user_room_id']).get_parser()   
+    delete_user_room_parser=ParserModule(['Authorization']).get_parser()   
+    delete_user_room_model=ApiModel(['delete_user_room_id']).get_model(user_namespace,"delete_user_room_model")
     @user_namespace.route("/<int:user_id>/room")
     class user_room(Resource):
-        @api.doc(parser=delete_user_room_parser)
+        @user_namespace.expect(delete_user_room_parser,delete_user_room_model,validate=False)
         @login_required
         def delete(user_id):
             current_user_id=g.user_id
