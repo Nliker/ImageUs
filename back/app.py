@@ -42,6 +42,6 @@ def create_app(test_config=None):
 
     user_router(api,services)
     room_router(api,services)
-    # image_router(api,services)
+    image_router(api,services)
     
     return app
