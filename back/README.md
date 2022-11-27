@@ -1,6 +1,10 @@
 # insta_cloud
 개인의 이미지를 저장하고 공유 할 수 있는 서비스입니다.
 
+#지식
+### 1.left join 시 왼쪽의 필터링을 먼저 해도 결국엔 무시된다.
+### 2.join 으로 나운 결과물은 자동으로 오름차순 정렬된다.
+
 기능
 ### 1. 유저 회원가입
 ### 2. 친구
@@ -8,6 +12,15 @@
 ### 4. 방 생성
 ### 5. 선택적 사진 공유
 ### 6. 앨범 단위(추후 완성)
+### 7. 방장이 방을 나갈시에 방장 바꾸기
+
+추가기능
+### 0.이미지 삭제 시 14일 유효기간 기능
+### 1.유저삭제
+### 2.유저 프로파일 이미지 업로드
+### 3.이미지 서버 구축
+### 4.소셜로그인
+### 5.친구 검색 서버 구축
 
 ## ERD
 ## database 
@@ -20,6 +33,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `hashed_password` varchar(255) NOT NULL,
   `profile` varchar(255) NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `name` varchar(255) NOT NULL,
@@ -31,6 +45,7 @@ CREATE TABLE `users` (
 CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
   `friend_user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`user_id`,`friend_id`)
@@ -41,6 +56,7 @@ CREATE TABLE `images` (
   `id` int NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
   `user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -53,6 +69,7 @@ CREATE TABLE `rooms` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(300) NOT NULL,
   `host_user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -62,6 +79,7 @@ CREATE TABLE `rooms` (
 CREATE TABLE `rooms_user_list` (
   `room_id` int NOT NULL,
   `user_id` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`room_id`,`user_id`),
@@ -75,7 +93,10 @@ CREATE TABLE `rooms_user_list` (
 CREATE TABLE `images_room_list` (
   `image_id` int NOT NULL,
   `room_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` boolean not null DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT, 
+  `public' int not null default 0,
+  CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`,`room_id`),
   INDEX `room_id` (`room_id`)
 )
