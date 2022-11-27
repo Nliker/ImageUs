@@ -5,13 +5,16 @@ import { Background, CloseBtn, Container, Wrapper } from './styles';
 
 interface Props {
   children?: React.ReactNode;
-  modalName: string;
 }
 
-const ModalLayout = ({ children, modalName }: Props) => {
-  const { mutate: modalMutate } = useSWR(`${modalName === 'image_modal' ? 'showImageModal' : 'showUploadModal'}`);
+const ModalLayout = ({ children }: Props) => {
+  const { mutate: showModalMutate } = useSWR('showModalState');
+
   const onClickCloseModal = () => {
-    modalMutate(false, false);
+    showModalMutate({
+      upload: false,
+      image: false
+    });
   };
 
   return (

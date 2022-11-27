@@ -15,7 +15,8 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { data: showUploadModal } = useSWR('showUploadModal');
-  const { data: showImageModal } = useSWR('showImageModal');
+  const { data: imageModalState } = useSWR('imageModalState');
+  const { data: showModalState } = useSWR('showModalState');
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
   // const [showUploadModal, setshowUploadModal] = useState<boolean>(false);
   // const [showImageModal, setShowImageModal] = useState(false);
@@ -41,10 +42,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   // const onCloseImageModal = useCallback(() => {
   //   setShowImageModal(false);
   // }, []);
-
+  console.log(imageModalState);
   return (
     <Wrapper>
-      <Container showModal={showUploadModal}>
+      <Container showModal={showModalState}>
         <TopNavBar />
         {isMobile && <BottomNavBar />}
         {/* <BottomNavBar showModal={showModal} /> */}
@@ -53,8 +54,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* {showSideBar && <SideBar />} */}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
-      {showUploadModal && <UploadModal />}
-      {showImageModal && <ContentImageModal />}
+      {showModalState?.upload && <UploadModal />}
+      {showModalState?.image && <ContentImageModal />}
     </Wrapper>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { ContentBox, ImageCard, ImageInfo, InfoItem, MainContainer, Wrapper } from './styles';
@@ -23,10 +23,34 @@ interface Props {
   onShowModal: (e: any) => void;
 }
 
+interface ImageType {
+  id: number,
+  url: string,
+  name: string
+}
+
 const ContentSection = () => {
-  const { mutate: imageModalMutate } = useSWR('showImageModal');
-  const onShowImageModal = () => {
-    imageModalMutate(true, false);
+  // 전체 이미지 정보
+  const { mutate: imageInfoMutate } = useSWR('imageInfo');
+  // 클릭한 이미지 정보
+  const { mutate: imageModalMutate } = useSWR('imageModalState');
+  const { mutate: showModalMutate } = useSWR('showModalState');
+
+
+  useEffect(() => {
+    imageInfoMutate(dummyImages, false);
+  }, []);
+  
+  const onShowImageModal = (image: ImageType) => () => {
+    imageModalMutate({
+      clickImageId: image.id,
+      clickImageUrl: image.url,
+      clickImageName: image.name,
+    }, false);
+    showModalMutate({
+      upload: false,
+      image: true
+    }, false);
   };
 
   return (
@@ -34,7 +58,7 @@ const ContentSection = () => {
       <MainContainer>
         {dummyImages.map((data) => {
           return (
-            <ContentBox key={data.id} onClick={onShowImageModal}>
+            <ContentBox key={data.id} onClick={onShowImageModal(data)}>
               <div>
                 <Link to="#">
                   <ImageCard>
