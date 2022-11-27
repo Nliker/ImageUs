@@ -25,7 +25,7 @@ def image_router(image_api,services):
 
     @namespace.route("/upload/<int:user_id>")
     class upload(Resource):
-        @image_api.doc(parser=parser)
+        @namespace.doc(parser=parser)
         def post(self,user_id):
             """files의 image에 담긴 이미지를 업로드 합니다."""
             upload_form = UploadForm(CombinedMultiDict((request.files, request.headers)),meta={"csrf": False})

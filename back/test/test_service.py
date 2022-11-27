@@ -1049,12 +1049,12 @@ def test_upload_image(image_service):
         'user_id':1
     }
     result=image_service.upload_image(new_image)
-    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
     new_image_id=result['new_image_id']
     new_image_info=image_service.get_image_info(new_image_id)
     assert new_image_info=={
         'id':5,
-        'link':new_image_link,
+        'link':must_new_image_link,
         'user_id':1
     }
     #같은 사진을 두 번 올렸을 경우
@@ -1066,11 +1066,11 @@ def test_upload_image(image_service):
     result=image_service.upload_image(new_image)
     new_image_id=result['new_image_id']
     filename='sample_image(1).JPG'
-    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+    must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
     new_image_info=image_service.get_image_info(new_image_id)
     assert new_image_info=={
         'id':6,
-        'link':new_image_link,
+        'link':must_new_image_link,
         'user_id':1
     }
     
@@ -1148,27 +1148,27 @@ def test_upload_room_image(image_service):
         }
     ]
 
-def test_is_user_image_room_member(image_service):
-    is_user_image_room_member=image_service.is_user_image_room_member(3,4)
-    assert is_user_image_room_member==True
-    is_user_image_room_member=image_service.is_user_image_room_member(3,2)
-    assert is_user_image_room_member==True
+# def test_is_user_image_room_member(image_service):
+#     is_user_image_room_member=image_service.is_user_image_room_member(3,4)
+#     assert is_user_image_room_member==True
+#     is_user_image_room_member=image_service.is_user_image_room_member(3,2)
+#     assert is_user_image_room_member==True
     
-    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
-    assert is_user_image_room_member==True
-    is_user_image_room_member=image_service.is_user_image_room_member(1,3)
-    assert is_user_image_room_member==False
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+#     assert is_user_image_room_member==True
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,3)
+#     assert is_user_image_room_member==False
 
-    row=database.execute(text("""
-        update rooms_user_list
-        set deleted=1
-        where room_id=1
-        and user_id=1
-        and deleted=0
-        """)).rowcount
-    assert row==1
-    is_user_image_room_member=image_service.is_user_image_room_member(1,2)
-    assert is_user_image_room_member==False
+#     row=database.execute(text("""
+#         update rooms_user_list
+#         set deleted=1
+#         where room_id=1
+#         and user_id=1
+#         and deleted=0
+#         """)).rowcount
+#     assert row==1
+#     is_user_image_room_member=image_service.is_user_image_room_member(1,2)
+#     assert is_user_image_room_member==False
 
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
