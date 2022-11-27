@@ -70,8 +70,13 @@ const dummyData = [
 
 const UploadModal = () => {
   const { mutate: uploadModalMutate } = useSWR('showUploadModal');
+  const { mutate: showModalMutate } = useSWR('showModalState');
+  
   const onClickCloseModal = () => {
-    uploadModalMutate(false, false);
+    showModalMutate({
+      upload: false,
+      image: false
+    }, false);
   };
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
