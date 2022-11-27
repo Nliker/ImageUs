@@ -5,7 +5,7 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 from auth import login_required,g
 
 from flask_restx import Resource,Namespace,fields
-from tool import ParserModule
+from tool import ParserModule,ApiModel
 
 room_namespace=Namespace('room',description='방의 정보를 생성,호출,수정,삭제 합니다.')
 
@@ -28,11 +28,10 @@ def room_router(api,services):
     #     'success':3(초대한 사람 수)
     # }
     
-    post_room_model=room_namespace.model('post_room_model',{
-        "userlist":fields.List(fields.Integer(),required=False),
-        "title":fields.String(required=False),
-    })
+    post_room_model=ApiModel(['userlist','title']).get_model(room_namespace,"post_room_model")
+
     post_room_parser=ParserModule(['Authorization']).get_parser()
+    
     @room_namespace.route("")
     class room(Resource):
         @room_namespace.expect(post_room_parser,post_room_model,validate=False)
