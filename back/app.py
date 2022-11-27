@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask,make_response
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import UserDao,ImageDao,RoomDao
 from service import UserService,ImageService,RoomService
 from view import user_router,image_router,room_router
 
-from flask_restx import Api
+from flask_restx import Api,Resource
 
 class Services:
     pass
@@ -26,9 +26,10 @@ def create_app(test_config=None):
 
     print("데이터베이스 연결 성공")
 
-    @app.route("/ping",methods=["GET"])
-    def ping():
-        return "pong",200
+    @api.route("/ping")
+    class ping(Resource):
+        def get():
+            return make_response("pong",200)
     
     user_dao=UserDao(database)
     image_dao=ImageDao(database)
