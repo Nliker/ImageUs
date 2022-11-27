@@ -4,11 +4,17 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
 
+from flask_restx import Resource,Namespace
 
+from tool import ParserModule
+
+image_namespace=Namespace('image',description='이미지의 정보를 생성,호출,수정,삭제 합니다.')
 
 def image_router(api,services):
     image_service=services.image_service
     room_service=services.room_service
+    
+    api.add_namespace(image_namespace,'')
     
     #새로운 사진을 게시합니다.
     #input
@@ -27,27 +33,30 @@ def image_router(api,services):
     #     }
     #     'success':1
     # }
-    @app.route("/image",methods=["POST"])
-    @login_required
-    def post_image():
-        current_user_id=g.user_id
-        if 'image' not in request.files or request.files['image'].filename=='':
-            return 'file is missing',404
+    post_image_parser=ParserModule(['image']).get_parser()
+    @api.route("/image",methods=["POST"])
+    class image(Resource):
+        @api.doc(parser=post_image_parser)
+        @login_required
+        def post_image():
+            current_user_id=g.user_id
+            if 'image' not in request.files or request.files['image'].filename=='':
+                return 'file is missing',404
 
-        image=request.files['image']
-        new_image={
-            'image':image,
-            'user_id':current_user_id
-        }
-        result=image_service.upload_image(new_image)
-        if 'message' in result:
-            return result['message'],result['status_code']
+            image=request.files['image']
+            new_image={
+                'image':image,
+                'user_id':current_user_id
+            }
+            result=image_service.upload_image(new_image)
+            if 'message' in result:
+                return result['message'],result['status_code']
 
-        new_image_id=result['new_image_id']
+            new_image_id=result['new_image_id']
 
-        image_info=image_service.get_image_info(new_image_id)
+            image_info=image_service.get_image_info(new_image_id)
 
-        return jsonify({'image_info':image_info}),200
+            return jsonify({'image_info':image_info}),200
     
     #id가 image_id인 사진을 삭제합니다.
     #input
