@@ -29,13 +29,12 @@ def room_router(api,services):
     # }
     
     post_room_model=ApiModel(['userlist','title']).get_model(room_namespace,"post_room_model")
-
     post_room_parser=ParserModule(['Authorization']).get_parser()
-    
+
     @room_namespace.route("")
     class room(Resource):
         @room_namespace.expect(post_room_parser,post_room_model,validate=False)
-        # @login_required
+        @login_required
         def post(self):
             room_userlist=request.json['userlist']
             current_user_id=g.user_id
