@@ -291,7 +291,7 @@ def user_router(api,services):
     class user_room(Resource):
         @user_namespace.expect(delete_user_room_parser,delete_user_room_model,validate=False)
         @login_required
-        def delete(user_id):
+        def delete(self,user_id):
             current_user_id=g.user_id
             
             if current_user_id != user_id:

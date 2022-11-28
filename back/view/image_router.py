@@ -140,7 +140,7 @@ def image_router(api,services):
     class image_roomlist(Resource):
         @image_namespace.expect(get_image_roomlist_parser,validate=False)
         @login_required
-        def get(image_id):
+        def get(self,image_id):
             if not image_service.get_image_info(image_id):
                 return make_response('해당 이미지는 존재하지 않습니다.',404)
 
@@ -181,7 +181,7 @@ def image_router(api,services):
     # }
         @image_namespace.expect(post_image_roomlist_parser,post_image_roomlist_model,validate=False)
         @login_required
-        def post(image_id):
+        def post(self,image_id):
             if not image_service.get_image_info(image_id):
                 return make_response('해당 이미지는 존재하지 않습니다.',404)
 
