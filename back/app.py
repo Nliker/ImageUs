@@ -11,11 +11,15 @@ class Services:
     pass
 
 def create_app(test_config=None):
+    
+    api=Api(title='cloudy back-server api docs',doc='/api-docs')
+    
     app=Flask(__name__)
 
     CORS(app)
 
-    api=Api(app,title='cloudy back-server api docs',doc='/api-docs')
+    api.init_app(app)
+
     
     if test_config is None:
         app.config.from_pyfile("config.py")
@@ -25,10 +29,11 @@ def create_app(test_config=None):
     database=create_engine(app.config['DB_URL'],encoding='utf-8',max_overflow=0)
 
     print("데이터베이스 연결 성공")
-
+    
     @api.route("/ping")
     class ping(Resource):
-        def get():
+        def get(self):
+            '''back 작동 테스트를 위한 api입니다.'''
             return make_response("pong",200)
     
     user_dao=UserDao(database)
