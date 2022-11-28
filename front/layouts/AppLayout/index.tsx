@@ -8,6 +8,7 @@ import { useMediaQuery } from 'react-responsive';
 import UploadModal from '@components/UploadModal';
 import ContentImageModal from '@components/ContentImageModal';
 import useSWR from 'swr';
+import { useLocation } from 'react-router';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -18,9 +19,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const { data: imageModalState } = useSWR('imageModalState');
   const { data: showModalState } = useSWR('showModalState');
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
-  // const [showUploadModal, setshowUploadModal] = useState<boolean>(false);
-  // const [showImageModal, setShowImageModal] = useState(false);
+  const currentUrl = useLocation();
   const isMobile = useMediaQuery({ maxWidth: 1023 });
+  console.log(currentUrl);
 
   const handleRoomListBtn = useCallback(() => {
     setshowSideBar((prev) => !prev);
@@ -38,7 +39,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   // const onShowImageModal = useCallback(() => {
   //   setShowImageModal(true);
   // }, []);
-  
+
   // const onCloseImageModal = useCallback(() => {
   //   setShowImageModal(false);
   // }, []);
@@ -48,10 +49,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <Container showModal={showModalState}>
         <TopNavBar />
         {isMobile && <BottomNavBar />}
-        {/* <BottomNavBar showModal={showModal} /> */}
-        <ToolBar handleRoomListBtn={handleRoomListBtn} />
-        <SideBar show={showSideBar} />
-        {/* {showSideBar && <SideBar />} */}
+        {currentUrl.pathname === '/main_page' && (
+          <>
+            <ToolBar handleRoomListBtn={handleRoomListBtn} />
+            <SideBar show={showSideBar} />
+          </>
+        )}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
       {showModalState?.upload && <UploadModal />}
