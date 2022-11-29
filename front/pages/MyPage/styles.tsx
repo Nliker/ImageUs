@@ -25,8 +25,21 @@ export const ProfileBox = styled.div`
 `;
 
 export const EachRoomPictureList = styled.div`
+  a {
+    text-decoration: none;
+    color: black;
+    &:active {
+      color: black;
+    }
+  }
+`;
+
+export const SubMenu = styled.div`
   display: flex;
   gap: 1rem;
+  a.menu_active {
+    border-top: 1px solid rgb(38, 38, 38);
+  }
 `;
 
 export const ProfileImage = styled.div`
