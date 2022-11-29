@@ -12,14 +12,11 @@ class Services:
 
 def create_app(test_config=None):
     
-    api=Api(title='cloudy back-server api docs',doc='/api-docs')
-    
     app=Flask(__name__)
 
     CORS(app)
-
-    api.init_app(app)
-
+    
+    api=Api(app,title='cloudy back-server api docs',doc='/api-docs')
     
     if test_config is None:
         app.config.from_pyfile("config.py")
@@ -47,7 +44,7 @@ def create_app(test_config=None):
     services.room_service=RoomService(room_dao,app.config)
 
     user_router(api,services)
-    room_router(api,services)
-    image_router(api,services)
+    # room_router(api,services)
+    # image_router(api,services)
     
     return app
