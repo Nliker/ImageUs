@@ -2,8 +2,9 @@ import MypageInfo from '@components/MypageInfo';
 import MyPictures from '@components/MyPictures';
 import AppLayout from '@layouts/AppLayout';
 import React, { useState } from 'react';
-import { NavLink, Route } from 'react-router-dom';
-import { ContentBox, EachRoomPictureList, ProfileBox, ProfileImage, ProfileInfo, WrapperBox } from './styles';
+import { NavLink } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
+import { ContentBox, EachRoomPictureList, ProfileBox, ProfileImage, ProfileInfo, SubMenu, WrapperBox } from './styles';
 
 const dummyImages = [
   { id: 1, name: 'first_image', url: 'image_test.png' },
@@ -47,18 +48,25 @@ const MyPage = () => {
             </ProfileInfo>
           </ProfileBox>
           <EachRoomPictureList>
-            <div>
-              <NavLink to={``}>
-                <div>현재 게시물</div>
+            <SubMenu>
+              <NavLink to={`/my_page`} className={({ isActive }) => (isActive ? 'menu_active' : undefined)} end>
+                <div>
+                  사진첩
+                  <span>0</span>
+                </div>
               </NavLink>
-              <NavLink to={``}>
-                <div>프로필 편집</div>
+              <NavLink to={`/my_page/my_profile`} className={({ isActive }) => (isActive ? 'menu_active' : undefined)}>
+                <div>
+                  프로필 편집
+                </div>
               </NavLink>
-            </div>
+            </SubMenu>
             <div>
               {/* 여기를 Route를 활용해서 만든다. */}
-              <Route path="" element={<MyPictures />}/>
-              <Route path="" element={<MypageInfo />}/>
+              <Routes>
+                <Route path="/" element={<MyPictures />} />
+                <Route path="my_profile" element={<MypageInfo />} />
+              </Routes>
             </div>
           </EachRoomPictureList>
         </ContentBox>
