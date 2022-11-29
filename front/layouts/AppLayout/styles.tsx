@@ -19,8 +19,9 @@ export const Container = styled.div<{ showModal: undefined | {upload: boolean, i
 
 export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
-  height: calc(100vh - 30px);
+  height: calc(100vh - 55px);
   background-color: rgb(237, 241, 245);
+  overflow-y: auto;
 
   transition: transform 0.5s;
   transform: translateX(0px);
