@@ -132,6 +132,11 @@ class ApiModel:
                     'title':fields.String,
                     'host_user_id':fields.String
             }
+    success=fields.Integer(
+        default=3,
+        description='int_success',
+        required=False
+    )
     
     def __init__(self,api,modelname,args):
         self.payload={}
@@ -162,7 +167,7 @@ class ApiModel:
             self.payload['delete_user_room_id']=self.delete_user_room_id
 
         if 'userlist' in args:
-            self.payload['delete_friend_user_id']=self.userlist
+            self.payload['userlist']=self.userlist
     
         if 'title' in args:
             self.payload['title']=self.title
@@ -210,6 +215,24 @@ class ApiModel:
                 required=False
             )
             
+        if 'user_info_list' in args:
+            self.payload['userlist']=fields.List(
+                fields.Nested(api.model("user_info_model",
+                self.user_info)),
+                default=[{
+                    'id':1,
+                    'name':'testuser1',
+                    'email':'test1user@test.com',
+                    'profile':'testuser1'
+                },{
+                    'id':2,
+                    'name':'testuser2',
+                    'email':'test2user@test.com',
+                    'profile':'testuser2'
+                }],
+                required=False
+            )
+        
         if 'friendlist' in args:
             self.payload['firendlist']=fields.List(
                 fields.Nested(api.model("user_info_model",
@@ -273,10 +296,37 @@ class ApiModel:
                 }],
                 required=False
             )
-        
-
-        self.api_model=api.model(modelname,self.payload)
             
+        if 'room_info' in args:
+            self.payload['room_info']=fields.Nested(api.model("room_info_model",
+            self.room_info 
+            ),
+            default={
+                'id':2,
+                'title':'경주여행',
+                'host_user_id':3
+            },
+            required=False)
+        
+        if 'image_info' in args:
+            self.payload['image_info']=fields.Nested(api.model("image_info_model",
+            self.image_info
+            ),
+            default={
+                'id':3,
+                'link':'http://example3.com',
+                'user_id':2
+            },
+            required=False
+            )
+        
+        if 'success' in args:
+            self.payload['success']=self.success
+        
+        
+            
+        self.api_model=api.model(modelname,self.payload)
+        
     def get_model(self):
         return self.api_model
         
@@ -374,7 +424,7 @@ class ApiError:
         return self.errors['image_existance_error']
     
     def image_existance_error_model(self,api):
-        return api.model('image_existance_error_model',{'message':fields.String(self.erorrs['image_existance_error']['message'])})
+        return api.model('image_existance_error_model',{'message':fields.String(self.errors['image_existance_error']['message'])})
                     
     def room_existance_error(self):
         return self.errors['room_existance_error']
