@@ -18,99 +18,372 @@ class ParserModule:
         return self.parser
 
 class ApiModel:
-    def __init__(self,args):
-        self.payload={}
-        if 'name' in args:
-            self.payload['name']=fields.String(
+    id=fields.Integer(
+                default=1,
+                description="int_id",
+                required=False
+            )
+    name=fields.String(
                 default="testname",
                 description="str_user_name",
                 required=False
             )
-        if 'email' in args:
-            self.payload['email']=fields.String(
+    
+    email=fields.String(
                 default="test@test.com",
                 description="str_user_email",
                 required=False
             )
-        if 'profile' in args:
-            self.payload['profile']=fields.String(
+
+    profile=fields.String(
                 default="im testuser",
                 description="str_user_profile",
                 required=False
             )
-        if 'password' in args:
-            self.payload['password']=fields.String(
+    
+    password=fields.String(
                 default="test_password",
                 description="str_user_password",
                 required=False
             )
-        if 'friend_user_id' in args:
-            self.payload['friend_user_id']=fields.Integer(
+    
+    friend_user_id=fields.Integer(
                 default=1,
                 description="int_friend_user_id",
                 required=False
             )
-        
-        if 'delete_friend_user_id' in args:
-            self.payload['delete_friend_user_id']=fields.Integer(
+    
+    delete_friend_user_id=fields.Integer(
                 default=1,
                 description="int_delete_user_id",
                 required=False
             )
-        if 'delete_user_room_id' in args:
-            self.payload['delete_user_room_id']=fields.Integer(
+    
+    delete_user_room_id=fields.Integer(
                 default=1,
                 description="int_delete_user_room_id",
                 required=False
             )
-        if 'userlist' in args:
-            self.payload['delete_friend_user_id']=fields.List(
+    
+    userlist=fields.List(
+                fields.Integer(),
+                default=[1,2,3],
+                description="int_user_id_list",
+                required=False
+            )
+    title=fields.String(
+                default=1,
+                description="str_room_title",
+                required=False
+            )
+
+    delete_room_image_id=fields.Integer(
+                default=1,
+                description="int_delete_room_image_id",
+                required=False
+            )
+    
+    delete_room_user_id=fields.Integer(
+                default=1,
+                description="int_delete_room_user_id",
+                required=False
+            )
+    
+    invite_userlist=fields.List(
                 fields.Integer(),
                 default=[1,2,3],
                 description="int_user_id_list",
                 required=False
             )
     
-        if 'title' in args:
-            self.payload['title']=fields.String(
-                default=1,
-                description="str_room_title",
-                required=False
-            )
-        
-        if 'delete_room_image_id' in args:
-            self.payload['delete_room_image_id']=fields.Integer(
-                default=1,
-                description="int_delete_room_image_id",
-                required=False
-            )
-        if 'delete_room_user_id' in args:
-            self.payload['delete_room_user_id']=fields.Integer(
-                default=1,
-                description="int_delete_room_user_id",
-                required=False
-            )
-        if 'invite_userlist' in args:
-            self.payload['invite_userlist']=fields.List(
-                fields.Integer(),
-                default=[1,2,3],
-                description="int_user_id_list",
-                required=False
-            )
-        if 'delete_image_id' in args:
-            self.payload['delete_image_id']=fields.Integer(
+    delete_image_id=fields.Integer(
                 default=1,
                 description="int_delete_image_id",
                 required=False
             )
-        if 'update_roomlist' in args:
-            self.payload['update_roomlist']=fields.List(
+    
+    update_roomlist=fields.List(
                 fields.Integer(),
                 default=[1,2,3],
                 description="int_room_id_list",
                 required=False
             )
+    access_token=fields.String(
+            default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMjA0MTI0fQ.fSmmDgTan1cpE1kOK2xM_fM3NzYnN-3EeZgPmbssnsY",
+            description='str_access_token',
+            required=False
+    )
+    
+    user_info={
+                    'id':fields.Integer,
+                    'name':fields.String,
+                    'email':fields.String,
+                    'profile':fields.String
+                }
+    
+    image_info={
+                    'id':fields.Integer,
+                    'link':fields.String,
+                    'user_id':fields.Integer,
+                }
+
+    room_info={
+                    'id':fields.Integer,
+                    'title':fields.String,
+                    'host_user_id':fields.String
+            }
+    
+    def __init__(self,api,modelname,args):
+        self.payload={}
+        self.api=api
+        
+        if 'id' in args:
+            self.payload['id']=self.id
             
-    def get_model(self,api,modelname):
+        if 'name' in args:
+            self.payload['name']=self.name
+            
+        if 'email' in args:
+            self.payload['email']=self.email
+
+        if 'profile' in args:
+            self.payload['profile']=self.profile
+            
+        if 'password' in args:
+            self.payload['password']=self.password
+            
+        if 'friend_user_id' in args:
+            self.payload['friend_user_id']=self.friend_user_id
+        
+        if 'delete_friend_user_id' in args:
+            self.payload['delete_friend_user_id']=self.delete_friend_user_id
+
+        if 'delete_user_room_id' in args:
+            self.payload['delete_user_room_id']=self.delete_user_room_id
+
+        if 'userlist' in args:
+            self.payload['delete_friend_user_id']=self.userlist
+    
+        if 'title' in args:
+            self.payload['title']=self.title
+        
+        if 'delete_room_image_id' in args:
+            self.payload['delete_room_image_id']=self.delete_room_image_id
+
+        if 'delete_room_user_id' in args:
+            self.payload['delete_room_user_id']=self.delete_room_user_id
+
+        if 'invite_userlist' in args:
+            self.payload['invite_userlist']=self.invite_userlist
+
+        if 'delete_image_id' in args:
+            self.payload['delete_image_id']=self.delete_image_id
+            
+        if 'update_roomlist' in args:
+            self.payload['update_roomlist']=self.update_roomlist
+            
+        if 'imagelist' in args:
+            self.payload['imagelist']=fields.List(
+                fields.Nested(api.model("image_model",self.image_info)),
+                default=[{
+                    'id':1,
+                    'link':'http://example1.com',
+                    'user_id':1,
+                },{
+                    'id':2,
+                    'link':'http://example2.com',
+                    'user_id':1,
+                }],
+                required=False
+            )
+            
+            
+        if 'user_info' in args:
+            self.payload['user_info']=fields.Nested(api.model("user_info_model",
+                self.user_info),
+                default={
+                    'id':1,
+                    'name':'testuser1',
+                    'email':'test1user@test.com',
+                    'profile':'testuser1'
+                },
+                required=False
+            )
+            
+        if 'friendlist' in args:
+            self.payload['firendlist']=fields.List(
+                fields.Nested(api.model("user_info_model",
+                self.user_info)),
+                default=[{
+                    'id':1,
+                    'name':'testuser1',
+                    'email':'test1user@test.com',
+                    'profile':'testuser1'
+                },{
+                    'id':2,
+                    'name':'testuser2',
+                    'email':'testuser2@test.com',
+                    'profile':'testuser2'
+                }],
+                required=False
+            )
+            
+        if 'access_token' in args:
+            self.payload['access_token']=self.access_token
+
+        if 'room_info_list' in args:
+            user_info_list=fields.List(
+                fields.Nested(api.model("user_info_model",
+                self.user_info)))
+            room_info={**self.room_info,'userlist':user_info_list}
+
+            self.payload['roomlist']=fields.List(
+                fields.Nested(api.model("room_info_list_model",
+                room_info)),
+                default=[{
+                    'id':1,
+                    'title':'서울여행',
+                    'host_user_id':1,
+                    'userlist':[{
+                        'id':1,
+                        'name':'testuser1',
+                        'email':'testuser1@test.com',
+                        'profile':'im testuser1'
+                    },{
+                        'id':2,
+                        'name':'testuser2',
+                        'email':'testuser2@test.com',
+                        'profile':'im testuser2'
+                    }]
+                },{
+                    'id':3,
+                    'title':'부산여행',
+                    'host_user_id':4,
+                    'userlist':[{
+                        'id':4,
+                        'name':'testuser4',
+                        'email':'testuser4@test.com',
+                        'profile':'im testuser4'
+                    },{
+                        'id':3,
+                        'name':'testuser3',
+                        'email':'testuser3@test.com',
+                        'profile':'im testuser3'
+                    }]
+                }],
+                required=False
+            )
+        
+
         self.api_model=api.model(modelname,self.payload)
+            
+    def get_model(self):
         return self.api_model
+        
+class ApiError:
+    errors={
+        'email_existance_sign_up_error':{
+            'message':"이메일이 이미 존재합니다.",
+            'status_code':401
+        },
+        'email_existance_login_error':{
+            'message':"이메일이 존재하지 않습니다.",
+            'status_code':401
+        },
+        'user_existance_error':{
+            'message':"해당 유저가 존재하지 않습니다.",
+            'status_code':404
+        },
+        'credential_error':{
+            'message':"비밀번호가 일치하지 않습니다.",
+            'status_code':401
+        },
+        'authorizaion_error':{
+            'message':"권한이 없습니다.",
+            'status_code':401
+        },
+        'friend_existance_error':{
+            'message':"이미 친구인 유저입니다.",
+            'status_code':401
+        },
+        'file_missing_error':{
+            'message':"file is missing.",
+            'status_code':404
+        },
+        'image_existance_error':{
+            'message':"이미지가 존재하지 않습니다.",
+            'status_code':404
+        },
+        'room_existance_error':{
+            'message':"방이 존재하지 않습니다.",
+            'status_code':404
+        },
+        'room_user_error':{
+            'message':"방의 유저가 아닙니다.",
+            'status_code':401
+        }   
+    }
+    def say_hello(self):
+        return "Hello"
+    
+    def email_existance_sign_up_error(self):
+        return self.errors['email_existance_sign_up_error']
+    
+    def email_existance_sign_up_error_model(self,api):
+        return api.model('email_existance_sign_up_error_model',{'message':fields.String(self.errors['email_existance_sign_up_error']['message'])})
+    
+    def email_existance_login_error(self):
+        return self.errors['email_existance_login_error']
+    
+    def email_existance_login_error_model(self,api):
+        return api.model('email_existance_login_error_model',{'message':fields.String(self.errors['email_existance_login_error']['message'])})
+            
+    
+    def user_existance_error(self):
+        return self.errors['user_existance_error']
+    
+    def user_existance_error_model(self,api):
+        return api.model('user_existance_error_model',{'message':fields.String(self.errors['user_existance_error']['message'])})
+
+    
+    def credential_error(self):
+        return self.errors['credential_error']
+    
+    def credential_error_model(self,api):
+        return api.model('credential_error_model',{'message':fields.String(self.errors['credential_error']['message'])})
+
+    def authorizaion_error(self):
+        return self.errors['authorizaion_error']
+    
+    def authorizaion_error_model(self,api):
+        return api.model('authorizaion_error_model',{'message':fields.String(self.errors['authorizaion_error']['message'])})
+                 
+    def friend_existance_error(self):
+        return self.errors['friend_existance_error']
+    
+    def friend_existance_error_model(self,api):
+        return api.model('friend_existance_error_model',{'message':fields.String(self.errors['friend_existance_error']['message'])})
+                  
+    def file_missing_error(self):
+        return self.errors['file_missing_error']
+    
+    def file_missing_error_model(self,api):
+        return api.model('file_missing_error_model',{'message':fields.String(self.errors['file_missing_error']['message'])})
+          
+    def image_existance_error(self):
+        return self.errors['image_existance_error']
+    
+    def image_existance_error_model(self,api):
+        return api.model('image_existance_error_model',{'message':fields.String(self.erorrs['image_existance_error']['message'])})
+                    
+    def room_existance_error(self):
+        return self.errors['room_existance_error']
+    
+    def room_existance_error_model(self,api):
+        return api.model('room_existance_error_model',{'message':fields.String(self.errors['room_existance_error']['message'])})
+               
+    def room_user_error(self):
+        return self.errors['room_user_error']
+    
+    def room_user_error_model(self,api):
+        return api.model('room_user_error_model',{'message':fields.String(self.errors['room_user_error']['message'])})
