@@ -25,7 +25,7 @@ def image_router(image_api,services):
 
     @namespace.route("/upload/<int:user_id>")
     class upload(Resource):
-        @namespace.doc(parser=parser)
+        @namespace.expect(parser,validate=False)
         def post(self,user_id):
             """files의 image에 담긴 이미지를 업로드 합니다."""
             upload_form = UploadForm(CombinedMultiDict((request.files, request.headers)),meta={"csrf": False})
@@ -59,7 +59,7 @@ def image_router(image_api,services):
 
     @namespace.route("/image-download/<int:user_id>/<string:image_filename>",methods=["GET"])
     class image_download(Resource):
-        @image_api.doc(parser=parser)
+        @namespace.expect(parser,validate=False)
         def get(self,user_id,image_filename):
             """user_id의 image_filename인 사진을 다운합니다."""
             access_token=request.headers['Authorization'] if 'Authorization' in request.headers else None

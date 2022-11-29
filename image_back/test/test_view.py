@@ -18,7 +18,7 @@ image_dir=f"{parent_path}/{config.test_config['IMAGE_PATH']}"
 
 filename='sample_image.JPG'
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def api():
     app=create_app(test_config=config.test_config)
     app.config['TEST']=True
@@ -262,7 +262,6 @@ def test_post_unauthorize_upload(api):
             content_type='multipart/form-data')
         
     assert resp.status_code==401
-    assert resp.text=='업로드 토큰이 없습니다.'
     
     #이미지 파일이 없을 경우 확인
     resp=api.post('/upload/1',
@@ -272,8 +271,7 @@ def test_post_unauthorize_upload(api):
             data={'wrong_key':(BytesIO(image),filename)},
             content_type='multipart/form-data')
         
-    assert resp.status_code==404
-    assert resp.text=='File is missing'
+    assert resp.status_code==401
     
     #이미지 이름이 없을 경우 확인
     resp=api.post('/upload/1',
@@ -283,8 +281,7 @@ def test_post_unauthorize_upload(api):
             data={'wrong_image':(BytesIO(image),None)},
             content_type='multipart/form-data')
         
-    assert resp.status_code==404
-    assert resp.text=='File is missing'
+    assert resp.status_code==401
 
     payload={
             'worng_key':1,
