@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { BtnDiv, BtnSpan, SideBarButton, Wrapper } from './styles';
+import { LeftIcon, RightIcons, Wrapper } from './styles';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
+import { BiUserCircle } from 'react-icons/bi';
 
 interface Props {
   handleRoomListBtn: (e: any) => void;
@@ -13,20 +14,24 @@ const ToolBar = ({ handleRoomListBtn }: Props) => {
 
   return (
     <Wrapper>
-      <div>
+      <LeftIcon>
         {/* <SideBarButton>{isMobile && <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />}</SideBarButton> */}
-        <SideBarButton><MdOutlineSpaceDashboard onClick={handleRoomListBtn} /></SideBarButton>
-      </div>
-      {/* <BtnDiv>
-        <BtnSpan>
-          <IoPeopleCircleSharp />
-        </BtnSpan>
-      </BtnDiv> */}
-      <div>
-        <BtnSpan>
-          <RiListSettingsLine />
-        </BtnSpan>
-      </div>
+        <span>
+          <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />
+        </span>
+      </LeftIcon>
+      <RightIcons>
+        <div>
+          <span>
+            <RiListSettingsLine />
+          </span>
+        </div>
+        <div>
+          <span>
+            <BiUserCircle />
+          </span>
+        </div>
+      </RightIcons>
     </Wrapper>
   );
 };

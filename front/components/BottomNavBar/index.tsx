@@ -1,5 +1,5 @@
 import React from 'react';
-import { BsPeople } from 'react-icons/bs';
+import { CgUserList } from 'react-icons/cg';
 import { SlCloudUpload } from 'react-icons/sl';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
@@ -42,7 +42,7 @@ const BottomNavBar = () => {
           </MobileNavItem>
           <MobileNavItem>
             <NavLink to={'/friend_list'}>
-              <BsPeople />
+              <CgUserList />
               친구목록 관리
             </NavLink>
           </MobileNavItem>
