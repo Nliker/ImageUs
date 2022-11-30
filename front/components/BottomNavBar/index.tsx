@@ -41,7 +41,7 @@ const BottomNavBar = () => {
             </h1>
           </MobileNavItem>
           <MobileNavItem>
-            <NavLink to={'/magnagement_page'}>
+            <NavLink to={'/friend_list'}>
               <BsPeople />
               친구목록 관리
             </NavLink>
