@@ -10,35 +10,52 @@ export const Wrapper = styled.div`
   div {
     display: flex;
     align-items: center;
+    height: 100%;
+    span {
+      height: 20px;
+      display: block;
+      line-height: 16px;
+      cursor: pointer;
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
 `;
 
-export const SideBarButton = styled.span`
-  width: 23px;
-  align-items: center;
-  display: inline-flex;
-  justify-content: center;
-  cursor: pointer;
-  svg {
-    width: 23px;
-    height: auto;
+export const RightIcons = styled.div`
+  flex-basis: 50%;
+  justify-content: flex-end;
+  & > div:first-of-type {
+    margin-right: 20px;
   }
 `;
 
-export const BtnDiv = styled.div`
-    height: 23px;
+export const LeftIcon = styled.div`
+  flex-basis: 50%;
 `;
 
-export const BtnSpan = styled.span`
-  width: 23px;
-  align-items: center;
-  display: inline-flex;
-  justify-content: center;
-  cursor: pointer;
-  svg {
-    width: 23px;
-    height: auto;
-  }
-`;
+// export const SideBarButton = styled.span`
+//   width: 23px;
+//   align-items: center;
+//   display: inline-flex;
+//   justify-content: center;
+//   cursor: pointer;
+//   svg {
+//     width: 23px;
+//     height: auto;
+//   }
+// `;
 
-
+// export const BtnSpan = styled.span`
+//   width: 23px;
+//   align-items: center;
+//   display: inline-flex;
+//   justify-content: center;
+//   cursor: pointer;
+//   svg {
+//     width: 23px;
+//     height: auto;
+//   }
+// `;
