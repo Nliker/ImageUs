@@ -583,7 +583,7 @@ def test_get_user_imagelist(api):
     access_token=generate_access_token(3)
     resp=api.get(f"/user/{user_id}/imagelist",
             headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #친구 생성
 def test_post_user_friend(api):
@@ -606,7 +606,7 @@ def test_post_user_friend(api):
             headers={'Authorization':access_token},
             content_type='application/json')
     
-    assert resp.status_code==401
+    assert resp.status_code==402
     #1번 유저가 존재하지 않은 유저에게 친구 추가 확인
     friend={'friend_user_id':100}
     resp=api.post(f"/user/{user_id}/friend",
@@ -622,7 +622,7 @@ def test_post_user_friend(api):
             data=json.dumps(friend),
             headers={'Authorization':access_token},
             content_type='application/json')
-    assert resp.status_code==401
+    assert resp.status_code==403
     
 #유저의 친구 목록 가져오기
 def test_get_user_friendlist(api):
@@ -673,7 +673,7 @@ def test_get_user_friendlist(api):
     resp=api.get(f"/user/{user_id}/friendlist",
             headers={'Authorization':access_token})
 
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #유저의 친구 삭제
 def test_delete_user_friend(api):
@@ -704,7 +704,7 @@ def test_delete_user_friend(api):
             headers={'Authorization':access_token},
             content_type='application/json')
 
-    assert resp.status_code==401
+    assert resp.status_code==403
     #존재하지 않는 유저를 삭제하려 할때
     user_id=1
     access_token=generate_access_token(user_id)
@@ -755,7 +755,7 @@ def test_get_user_roomlist(api):
     access_token=generate_access_token(3)
     resp=api.get(f"/user/{user_id}/roomlist",
                 headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #유저가 방을 나가기
 def test_delete_user_room(api):
@@ -780,7 +780,7 @@ def test_delete_user_room(api):
         data=json.dumps(delete_user_room),
         headers={'Authorization':access_token},
         content_type='application/json')
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 def test_post_room(api):
     user_id=1
@@ -888,7 +888,7 @@ def test_delete_room_image(api):
         headers={'Authorization':access_token},
         content_type='application/json')
     
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #방의 이미지 정보 목록을 불러옵니다.
 def test_get_room_imagelist(api):
@@ -920,7 +920,7 @@ def test_get_room_imagelist(api):
     access_token=generate_access_token(3)
     resp=api.get(f"/room/{room_id}/imagelist",
             headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #방의 유저 정보 목록을 불러 옵니다.
 def test_get_room_userlist(api):
@@ -952,7 +952,7 @@ def test_get_room_userlist(api):
     access_token=generate_access_token(3)
     resp=api.get(f"/room/{room_id}/userlist",
             headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #방의 유저를 초대
 def test_delete_room_user(api):
@@ -979,7 +979,7 @@ def test_delete_room_user(api):
             data=json.dumps(delete_room_user),
             headers={'Authorization':access_token},
             content_type='application/json')
-    assert resp.status_code==401
+    assert resp.status_code==403
 
 #방의 유저를 초대
 def test_post_room_user(api):
@@ -1103,7 +1103,7 @@ def test_delete_image(api):
             headers={'Authorization':access_token},
             content_type='application/json')
     
-    assert resp.status_code==401
+    assert resp.status_code==403
     #존재하지 않는 사진에 대해 삭제 확인
     delete_image={
         'delete_image_id':100
@@ -1138,7 +1138,7 @@ def test_get_image(api):
     image_id=1
     resp=api.get(f"/image/{image_id}",
             headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
     #존재하지 않는 사진을 불러옵니다.
     access_token=generate_access_token(3)
     image_id=100
@@ -1176,7 +1176,7 @@ def test_get_image_roomlist(api):
     access_token=generate_access_token(3)
     resp=api.get(f"/image/{image_id}/roomlist",
                 headers={'Authorization':access_token})
-    assert resp.status_code==401
+    assert resp.status_code==403
     #존재하지 않는 사진에 대한 방 권한 확인
     image_id=100
     access_token=generate_access_token(3)
@@ -1205,7 +1205,7 @@ def test_post_image_roomlist(api):
                 data=json.dumps(update_roomlist),
                 headers={'Authorization':access_token},
                 content_type='application/json')
-    assert resp.status_code==401
+    assert resp.status_code==403
     #존재하지 않는 사진에 대한 사진의 방 권한 목록 확인
     image_id=100
     resp=api.post(f"/image/{image_id}/roomlist",
