@@ -43,7 +43,6 @@ class ImageService:
 
         output_path=image_path_and_name
         while os.path.exists(output_path):
-            print("이미지 이름 처리중")
             output_path=f"{image_dir_and_name}({uniq}){image_ext}"
             uniq+=1
 
