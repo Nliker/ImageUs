@@ -57,7 +57,7 @@ def image_router(api,services):
             current_user_id=g.user_id
             if 'image' not in request.files or request.files['image'].filename=='':
                 return make_response(jsonify({'message':api_error.file_missing_error()['message']})
-                                     ,api_error.file_missing_error_model()['status_code'])
+                                     ,api_error.file_missing_error()['status_code'])
 
             image=request.files['image']
             new_image={
