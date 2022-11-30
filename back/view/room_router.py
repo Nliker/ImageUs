@@ -15,7 +15,9 @@ def room_router(api,services):
     user_service=services.user_service
 
     api.add_namespace(room_namespace,'')
-    api_error=ApiError()
+    api_error=ApiError(room_namespace)
+    api_model=ApiModel(room_namespace)
+    api_parser_module=ParserModule()
     #room을 생성합니다.
     #input
     # {
@@ -28,9 +30,9 @@ def room_router(api,services):
     #     'success':3(초대한 사람 수)
     # }
     
-    post_room_parser=ParserModule(['Authorization']).get_parser()
-    post_room_model=ApiModel(room_namespace,"post_room_model",['userlist','title']).get_model()
-    post_room_response_model=ApiModel(room_namespace,"post_room_response_model",['room_info','success']).get_model()
+    post_room_parser=api_parser_module.get_parser(['Authorization'])
+    post_room_model=api_model.get_model("post_room_model",['userlist','title'])
+    post_room_response_model=api_model.get_model("post_room_response_model",['room_info','success'])
     @room_namespace.route("")
     class room(Resource):
         @room_namespace.expect(post_room_parser,post_room_model,validate=False)
@@ -74,18 +76,18 @@ def room_router(api,services):
     #     'image_info':image_info,
     #     'success':1
     # }
-    post_room_image_parser=ParserModule(['Authorization','image']).get_parser()
-    post_room_image_response_model=ApiModel(room_namespace,"post_room_image_response_model",['image_info','success']).get_model()
+    post_room_image_parser=api_parser_module.get_parser(['Authorization','image'])
+    post_room_image_response_model=api_model.get_model("post_room_image_response_model",['image_info','success'])
 
-    delete_room_image_parser=ParserModule(['Authorization']).get_parser()
-    delete_room_image_model=ApiModel(room_namespace,"delete_room_image_model",['delete_room_image_id']).get_model()
+    delete_room_image_parser=api_parser_module.get_parser(['Authorization'])
+    delete_room_image_model=api_model.get_model("delete_room_image_model",['delete_room_image_id'])
     @room_namespace.route("/<int:room_id>/image")
     class room_image(Resource):
         @room_namespace.expect(post_room_image_parser,validate=False)
         @room_namespace.response(200,'방에 이미지를 업로드 성공하였습니다',post_room_image_response_model)
         @room_namespace.response(api_error.file_missing_error()['status_code'],
                                  '파일이 존재하지 않습니다.',
-                                 api_error.file_missing_error_model(api=room_namespace))
+                                 api_error.file_missing_error_model())
         @login_required
         def post(self,room_id):
             current_user_id=g.user_id
@@ -121,10 +123,10 @@ def room_router(api,services):
         @room_namespace.response(200,'삭제를 완료하였습니다')
         @room_namespace.response(api_error.image_existance_error()['status_code'],
                                  '이미지가 존재하지 않습니다.',
-                                 api_error.image_existance_error_model(api=room_namespace))
+                                 api_error.image_existance_error_model())
         @room_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=room_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def delete(self,room_id):
             current_user_id=g.user_id
@@ -158,18 +160,18 @@ def room_router(api,services):
     #         }
     #     ]
     # }
-    get_room_imagelist_parser=ParserModule(['Authorization']).get_parser()
-    get_room_imagelist_response_model=ApiModel(room_namespace,'get_room_imagelist_response_model',['imagelist']).get_model()
+    get_room_imagelist_parser=api_parser_module.get_parser(['Authorization'])
+    get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist'])
     @room_namespace.route("/<int:room_id>/imagelist")
     class room_imagelist(Resource):
         @room_namespace.expect(get_room_imagelist_parser,validate=False)
         @room_namespace.response(200,'이미지의 정보 목록을 불러옵니다.',get_room_imagelist_response_model)
         @room_namespace.response(api_error.room_existance_error()['status_code'],
                                  '방이 존재하지 않습니다.',
-                                 api_error.room_existance_error_model(api=room_namespace))
+                                 api_error.room_existance_error_model())
         @room_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=room_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def get(self,room_id):
             current_user_id=g.user_id
@@ -205,8 +207,8 @@ def room_router(api,services):
     #         }
     #     ]
     # }
-    get_room_userlist_parser=ParserModule(['Authorization']).get_parser()
-    get_room_userlist_response_model=ApiModel(room_namespace,'get_room_userlist_response_model',['user_info_list']).get_model()
+    get_room_userlist_parser=api_parser_module.get_parser(['Authorization'])
+    get_room_userlist_response_model=api_model.get_model('get_room_userlist_response_model',['user_info_list'])
     @room_namespace.route("/<int:room_id>/userlist") 
     class room_userlist(Resource):
         @room_namespace.expect(get_room_userlist_parser,validate=False)
@@ -215,10 +217,10 @@ def room_router(api,services):
                                  get_room_userlist_response_model)
         @room_namespace.response(api_error.room_existance_error()['status_code'],
                                  '방이 존재하지 않습니다.',
-                                 api_error.room_existance_error_model(api=room_namespace))
+                                 api_error.room_existance_error_model())
         @room_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=room_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def get(self,room_id):
             current_user_id=g.user_id
@@ -241,21 +243,21 @@ def room_router(api,services):
     # }
     #output
     #'{result}명 초대 성공'
-    post_room_user_parser=ParserModule(['Authorization']).get_parser()
-    post_room_user_model=ApiModel(room_namespace,"post_room_user_model",['invite_userlist']).get_model()
+    post_room_user_parser=api_parser_module.get_parser(['Authorization'])
+    post_room_user_model=api_model.get_model("post_room_user_model",['invite_userlist'])
 
-    delete_room_user_parser=ParserModule(['Authorization']).get_parser()
-    delete_room_user_model=ApiModel(room_namespace,"delete_room_user_model",['delete_room_user_id']).get_model()
+    delete_room_user_parser=api_parser_module.get_parser(['Authorization'])
+    delete_room_user_model=api_model.get_model("delete_room_user_model",['delete_room_user_id'])
     @room_namespace.route("/<int:room_id>/user") 
     class room_user(Resource):
         @room_namespace.expect(post_room_user_parser,post_room_user_model,validate=False)
         @room_namespace.response(200,'초대를 성공하였습니다.')
         @room_namespace.response(api_error.room_existance_error()['status_code'],
                                  '방이 존재하지 않습니다.',
-                                 api_error.room_existance_error_model(api=room_namespace))
+                                 api_error.room_existance_error_model())
         @room_namespace.response(api_error.room_user_error()['status_code'],
                                  '방의 유저가 아니기에 권한이 없습니다.',
-                                 api_error.room_user_error_model(api=room_namespace))
+                                 api_error.room_user_error_model())
         @login_required
         def post(self,room_id):
             if not room_service.get_room_info(room_id):
@@ -288,13 +290,13 @@ def room_router(api,services):
         @room_namespace.response(200,'방에서 유저를 강퇴하였습니다.')
         @room_namespace.response(api_error.room_existance_error()['status_code'],
                                  '방이 존재하지 않습니다.',
-                                 api_error.room_existance_error_model(api=room_namespace))
+                                 api_error.room_existance_error_model())
         @room_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=room_namespace))
+                                api_error.authorizaion_error_model())
         @room_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
-                                api_error.user_existance_error_model(api=room_namespace))
+                                api_error.user_existance_error_model())
         @login_required
         def delete(self,room_id):
             current_user_id=g.user_id

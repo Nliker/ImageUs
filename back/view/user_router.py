@@ -4,7 +4,7 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
 
-from flask_restx import Resource,Namespace,fields
+from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 
@@ -16,7 +16,9 @@ def user_router(api,services):
     room_service=services.room_service
 
     api.add_namespace(user_namespace,'')
-    api_error=ApiError()
+    api_error=ApiError(user_namespace)
+    api_model=ApiModel(user_namespace)
+    api_parser_module=ParserModule()
     #회원가입을 합니다.ss
     #input
     # {
@@ -35,19 +37,16 @@ def user_router(api,services):
     #             'profile':<str>,
     #     }
     # }
-    post_sign_up_model=ApiModel(
-                                user_namespace,
-                                "post_sign_up_model",
-                                ['name','email','password','profile']
-                            ).get_model()
-    post_sign_up_response_model=ApiModel(user_namespace,'post_sign_up_response_model',['user_info']).get_model()
+    post_sign_up_model=api_model.get_model("post_sign_up_model",
+                                ['name','email','password','profile'])
+    post_sign_up_response_model=api_model.get_model('post_sign_up_response_model',['user_info'])
     @user_namespace.route("/sign-up")
     class sign_up(Resource):
         @user_namespace.expect(post_sign_up_model,validate=False)
         @user_namespace.response(200,'유저의 정보를 반환합니다.',post_sign_up_response_model)
         @user_namespace.response(api_error.email_existance_sign_up_error()['status_code'],
                                  '이메일이 이미 등록 되어있어 실패하였습니다.',
-                                 api_error.email_existance_sign_up_error_model(api=user_namespace))
+                                 api_error.email_existance_sign_up_error_model())
         def post(self):
             new_user=request.json
 
@@ -72,13 +71,13 @@ def user_router(api,services):
     #         'profile':<str>,
     #     }
     # }
-    get_user_response_model=ApiModel(user_namespace,'post_sign_up_response_model',['user_info']).get_model()
+    get_user_response_model=api_model.get_model('post_sign_up_response_model',['user_info'])
     @user_namespace.route("/<int:user_id>")
     class user(Resource):
         @user_namespace.response(200,'유저의 정보를 반환합니다.',get_user_response_model)
         @user_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
-                                api_error.user_existance_error_model(api=user_namespace))
+                                api_error.user_existance_error_model())
         def get(self,user_id):
             user_info=user_service.get_user_info(user_id)
             if user_info:
@@ -97,18 +96,18 @@ def user_router(api,services):
     # {
     #     'access_token':<str>
     # }
-    post_login_model=ApiModel(user_namespace,"post_login_model",['email','password']).get_model()
-    post_login_response_model=ApiModel(user_namespace,"post_login_response_model",['access_token']).get_model()
+    post_login_model=api_model.get_model("post_login_model",['email','password'])
+    post_login_response_model=api_model.get_model("post_login_response_model",['access_token'])
     @user_namespace.route("/login")
     class login(Resource):
         @user_namespace.expect(post_login_model,validate=False)
         @user_namespace.response(200,'접근 토큰을 반환합니다.',post_login_response_model)
         @user_namespace.response(api_error.email_existance_login_error()['status_code'],
                                  '이메일이 존재하지 않습니다.',
-                                 api_error.email_existance_login_error_model(api=user_namespace))
+                                 api_error.email_existance_login_error_model())
         @user_namespace.response(api_error.credential_error()['status_code'],
                                  '비밀번호가 일치하지 않습니다.',
-                                 api_error.credential_error_model(api=user_namespace))
+                                 api_error.credential_error_model())
         def post(self):
             credential=request.json
             
@@ -143,15 +142,15 @@ def user_router(api,services):
     #         }
     #     ]
     # }
-    get_user_imagelist_parser=ParserModule(['Authorization']).get_parser()
-    get_user_imagelist_response_model=ApiModel(user_namespace,'get_user_imagelist_response_model',['imagelist']).get_model()
+    get_user_imagelist_parser=api_parser_module.get_parser(['Authorization'])
+    get_user_imagelist_response_model=api_model.get_model('get_user_imagelist_response_model',['imagelist'])
     @user_namespace.route("/<int:user_id>/imagelist")
     class user_imagelist(Resource):
         @user_namespace.expect(get_user_imagelist_parser,validate=False)
         @user_namespace.response(200,'유저의 이미지 정보 목록을 반환합니다.',get_user_imagelist_response_model)
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -184,15 +183,15 @@ def user_router(api,services):
     #         }        
     #     ]
     # }
-    get_user_friendlist_parser=ParserModule(['Authorization']).get_parser()
-    get_user_friendlist_response_model=ApiModel(user_namespace,"get_user_friendlist_response_model",['friendlist']).get_model()
+    get_user_friendlist_parser=api_parser_module.get_parser(['Authorization'])
+    get_user_friendlist_response_model=api_model.get_model("get_user_friendlist_response_model",['friendlist'])
     @user_namespace.route("/<int:user_id>/friendlist")
     class user_friendlist(Resource):
         @user_namespace.expect(get_user_friendlist_parser,validate=False)
         @user_namespace.response(200,'친구의 유저 정보 목록을 불러옵니다.',get_user_friendlist_response_model)
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -204,11 +203,11 @@ def user_router(api,services):
             user_friend_info_list=user_service.get_user_friendlist(current_user_id)
             return make_response(jsonify({'friendlist':user_friend_info_list}),200)
     
-    post_user_friend_parser=ParserModule(['Authorization']).get_parser()   
-    post_user_friend_model=ApiModel(user_namespace,'post_user_friend_model',['friend_user_id']).get_model()
+    post_user_friend_parser=api_parser_module.get_parser(['Authorization'])
+    post_user_friend_model=api_model.get_model('post_user_friend_model',['friend_user_id'])
     
-    delete_user_friend_parser=ParserModule(['Authorization']).get_parser()   
-    delete_user_friend_model=ApiModel(user_namespace,"delete_user_friend_model",['delete_friend_user_id']).get_model()
+    delete_user_friend_parser=api_parser_module.get_parser(['Authorization'])
+    delete_user_friend_model=api_model.get_model("delete_user_friend_model",['delete_friend_user_id'])
     
     #id가 user_id인 유저의 친구를 삭제합니다.
     #input
@@ -224,10 +223,10 @@ def user_router(api,services):
         @user_namespace.response(200,'친구를 삭제 하였습니다.')
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @user_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
-                                api_error.user_existance_error_model(api=user_namespace))
+                                api_error.user_existance_error_model())
         @login_required
         def delete(self,user_id):
             current_user_id=g.user_id
@@ -257,13 +256,13 @@ def user_router(api,services):
         @user_namespace.response(200,'삭제를 성공하였습니다.')
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @user_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
-                                api_error.user_existance_error_model(api=user_namespace))
+                                api_error.user_existance_error_model())
         @user_namespace.response(api_error.friend_existance_error()['status_code'],
                                 '이미 친구로 등록되어 있어 실패하였습니다.',
-                                api_error.friend_existance_error_model(api=user_namespace))
+                                api_error.friend_existance_error_model())
         @login_required
         def post(self,user_id):
             current_user_id=g.user_id
@@ -317,15 +316,15 @@ def user_router(api,services):
     #          }
     #     ]
     # }
-    get_user_roomlist_parser=ParserModule(['Authorization']).get_parser()
-    get_user_roomlist_response_model=ApiModel(user_namespace,'get_user_roomlist_response_model',['room_info_list']).get_model()
+    get_user_roomlist_parser=api_parser_module.get_parser(['Authorization'])
+    get_user_roomlist_response_model=api_model.get_model('get_user_roomlist_response_model',['room_info_list'])
     @user_namespace.route("/<int:user_id>/roomlist")
     class user_roomlist(Resource):
         @user_namespace.expect(get_user_roomlist_parser,validate=False)
         @user_namespace.response(200,'방의 정보 목록을 불러옵니다.',get_user_roomlist_response_model)
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
             current_user_id=g.user_id
@@ -351,15 +350,15 @@ def user_router(api,services):
     # }
     #output
     # '삭제 성공'
-    delete_user_room_parser=ParserModule(['Authorization']).get_parser()   
-    delete_user_room_model=ApiModel(user_namespace,"delete_user_room_model",['delete_user_room_id']).get_model()
+    delete_user_room_parser=api_parser_module.get_parser(['Authorization'])   
+    delete_user_room_model=api_model.get_model("delete_user_room_model",['delete_user_room_id'])
     @user_namespace.route("/<int:user_id>/room")
     class user_room(Resource):
         @user_namespace.expect(delete_user_room_parser,delete_user_room_model,validate=False)
         @user_namespace.response(200,'친구 삭제에 성공하였습니다')
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
-                                api_error.authorizaion_error_model(api=user_namespace))
+                                api_error.authorizaion_error_model())
         @login_required
         def delete(self,user_id):
             current_user_id=g.user_id
