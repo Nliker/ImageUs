@@ -19,7 +19,6 @@ def user_router(api,services):
     api_error=ApiError(user_namespace)
     api_model=ApiModel(user_namespace)
     api_parser_module=ParserModule()
-    #회원가입을 합니다.ss
     #input
     # {
     #     'name':<str>,
@@ -48,6 +47,9 @@ def user_router(api,services):
                                  '이메일이 이미 등록 되어있어 실패하였습니다.',
                                  api_error.email_existance_sign_up_error_model())
         def post(self):
+            '''
+            회원가입을 합니다.
+            '''
             new_user=request.json
 
             if user_service.is_email_exists(new_user['email']):
@@ -59,7 +61,6 @@ def user_router(api,services):
             
             return make_response(jsonify({'user_info':user_info}),200)
 
-    #id가 user_id인 유저의 정보를 불러옵니다.
     #input
     #output
     # {
@@ -79,6 +80,9 @@ def user_router(api,services):
                                  '해당 유저가 존재하지 않습니다.',
                                 api_error.user_existance_error_model())
         def get(self,user_id):
+            '''
+            id가 user_id인 유저의 정보를 불러옵니다.
+            '''
             user_info=user_service.get_user_info(user_id)
             if user_info:
                 return make_response(jsonify({'user_info':user_info}),200)
@@ -86,7 +90,6 @@ def user_router(api,services):
                 return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
                                      api_error.user_existance_error()['status_code'])
     
-    #로그인을 합니다.
     #input
     # {
     #     'email':<str>,
@@ -109,6 +112,9 @@ def user_router(api,services):
                                  '비밀번호가 일치하지 않습니다.',
                                  api_error.credential_error_model())
         def post(self):
+            '''
+            로그인을 합니다.
+            '''
             credential=request.json
             
             if not user_service.is_email_exists(credential['email']):
@@ -125,7 +131,6 @@ def user_router(api,services):
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
 
-    #id가 user_id인 유저의 이미지리스트를 불러옵니다.
     #input
     #output
     # {
@@ -153,6 +158,9 @@ def user_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
+            '''
+            id가 user_id인 유저의 이미지 정보 목록을 불러옵니다.
+            '''
             current_user_id=g.user_id
             
             #current_usre_id와 user_id를 따로 받으면 추후 누가 조회 했는지 알 수 있음
@@ -164,7 +172,6 @@ def user_router(api,services):
 
             return make_response(jsonify({'imagelist':image_list}),200)
     
-    #id가 user_id인 유저의 친구 리스트를 불러옵니다.
     #input
     #output
     # {
@@ -194,6 +201,9 @@ def user_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
+            '''
+            id가 user_id인 유저의 친구 정보 목록을 불러옵니다.
+            '''
             current_user_id=g.user_id
             
             if current_user_id != user_id:
@@ -209,7 +219,6 @@ def user_router(api,services):
     delete_user_friend_parser=api_parser_module.get_parser(['Authorization'])
     delete_user_friend_model=api_model.get_model("delete_user_friend_model",['delete_friend_user_id'])
     
-    #id가 user_id인 유저의 친구를 삭제합니다.
     #input
     # {
     #     'delete_friend_user_id':<int>
@@ -229,6 +238,9 @@ def user_router(api,services):
                                 api_error.user_existance_error_model())
         @login_required
         def delete(self,user_id):
+            '''
+            id가 user_id인 유저의 친구를 삭제합니다.
+            '''
             current_user_id=g.user_id
 
             if current_user_id != user_id:
@@ -244,7 +256,6 @@ def user_router(api,services):
             result=user_service.delete_user_friend(current_user_id,delete_friend_user_id)
             return make_response(f"{result}명 삭제 성공")
             
-    #id가 user_id인 유저의 친구를 생성합니다.
     #input
     # {
     #     'friend_user_id':<int>
@@ -265,6 +276,9 @@ def user_router(api,services):
                                 api_error.friend_existance_error_model())
         @login_required
         def post(self,user_id):
+            '''
+            id가 user_id인 유저의 친구를 생성합니다.
+            '''
             current_user_id=g.user_id
             friend_user_id=request.json['friend_user_id']
             
@@ -284,7 +298,6 @@ def user_router(api,services):
 
             return make_response(f"{result}명 친구 생성 성공")
     
-    #id가 user_id인 유저의 방 리스트를 불러옵니다.
     #input
     #output
     # {
@@ -327,6 +340,9 @@ def user_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
+            '''
+            id가 user_id인 유저의 방 정보 목록을 불러옵니다.
+            '''
             current_user_id=g.user_id
             
             if current_user_id != user_id:
@@ -342,8 +358,6 @@ def user_router(api,services):
             
             return make_response(jsonify({'roomlist':room_info_list}),200)
         
-        
-    #id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
     #input
     # {
     #     'delete_user_room_id':'room_id'
@@ -361,6 +375,9 @@ def user_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def delete(self,user_id):
+            '''
+            id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
+            '''
             current_user_id=g.user_id
             
             if current_user_id != user_id:

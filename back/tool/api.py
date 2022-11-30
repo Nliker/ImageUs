@@ -351,11 +351,11 @@ class ApiError:
     errors={
         'email_existance_sign_up_error':{
             'message':"이메일이 이미 존재합니다.",
-            'status_code':401
+            'status_code':402
         },
         'email_existance_login_error':{
             'message':"이메일이 존재하지 않습니다.",
-            'status_code':401
+            'status_code':404
         },
         'user_existance_error':{
             'message':"해당 유저가 존재하지 않습니다.",
@@ -367,11 +367,11 @@ class ApiError:
         },
         'authorizaion_error':{
             'message':"권한이 없습니다.",
-            'status_code':401
+            'status_code':403
         },
         'friend_existance_error':{
             'message':"이미 친구인 유저입니다.",
-            'status_code':401
+            'status_code':402
         },
         'file_missing_error':{
             'message':"file is missing.",
@@ -387,7 +387,7 @@ class ApiError:
         },
         'room_user_error':{
             'message':"방의 유저가 아닙니다.",
-            'status_code':401
+            'status_code':403
         }   
     }
     

@@ -18,7 +18,7 @@ def image_router(api,services):
     api_error=ApiError(image_namespace)
     api_model=ApiModel(image_namespace)
     api_parser_model=ParserModule()
-    #새로운 사진을 게시합니다.
+
     #input
     # {
     #     'files':{
@@ -51,6 +51,9 @@ def image_router(api,services):
                                  api_error.file_missing_error_model())
         @login_required
         def post(self):
+            '''
+            사진을 생성합니다.
+            '''
             current_user_id=g.user_id
             if 'image' not in request.files or request.files['image'].filename=='':
                 return make_response(jsonify({'message':api_error.file_missing_error()['message']})
@@ -70,7 +73,7 @@ def image_router(api,services):
             image_info=image_service.get_image_info(new_image_id)
 
             return make_response(jsonify({'image_info':image_info}),200)
-    #id가 image_id인 사진을 삭제합니다.
+
     #input
     # {
     #     'delete_image_id':<int>
@@ -85,6 +88,9 @@ def image_router(api,services):
         @image_namespace.response(api_error.authorizaion_error()['status_code'],'사진에 대한 권한이 없습니다.',api_error.authorizaion_error_model())
         @login_required
         def delete(self):
+            '''
+            id가 image_id인 사진을 삭제합니다.
+            '''
             delete_image_id=request.json['delete_image_id']
             
             if not image_service.get_image_info(delete_image_id):
@@ -101,7 +107,6 @@ def image_router(api,services):
             
             return make_response(f'{delete_image_result}장 삭제 및 {delete_image_room_result}개의 관련 방 권한 삭제 완료',200)
 
-    #id가 image_id 인 사진의 정보를 불러옵니다.
     #input
     #output
     # {
@@ -124,6 +129,9 @@ def image_router(api,services):
         @image_namespace.response(api_error.authorizaion_error()['status_code'],'사진에 대한 권한이 없습니다.',api_error.authorizaion_error_model())
         @login_required
         def get(self,image_id):
+            '''
+            id가 image_id 인 사진의 정보를 불러옵니다.
+            '''
             if not image_service.get_image_info(image_id):
                 return make_response(jsonify({'message':api_error.image_existance_error()['message']})
                                      ,api_error.image_existance_error()['status_code'])
@@ -138,7 +146,6 @@ def image_router(api,services):
 
             return make_response(jsonify({'image_info':image_info}),200)
     
-    #id가 image_id 인 사진의 방 리스트를 불러옵니다.
     #input
     #output
     # {
@@ -160,7 +167,7 @@ def image_router(api,services):
     get_image_roomlist_response_model=api_model.get_model("get_image_roomlist_response_model",['room_info_list'])
     
     post_image_roomlist_parser=api_parser_model.get_parser(['Authorization'])
-    post_image_roomlist_model=api_model.get_model("post_image_roomlist_model",['updaet_roomlist'])
+    post_image_roomlist_model=api_model.get_model("post_image_roomlist_model",['update_roomlist'])
     post_image_roomlist_response_model=api_model.get_model("post_image_roomlist_response_model",['update_image_room_result','room_info_list'])
     @image_namespace.route("/<int:image_id>/roomlist")
     class image_roomlist(Resource):
@@ -172,6 +179,10 @@ def image_router(api,services):
         @image_namespace.response(api_error.authorizaion_error()['status_code'],'사진에 대한 권한이 없습니다.',api_error.authorizaion_error_model())
         @login_required
         def get(self,image_id):
+            '''
+            id가 image_id 인 사진의 방 정보 목록을 불러옵니다.
+            '''
+
             if not image_service.get_image_info(image_id):
                 return make_response(jsonify({'message':api_error.image_existance_error()['message']})
                                      ,api_error.image_existance_error()['status_code'])
@@ -185,7 +196,6 @@ def image_router(api,services):
             image_roomlist=image_service.get_image_roomlist(image_id)
             return make_response(jsonify({'roomlist':image_roomlist}),200)
         
-    #id가 image_id 인 사진의 방 리스트를 수정합니다.
     #input
     # {
     #     'update_roomlist':[1,2,3,4]
@@ -220,6 +230,9 @@ def image_router(api,services):
         @image_namespace.response(api_error.authorizaion_error()['status_code'],'사진에 대한 권한이 없습니다.',api_error.authorizaion_error_model())
         @login_required
         def post(self,image_id):
+            '''
+            id가 image_id 인 사진의 방 목록을 수정합니다.
+            '''
             if not image_service.get_image_info(image_id):
                 return make_response(jsonify({'message':api_error.image_existance_error()['message']})
                                      ,api_error.image_existance_error()['status_code'])
