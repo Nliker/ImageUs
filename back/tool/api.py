@@ -2,20 +2,20 @@ from flask_restx import reqparse,fields
 from werkzeug.datastructures import FileStorage
 
 class ParserModule:
-    def __init__(self,args):
-        self.parser=reqparse.RequestParser()
+    def get_parser(self,args):
+        parser=reqparse.RequestParser()
         if 'Authorization' in args:
-            self.parser.add_argument('Authorization',type=str,
+            parser.add_argument('Authorization',type=str,
                         location='headers',
                         help='access_token',
                         required=False)
         if 'image' in args:
-            self.parser.add_argument('image',type=FileStorage,
+            parser.add_argument('image',type=FileStorage,
                             location='files',
                             help='imagefile',
                             required=False)
-    def get_parser(self):
-        return self.parser
+        return parser
+    
 
 class ApiModel:
     id=fields.Integer(
@@ -138,58 +138,66 @@ class ApiModel:
         required=False
     )
     
-    def __init__(self,api,modelname,args):
-        self.payload={}
+    image_room_update_result={
+        'addlist':fields.List(fields.Integer),
+        'add_result':fields.Integer,
+        'deletelist':fields.List(fields.Integer),
+        'delete_result':fields.Integer
+    }
+    
+    def __init__(self,api):
         self.api=api
         
+    def get_model(self,modelname,args):
+        payload={}
         if 'id' in args:
-            self.payload['id']=self.id
+            payload['id']=self.id
             
         if 'name' in args:
-            self.payload['name']=self.name
+            payload['name']=self.name
             
         if 'email' in args:
-            self.payload['email']=self.email
+            payload['email']=self.email
 
         if 'profile' in args:
-            self.payload['profile']=self.profile
+            payload['profile']=self.profile
             
         if 'password' in args:
-            self.payload['password']=self.password
+            payload['password']=self.password
             
         if 'friend_user_id' in args:
-            self.payload['friend_user_id']=self.friend_user_id
+            payload['friend_user_id']=self.friend_user_id
         
         if 'delete_friend_user_id' in args:
-            self.payload['delete_friend_user_id']=self.delete_friend_user_id
+            payload['delete_friend_user_id']=self.delete_friend_user_id
 
         if 'delete_user_room_id' in args:
-            self.payload['delete_user_room_id']=self.delete_user_room_id
+            payload['delete_user_room_id']=self.delete_user_room_id
 
         if 'userlist' in args:
-            self.payload['userlist']=self.userlist
+            payload['userlist']=self.userlist
     
         if 'title' in args:
-            self.payload['title']=self.title
+            payload['title']=self.title
         
         if 'delete_room_image_id' in args:
-            self.payload['delete_room_image_id']=self.delete_room_image_id
+            payload['delete_room_image_id']=self.delete_room_image_id
 
         if 'delete_room_user_id' in args:
-            self.payload['delete_room_user_id']=self.delete_room_user_id
+            payload['delete_room_user_id']=self.delete_room_user_id
 
         if 'invite_userlist' in args:
-            self.payload['invite_userlist']=self.invite_userlist
+            payload['invite_userlist']=self.invite_userlist
 
         if 'delete_image_id' in args:
-            self.payload['delete_image_id']=self.delete_image_id
+            payload['delete_image_id']=self.delete_image_id
             
         if 'update_roomlist' in args:
-            self.payload['update_roomlist']=self.update_roomlist
+            payload['update_roomlist']=self.update_roomlist
             
         if 'imagelist' in args:
-            self.payload['imagelist']=fields.List(
-                fields.Nested(api.model("image_model",self.image_info)),
+            payload['imagelist']=fields.List(
+                fields.Nested(self.api.model("image_model",self.image_info)),
                 default=[{
                     'id':1,
                     'link':'http://example1.com',
@@ -204,7 +212,7 @@ class ApiModel:
             
             
         if 'user_info' in args:
-            self.payload['user_info']=fields.Nested(api.model("user_info_model",
+            payload['user_info']=fields.Nested(self.api.model("user_info_model",
                 self.user_info),
                 default={
                     'id':1,
@@ -216,8 +224,8 @@ class ApiModel:
             )
             
         if 'user_info_list' in args:
-            self.payload['userlist']=fields.List(
-                fields.Nested(api.model("user_info_model",
+            payload['userlist']=fields.List(
+                fields.Nested(self.api.model("user_info_model",
                 self.user_info)),
                 default=[{
                     'id':1,
@@ -234,8 +242,8 @@ class ApiModel:
             )
         
         if 'friendlist' in args:
-            self.payload['firendlist']=fields.List(
-                fields.Nested(api.model("user_info_model",
+            payload['firendlist']=fields.List(
+                fields.Nested(self.api.model("user_info_model",
                 self.user_info)),
                 default=[{
                     'id':1,
@@ -252,16 +260,16 @@ class ApiModel:
             )
             
         if 'access_token' in args:
-            self.payload['access_token']=self.access_token
+            payload['access_token']=self.access_token
 
         if 'room_info_list' in args:
             user_info_list=fields.List(
-                fields.Nested(api.model("user_info_model",
+                fields.Nested(self.api.model("user_info_model",
                 self.user_info)))
             room_info={**self.room_info,'userlist':user_info_list}
 
-            self.payload['roomlist']=fields.List(
-                fields.Nested(api.model("room_info_list_model",
+            payload['roomlist']=fields.List(
+                fields.Nested(self.api.model("room_info_list_model",
                 room_info)),
                 default=[{
                     'id':1,
@@ -298,7 +306,7 @@ class ApiModel:
             )
             
         if 'room_info' in args:
-            self.payload['room_info']=fields.Nested(api.model("room_info_model",
+            payload['room_info']=fields.Nested(self.api.model("room_info_model",
             self.room_info 
             ),
             default={
@@ -309,7 +317,7 @@ class ApiModel:
             required=False)
         
         if 'image_info' in args:
-            self.payload['image_info']=fields.Nested(api.model("image_info_model",
+            payload['image_info']=fields.Nested(self.api.model("image_info_model",
             self.image_info
             ),
             default={
@@ -321,14 +329,23 @@ class ApiModel:
             )
         
         if 'success' in args:
-            self.payload['success']=self.success
+            payload['success']=self.success
         
+        if 'update_image_room_result' in args:
+            payload['result']=fields.Nested(self.api.model("update_image_room_result",
+            self.image_room_update_result
+            ),
+            default={
+                'addlist':[1,3,5],
+                'add_result':3,
+                'deletelist':[2,5],
+                'delete_list':2
+            },
+            required=False)
+                        
+        api_model=self.api.model(modelname,payload)
         
-            
-        self.api_model=api.model(modelname,self.payload)
-        
-    def get_model(self):
-        return self.api_model
+        return api_model
         
 class ApiError:
     errors={
@@ -373,67 +390,68 @@ class ApiError:
             'status_code':401
         }   
     }
-    def say_hello(self):
-        return "Hello"
     
+    def __init__(self,api):
+        self.api=api
+        
     def email_existance_sign_up_error(self):
         return self.errors['email_existance_sign_up_error']
     
-    def email_existance_sign_up_error_model(self,api):
-        return api.model('email_existance_sign_up_error_model',{'message':fields.String(self.errors['email_existance_sign_up_error']['message'])})
+    def email_existance_sign_up_error_model(self):
+        return self.api.model('email_existance_sign_up_error_model',{'message':fields.String(self.errors['email_existance_sign_up_error']['message'])})
     
     def email_existance_login_error(self):
         return self.errors['email_existance_login_error']
     
-    def email_existance_login_error_model(self,api):
-        return api.model('email_existance_login_error_model',{'message':fields.String(self.errors['email_existance_login_error']['message'])})
+    def email_existance_login_error_model(self):
+        return self.api.model('email_existance_login_error_model',{'message':fields.String(self.errors['email_existance_login_error']['message'])})
             
     
     def user_existance_error(self):
         return self.errors['user_existance_error']
     
-    def user_existance_error_model(self,api):
-        return api.model('user_existance_error_model',{'message':fields.String(self.errors['user_existance_error']['message'])})
+    def user_existance_error_model(self):
+        return self.api.model('user_existance_error_model',{'message':fields.String(self.errors['user_existance_error']['message'])})
 
     
     def credential_error(self):
         return self.errors['credential_error']
     
-    def credential_error_model(self,api):
-        return api.model('credential_error_model',{'message':fields.String(self.errors['credential_error']['message'])})
+    def credential_error_model(self):
+        return self.api.model('credential_error_model',{'message':fields.String(self.errors['credential_error']['message'])})
 
     def authorizaion_error(self):
         return self.errors['authorizaion_error']
     
-    def authorizaion_error_model(self,api):
-        return api.model('authorizaion_error_model',{'message':fields.String(self.errors['authorizaion_error']['message'])})
+    def authorizaion_error_model(self):
+        return self.api.model('authorizaion_error_model',{'message':fields.String(self.errors['authorizaion_error']['message'])})
                  
     def friend_existance_error(self):
         return self.errors['friend_existance_error']
     
-    def friend_existance_error_model(self,api):
-        return api.model('friend_existance_error_model',{'message':fields.String(self.errors['friend_existance_error']['message'])})
+    def friend_existance_error_model(self):
+        return self.api.model('friend_existance_error_model',{'message':fields.String(self.errors['friend_existance_error']['message'])})
                   
     def file_missing_error(self):
         return self.errors['file_missing_error']
     
-    def file_missing_error_model(self,api):
-        return api.model('file_missing_error_model',{'message':fields.String(self.errors['file_missing_error']['message'])})
+    def file_missing_error_model(self):
+        return self.api.model('file_missing_error_model',{'message':fields.String(self.errors['file_missing_error']['message'])})
           
     def image_existance_error(self):
         return self.errors['image_existance_error']
     
-    def image_existance_error_model(self,api):
-        return api.model('image_existance_error_model',{'message':fields.String(self.errors['image_existance_error']['message'])})
+    def image_existance_error_model(self):
+        return self.api.model('image_existance_error_model',{'message':fields.String(self.errors['image_existance_error']['message'])})
                     
     def room_existance_error(self):
         return self.errors['room_existance_error']
     
-    def room_existance_error_model(self,api):
-        return api.model('room_existance_error_model',{'message':fields.String(self.errors['room_existance_error']['message'])})
+    def room_existance_error_model(self):
+        return self.api.model('room_existance_error_model',{'message':fields.String(self.errors['room_existance_error']['message'])})
                
     def room_user_error(self):
         return self.errors['room_user_error']
     
-    def room_user_error_model(self,api):
-        return api.model('room_user_error_model',{'message':fields.String(self.errors['room_user_error']['message'])})
+    def room_user_error_model(self):
+        return self.api.model('room_user_error_model',{'message':fields.String(self.errors['room_user_error']['message'])})
