@@ -18,7 +18,7 @@ def room_router(api,services):
     api_error=ApiError(room_namespace)
     api_model=ApiModel(room_namespace)
     api_parser_module=ParserModule()
-    #room을 생성합니다.
+
     #input
     # {
     #     userlist:[1,2,3],
@@ -39,6 +39,9 @@ def room_router(api,services):
         @room_namespace.response(200,'방 생성에 성공하였습니다.',post_room_response_model)
         @login_required
         def post(self):
+            '''
+            방을 생성합니다.
+            '''
             room_userlist=request.json['userlist']
             current_user_id=g.user_id
             
@@ -64,7 +67,6 @@ def room_router(api,services):
                 'room_info':room_info,
                 'success':result}),200)
     
-    #id가 room_id인 room에 이미지를 업로드 합니다.
     #input
     # {
     #     'files':{
@@ -90,6 +92,9 @@ def room_router(api,services):
                                  api_error.file_missing_error_model())
         @login_required
         def post(self,room_id):
+            '''
+            id가 room_id인 room에 이미지를 업로드 합니다.
+            '''
             current_user_id=g.user_id
             
             if 'image' not in request.files or request.files['image'].filename=='':
@@ -112,7 +117,6 @@ def room_router(api,services):
             else:
                 return make_response(jsonify({'message':result['message']}),result['status_code'])
             
-    #id가 room_id인 room의 id가 image_id인 image의 권한을 삭제합니다.
     #input
     # {
     #     'delete_room_image_id':<int>
@@ -129,6 +133,9 @@ def room_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def delete(self,room_id):
+            '''
+            id가 room_id인 room에서 id가 image_id인 image를 삭제합니다.
+            '''
             current_user_id=g.user_id
             delete_room_image_id=request.json['delete_room_image_id']
             if not image_service.get_image_info(delete_room_image_id):
@@ -143,7 +150,6 @@ def room_router(api,services):
             
             return make_response(f"{result}장 삭제 완료",200)
             
-    #id가 room_id인 room의 이미지 리스트를 불러옵니다.
     #input
     #output
     # {
@@ -174,6 +180,9 @@ def room_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,room_id):
+            '''
+            id가 room_id인 room의 이미지 정보 목록을 불러옵니다.
+            '''
             current_user_id=g.user_id
             if not room_service.get_room_info(room_id):
                 return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
@@ -187,8 +196,6 @@ def room_router(api,services):
                 
             return make_response(jsonify({'imagelist':imagelist}),200)
             
-    
-    #id가 room_id인 room의 유저 리스트를 불러옵니다.
     #input
     #output
     # {
@@ -223,6 +230,9 @@ def room_router(api,services):
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,room_id):
+            '''
+            id가 room_id인 room의 유저 정보 목록을 불러옵니다.
+            '''
             current_user_id=g.user_id
             if not room_service.get_room_info(room_id):
                 return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
@@ -236,7 +246,6 @@ def room_router(api,services):
 
             return make_response(jsonify({'userlist':room_user_info_list}),200)
     
-    #id가 room_id인 room의 id가 user_id인 유저를 초대합니다.
     #input
     # {
     #     'invite_userlist':[1,2,]
@@ -260,6 +269,9 @@ def room_router(api,services):
                                  api_error.room_user_error_model())
         @login_required
         def post(self,room_id):
+            '''
+            id가 room_id인 room에 id가 user_id인 유저를 초대합니다.(방 초대)
+            '''
             if not room_service.get_room_info(room_id):
                 return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
                                      api_error.room_existance_error()['status_code'])
@@ -279,7 +291,7 @@ def room_router(api,services):
             result=room_service.create_room_users(room_id,exist_invite_userlist)
 
             return make_response(f'{result}명 초대 성공',200)
-    #id가 room_id인 room의 id가 user_id인 유저를 강퇴합니다.
+
     #input
     # {
     #     'delete_room_user_id':<int>
@@ -292,13 +304,16 @@ def room_router(api,services):
                                  '방이 존재하지 않습니다.',
                                  api_error.room_existance_error_model())
         @room_namespace.response(api_error.authorizaion_error()['status_code'],
-                                 '소유물이 아니기에 권한이 없습니다',
+                                 '방장이 아니기에 권한이 없습니다',
                                 api_error.authorizaion_error_model())
         @room_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
                                 api_error.user_existance_error_model())
         @login_required
         def delete(self,room_id):
+            '''
+            id가 room_id인 room에서 id가 user_id인 유저를 강퇴합니다.
+            '''
             current_user_id=g.user_id
             delete_room_user_id=request.json['delete_room_user_id']
             if not room_service.get_room_info(room_id):
