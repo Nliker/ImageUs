@@ -27,12 +27,12 @@ const MypageInfo = () => {
           <button type="button">변경하기</button>
         </div>
       </div>
-      <div>
+      {/* <div>
         <aside>
           <label htmlFor="">방 목록</label>
         </aside>
         <div></div>
-      </div>
+      </div> */}
     </div>
   );
 };
