@@ -7,6 +7,9 @@ export const Wrapper = styled.nav`
   width: 100%;
   z-index: 100;
   font-size: 0.75rem;
+  h1 {
+    margin: 0;
+  }
 `;
 
 export const BottomContainer = styled.div`
@@ -36,23 +39,20 @@ export const MobileNavItem = styled.li`
   list-style: none;
   box-sizing: border-box;
   padding: 0.5rem 1rem;
+  svg {
+    display: block;
+    margin: 0 auto 3px;
+    width: 25px;
+    height: auto;
+  }
   &>a, &>.upload_btn {
     border-radius: 5px;
-    svg {
-      display: block;
-      margin: 0 auto 3px;
-      width: 25px;
-      height: auto;
-    }
     &:hover {
       background-color: #d6d6d6;
     }
   }
   .upload_btn {
     cursor: pointer;
-  }
-  h1 {
-    margin: 0;
   }
 `;
 
