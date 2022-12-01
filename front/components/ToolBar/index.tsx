@@ -4,6 +4,7 @@ import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi';
+import { NavLink } from 'react-router-dom';
 
 interface Props {
   handleRoomListBtn: (e: any) => void;
@@ -11,38 +12,45 @@ interface Props {
 
 const ToolBar = ({ handleRoomListBtn }: Props) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
+  const [showUserBox, setShowUserBox] = useState(false);
+
+  const handleUserBox = useCallback(() => setShowUserBox((prev) => !prev), []);
 
   return (
     <Wrapper>
-      <LeftIcon>
+      <LeftIcon className='toolbar_icon'>
         {/* <SideBarButton>{isMobile && <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />}</SideBarButton> */}
         <span>
           <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />
         </span>
       </LeftIcon>
-      <RightIcons>
+      <RightIcons className='toolbar_icon'>
         <div>
           <span>
             <RiListSettingsLine />
           </span>
         </div>
         <div>
-          <span>
+          <span onClick={handleUserBox}>
             <BiUserCircle />
           </span>
         </div>
       </RightIcons>
-      <UserBox>
+      {showUserBox && <UserBox>
         <UserInfo>
           <img src="image_test.png" alt="test_img" />
-          <div className={"info_words"}>
-            <p><span>이름</span>님 어서오세요!</p>
+          <div className={'info_words'}>
+            <p>
+              <span>이름</span>님 어서오세요!
+            </p>
             {/* <p>email: </p> */}
             <p>asdfaskla@naver.com</p>
           </div>
         </UserInfo>
-        <LogoutBtn><span>로그아웃</span></LogoutBtn>
-      </UserBox>
+        <LogoutBtn>
+          <NavLink to={'/'}>로그아웃</NavLink>
+        </LogoutBtn>
+      </UserBox>}
     </Wrapper>
   );
 };
