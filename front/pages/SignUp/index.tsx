@@ -1,9 +1,8 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
-import { InputBox } from '@components/UserInfoInputBox/styles';
 import useInput from '@hooks/useInput';
 import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
-import { ErrorText, InputContainer, PasswordCheckBox, SubmitBox } from './styles';
+import { ErrorText, InputBox, InputContainer, PasswordCheckBox, SubmitBox } from './styles';
 
 interface ErrorMessage {
   nameError: string;
