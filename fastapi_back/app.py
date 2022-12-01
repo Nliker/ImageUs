@@ -1,48 +1,51 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 from sqlalchemy import create_engine
-from fastapi.responses import JSONResponse
 from config import Settings
 from functools import lru_cache
 
-from model import UserDao,ImageDao,RoomDao
-from service import UserService,ImageService,RoomService
-from view import user_router,image_router,room_router
+from fastapi.responses import PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+import jwt
+
+# from model import UserDao,ImageDao,RoomDao
+# from service import UserService,ImageService,RoomService
+# from view import user_router,image_router,room_router
+from auth import verify_token
 
 class Services:
     pass
 
-def create_app(test_config=None):
+def create_app(test_setting=None):
     app=FastAPI()
     
-    @lru_cache()
-    def get_settings():
-        return Settings()
-    
-    
-    if test_config is None:
-        settings: Settings=get_settings()
+    if test_setting is None:
+        settings: Settings=Settings()
     else:
-        settings: Settings=get_settings(test_config)
+        settings: Settings=test_setting
 
     database=create_engine(settings.DB_URL,encoding='utf-8',max_overflow=0)
     print("DB is connected....")
-
+    
     @app.get("/ping",status_code=200)
-    async def ping():
-        return "pong"
+    async def ping(current_user_id: int=Depends(verify_token)):
+
+        return f"{current_user_id}pong"
     
-    user_dao=UserDao(database)
-    image_dao=ImageDao(database)
-    room_dao=RoomDao(database)
     
-    services=Services
     
-    services.user_service=UserService(user_dao,settings)
-    services.image_service=ImageService(image_dao,settings)
-    services.room_service=RoomService(room_dao,app,settings)
+    # user_dao=UserDao(database)
+    # image_dao=ImageDao(database)
+    # room_dao=RoomDao(database)
     
-    user_router(app,services)
+    # services=Services
+    
+    # services.user_service=UserService(user_dao,settings)
+    # services.image_service=ImageService(image_dao,settings)
+    # services.room_service=RoomService(room_dao,app,settings)
+    
+    # user_router(app,services)
     # room_router(app,services)
     # image_router(app,services)
     
