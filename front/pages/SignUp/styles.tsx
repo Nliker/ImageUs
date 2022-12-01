@@ -7,6 +7,30 @@ export const InputContainer = styled.div`
         padding-top: 24px;
     }
 `;
+
+export const InputBox = styled.div`
+  input {
+    width: 100%;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    box-shadow: 0 0 3px #eee;    
+    border-radius: 4px;
+    color: #202124;
+    font-size: 17px;
+    height: 56px;
+    margin: 1px 1px 0 1px;
+    padding: 13px 15px;
+  }
+  label {
+    display: block;
+    text-align: left;
+    &:not(.pwcheck-label) {
+      padding-bottom: 10px;
+      color: #d93025;
+    }
+  }
+`;
+
 export const NameBox = styled.div``;
 export const EmailBox = styled.div``;
 export const PasswordBox = styled.div``;
@@ -27,3 +51,4 @@ export const SubmitBox = styled.div`
 export const ErrorText = styled.p`
     margin: 0 0 0 30px;
 `;
+

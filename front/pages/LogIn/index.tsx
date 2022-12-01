@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import UserInfoInputBox from '@components/UserInfoInputBox';
-import { EmailInputContainer, InputDiv, PasswordInputContainer, SubmitBox } from './styled';
-import { CheckBox, InputBox } from '@components/UserInfoInputBox/styles';
+import { CheckBox, EmailInputContainer, InputBox, InputDiv, PasswordInputContainer, SubmitBox } from './styled';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 
