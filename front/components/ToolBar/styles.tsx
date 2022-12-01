@@ -7,7 +7,7 @@ export const Wrapper = styled.div`
   align-items: center;
   padding: 0 20px;
   box-shadow: rgb(0 0 0 / 10%) 2px 0px 2px;
-  & > div:not(:last-of-type) {
+  .toolbar_icon {
     display: flex;
     align-items: center;
     height: 100%;
