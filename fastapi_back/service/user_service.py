@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import jwt
 
 class UserService:
-    def __init__(self,user_dao,config):
-        self.config=config
+    def __init__(self,user_dao,settings):
+        self.settings=settings
         self.user_dao=user_dao
     '''
     userdao
@@ -56,13 +56,13 @@ class UserService:
         return authorized
     
     def generate_access_token(self,user_id):
-        jwt_expire_time= timedelta(seconds=self.config['JWT_EXPIRE_TIME'])
+        jwt_expire_time= timedelta(seconds=self.settings.JWT_EXPIRE_TIME)
         payload={
             'user_id':user_id,
             'exp':datetime.utcnow()+jwt_expire_time,
             'iat':datetime.utcnow()
         }
-        access_token=jwt.encode(payload,self.config['JWT_SECRET_KEY'],'HS256')
+        access_token=jwt.encode(payload,self.settings.JWT_SECRET_KEY,'HS256')
 
         return access_token
     
