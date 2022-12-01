@@ -1,12 +1,10 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 
-export const InputDiv = styled.div`
-`
+export const InputDiv = styled.div``;
 
-export const EmailInputContainer = styled.div`
-`
+export const EmailInputContainer = styled.div``;
 export const PasswordInputContainer = styled.div`
-  margin-top: 20px;
+  // margin-top: 20px;
 `;
 
 export const InputBox = styled.div`
@@ -14,7 +12,7 @@ export const InputBox = styled.div`
     width: 100%;
     border: 1px solid #ccc;
     box-sizing: border-box;
-    box-shadow: 0 0 3px #eee;    
+    box-shadow: 0 0 3px #eee;
     border-radius: 4px;
     color: #202124;
     font-size: 17px;
@@ -30,6 +28,14 @@ export const InputBox = styled.div`
       // color: #d93025;
     }
   }
+`;
+
+export const ErrorMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  color: orangered;
 `;
 
 export const CheckBox = styled.div`
@@ -51,4 +57,3 @@ export const SubmitBox = styled.div`
 //   justify-content: space-between;
 //   margin-top: 40px;
 // `;
-
