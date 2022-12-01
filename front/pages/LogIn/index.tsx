@@ -1,6 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import UserInfoInputBox from '@components/UserInfoInputBox';
-import { CheckBox, EmailInputContainer, InputBox, InputDiv, PasswordInputContainer, SubmitBox } from './styled';
+import {
+  CheckBox,
+  EmailInputContainer,
+  ErrorMessage,
+  InputBox,
+  InputDiv,
+  PasswordInputContainer,
+  SubmitBox,
+} from './styled';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 
@@ -8,8 +16,6 @@ const LogIn = () => {
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
-  const [emailFormError, setEmailFormError] = useState<boolean>(false);
-  const [pwFormError, setPwFormError] = useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
   const [pwErrorMessage, setPwErrorMessage] = useState<string>('');
   const emailRef = useRef(null);
@@ -22,52 +28,60 @@ const LogIn = () => {
     return setChecked((prev) => !prev);
   }, []);
 
+  const emailValidation = useCallback((value: string) => {
+    if (!value) {
+      setEmailErrorMessage('이메일을 입력해주세요.');
+      return false;
+    } else if (!emailRegex.test(value)) {
+      setEmailErrorMessage('이메일 형식에 맞지 않습니다.');
+      return false;
+    }
+    setEmailErrorMessage('');
+    return true;
+  }, []);
+
+  const pwValidation = useCallback((value: string) => {
+    if (!value) {
+      setPwErrorMessage('비밀번호를 입력해주세요.');
+      return false;
+    } else if (value?.length < 8) {
+      setPwErrorMessage('비밀번호는 8글자 이상입니다.');
+      return false;
+    } 
+    setPwErrorMessage('');
+    return true;
+  }, []);
+
+  const onChangeEmailInput = useCallback((e: { target: { value: string } }) => {
+    setEmailValue(e.target.value);
+    const inputValue = e.target.value;
+    emailValidation(inputValue);
+  }, []);
+
+  const onChangePasswordInput = useCallback((e: { target: { value: string } }) => {
+    setPwValue(e.target.value);
+    const inputValue = e.target.value;
+    pwValidation(inputValue);
+  }, []);
+
   const onSubmitLoginInfo = useCallback(
     (e: { preventDefault: () => void }) => {
       e.preventDefault();
-      // console.log('확인', emailFormError, pwFormError);
-      if (emailFormError && pwFormError) {
+      const emailCheck = emailValidation(emailValue);
+      const pwCheck = pwValidation(passwordValue);
+      if (!emailCheck && !pwCheck) {
         alert('이메일과 비밀번호를 다시 확인해주세요.');
-      } else if (emailFormError) {
+      } else if (!emailCheck) {
         alert('이메일을 다시 확인해주세요.');
-      } else if (pwFormError) {
+      } else if (!pwCheck) {
         alert('비밀번호를 다시 확인해주세요.');
       } else {
         // axios.post();
         // 페이지
       }
     },
-    [emailFormError, pwFormError],
+    [emailValue, passwordValue],
   );
-
-  const onChangeEmailInput = useCallback((e: { target: { value: string } }) => {
-    setEmailValue(e.target.value);
-    const inputValue = e.target.value;
-    if (!inputValue) {
-      setEmailErrorMessage('이메일을 입력해주세요.');
-      setEmailFormError(true);
-    } else if (!emailRegex.test(inputValue)) {
-      setEmailErrorMessage('이메일 형식에 맞지 않습니다.');
-      setEmailFormError(true);
-    } else {
-      setEmailFormError(false);
-    }
-  }, []);
-
-  const onChangePasswordInput = useCallback((e: { target: { value: string } }) => {
-    // console.log(e.target.value);
-    setPwValue(e.target.value);
-    const inputValue = e.target.value;
-    if (!inputValue) {
-      setPwErrorMessage('비밀번호를 입력해주세요.');
-      setPwFormError(true);
-    } else if (inputValue?.length < 8) {
-      setPwErrorMessage('비밀번호는 8글자 이상입니다.');
-      setPwFormError(true);
-    } else {
-      setPwFormError(false);
-    }
-  }, []);
 
   return (
     <div>
@@ -86,7 +100,9 @@ const LogIn = () => {
                   placeholder="이메일을 입력하세요."
                 />
               </InputDiv>
-              {emailFormError && <p>{emailErrorMessage}</p>}
+              <ErrorMessage>
+                <span>{emailErrorMessage}</span>
+              </ErrorMessage>
             </InputBox>
           </EmailInputContainer>
           <PasswordInputContainer>
@@ -102,7 +118,9 @@ const LogIn = () => {
                   placeholder="비밀번호를 입력하세요."
                 />
               </InputDiv>
-              {pwFormError && <p>{pwErrorMessage}</p>}
+              <ErrorMessage>
+                <span>{pwErrorMessage}</span>
+              </ErrorMessage>
             </InputBox>
           </PasswordInputContainer>
           <CheckBox>
