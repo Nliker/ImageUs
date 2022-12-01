@@ -1,22 +1,22 @@
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
-from fastapi import Depends
-from functools import wraps
-from starlette.requests import Request
+from fastapi import Header
 from config import Settings
 import jwt
+from custom_exception import error as er
 
-def verify_token(request: Request,settings: Settings):
-    access_token=request.headers.get('Authorization')
+def verify_token(Authorization: str | None=Header(default=None),settings=Settings(),error=er()):
+    access_token=Authorization
     if access_token is not None:
         try:
-            payload=jwt.decode(access_token,settings.JWT_SECRET_KEY_,'HS256')
+            payload=jwt.decode(access_token,settings.JWT_SECRET_KEY,"HS256")
         except:
-            return '유효하지 않은 토큰입니다!',401
+            print("asdasd")
+            error.verify_token_error().get_raise()
         if 'user_id' not in payload and type(payload['user_id']) !=type(1):
-            return '필수정보가 없는 토큰입니다!',401
+            print("good")
+            error.verify_token_error().get_raise()
     else:
-        return '토큰이 존재하지 않습니다.',401
+        error.token_existance_error().get_raise()
     
     return payload['user_id']

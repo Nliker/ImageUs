@@ -1,6 +1,5 @@
-from .user_auth import login_required,g
+from .user_auth import verify_token
 
 __all__=[
-    'login_required',
-    'g'
+    'verify_token'
 ]
