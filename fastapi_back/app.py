@@ -2,16 +2,10 @@ import uvicorn
 from fastapi import FastAPI,Depends
 from sqlalchemy import create_engine
 from config import Settings
-from functools import lru_cache
 
-from fastapi.responses import PlainTextResponse
-from starlette.exceptions import HTTPException as StarletteHTTPException
-
-import jwt
-
-# from model import UserDao,ImageDao,RoomDao
-# from service import UserService,ImageService,RoomService
-# from view import user_router,image_router,room_router
+from model import UserDao,ImageDao,RoomDao
+from service import UserService,ImageService,RoomService
+from view import user_router
 from auth import verify_token
 
 class Services:
@@ -29,23 +23,23 @@ def create_app(test_setting=None):
     print("DB is connected....")
     
     @app.get("/ping",status_code=200)
-    async def ping(current_user_id: int=Depends(verify_token)):
+    async def ping():
 
-        return f"{current_user_id}pong"
+        return "pong"
     
     
     
-    # user_dao=UserDao(database)
-    # image_dao=ImageDao(database)
-    # room_dao=RoomDao(database)
+    user_dao=UserDao(database)
+    image_dao=ImageDao(database)
+    room_dao=RoomDao(database)
     
-    # services=Services
+    services=Services
     
-    # services.user_service=UserService(user_dao,settings)
-    # services.image_service=ImageService(image_dao,settings)
-    # services.room_service=RoomService(room_dao,app,settings)
+    services.user_service=UserService(user_dao,settings)
+    services.image_service=ImageService(image_dao,settings)
+    services.room_service=RoomService(room_dao,settings)
     
-    # user_router(app,services)
+    user_router(app,services)
     # room_router(app,services)
     # image_router(app,services)
     
