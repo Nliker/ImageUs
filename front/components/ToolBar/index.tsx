@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { LeftIcon, RightIcons, Wrapper } from './styles';
+import { LeftIcon, LogoutBtn, RightIcons, UserBox, UserInfo, Wrapper } from './styles';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
@@ -32,6 +32,17 @@ const ToolBar = ({ handleRoomListBtn }: Props) => {
           </span>
         </div>
       </RightIcons>
+      <UserBox>
+        <UserInfo>
+          <img src="image_test.png" alt="test_img" />
+          <div className={"info_words"}>
+            <p><span>이름</span>님 어서오세요!</p>
+            {/* <p>email: </p> */}
+            <p>asdfaskla@naver.com</p>
+          </div>
+        </UserInfo>
+        <LogoutBtn><span>로그아웃</span></LogoutBtn>
+      </UserBox>
     </Wrapper>
   );
 };
