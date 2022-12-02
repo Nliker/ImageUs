@@ -44,11 +44,13 @@ export const PasswordCheckBox = styled.div`
 
 export const SubmitBox = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 40px;
 `;
 
-export const ErrorText = styled.p`
-    margin: 0 0 0 30px;
+export const ErrorText = styled.div`
+    span {
+      margin: 0 0 0 30px;
+    }
 `;
 
