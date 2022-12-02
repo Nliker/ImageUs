@@ -81,8 +81,8 @@ const config: Configuration = {
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
     proxy: {
-      '/api/': {
-        target: 'http://localhost:3095',
+      '/user': {
+        target: 'http://118.42.101.135:5000',
         changeOrigin: true,
       },
     },
