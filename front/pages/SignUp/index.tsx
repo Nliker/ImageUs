@@ -1,7 +1,9 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import useInput from '@hooks/useInput';
+import axios from 'axios';
 import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
+import { Navigate, redirect, useNavigate } from 'react-router-dom';
 import { ErrorText, InputBox, InputContainer, PasswordCheckBox, SubmitBox } from './styles';
 
 interface ErrorMessage {
@@ -27,6 +29,7 @@ const SignUp = () => {
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])",
   );
+  const navigate = useNavigate();
 
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
@@ -130,7 +133,19 @@ const SignUp = () => {
         return;
       }
       // axios 요청
-      console.log('axios 요청');
+      axios.post('user/sign-up', {
+        name,
+        email,
+        profile: 'test1',
+        password: pw 
+      }).then((res) => {
+        console.log(res);
+        alert('회원가입되었습니다.');
+        navigate('/login');
+        // return redirect('/login');
+      }).catch((err) => {
+        console.log(err.response.data.message);
+      });
     },
     [checkErrorValue, errorMessage],
   );
@@ -152,7 +167,7 @@ const SignUp = () => {
                     placeholder="이름을 입력하세요."
                   />
                 </div>
-                <ErrorText>{errorMessage.nameError}</ErrorText>
+                <ErrorText><span>{errorMessage.nameError}</span></ErrorText>
               </label>
             </InputBox>
             <InputBox>
@@ -167,7 +182,7 @@ const SignUp = () => {
                     placeholder="이메일을 입력하세요."
                   />
                 </div>
-                <ErrorText>{errorMessage.emailError}</ErrorText>
+                <ErrorText><span>{errorMessage.emailError}</span></ErrorText>
               </label>
             </InputBox>
             <InputBox>
@@ -182,7 +197,7 @@ const SignUp = () => {
                     placeholder="비밀번호를 입력하세요."
                   />
                 </div>
-                <ErrorText>{errorMessage.pwError}</ErrorText>
+                <ErrorText><span>{errorMessage.pwError}</span></ErrorText>
               </label>
               <label htmlFor="pw-check">
                 {/* <span>비밀번호 확인</span> */}
@@ -195,7 +210,7 @@ const SignUp = () => {
                     placeholder="비밀번호를 한 번 더 입력하세요."
                   />
                 </div>
-                <ErrorText>{errorMessage.pwCheck}</ErrorText>
+                <ErrorText><span>{errorMessage.pwCheck}</span></ErrorText>
               </label>
               <PasswordCheckBox>
                 <label htmlFor="show-pw" className="pwcheck-label" onClick={checkHandler}>
