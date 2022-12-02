@@ -17,7 +17,7 @@ import fetcher from '@utils/fetcher';
 // auth라는 swr api를 만들어서 페이지 진입할 때 올바른 접속인지 확인 필요
 
 const LogIn = () => {
-  const { mutate } = useSWR('login');
+  const { data, mutate } = useSWR('login');
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -30,6 +30,7 @@ const LogIn = () => {
   );
   const navigate = useNavigate();
 
+  console.log('login', data);
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
   }, []);
