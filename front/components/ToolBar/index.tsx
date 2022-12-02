@@ -4,7 +4,8 @@ import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import useSWR from 'swr';
 
 interface Props {
   handleRoomListBtn: (e: any) => void;
@@ -12,10 +13,21 @@ interface Props {
 
 const ToolBar = ({ handleRoomListBtn }: Props) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
+  const { mutate: logInMutate } = useSWR('login');
   const [showUserBox, setShowUserBox] = useState(false);
+  const navigate = useNavigate();
 
   const handleUserBox = useCallback(() => setShowUserBox((prev) => !prev), []);
 
+  const onClickLogOut = useCallback(() => {
+    const data = {
+      token: '',
+      login: false
+    };
+    logInMutate(data);
+    navigate('/');
+  }, []);
+  
   return (
     <Wrapper>
       <LeftIcon className='toolbar_icon'>
@@ -48,7 +60,7 @@ const ToolBar = ({ handleRoomListBtn }: Props) => {
           </div>
         </UserInfo>
         <LogoutBtn>
-          <NavLink to={'/'}>로그아웃</NavLink>
+          <span onClick={onClickLogOut}>로그아웃</span>
         </LogoutBtn>
       </UserBox>}
     </Wrapper>
