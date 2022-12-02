@@ -43,7 +43,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   // const onCloseImageModal = useCallback(() => {
   //   setShowImageModal(false);
   // }, []);
-  console.log(imageModalState);
+  // console.log(imageModalState);
   return (
     <Wrapper>
       <Container showModal={showModalState}>
