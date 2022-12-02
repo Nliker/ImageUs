@@ -9,10 +9,15 @@ import {
   PasswordInputContainer,
   SubmitBox,
 } from './styled';
-import { NavLink } from 'react-router-dom';
+import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
+
+// auth라는 swr api를 만들어서 페이지 진입할 때 올바른 접속인지 확인 필요
 
 const LogIn = () => {
+  const { mutate } = useSWR('login');
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -23,6 +28,7 @@ const LogIn = () => {
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])",
   );
+  const navigate = useNavigate();
 
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
@@ -47,7 +53,7 @@ const LogIn = () => {
     } else if (value?.length < 8) {
       setPwErrorMessage('비밀번호는 8글자 이상입니다.');
       return false;
-    } 
+    }
     setPwErrorMessage('');
     return true;
   }, []);
@@ -76,8 +82,25 @@ const LogIn = () => {
       } else if (!pwCheck) {
         alert('비밀번호를 다시 확인해주세요.');
       } else {
-        // axios.post();
-        // 페이지
+        axios
+          .post('/user/login', {
+            email: emailValue,
+            password: passwordValue,
+          })
+          .then((res) => {
+            const data = {
+              token: res.data,
+              login: true
+            }
+            mutate(data);
+            // 페이지 이동
+            // redirect('/main_page');
+            navigate('/main_page');
+          })
+          .catch((err) => {
+            // console.log(err);
+            alert(err.response.data.message);
+          });
       }
     },
     [emailValue, passwordValue],
