@@ -86,6 +86,9 @@ export const LogoutBtn = styled.div`
   justify-content: flex-end;
   align-items: end;
   height: 40px;
+  span {
+    cursor: pointer;
+  }
 `;
 
 // export const SideBarButton = styled.span`
