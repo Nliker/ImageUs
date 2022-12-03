@@ -131,7 +131,7 @@ const LogIn = () => {
               <label htmlFor="password-input">비밀번호를 입력하세요.</label>
               <InputDiv>
                 <input
-                  type="text"
+                  type="password"
                   id="password-input"
                   ref={passwordRef}
                   value={passwordValue}
