@@ -1,10 +1,13 @@
 import EachChannel from '@components/EachChannel';
+import getDataFetcher from '@utils/getDataFetcher';
 import React, { useCallback, useState } from 'react';
 import { IoMdArrowDropright } from 'react-icons/io';
+import useSWR from 'swr';
 import { Collapse, Subtitle } from './styles';
 
 const ChannelList = () => {
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
+  // const { data } = useSWR(`/user/${user_id}/roomlist`, getDataFetcher);
   // 임시 데이터
   const channelData = [
     {
