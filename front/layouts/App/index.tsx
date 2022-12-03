@@ -15,23 +15,22 @@ const App = () => {
   console.log('app', isLogIn);
   return (
     <Routes>
-      <Route
-        path="/"
-        element={ isLogIn ? <Navigate to="/main_page" replace /> : <Navigate to="/login" replace />}
-      />
-      <Route path="/login" element={<LogIn />} />
-      <Route path="/signup" element={<SignUp />} />
-      {/* 이하 비회원 접근 불가 페이지 */}
-      {/* <Route path="/*" element={<LogInCheck />} /> */}
-      {isLogIn && (
+      <Route path="/" element={isLogIn ? <Navigate to="/main_page" /> : <Navigate to="/login" />} />
+      {isLogIn ? (
         <>
+        {/* 이하 비회원 접근 불가 페이지 */}
           <Route path="/main_page" element={<MainPage />} />
           <Route path="/my_page/*" element={<MyPage />} />
           <Route path="/friend_list" element={<FriendList />} />
         </>
+      ) : (
+        <>
+          <Route path="/login" element={<LogIn />} />
+          <Route path="/signup" element={<SignUp />} />
+        </>
       )}
       {/* 추후에 404페이지 작성용 Route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
