@@ -12,12 +12,12 @@ import {
 import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useSWR from 'swr';
-import fetcher from '@utils/fetcher';
+import logInFetcher from '@utils/logInFetcher';
 
 // auth라는 swr api를 만들어서 페이지 진입할 때 올바른 접속인지 확인 필요
 
 const LogIn = () => {
-  const { data, mutate } = useSWR('login');
+  const { data, mutate } = useSWR('login', logInFetcher);
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -30,7 +30,7 @@ const LogIn = () => {
   );
   const navigate = useNavigate();
 
-  console.log('login', data);
+  // console.log('login', data);
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
   }, []);
@@ -89,11 +89,8 @@ const LogIn = () => {
             password: passwordValue,
           })
           .then((res) => {
-            const data = {
-              token: res.data,
-              login: true
-            }
-            mutate(data);
+            sessionStorage.setItem('token', res.data);
+            mutate();
             // 페이지 이동
             // redirect('/main_page');
             navigate('/main_page');
