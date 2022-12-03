@@ -6,6 +6,7 @@ import { RiListSettingsLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi';
 import { NavLink, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
+import logInFetcher from '@utils/logInFetcher';
 
 interface Props {
   handleRoomListBtn: (e: any) => void;
@@ -13,18 +14,15 @@ interface Props {
 
 const ToolBar = ({ handleRoomListBtn }: Props) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
-  const { mutate: logInMutate } = useSWR('login');
+  const { mutate } = useSWR('login', logInFetcher);
   const [showUserBox, setShowUserBox] = useState(false);
   const navigate = useNavigate();
 
   const handleUserBox = useCallback(() => setShowUserBox((prev) => !prev), []);
 
   const onClickLogOut = useCallback(() => {
-    const data = {
-      token: '',
-      login: false
-    };
-    logInMutate(data);
+    sessionStorage.clear();
+    // mutate();
     navigate('/');
   }, []);
   

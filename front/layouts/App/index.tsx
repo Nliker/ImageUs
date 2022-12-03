@@ -2,6 +2,7 @@ import React from 'react';
 import loadable from '@loadable/component';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import useSWR from 'swr';
+import logInFetcher from '@utils/logInFetcher';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -10,13 +11,13 @@ const MyPage = loadable(() => import('@pages/MyPage'));
 const FriendList = loadable(() => import('@pages/FriendsList'));
 
 const App = () => {
-  const { data: isLogIn } = useSWR('login');
+  const { data: isLogIn } = useSWR('login', logInFetcher);
   console.log('app', isLogIn);
   return (
     <Routes>
       <Route
         path="/"
-        element={isLogIn?.login === true ? <Navigate to="/main_page" replace /> : <Navigate to="/login" replace />}
+        element={ isLogIn ? <Navigate to="/main_page" replace /> : <Navigate to="/login" replace />}
       />
       <Route path="/login" element={<LogIn />} />
       <Route path="/signup" element={<SignUp />} />
