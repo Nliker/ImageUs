@@ -13,7 +13,8 @@ const ModalLayout = ({ children }: Props) => {
   const onClickCloseModal = () => {
     showModalMutate({
       upload: false,
-      image: false
+      image: false,
+      create_room: false
     });
   };
 
