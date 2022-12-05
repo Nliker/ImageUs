@@ -9,6 +9,7 @@ import UploadModal from '@components/UploadModal';
 import ContentImageModal from '@components/ContentImageModal';
 import useSWR from 'swr';
 import { useLocation } from 'react-router';
+import CreateRoomModal from '@components/CreateRoomModal';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -21,7 +22,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
   const currentUrl = useLocation();
   const isMobile = useMediaQuery({ maxWidth: 1023 });
-  console.log(currentUrl);
+  // console.log(currentUrl);
 
   const handleRoomListBtn = useCallback(() => {
     setshowSideBar((prev) => !prev);
@@ -59,6 +60,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </Container>
       {showModalState?.upload && <UploadModal />}
       {showModalState?.image && <ContentImageModal />}
+      {showModalState?.create_room && <CreateRoomModal />}
     </Wrapper>
   );
 };
