@@ -70,10 +70,11 @@ const dummyData = [
 
 const UploadModal = () => {
   const { mutate: uploadModalMutate } = useSWR('showUploadModal');
-  const { mutate: showModalMutate } = useSWR('showModalState');
+  const { data, mutate: showModalMutate } = useSWR('showModalState');
   
   const onClickCloseModal = () => {
     showModalMutate({
+      ...data,
       upload: false,
       image: false
     }, false);

@@ -13,12 +13,12 @@ import useSWR from 'swr';
 
 const BottomNavBar = () => {
   // const { mutate: uploadModalMutate } = useSWR('showUploadModal');
-  const { mutate: showModalMutate } = useSWR('showModalState');
+  const { data, mutate: showModalMutate } = useSWR('showModalState');
 
   const onClickUploadModal = () => {
     showModalMutate({
+      ...data,
       upload: true,
-      image: false
     }, false);
   }
   
