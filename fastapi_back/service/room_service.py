@@ -1,6 +1,6 @@
 class RoomService:
-    def __init__(self,room_dao,config):
-        self.config=config
+    def __init__(self,room_dao,settings):
+        self.settings=settings
         self.room_dao=room_dao
     '''
     roomdao
