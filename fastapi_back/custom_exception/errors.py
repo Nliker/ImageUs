@@ -15,7 +15,6 @@ class error(Exception):
     def __init__(self,detail="에러입니다.",status_code=STATUSCODE.HTTP_400):
         self.detail=detail
         self.status_code=status_code
-
     
     def token_existance_error(self):
         self.detail="토큰이 존재하지 않습니다."
@@ -44,6 +43,8 @@ class error(Exception):
     def user_existance_error(self):
         self.detail="유저가 존재하지 않습니다."
         self.status_code=STATUSCODE.HTTP_404
+
+        return self
     
     def credential_error(self):
         self.detail="비밀번호가 일치하지 않습니다."
@@ -66,6 +67,8 @@ class error(Exception):
     def file_missing_error(self):
         self.detail="파일이 존재하지 않습니다."
         self.status_code=STATUSCODE.HTTP_404
+
+        return self
     
     def image_existance_error(self):
         self.detail="이미지가 존재하지 않습니다."
