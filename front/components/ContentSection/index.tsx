@@ -34,7 +34,7 @@ const ContentSection = () => {
   const { mutate: imageInfoMutate } = useSWR('imageInfo');
   // 클릭한 이미지 정보
   const { mutate: imageModalMutate } = useSWR('imageModalState');
-  const { mutate: showModalMutate } = useSWR('showModalState');
+  const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
 
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const ContentSection = () => {
       clickImageName: image.name,
     }, false);
     showModalMutate({
-      upload: false,
+      ...showModalData,
       image: true
     }, false);
   };
