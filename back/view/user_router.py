@@ -79,6 +79,7 @@ def user_router(api,services):
         @user_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
                                 api_error.user_existance_error_model())
+        @login_required
         def get(self,user_id):
             '''
             id가 user_id인 유저의 정보를 불러옵니다.
@@ -89,6 +90,40 @@ def user_router(api,services):
             else:
                 return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
                                      api_error.user_existance_error()['status_code'])
+    
+    #input
+    #output
+    # {
+    #     'user_info':{
+    #         'id':1,
+    #         'name':'test1',
+    #         'email':'test1@test.com',
+    #         'profile':'test1user'
+    #     }
+    # }
+    get_my_response_model_parser=api_parser_module.get_parser(['Authorization'])
+    get_my_response_model=api_model.get_model('get_my_response_model',['user_info'])
+    
+    @user_namespace.route("/my")
+    class my(Resource):
+        @user_namespace.expect(get_my_response_model_parser,validate=False)
+        @user_namespace.response(200,'유저의 정보를 반환합니다.',get_my_response_model)
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
+        @login_required
+        def get(self):
+            '''
+            현재 로그인된 유저의 정보를 불러옵니다.
+            '''
+            current_user_id=g.user_id
+            user_info=user_service.get_user_info(current_user_id)
+            if user_info:
+                return make_response(jsonify({'user_info':user_info}),200)
+            else:
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
+    
     
     #input
     # {
