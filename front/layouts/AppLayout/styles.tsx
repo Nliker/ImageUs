@@ -7,11 +7,11 @@ export const Wrapper = styled.div`
   user-select: none;
 `;
 
-export const Container = styled.div<{ showModal: undefined | {upload: boolean, image: boolean}}>`
+export const Container = styled.div<{ showModal: undefined | {upload: boolean, image: boolean, create_room: boolean}}>`
   height: 100%;
   width: 100%;
   ${({ showModal }) =>
-    (showModal?.upload || showModal?.image) &&
+    (showModal?.upload || showModal?.image || showModal?.create_room) &&
     `
     position: fixed;
   `}
