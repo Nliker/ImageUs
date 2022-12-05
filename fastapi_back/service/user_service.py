@@ -56,6 +56,7 @@ class UserService:
         return authorized
     
     def generate_access_token(self,user_id):
+        print(self.settings)
         jwt_expire_time= timedelta(seconds=self.settings.JWT_EXPIRE_TIME)
         payload={
             'user_id':user_id,
