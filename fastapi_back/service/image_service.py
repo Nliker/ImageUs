@@ -3,8 +3,8 @@ import jwt
 
 
 class ImageService:
-    def __init__(self,image_dao,config):
-        self.config=config
+    def __init__(self,image_dao,settings):
+        self.settings=settings
         self.image_dao=image_dao
         
     '''
@@ -63,15 +63,15 @@ class ImageService:
     def upload_image(self,new_image):
         files=new_image['image']
         
-        upload={'image':(files.filename,files.read())}
+        upload={'image':(files.filename,files.file.read())}
         
         payload={
             'user_id':new_image['user_id'],
         }
         
-        image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
+        image_upload_token=jwt.encode(payload,self.settings.IMAGE_UPLOAD_KEY,'HS256')
 
-        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}{new_image['user_id']}",
+        res = requests.post(f"{self.settings.IMAGE_UPLOAD_URL}{new_image['user_id']}",
                 files=upload,
                 headers = {'Authorization':image_upload_token})
     
@@ -91,15 +91,15 @@ class ImageService:
     def upload_room_image(self,room_id,new_image):
         files=new_image['image']
         
-        upload={'image':(files.filename,files.read())}
+        upload={'image':(files.filename,files.file.read())}
 
         payload={
             'user_id':new_image['user_id'],
         }
         
-        image_upload_token=jwt.encode(payload,self.config['IMAGE_UPLOAD_KEY'],'HS256')
+        image_upload_token=jwt.encode(payload,self.settings.IMAGE_UPLOAD_KEY,'HS256')
 
-        res = requests.post(f"{self.config['IMAGE_UPLOAD_URL']}{new_image['user_id']}",
+        res = requests.post(f"{self.settings.IMAGE_UPLOAD_URL}{new_image['user_id']}",
                 files=upload,
                 headers = {'Authorization':image_upload_token})
         if res.status_code==200:
