@@ -35,7 +35,7 @@ const MemberList = () => {
         <span>Members</span>
       </Subtitle>
       <div>
-        {!memberCollapse &&
+        {memberCollapse &&
           memberData?.map((member) => {
             return <EachMember key={member.id} member={member} />;
           })}
