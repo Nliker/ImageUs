@@ -57,19 +57,26 @@ async def find_users_async(n):
         await asyncio.sleep(1)
     print(f'> 총 {n} 명 사용자 비동기 조회 완료!')
 
-async def get_delay(n):
-    print("딜레이 시작")
+async def get_delay(n,word):
+    print("딜레이 시작",word)
     await asyncio.sleep(n)
+    print(word)
     print("딜레이 끝")
     return 100
 async def say_hello():
     print("hello")
 
 async def process_async():
-    task1=asyncio.create_task(get_delay(3))
-    task2=asyncio.create_task(get_delay(5))
+
+    task1=asyncio.create_task(get_delay(3,'hello'))
+    task2=asyncio.create_task(get_delay(3,'im good'))
+        
     print("중간")
+    print("중간굿")
+    print("끝")
+    
     result=await task1
+
     print(result)
     await task2
     # task=asyncio.create_task(get_delay(3))
