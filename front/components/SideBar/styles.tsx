@@ -33,7 +33,7 @@ export const ContentTabs = styled.ul`
   position: relative;
   padding: 0;
   list-style: none;
-  min-height: 300px;
+  min-height: 450px;
   overflow: hidden;
 `;
 
@@ -61,7 +61,8 @@ export const Tab = styled.li`
     overflow-y: auto;
   }
   & .tab_content > article {
-    // transform: translateX(-100%);
+    height: 400px;
+    transform: translateX(-100%);
     // transition: all 0.5s ease-in-out;
   }
   & [type='radio']:checked ~ label {
@@ -74,7 +75,7 @@ export const Tab = styled.li`
   }
   & [type='radio']:checked + label + .tab_content > article {
     display: block;
-    // transform: translateX(0);
+    transform: translateX(0);
   }
 `;
 
