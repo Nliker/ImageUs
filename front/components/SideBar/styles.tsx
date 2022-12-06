@@ -29,8 +29,53 @@ export const ContentWrapper = styled.div`
   }
 `;
 
-export const ChannelListBox = styled.div`
-  // margin-bottom: 10px;
+export const ContentTabs = styled.ul`
+  position: relative;
+  padding: 0;
+  list-style: none;
+  min-height: 300px;
+  overflow: hidden;
+`;
+
+export const Tab = styled.li`
+  float: left;
+  padding: 10px 0;
+  & label {
+    position: relative;
+    background: #eee;
+    padding: 8px 20px;
+    border: 1px solid #ccc;
+  }
+  & [type='radio'] {
+    display: none;
+  }
+  & .tab_content {
+    position: absolute;
+    background: white;
+    top: 39px;
+    left: 0;
+    right: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+  }
+  & .tab_content > article {
+    // transform: translateX(-100%);
+    // transition: all 0.5s ease-in-out;
+  }
+  & [type='radio']:checked ~ label {
+    background: white;
+    border-bottom: 1px solid white;
+    z-index: 2;
+  }
+  & [type='radio']:checked + label + .tab_content {
+    z-index: 1;
+  }
+  & [type='radio']:checked + label + .tab_content > article {
+    display: block;
+    // transform: translateX(0);
+  }
 `;
 
 export const CreateRoomBtn = styled.button`
