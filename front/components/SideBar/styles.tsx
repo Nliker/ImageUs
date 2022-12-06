@@ -32,6 +32,7 @@ export const ContentWrapper = styled.div`
 export const ContentTabs = styled.ul`
   position: relative;
   padding: 0;
+  margin: 0;
   list-style: none;
   min-height: 450px;
   overflow: hidden;
@@ -39,12 +40,16 @@ export const ContentTabs = styled.ul`
 
 export const Tab = styled.li`
   float: left;
-  padding: 10px 0;
+  width: calc(100% / 2);
+  // padding: 10px 0;
   & label {
     position: relative;
-    background: #eee;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
     padding: 8px 20px;
     border: 1px solid #ccc;
+    background: #eee;
   }
   & [type='radio'] {
     display: none;
