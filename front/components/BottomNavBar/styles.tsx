@@ -45,6 +45,9 @@ export const MobileNavItem = styled.li`
     width: 25px;
     height: auto;
   }
+  h1 svg {
+    margin: 0 auto;
+  }
   &>a, &>.upload_btn {
     border-radius: 5px;
     &:hover {
