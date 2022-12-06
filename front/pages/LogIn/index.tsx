@@ -17,7 +17,9 @@ import logInFetcher from '@utils/logInFetcher';
 // auth라는 swr api를 만들어서 페이지 진입할 때 올바른 접속인지 확인 필요
 
 const LogIn = () => {
-  const { data, mutate } = useSWR('login', logInFetcher);
+  const { data, mutate } = useSWR('login', logInFetcher, {
+    dedupingInterval: 10000,
+  });
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -89,7 +91,7 @@ const LogIn = () => {
             password: passwordValue,
           })
           .then((res) => {
-            sessionStorage.setItem('token', res.data);
+            sessionStorage.setItem('token', res.data.access_token);
             mutate();
             // 페이지 이동
             // redirect('/main_page');
