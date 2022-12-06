@@ -18,7 +18,7 @@ const SideBar = ({ show }: SidebarProps) => {
       create_room: true,
     });
   }, [showModalData]);
-  console.log(showModalData);
+  // console.log(showModalData);
 
   return (
     <Wrapper show={show}>
