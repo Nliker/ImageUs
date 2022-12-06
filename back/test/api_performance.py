@@ -36,9 +36,9 @@ class TestUserClass(HttpUser):
     #         "password":"test1234"
     #     }
         
-    #     self.client.post("/user/login",
-    #         json.dumps(user_credential),
-    #         headers={"Content-Type" : "application/json"})
+        # self.client.post("/user/login",
+        #     json.dumps(user_credential),
+        #     headers={"Content-Type" : "application/json"})
         
     @task
     def post_image(self):
