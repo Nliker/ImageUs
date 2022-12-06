@@ -38,7 +38,7 @@ const ChannelList = () => {
         <span>Channels</span>
       </Subtitle>
       <div>
-        {!channelCollapse &&
+        {channelCollapse &&
           channelData?.map((channel) => {
             return <EachChannel key={channel.id} channel={channel} />;
           })}
