@@ -63,6 +63,7 @@ export const Tab = styled.li`
     padding: 0;
     box-sizing: border-box;
     border: 1px solid #ccc;
+    border-top: none;
     overflow-y: auto;
   }
   & .tab_content > article {
