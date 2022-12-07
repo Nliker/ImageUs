@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import loadable from '@loadable/component';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import useSWR from 'swr';
@@ -11,14 +11,26 @@ const MyPage = loadable(() => import('@pages/MyPage'));
 const FriendList = loadable(() => import('@pages/FriendsList'));
 
 const App = () => {
-  const { data: isLogIn } = useSWR('login', logInFetcher);
-  console.log('app', isLogIn);
-  return (
+  // 한 번만 요청하도록 옵션 추가
+  const { data: isLogIn, isValidating } = useSWR('/user/my', logInFetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  
+  // useEffect(() => {
+  //   console.log('test');
+  // }, []);
+  console.log('app', isLogIn, isValidating);
+  // const isLogIn = true;
+  return isValidating ? (
+    <div>로딩중...</div>
+  ) : (
     <Routes>
       <Route path="/" element={isLogIn ? <Navigate to="/main_page" /> : <Navigate to="/login" />} />
       {isLogIn ? (
         <>
-        {/* 이하 비회원 접근 불가 페이지 */}
+          {/* 이하 비회원 접근 불가 페이지 */}
           <Route path="/main_page" element={<MainPage />} />
           <Route path="/my_page/*" element={<MyPage />} />
           <Route path="/friend_list" element={<FriendList />} />
