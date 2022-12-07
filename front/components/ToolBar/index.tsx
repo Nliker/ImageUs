@@ -14,7 +14,6 @@ interface Props {
 
 const ToolBar = ({ handleRoomListBtn }: Props) => {
   const isMobile = useMediaQuery({ maxWidth: 1023 });
-  const { mutate } = useSWR('login', logInFetcher);
   const [showUserBox, setShowUserBox] = useState(false);
   const navigate = useNavigate();
 
