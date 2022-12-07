@@ -60,25 +60,54 @@ async def find_users_async(n):
 async def get_delay(n,word):
     print("딜레이 시작",word)
     await asyncio.sleep(n)
-    print(word)
-    print("딜레이 끝")
+    print(word) 
+    print("딜레이 끝",word)
     return 100
-async def say_hello():
-    print("hello")
+
+async def test_task(n):
+    print("이것은 task",n,"입니다.")
+async def say_hello(k):
+    task=asyncio.create_task(test_task(k))
+    print("굿",k)
+    
+    await task
+    print("hello",k)
+
+async def say_test(n,k):
+    for i in range(n):
+        print(i,k)
+        await say_hello(n)
+        print("이것은 입니다",n)
+        # task1=asyncio.create_task(say_hello(k))
+        # await task1
+        # await say_hello(k)
+
+async def view(n):
+    await say_test(n,n+100)
 
 async def process_async():
-
-    task1=asyncio.create_task(get_delay(3,'hello'))
-    task2=asyncio.create_task(get_delay(3,'im good'))
-        
-    print("중간")
-    print("중간굿")
-    print("끝")
-    
-    result=await task1
-
-    print(result)
+    task1=asyncio.create_task(view(5))
+    task2=asyncio.create_task(view(3))
+    task3=asyncio.create_task(view(1))
+    await task1
     await task2
+    await task3
+    # task1=asyncio.create_task(get_delay(2,'hello'))
+    # task2=asyncio.create_task(get_delay(2,'im good'))
+    # # print("중간")
+    # # print("중간굿")
+    # # print("끝")
+    # await asyncio.sleep(6)
+    # print("중간")
+    # print("중간굿")
+    # print("끝")
+    # result=await task1
+    # print(result)
+    # await task2
+    # task1=asyncio.create_task(say_test(10,'first'))
+    # task2=asyncio.create_task(say_test(5,'second'))
+    # await task1
+    # await task2
     # task=asyncio.create_task(get_delay(3))
     # result=await task
     # print("good")
@@ -95,4 +124,6 @@ async def process_async():
     # print(f'>>> 비동기 처리 총 소요 시간: {end - start}')
 
 if __name__ == '__main__':
+    print("======start======")
     asyncio.run(process_async())
+    print("gooood")
