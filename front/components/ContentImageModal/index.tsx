@@ -17,7 +17,7 @@ const ContentImageModal = () => {
   const { data: imageInfo, mutate: imageInfoMutate } = useSWR('imageInfo');
   const { data: imageModalState, mutate: imageModalMutate } = useSWR('imageModalState');
 
-  console.log(imageModalState);
+  // console.log(imageModalState);
   return (
     <ModalLayout>
       <ModalBoxContainer>
