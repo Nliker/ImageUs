@@ -9,10 +9,6 @@ import useSWR from 'swr';
 import { ContentWrappper, Wrappper } from './styles';
 
 const MainPage = () => {
-  const { data: isLogIn } = useSWR('login', logInFetcher);
-
-  console.log('main', isLogIn);
-
   return (
     <AppLayout>
       <Wrappper>
