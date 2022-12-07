@@ -11,15 +11,10 @@ import {
 } from './styled';
 import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import logInFetcher from '@utils/logInFetcher';
 
-// auth라는 swr api를 만들어서 페이지 진입할 때 올바른 접속인지 확인 필요
-
 const LogIn = () => {
-  const { data, mutate } = useSWR('login', logInFetcher, {
-    dedupingInterval: 10000,
-  });
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -72,7 +67,7 @@ const LogIn = () => {
     const inputValue = e.target.value;
     pwValidation(inputValue);
   }, []);
-
+  
   const onSubmitLoginInfo = useCallback(
     (e: { preventDefault: () => void }) => {
       e.preventDefault();
@@ -91,14 +86,14 @@ const LogIn = () => {
             password: passwordValue,
           })
           .then((res) => {
-            sessionStorage.setItem('token', res.data.access_token);
-            mutate();
+            sessionStorage.setItem('TOKEN', res.data.access_token);
+            sessionStorage.setItem('USER_ID', res.data.user_id);
+            mutate('/user/my');
             // 페이지 이동
-            // redirect('/main_page');
+            console.log('이동');
             navigate('/main_page');
           })
           .catch((err) => {
-            // console.log(err);
             alert(err.response.data.message);
           });
       }
