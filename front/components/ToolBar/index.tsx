@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi';
 import { NavLink, useNavigate } from 'react-router-dom';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import logInFetcher from '@utils/logInFetcher';
 
 interface Props {
@@ -21,7 +21,7 @@ const ToolBar = ({ handleRoomListBtn }: Props) => {
 
   const onClickLogOut = useCallback(() => {
     sessionStorage.clear();
-    // mutate();
+    mutate('/user/my');
     navigate('/');
   }, []);
   
