@@ -23,6 +23,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
 `;
 
 export const ContentWrapper = styled.div`
+  height: 100%;
   & > div {
     border-bottom: 1px solid rgb(237, 241, 245);
     padding: 9px 8px 8px 6px;
@@ -34,19 +35,21 @@ export const ContentTabs = styled.ul`
   padding: 0;
   margin: 0;
   list-style: none;
-  min-height: 450px;
+  height: 100%;
   overflow: hidden;
 `;
 
 export const Tab = styled.li`
   float: left;
   width: calc(100% / 2);
+  height: 40px;
   // padding: 10px 0;
   & label {
     position: relative;
     display: inline-block;
     box-sizing: border-box;
     width: 100%;
+    height: 100%;
     padding: 8px 20px;
     border: 1px solid #ccc;
     background: #eee;
@@ -56,18 +59,21 @@ export const Tab = styled.li`
   }
   & .tab_content {
     position: absolute;
-    background: white;
+    height: calc(100% - 40px);
     top: 39px;
     left: 0;
     right: 0;
     padding: 0;
+    background: white;
     box-sizing: border-box;
     border: 1px solid #ccc;
-    border-top: none;
+    // border-top: none;
     overflow-y: auto;
   }
   & .tab_content > article {
     height: 400px;
+    padding: 10px;
+    
     transform: translateX(-100%);
     // transition: all 0.5s ease-in-out;
   }
@@ -85,6 +91,12 @@ export const Tab = styled.li`
   }
 `;
 
+export const CreateRoomBox = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`
+
 export const CreateRoomBtn = styled.button`
   position: relative;
 
@@ -96,7 +108,7 @@ export const CreateRoomBtn = styled.button`
   outline: none;
   background-color: #f4f5f6;
   border-radius: 40px;
-  box-shadow: -6px -20px 35px #ffffff, -6px -10px 15px #ffffff, -20px 0px 30px #ffffff, 6px 20px 25px rgba(0, 0, 0, 0.2);
+  // box-shadow: -6px -20px 35px #ffffff, -6px -10px 15px #ffffff, -20px 0px 30px #ffffff, 6px 20px 25px rgba(0, 0, 0, 0.2);
   transition: 0.13s ease-in-out;
   cursor: pointer;
 

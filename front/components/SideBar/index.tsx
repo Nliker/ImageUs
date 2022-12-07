@@ -2,7 +2,7 @@ import ChannelList from '@components/ChannelList';
 import MemberList from '@components/MemberList';
 import React, { useCallback, useState } from 'react';
 import useSWR from 'swr';
-import { ContentTabs, ContentWrapper, CreateRoomBtn, Tab, Wrapper } from './styles';
+import { ContentTabs, ContentWrapper, CreateRoomBox, CreateRoomBtn, Tab, Wrapper } from './styles';
 
 interface SidebarProps {
   show: boolean;
@@ -40,7 +40,7 @@ const SideBar = ({ show }: SidebarProps) => {
               <article>
                 <ChannelList />
               </article>
-              {/* <div>
+              <CreateRoomBox>
                 <CreateRoomBtn onClick={onClickCreateRoomBtn}>
                   <div className="btn_content">
                     <div className="btn_icon">
@@ -48,7 +48,7 @@ const SideBar = ({ show }: SidebarProps) => {
                     </div>
                   </div>
                 </CreateRoomBtn>
-              </div> */}
+              </CreateRoomBox>
             </div>
           </Tab>
           <Tab>
