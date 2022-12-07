@@ -27,7 +27,7 @@ class TestUserClass(HttpUser):
     def login(self):
         user_credential={
             'email':'test1@test.com',
-            'password':'test'
+            'password':'test1'
         }
         
         self.client.post("/user/login",
