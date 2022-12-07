@@ -30,8 +30,8 @@ class UserService:
     delete_user_friend(user_id,delete_friend_user_id)->0 or 1
     '''
     
-    def is_email_exists(self,email):
-        user=self.user_dao.get_user_id_and_password(email)
+    async def is_email_exists(self,email):
+        user=await self.user_dao.get_user_id_and_password(email)
         #유저가 없다면 False,있으면 True
         if user:
             return True
@@ -41,6 +41,7 @@ class UserService:
     def create_new_user(self,new_user):
         password=new_user['password']
         new_user['hashed_password']=bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+        print(new_user['hashed_password'])
         new_user_id=self.user_dao.insert_user(new_user)
         return new_user_id
 
