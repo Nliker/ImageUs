@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-
 export const Wrapper = styled.div``;
 
 export const Container = styled.div`
@@ -147,16 +146,16 @@ export const ModalImageBox = styled.div`
   justify-content: center;
 `;
 
-export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
-  // 이미지에 따라 width 와 height를 동적으로 변환시켜 주어야 한다.
+export const ImageDiv = styled.div<{ image: HTMLImageElement | null}>`
+  // 이미지가 load 되고 난 뒤에 값들을 넣어준다.
   ${({ image }) => {
-    const ratio = image && 360 / image?.height;
+    console.log(image?.height, image, image?.width);
     return `
-    width: ${ratio && image?.width * ratio}px;
+    background-image: url(${image?.src});
+    width: ${ image && ((360 / image.height) * image.width).toFixed(3) }px;
     `;
   }};
   height: 360px;
-  background-image: url(image_test.png);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;

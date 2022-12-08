@@ -1,5 +1,4 @@
-import React, { useCallback, DragEvent, useState, useRef, useEffect } from 'react';
-import { debounce } from 'lodash';
+import React, { useCallback, DragEvent, useState, useEffect } from 'react';
 import {
   Background,
   ChannelListBox,
@@ -40,6 +39,7 @@ interface ChannelProps {
   check: boolean;
 }
 
+
 const dummyData = [
   {
     id: 1,
@@ -71,16 +71,10 @@ const dummyData = [
 const UploadModal = () => {
   const { mutate: uploadModalMutate } = useSWR('showUploadModal');
   const { data, mutate: showModalMutate } = useSWR('showModalState');
-  
-  const onClickCloseModal = () => {
-    showModalMutate({
-      ...data,
-      upload: false,
-      image: false
-    }, false);
-  };
   const [dragOver, setDragOver] = useState<boolean>(false);
+  const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
+  const [imageInfo, setImageInfo] = useState({ width: 0, height: 0 });
   const [uploadStep, setUploadStep] = useState<number>(0);
   // 백에서 정보를 받아서 check 키값을 추가해서 channelList 객체로 만든다.
   const [channelList, setChannelList] = useState<Array<ChannelProps>>(dummyData);
@@ -88,59 +82,60 @@ const UploadModal = () => {
 
   const headerName = ['사진 업로드', '채널 선택', '결과물'];
 
-  // const [currentModalWidth, setCurrentModalWidth] = useState<number | null>(null);
-  // const modalRef = useRef<HTMLDivElement>(null);
+  // 이미지가 로드되고 난 뒤에 넓이와 높이 값을 전달한다.
+  // 업로드 후에 이미지 브라우저 메모리 삭제
 
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return setImageData(tmpImageData);
+    }, 300);
+    return () => clearTimeout(debounce);
+  }, [tmpImageData]);
 
-  // 맨 처음 실행과 화면 리사이즈를 하거나 다음 버튼을 누를 때 handleResize 실행 
-  // const handleResize = debounce(() => {
-  //   if (!modalRef) return;
-  //   if (modalRef.current) {
-  //     console.log(modalRef.current.offsetWidth);
-  //     setCurrentModalWidth(modalRef.current.offsetWidth);
-  //   }
-  // }, 300);
-  
-  // useEffect(() => {
-  //   handleResize();
-  //   window.addEventListener('resize', handleResize);
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize);
-  //   }
-  // }, []);
+  const onClickCloseModal = () => {
+    showModalMutate(
+      {
+        ...data,
+        upload: false,
+        image: false,
+      },
+      false,
+    );
+  };
 
-  // const getContentOffsetWidth = useCallback(() => {
-
-  // }, []);
-
-  const onDropData = useCallback((e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const formData: any = new FormData();
-    if (e.dataTransfer.items) {
-      for (let i = 0; i < e.dataTransfer.items.length; i++) {
-        if (e.dataTransfer.items[i].kind === 'file') {
-          const file = e.dataTransfer.items[i].getAsFile();
-          console.log('... file[' + i + '].name = ' + file?.name);
-          formData.append('image', file);
+  const onDropData = useCallback(
+    (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const formData: any = new FormData();
+      if (e.dataTransfer.items) {
+        for (let i = 0; i < e.dataTransfer.items.length; i++) {
+          if (e.dataTransfer.items[i].kind === 'file') {
+            const file = e.dataTransfer.items[i].getAsFile();
+            console.log('... file[' + i + '].name = ' + file?.name);
+            formData.append('image', file);
+          }
+        }
+      } else {
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          console.log('... file[' + i + '].name = ' + e.dataTransfer.files[i].name);
+          formData.append('image', e.dataTransfer.files[i]);
         }
       }
-    } else {
-      for (let i = 0; i < e.dataTransfer.files.length; i++) {
-        console.log('... file[' + i + '].name = ' + e.dataTransfer.files[i].name);
-        formData.append('image', e.dataTransfer.files[i]);
-      }
-    }
-    setDragOver(false);
-    // 현재 폴더에 저장된 테스트 이미지로 적용
-    const image = new Image();
-    image.src = 'image_test.png';
-    if (image) setImageData(image);
+      setDragOver(false);
 
-    // 이미지 테스트
-    // for (const entries of formData.values()) {
-    //   console.log(entries);
-    // }
-  }, []);
+      // 이미지를 브라우저 메모리에 저장해서 미리보기를 보여준다.
+      // 이미지가 업로드 되면 그 때 revokeObjectURL(src)를 사용해서 메모리 누수를 방지한다.
+      // 이미지가 로드되고 난 뒤에 값을 태그에 전달한다. useEffect 활용
+
+      // setImageURLs(URL.createObjectURL(formData.get('image')));
+      const imageURLs = URL.createObjectURL(formData.get('image'));
+      const image = new Image();
+      image.src = imageURLs;
+
+      setTmpImageData(image);
+    },
+    [imageData],
+  );
 
   const onDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -206,6 +201,7 @@ const UploadModal = () => {
     [channelList, selectedChannels],
   );
 
+  // console.log(imageData);
   return (
     <Wrapper>
       <Background />
@@ -227,17 +223,17 @@ const UploadModal = () => {
                       <h1>결과물</h1> */}
                     </ModalTitle>
                     {uploadStep !== 0 && (
-                      <div className={"left_btn"} onClick={onClickPrevStep}>
+                      <div className={'left_btn'} onClick={onClickPrevStep}>
                         <button>이전</button>
                       </div>
                     )}
-                    <div className={"right_btn"} onClick={onClickNextStep}>
+                    <div className={'right_btn'} onClick={onClickNextStep}>
                       <button>다음</button>
                     </div>
                   </ModalHeader>
                 </ModalHeaderWrapper>
               </HeaderContainer>
-              <div className={"content_box"}>
+              <div className={'content_box'}>
                 {uploadStep === 0 && (
                   <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
                     <ImageDiv image={imageData}></ImageDiv>
@@ -265,10 +261,12 @@ const UploadModal = () => {
                   </ChannelListBox>
                 )}
                 {uploadStep === 2 && (
-                  <div className={"result_box"}>
+                  <div className={'result_box'}>
                     <ImageBox>
                       {/* <h2>업로드 사진</h2> */}
-                      <ImageDiv image={imageData}></ImageDiv>
+                      <ImageDiv
+                        image={imageData}
+                      ></ImageDiv>
                     </ImageBox>
                     <ListBox>
                       <div>
