@@ -84,26 +84,36 @@ async def say_test(n,k):
 
 async def view(n):
     await say_test(n,n+100)
-
+    
+async def say_n(n):
+    for i in range(n):
+        print(i)
+        
+async def sleep_test(n):
+    task=asyncio.create_task(say_n(n))
+    print("its_sleep_task")
+    await task
+    
 async def process_async():
-    task1=asyncio.create_task(view(5))
-    task2=asyncio.create_task(view(3))
-    task3=asyncio.create_task(view(1))
-    await task1
-    await task2
-    await task3
-    # task1=asyncio.create_task(get_delay(2,'hello'))
-    # task2=asyncio.create_task(get_delay(2,'im good'))
-    # # print("중간")
-    # # print("중간굿")
-    # # print("끝")
-    # await asyncio.sleep(6)
+    # task1=asyncio.create_task(view(5))
+    # task2=asyncio.create_task(view(3))
+    # task3=asyncio.create_task(view(1))
+    # await task1
+    # await task2
+    # await task3
+    task1=asyncio.create_task(get_delay(2,'hello'))
+    task2=asyncio.create_task(get_delay(2,'im good'))
     # print("중간")
     # print("중간굿")
     # print("끝")
-    # result=await task1
-    # print(result)
-    # await task2
+    # await asyncio.sleep(3)
+    await sleep_test(100)
+    print("중간")
+    print("중간굿")
+    print("끝")
+    result=await task1
+    print(result)
+    await task2
     # task1=asyncio.create_task(say_test(10,'first'))
     # task2=asyncio.create_task(say_test(5,'second'))
     # await task1
