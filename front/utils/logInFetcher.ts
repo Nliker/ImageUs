@@ -25,11 +25,12 @@ const logInFetcher = (url: string) => {
 };
 // 임시 로그인 Fetcher
 // const logInFetcher = () => {
-//     const hasToken = sessionStorage.getItem('token');
-//     if (hasToken) {
-//         return true;
-//     }
-//     return false;
+//     // const hasToken = sessionStorage.getItem('token');
+//     // if (hasToken) {
+//     //     return true;
+//     // }
+//     // return false;
+//     return true;
 // };
 
 export default logInFetcher;
