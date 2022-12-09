@@ -3,7 +3,7 @@ import getDataFetcher from '@utils/getUserRoomListFetcher';
 import React, { useCallback, useState } from 'react';
 import { IoMdArrowDropright } from 'react-icons/io';
 import useSWR from 'swr';
-import { Collapse, Subtitle } from './styles';
+import { Collapse, Container, Subtitle } from './styles';
 
 const ChannelList = () => {
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
@@ -30,7 +30,7 @@ const ChannelList = () => {
 
   const toggleChannelCollapse = useCallback(() => setChannelCollapse((prev) => !prev), []);
   return (
-    <>
+    <Container>
       <Subtitle onClick={toggleChannelCollapse}>
         <Collapse collapse={channelCollapse}>
           <IoMdArrowDropright />
@@ -43,7 +43,7 @@ const ChannelList = () => {
             return <EachChannel key={channel.id} channel={channel} />;
           })}
       </div>
-    </>
+    </Container>
   );
 };
 
