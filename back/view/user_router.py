@@ -10,7 +10,7 @@ from tool import ParserModule,ApiModel,ApiError
 
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
-def user_router(api,services):
+def user_router(api,services,config,es):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
@@ -19,6 +19,67 @@ def user_router(api,services):
     api_error=ApiError(user_namespace)
     api_model=ApiModel(user_namespace)
     api_parser_module=ParserModule()
+    
+    #input
+    #output
+    # {
+    #     'result':[
+    #         {
+    #             'id':2,
+    #             'email':'test1@test.com'
+    #         },
+    #         {
+    #             'id':3,
+    #             'email':'test3@test.com',
+    #         }
+    #     ]
+    # }
+    @user_namespace.route("/search")
+    class user_search(Resource):
+        def get(self):
+            query=request.args['email']
+            tokens=query.split(" ")
+            print(tokens)
+            not_allow_tokens=['',' ']
+            tokens=[token for token in tokens if token not in not_allow_tokens]
+            print(tokens)
+            
+            if(len(tokens)>=1):    
+                terms=[
+                    {
+                        'term':{
+                            "email":token 
+                        }
+                    } for token in tokens
+                ]
+                print(terms)
+                
+                payload={   
+                            "_source":  ["email","name"],
+                            "size":config['ELASTIC_MAX_SIZE'],
+                            "query": {
+                                "bool": {
+                                    "must":terms
+                                }
+                            },
+                            "sort":[
+                                {
+                                    "email.keyword":"asc",
+                                    "_score":{
+                                        "order":"desc"
+                                    }
+                                }
+                            ]
+                        }
+                resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
+                print(resp)
+                search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name']} for result in resp['hits']['hits']]
+                return make_response(jsonify({'result':search_result}),200)
+            else:
+                return make_response(jsonify({'result':[]}),200)
+
+
+
     #input
     # {
     #     'name':<str>,
