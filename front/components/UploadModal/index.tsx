@@ -21,6 +21,10 @@ import {
 import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import useSWR from 'swr';
+import getDataFetcher from '@utils/getUserRoomListFetcher';
+import getUserDataFetcher from '@utils/getUserRoomListFetcher';
+import getUserRoomListFetcher from '@utils/getUserRoomListFetcher';
+import { IRoomData } from '@typing/db';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
@@ -33,57 +37,70 @@ interface Props {
   onCloseModal: (e: any) => void;
 }
 
-interface ChannelProps {
+interface RoomDataType {
   id: number;
-  name: string;
+  title: string;
   check: boolean;
 }
 
 
-const dummyData = [
-  {
-    id: 1,
-    name: '채널1',
-    check: false,
-  },
-  {
-    id: 2,
-    name: '채널2',
-    check: false,
-  },
-  {
-    id: 3,
-    name: '채널3',
-    check: false,
-  },
-  {
-    id: 4,
-    name: '채널4',
-    check: false,
-  },
-  {
-    id: 5,
-    name: '채널5',
-    check: false,
-  },
-];
+// const dummyData = [
+//   {
+//     id: 1,
+//     name: '채널1',
+//     check: false,
+//   },
+//   {
+//     id: 2,
+//     name: '채널2',
+//     check: false,
+//   },
+//   {
+//     id: 3,
+//     name: '채널3',
+//     check: false,
+//   },
+//   {
+//     id: 4,
+//     name: '채널4',
+//     check: false,
+//   },
+//   {
+//     id: 5,
+//     name: '채널5',
+//     check: false,
+//   },
+// ];
 
 const UploadModal = () => {
-  const { mutate: uploadModalMutate } = useSWR('showUploadModal');
+  // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
+  const user_id = sessionStorage.getItem('USER_ID');
+  const { data: roomList } = useSWR(`/user/${user_id}/roomlist`, getUserRoomListFetcher,{
+    dedupingInterval: 4000
+  });
+  const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
+
   const { data, mutate: showModalMutate } = useSWR('showModalState');
+  const [uploadStep, setUploadStep] = useState<number>(0);
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
-  const [imageInfo, setImageInfo] = useState({ width: 0, height: 0 });
-  const [uploadStep, setUploadStep] = useState<number>(0);
-  // 백에서 정보를 받아서 check 키값을 추가해서 channelList 객체로 만든다.
-  const [channelList, setChannelList] = useState<Array<ChannelProps>>(dummyData);
-  const [selectedChannels, setSelectedChannels] = useState<Array<string>>([]);
 
   const headerName = ['사진 업로드', '채널 선택', '결과물'];
 
   // 이미지가 로드되고 난 뒤에 넓이와 높이 값을 전달한다.
   // 업로드 후에 이미지 브라우저 메모리 삭제
+
+  useEffect(() => {
+    if (!roomList) return;
+    const tmpRoomList = roomList.map((data: IRoomData) => {
+      return {
+        ...data,
+        check: false
+      }
+    });
+    setSelectedRooms([...tmpRoomList]);
+  }, [roomList])
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -165,40 +182,37 @@ const UploadModal = () => {
     });
   }, []);
 
-  const checkChannelItem = (id: number) => {
-    const newChannelList = channelList.map((channelItem) => {
-      if (channelItem.id === id) {
-        // channelItem.check = !channelItem.check;
-        // 불변성을 유지하기 위해서 아래처럼 새로운 변수에 값을 넣어서 리턴해야 한다.
-        // 그렇지 않고 위와 같이 쓰면 원래 state의 값이 변경된다. 객체의 참초값을 쓰게 됨으로
-        const newChannelItem = { ...channelItem, check: !channelItem.check };
-        return newChannelItem;
-      }
-      return channelItem;
-    });
-    setChannelList([...newChannelList]);
-  };
+  // const checkRoomItem = (id: number) => {
+  //   const newRoomList = roomList.map((roomData: IRoomData) => {
+  //     if (roomData.id === id) {
+  //       // 불변성을 유지하기 위해서 아래처럼 새로운 변수에 값을 넣어서 리턴해야 한다.
+  //       // 그렇지 않고 위와 같이 쓰면 원래 state의 값이 변경된다. 객체의 참초값을 쓰게 됨으로
+  //       const newRoomItem = { ...roomData, check: !roomData.check };
+  //       return newRoomItem;
+  //     }
+  //     return roomData;
+  //   });
+  //   setChannelList([...newRoomList]);
+  // };
 
-  const inputChannel = useCallback(
-    (data: ChannelProps) => () => {
-      // console.log(data, channelList);
+  const inputRoom = useCallback(
+    (data: RoomDataType) => () => {
       if (data.check) {
-        checkChannelItem(data.id);
-        setSelectedChannels((prev) => {
-          // channel명이 아니라 id로 고유한 값으로 필터링해야함
-          const newData = prev.filter((channel) => {
-            return channel !== data.name;
+        // checkRoomItem(data.id);
+        setSelectedRooms((prev) => {
+          const newData = prev.filter((room) => {
+            return room.id !== data.id;
           });
           return [...newData];
         });
       } else {
-        checkChannelItem(data.id);
-        setSelectedChannels((prev) => {
-          return [...prev, data?.name];
+        // checkRoomItem(data.id);
+        setSelectedRooms((prev) => {
+          return [...prev, data];
         });
       }
     },
-    [channelList, selectedChannels],
+    [roomList, selectedRooms],
   );
 
   // console.log(imageData);
@@ -243,19 +257,19 @@ const UploadModal = () => {
                 {uploadStep === 1 && (
                   <ChannelListBox>
                     <ul>
-                      {channelList.map((data, i) => {
+                      {roomList  && roomList.map((data: RoomDataType) => {
                         return (
-                          <li onClick={inputChannel(data)} key={i + data.name}>
+                          <li onClick={inputRoom(data)} key={data.id}>
                             {data.check ? <AiFillCheckCircle /> : <AiOutlineCheckCircle />}
-                            <span>{data.name}</span>
+                            <span>{data.title}</span>
                           </li>
                         );
                       })}
                     </ul>
                     <div>
                       <p>현재 선택한 방들</p>
-                      {selectedChannels.map((channel, i) => {
-                        return <span key={i + channel}>{channel}</span>;
+                      {selectedRooms.map((room) => {
+                        return <span key={room.id}>{room.title}</span>;
                       })}
                     </div>
                   </ChannelListBox>
@@ -272,8 +286,8 @@ const UploadModal = () => {
                       <div>
                         <h2>업로드할 채널목록</h2>
                         <ul>
-                          {selectedChannels.map((channel, i) => {
-                            return <li key={i + channel}>{channel}</li>;
+                          {selectedRooms.map((room) => {
+                            return <li key={room.id}>{room.title}</li>;
                           })}
                         </ul>
                       </div>
