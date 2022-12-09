@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div<{ show: boolean }>`
-  width: 215px;
+  width: 300px;
   height: calc(100vh - 85px);
   box-sizing: border-box;
   position: fixed;
@@ -11,7 +11,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   user-select: none;
 
   transition: transform 0.5s;
-  transform: translateX(-215px);
+  transform: translateX(-300px);
 
   ${({ show }) =>
     show &&
@@ -41,9 +41,10 @@ export const ContentTabs = styled.ul`
 
 export const Tab = styled.li`
   float: left;
+
   width: calc(100% / 2);
   height: 40px;
-  // padding: 10px 0;
+
   & label {
     position: relative;
     display: inline-block;
@@ -54,9 +55,11 @@ export const Tab = styled.li`
     border: 1px solid #ccc;
     background: #eee;
   }
+
   & [type='radio'] {
     display: none;
   }
+
   & .tab_content {
     position: absolute;
     height: calc(100% - 40px);
@@ -64,60 +67,53 @@ export const Tab = styled.li`
     left: 0;
     right: 0;
     padding: 0;
+
     background: white;
+    overflow-y: auto;
     box-sizing: border-box;
     border: 1px solid #ccc;
-    // border-top: none;
-    overflow-y: auto;
   }
-  & .tab_content > article {
+
+  & .tab_content > .tab_content_box {
     height: 400px;
     padding: 10px;
 
     transform: translateX(-100%);
     // transition: all 0.5s ease-in-out;
   }
+
   & [type='radio']:checked ~ label {
     background: white;
     border-bottom: 1px solid white;
     z-index: 2;
   }
+
   & [type='radio']:checked + label + .tab_content {
     z-index: 1;
   }
-  & [type='radio']:checked + label + .tab_content > article {
+
+  & [type='radio']:checked + label + .tab_content > .tab_content_box {
     display: block;
     transform: translateX(0);
   }
 `;
 
-export const CreateRoomBox = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+export const CreateBtnBox = styled.div`
+  padding: 1rem;
+  text-align: center;
 `;
 
-// export const ModalWrapper = styled.div`
-//   position: fixed;
-//   top: 0;
-//   right: 0;
-//   left: 0;
-//   bottom: 0;
-//   z-index: 1000;
-// `;
-
-export const CreateRoomBtn = styled.button`
+export const CreateBtn = styled.button`
   position: relative;
 
   padding: 0;
-  width: 150px;
+  width: 80px;
   height: 50px;
 
   border: 4px solid #888888;
   outline: none;
   background-color: #f4f5f6;
   border-radius: 40px;
-  // box-shadow: -6px -20px 35px #ffffff, -6px -10px 15px #ffffff, -20px 0px 30px #ffffff, 6px 20px 25px rgba(0, 0, 0, 0.2);
   transition: 0.13s ease-in-out;
   cursor: pointer;
 
@@ -133,17 +129,12 @@ export const CreateRoomBtn = styled.button`
   }
   .btn_content {
     position: relative;
-    // display: grid;
 
-    // padding: 20px;
     width: 100%;
     height: 100%;
 
-    // grid-template-columns: 1fr 1fr 1fr 1fr;
-    // grid-template-rows: 1fr 1fr;
-
-    box-shadow: inset 0px -8px 0px #dddddd, 0px -8px 0px #f4f5f6;
     border-radius: 40px;
+    box-shadow: inset 0px -8px 0px #dddddd, 0px -8px 0px #f4f5f6;
     transition: 0.13s ease-in-out;
 
     z-index: 1;
@@ -157,21 +148,18 @@ export const CreateRoomBtn = styled.button`
     grid-column: 4;
     align-self: start;
     justify-self: end;
-    // width: 32px;
     height: 32px;
     transition: 0.13s ease-in-out;
   }
   .btn_text {
     position: relative;
 
-    transform: translate3d(0px, -4px, 0px);
-    margin: 0;
-    align-self: end;
     grid-column: 1/5;
     grid-row: 2;
-
+    align-self: end;
+    margin: 0;
     text-align: center;
-    // font-size: 32px;
+
     background-color: #888888;
     color: transparent;
     text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
@@ -179,5 +167,6 @@ export const CreateRoomBtn = styled.button`
     -moz-background-clip: text;
     background-clip: text;
     transition: 0.13s ease-in-out;
+    transform: translate3d(0px, -4px, 0px);
   }
 `;

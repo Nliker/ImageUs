@@ -1,14 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
-import { Container, ContentWrapper, Wrapper } from './styles';
+import { Container, ContentWrapper, RoomModalWrapper, Wrapper } from './styles';
 import TopNavBar from '@components/TopNavBar';
 import BottomNavBar from '@components/BottomNavBar';
 import { useMediaQuery } from 'react-responsive';
 import UploadModal from '@components/UploadModal';
 import ContentImageModal from '@components/ContentImageModal';
 import useSWR from 'swr';
-import { useLocation } from 'react-router';
+import { Route, useLocation } from 'react-router';
 import CreateRoomModal from '@components/CreateRoomModal';
 
 interface AppLayoutProps {
@@ -60,7 +60,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </Container>
       {showModalState?.upload && <UploadModal />}
       {showModalState?.image && <ContentImageModal />}
-      {showModalState?.create_room && <CreateRoomModal />}
+      {showModalState?.create_room && (
+        <RoomModalWrapper>
+          <CreateRoomModal />
+        </RoomModalWrapper>
+      )}
     </Wrapper>
   );
 };

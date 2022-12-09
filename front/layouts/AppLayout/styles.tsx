@@ -29,6 +29,14 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
     show &&
     `
   transition: transform 0.5s;
-  transform: translate3d(215px, 0, 0);
+  transform: translate3d(300px, 0, 0);
   `}
 `;
+
+export const RoomModalWrapper = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+` 

@@ -3,7 +3,8 @@ import CreateRoomModal from '@components/CreateRoomModal';
 import MemberList from '@components/MemberList';
 import React, { useCallback, useState } from 'react';
 import useSWR from 'swr';
-import { ContentTabs, ContentWrapper, CreateRoomBox, CreateRoomBtn, Tab, Wrapper } from './styles';
+import ActionButton from './ActionButton';
+import { ContentTabs, ContentWrapper, CreateBtn, CreateBtnBox, Tab, Wrapper } from './styles';
 
 interface SidebarProps {
   show: boolean;
@@ -37,43 +38,24 @@ const SideBar = ({ show }: SidebarProps) => {
             <input type="radio" id="tab-1" name="tab-group-1" defaultChecked />
             <label htmlFor="tab-1">방 목록</label>
             <div className="tab_content">
-              {/* <h2>방 목록</h2> */}
-              <article>
+              <div className="tab_content_box">
+                <CreateBtnBox>
+                  <ActionButton onClickBtn={onClickCreateRoomBtn} btnTitle={'생성하기'} />
+                </CreateBtnBox>
                 <ChannelList />
-              </article>
-              <CreateRoomBox>
-                {/* {showModalState?.create_room && (
-                  <ModalWrapper>
-                    <CreateRoomModal />
-                  </ModalWrapper>
-                )} */}
-                <CreateRoomBtn onClick={onClickCreateRoomBtn}>
-                  <div className="btn_content">
-                    <div className="btn_icon">
-                      <p className="btn_text">방 생성하기</p>
-                    </div>
-                  </div>
-                </CreateRoomBtn>
-              </CreateRoomBox>
+              </div>
             </div>
           </Tab>
           <Tab>
             <input type="radio" id="tab-2" name="tab-group-1" />
-            <label htmlFor="tab-2">친구목록</label>
+            <label htmlFor="tab-2">멤버목록</label>
             <div className="tab_content">
-              {/* <h2>현재 방에 있는 사람 목록</h2> */}
-              <article>
+              <div className="tab_content_box">
+                <CreateBtnBox>
+                  <ActionButton btnTitle={'초대하기'} />
+                </CreateBtnBox>
                 <MemberList />
-              </article>
-              {/* <div className='tab_content'>
-                <CreateRoomBtn onClick={onClickCreateRoomBtn}>
-                  <div className="btn_content">
-                    <div className="btn_icon">
-                      <p className="btn_text">방 생성하기</p>
-                    </div>
-                  </div>
-                </CreateRoomBtn>
-              </div> */}
+              </div>
             </div>
           </Tab>
         </ContentTabs>

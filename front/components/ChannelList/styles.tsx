@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
 
+export const Container = styled.div`
+`;
+
 export const Subtitle = styled.div`
   display: inline-flex;
   align-items: center;
