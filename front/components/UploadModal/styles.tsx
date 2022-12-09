@@ -146,13 +146,13 @@ export const ModalImageBox = styled.div`
   justify-content: center;
 `;
 
-export const ImageDiv = styled.div<{ image: HTMLImageElement | null}>`
+export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지가 load 되고 난 뒤에 값들을 넣어준다.
   ${({ image }) => {
     console.log(image?.height, image, image?.width);
     return `
     background-image: url(${image?.src});
-    width: ${ image && ((360 / image.height) * image.width).toFixed(3) }px;
+    width: ${image && ((360 / image.height) * image.width).toFixed(3)}px;
     `;
   }};
   height: 360px;
@@ -195,12 +195,20 @@ export const ImageBox = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  // width: calc(100% - 340px);
-  text-align: center;
+
+  width: calc(100% / 2);
+  overflow: hidden;
 `;
 
 export const ListBox = styled.div`
-  // width: 340px;
   display: flex;
   justify-content: center;
+
+  width: calc(100% / 2);
+  & > div {
+    width: 100%;
+  }
+  h2 {
+    text-align: center;
+  }
 `;
