@@ -1,5 +1,5 @@
 import EachChannel from '@components/EachChannel';
-import getDataFetcher from '@utils/getDataFetcher';
+import getDataFetcher from '@utils/getUserRoomListFetcher';
 import React, { useCallback, useState } from 'react';
 import { IoMdArrowDropright } from 'react-icons/io';
 import useSWR from 'swr';
