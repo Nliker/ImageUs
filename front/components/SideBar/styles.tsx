@@ -73,7 +73,7 @@ export const Tab = styled.li`
   & .tab_content > article {
     height: 400px;
     padding: 10px;
-    
+
     transform: translateX(-100%);
     // transition: all 0.5s ease-in-out;
   }
@@ -95,7 +95,16 @@ export const CreateRoomBox = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 20px;
-`
+`;
+
+// export const ModalWrapper = styled.div`
+//   position: fixed;
+//   top: 0;
+//   right: 0;
+//   left: 0;
+//   bottom: 0;
+//   z-index: 1000;
+// `;
 
 export const CreateRoomBtn = styled.button`
   position: relative;
