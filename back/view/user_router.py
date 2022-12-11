@@ -87,6 +87,26 @@ def user_router(api,services,config,es):
 
 
 
+    @user_namespace.route("/email/<str:email>/auth")
+    class email_auth(Resource):
+        def post(self,email):
+            if user_service.is_email_exists(email):
+                return make_response(jsonify({'message':api_error.email_existance_sign_up_error()['message']}),
+                                     api_error.email_existance_sign_up_error()['status_code'])
+            
+            auth_password=user_service.generate_auth_password()
+
+            if user_service.get_email_auth_info(email):
+                result=user_service.initiate_email_auth(email,auth_password)
+
+            else:
+                result=user_service.create_new_email_auth(email,auth_password)
+
+            send_result=user_service.send_email_auth_password(email,auth_password)
+            
+            return make_response(jsonify({'result':'send mail success'}))
+            
+
     #input
     # {
     #     'name':<str>,
@@ -127,8 +147,9 @@ def user_router(api,services,config,es):
             new_user_id=user_service.create_new_user(new_user)
             user_info=user_service.get_user_info(new_user_id)
             
-            return make_response(jsonify({'user_info':user_info}),200)
+            return make_response(f"인증 메일을 전송하였습니다.")
 
+        
     #input
     #output
     # {
