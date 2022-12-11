@@ -1,6 +1,6 @@
 import AppLayout from '@layouts/AppLayout';
 import React from 'react';
-import { ContentBox, ContentList, Header, Wrapper } from './styles';
+import { ContentBox, ContentList, Header, SearchBox, Wrapper } from './styles';
 
 const dummyFreindList = [
   {
@@ -43,10 +43,19 @@ const FriendList = () => {
       <Wrapper>
         <Header>
           <div>
-            <h1>Follower List</h1>
+            <h1>친구 관리</h1>
           </div>
         </Header>
         <ContentBox>
+          <SearchBox>
+            <form method='get'>
+              <div className='search_input'>
+                <label htmlFor="searchFriend">Search</label>
+                <input type="text" id='searchFriend' name='search' autoComplete='off' placeholder='검색할 유저의 이메일을 입려하세요..'/>
+              </div>
+              <div className='search_btn'><button type='submit' >검색</button></div>
+            </form>
+          </SearchBox>
           <ContentList>
             <div>
               <table>
