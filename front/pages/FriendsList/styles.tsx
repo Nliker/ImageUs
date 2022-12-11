@@ -102,3 +102,7 @@ export const SearchBox = styled.div`
     }
   }
 `;
+
+export const SearchResult = styled.div`
+
+`;
