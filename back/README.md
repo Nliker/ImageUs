@@ -13,6 +13,8 @@
 ### 5. 선택적 사진 공유
 ### 6. 앨범 단위(추후 완성)
 ### 7. 방장이 방을 나갈시에 방장 바꾸기
+### 8. 친구 검색 서버 구축
+### 9. 이미지 서버 구축
 
 추가기능
 ### 0.이미지 삭제 시 14일 유효기간 기능
@@ -20,7 +22,7 @@
 ### 2.유저 프로파일 이미지 업로드
 ### 3.이미지 서버 구축
 ### 4.소셜로그인
-### 5.친구 검색 서버 구축
+### 5.이메일 인증
 
 ## ERD
 ## database 
@@ -95,13 +97,24 @@ CREATE TABLE `images_room_list` (
   `room_id` int NOT NULL,
   `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT, 
-  `public' int not null default 0,
+  `public` int not null default 0,
   CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`,`room_id`),
   INDEX `room_id` (`room_id`)
 )
 =>이미지의 방 조회(pri가 image_id하나에도 적용되기 때문에 인덱스 추가 x)
 =>방에서 이미지 조회시 인덱스 따로 필요
+
+7. email_auth
+CREATE TABLE `images_room_list` (
+  `email` int NOT NULL,
+  `auth_password` int NOT NULL,
+  `activated` int NOT NULL,
+  `deleted` boolean not null DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT, 
+  CURRENT_TIMESTAMP,
+  PRIMARY KEY (`email`)
+)
 
 <!-- 아래는 추후 완성 기능 -->
 <!-- 7. albums

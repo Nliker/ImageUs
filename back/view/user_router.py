@@ -97,14 +97,14 @@ def user_router(api,services,config,es):
             auth_password=user_service.generate_auth_password()
 
             if user_service.get_email_auth_info(email):
-                result=user_service.initiate_email_auth(email,auth_password)
+                user_service.initiate_email_auth(email,auth_password)
 
             else:
-                result=user_service.create_new_email_auth(email,auth_password)
+                user_service.create_new_email_auth(email,auth_password)
 
             send_result=user_service.send_email_auth_password(email,auth_password)
-            
-            return make_response(jsonify({'result':'send mail success'}))
+
+            return make_response(jsonify({'result':f'{send_result} send mail success'}))
             
 
     #input
