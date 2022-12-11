@@ -47,35 +47,61 @@
 # update_list=sorted(image_roomlist.union(update_roomlist))
 # print(update_list)
 
-import time
-import asyncio
+# import time
+# import asyncio
 
-async def find_users_async(n):
+# async def find_users_async(n):
     
-    for i in range(1, n + 1):
-        print(f'{n}명 중 {i}번 째 사용자 조회 중 ...')
-        await asyncio.sleep(1)
-    print(f'> 총 {n} 명 사용자 비동기 조회 완료!')
+#     for i in range(1, n + 1):
+#         print(f'{n}명 중 {i}번 째 사용자 조회 중 ...')
+#         await asyncio.sleep(1)
+#     print(f'> 총 {n} 명 사용자 비동기 조회 완료!')
     
-async def say_hello_delay(n):
-    print("hello",n)
-    await asyncio.sleep(n)
-async def task1(n):
-    task=asyncio.create_task(say_hello_delay(n))
-    await task
-    return n
-async def process_async():
-    start = time.time()
-    # await asyncio.wait([
-    #     find_users_async(3),
-    #     find_users_async(2),
-    #     find_users_async(1),
-    # ])
-    await task1(5)
-    print("giid")
-    task1(3)
-    end = time.time()
-    print(f'>>> 비동기 처리 총 소요 시간: {end - start}')
+# async def say_hello_delay(n):
+#     print("hello",n)
+#     await asyncio.sleep(n)
+# async def task1(n):
+#     task=asyncio.create_task(say_hello_delay(n))
+#     await task
+#     return n
+# async def process_async():
+#     start = time.time()
+#     # await asyncio.wait([
+#     #     find_users_async(3),
+#     #     find_users_async(2),
+#     #     find_users_async(1),
+#     # ])
+#     await task1(5)
+#     print("giid")
+#     task1(3)
+#     end = time.time()
+#     print(f'>>> 비동기 처리 총 소요 시간: {end - start}')
 
-if __name__ == '__main__':
-    asyncio.run(process_async())
+# if __name__ == '__main__':
+#     asyncio.run(process_async())
+import config
+import smtplib
+from email.mime.text import MIMEText
+
+sender=config.GOOGLE_MAIL_USER
+password=config.GOOGLE_MAIL_PASSWORD
+
+receiver='yon1997@naver.com'
+
+smtp=smtplib.SMTP('smtp.gmail.com',587)
+smtp.ehlo()
+smtp.starttls()
+smtp.login(sender,password)
+try:
+    msg=MIMEText("it's test email")
+    msg['Subject']='test_email_send'
+    msg['From']=sender
+    msg['To']=receiver
+    smtp.sendmail(sender,receiver,msg.as_string())
+except Exception as e:
+    print('error',e)
+finally:
+    if smtp is not None:
+        smtp.quit()
+    
+    
