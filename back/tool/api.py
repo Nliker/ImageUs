@@ -14,6 +14,11 @@ class ParserModule:
                             location='files',
                             help='imagefile',
                             required=False)
+        if 'email' in args:
+            parser.add_argument('email',type=str,
+                                location='args',
+                                help='email_str',
+                                required=False)
         return parser
     
 
@@ -113,6 +118,12 @@ class ApiModel:
             description='str_access_token',
             required=False
     )
+    
+    search_user_info={
+                    'id':fields.Integer,
+                    'email':fields.String,
+                    'name':fields.String
+    }
     
     user_info={
                     'id':fields.Integer,
@@ -342,6 +353,30 @@ class ApiModel:
                 'delete_list':2
             },
             required=False)
+            
+        if 'user_search_result' in args:
+            payload['result']=fields.List(
+                fields.Nested(self.api.model("user_search_result",
+                self.search_user_info)),
+                default=[
+                    {
+                        'id':3,
+                        'name':'testuser3',
+                        'email':'testuser3@test.com'
+                    },
+                    {
+                        'id':5,
+                        'name':'testuser5',
+                        'email':'testuser5@test.com'
+                    },
+                    {
+                        'id':6,
+                        'name':'testuser6',
+                        'email':'testuser6@test.com'
+                    }
+                ],
+                required=False
+            )
                         
         api_model=self.api.model(modelname,payload)
         
@@ -388,7 +423,12 @@ class ApiError:
         'room_user_error':{
             'message':"방의 유저가 아닙니다.",
             'status_code':403
-        }   
+        },
+        'user_search_no_arg_error':{
+            'message':"email성분이 존재하지 않습니다.",
+            'status_code':400
+        }
+        
     }
     
     def __init__(self,api):
@@ -454,4 +494,10 @@ class ApiError:
         return self.errors['room_user_error']
     
     def room_user_error_model(self):
-        return self.api.model('room_user_error_model',{'message':fields.String(self.errors['room_user_error']['message'])})
+        return self.api.model('room_user_error_model',{'message':fields.String(self.errors['room_user_error']['message'])})    
+    
+    def user_search_no_arg_error(self):
+        return self.errors['user_search_no_arg_error']
+
+    def user_search_no_arg_error_model(self):
+        return self.api.model('user_search_no_arg_model',{'message':fields.String(self.errors['user_search_no_arg_error']['message'])}) 

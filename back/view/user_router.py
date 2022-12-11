@@ -34,15 +34,22 @@ def user_router(api,services,config,es):
     #         }
     #     ]
     # }
+    
+    get_user_search_parser=api_parser_module.get_parser(['email'])
+    get_user_search_response_model=api_model.get_model("get_user_search_response_model",['user_search_result'])
     @user_namespace.route("/search")
     class user_search(Resource):
+        @user_namespace.expect(get_user_search_parser,validate=False)
+        @user_namespace.response(200,'검색한 유저의 정보를 반환합니다.',get_user_search_response_model)
+        @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
+                                 '이메일이 이미 등록 되어있어 실패하였습니다.',
+                                 api_error.user_search_no_arg_error_model())
         def get(self):
             query=request.args['email']
+            print(query)
             tokens=query.split(" ")
-            print(tokens)
             not_allow_tokens=['',' ']
             tokens=[token for token in tokens if token not in not_allow_tokens]
-            print(tokens)
             
             if(len(tokens)>=1):    
                 terms=[
