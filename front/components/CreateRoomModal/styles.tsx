@@ -51,6 +51,9 @@ export const ContentBox = styled.div`
   padding: 20px;
 `;
 
+export const Content = styled.div`
+`;
+
 export const RoomName = styled.div`
   display: flex;
   justify-content: space-around;
@@ -75,4 +78,9 @@ export const ResultRoomName = styled.div`
 
 export const ResultMembers = styled.div`
   flex: 5;
+`;
+
+export const ResultActionBtn = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
