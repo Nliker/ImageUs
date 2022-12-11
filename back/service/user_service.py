@@ -1,6 +1,9 @@
 import bcrypt
 from datetime import datetime, timedelta
 import jwt
+import smtplib
+from email.mime.text import MIMEText
+
 
 class UserService:
     def __init__(self,user_dao,config):
@@ -29,6 +32,49 @@ class UserService:
     ]
     delete_user_friend(user_id,delete_friend_user_id)->0 or 1
     '''
+    
+    def get_email_auth_info(self,email):
+        email_auth_info=self.user_dao.get_email_auth_info(email)
+        return email_auth_info    
+    
+    def initiate_email_auth(self,email,auth_password):
+        result=self.user_dao.update_email_auth(email,auth_password)
+        return result
+    
+    def create_new_email_auth(self,email,auth_password):
+        result=self.user_dao.insert_email_auth(email,auth_password)
+        return result
+
+    def send_email(self,email,auth_password):
+        
+        sender=self.config['GOOGLE_MAIL_USER']
+        password=self.config['GOOGLE_MAIL_PASSWORD']
+        receiver=email
+
+        smtp=smtplib.SMTP('smtp.gmail.com',587)
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.login(sender,password)
+
+        try:
+            msg=MIMEText(f"AUTH_PASWORD:{auth_password}")
+            msg['Subject']='test_email_send'
+            msg['From']=sender
+            msg['To']=receiver
+            smtp.sendmail(sender,receiver,msg.as_string())
+
+        except Exception as e:
+            print('error',e)
+            return 0
+        finally:
+            if smtp is not None:
+                smtp.quit()
+            return 1
+            
+    
+    def check_email_auth(self,email):
+        self.user_dao.get_email_auth_password(email)
+        
     
     def is_email_exists(self,email):
         user=self.user_dao.get_user_id_and_password(email)
