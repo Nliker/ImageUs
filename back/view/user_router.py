@@ -203,6 +203,12 @@ def user_router(api,services,config,es):
         @user_namespace.response(api_error.email_existance_sign_up_error()['status_code'],
                                  '이메일이 이미 등록 되어있어 실패하였습니다.',
                                  api_error.email_existance_sign_up_error_model())
+        @user_namespace.response(api_error.user_email_get_auth_error()['status_code'],
+                                 '이메일 인증 비밀번호를 먼저 발급해주세요.',
+                                 api_error.user_email_get_auth_error_model())     
+        @user_namespace.response(api_error.user_email_auth_activate_error()['status_code'],
+                                 '이메일 비밀번호 인증을 먼저 진행해주세요.',
+                                 api_error.user_email_auth_activate_error_model())
         def post(self):
             '''
             회원가입을 합니다.
@@ -212,11 +218,21 @@ def user_router(api,services,config,es):
             if user_service.is_email_exists(new_user['email']):
                 return make_response(jsonify({'message':api_error.email_existance_sign_up_error()['message']}),
                                      api_error.email_existance_sign_up_error()['status_code'])
+                                     
+            email_auth_info=user_service.get_email_auth_info(new_user['email'])
+
+            if email_auth_info==None:
+                return make_response(jsonify({'message':api_error.user_email_get_auth_error()['message']}),
+                                     api_error.user_email_get_auth_error()['status_code'])
+            
+            if email_auth_info['activated']==0:
+                return make_response(jsonify({'message':api_error.user_email_auth_activate_error()['message']}),
+                                     api_error.user_email_auth_activate_error()['status_code'])
             
             new_user_id=user_service.create_new_user(new_user)
             user_info=user_service.get_user_info(new_user_id)
             
-            return make_response(f"인증 메일을 전송하였습니다.")
+            return make_response(jsonify({'user_info':user_info}))
 
         
     #input
