@@ -8,7 +8,7 @@ const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
 const MainPage = loadable(() => import('@pages/MainPage'));
 const MyPage = loadable(() => import('@pages/MyPage'));
-const FriendList = loadable(() => import('@pages/FriendsList'));
+const PeopleManagement = loadable(() => import('@pages/PeopleManagement'));
 
 const App = () => {
   // 한 번만 요청하도록 옵션 추가
@@ -33,7 +33,7 @@ const App = () => {
           {/* 이하 비회원 접근 불가 페이지 */}
           <Route path="/main_page" element={<MainPage />} />
           <Route path="/my_page/*" element={<MyPage />} />
-          <Route path="/friend_list" element={<FriendList />} />
+          <Route path="/people_management/*" element={<PeopleManagement />} />
         </>
       ) : (
         <>
