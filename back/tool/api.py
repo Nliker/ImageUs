@@ -452,6 +452,10 @@ class ApiError:
         'email_auth_expire_error':{
             'message':"인증번호가 만료되었습니다.",
             'status_code':401
+        },
+        'user_email_auth_activate_error':{
+            'message':"먼저 이메일 인증을 진행해 주세요",
+            'status_code':401
         }
         
     }
@@ -550,4 +554,9 @@ class ApiError:
 
     def email_auth_expire_error_model(self):
         return self.api.model('email_auth_expire_error_model',{'message':fields.String(self.errors['email_auth_expire_error']['message'])})
-        
+    
+    def user_email_auth_activate_error(self):
+        return self.errors['user_email_auth_activate_error']
+
+    def user_email_auth_activate_error_model(self):
+        return self.api.model('user_email_auth_activate_error_model',{'message':fields.String(self.errors['user_email_auth_activate_error']['message'])})
