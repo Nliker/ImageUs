@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import jwt
 import smtplib
 from email.mime.text import MIMEText
-
+import random
 
 class UserService:
     def __init__(self,user_dao,config):
@@ -37,15 +37,23 @@ class UserService:
         email_auth_info=self.user_dao.get_email_auth_info(email)
         return email_auth_info    
     
+    def generate_auth_password(self):
+        numberlist=random.sample([0,1, 2, 3, 4, 5,6,7,8,9],4)
+        auth_password=""
+        for number in numberlist:
+            auth_password+=str(number)
+        return auth_password
+    
     def initiate_email_auth(self,email,auth_password):
         result=self.user_dao.update_email_auth(email,auth_password)
+        print(result)
         return result
     
     def create_new_email_auth(self,email,auth_password):
         result=self.user_dao.insert_email_auth(email,auth_password)
         return result
 
-    def send_email(self,email,auth_password):
+    def send_email_auth_password(self,email,auth_password):
         
         sender=self.config['GOOGLE_MAIL_USER']
         password=self.config['GOOGLE_MAIL_PASSWORD']
@@ -72,8 +80,25 @@ class UserService:
             return 1
             
     
-    def check_email_auth(self,email):
-        self.user_dao.get_email_auth_password(email)
+    def authorize_email_auth(self,email,auth_password):
+        email_auth_info=self.get_email_auth_info(email)
+        
+        if email_auth_info['auth_password']!=auth_password:
+            return False
+    
+        return True
+
+    def is_email_auth_expired(self,email):
+        email_auth_time_diff=self.user_dao.get_email_auth_time_diff(email)
+        print(email_auth_time_diff)
+        if email_auth_time_diff > self.config['AUTH_EMAIL_EXPIRE_TIME']:
+            return True
+        return False
+
+    def activate_email_auth(self,email):
+        result=self.user_dao.update_email_auth_activate(email)
+        print(result)
+        return result
         
     
     def is_email_exists(self,email):
