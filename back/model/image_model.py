@@ -27,6 +27,7 @@ class ImageDao:
             from images
             where user_id=:user_id
             and deleted=0
+            order by created_at
             """),{
                     'user_id':user_id
                 }).fetchall()
@@ -85,6 +86,7 @@ class ImageDao:
             where i_r.image_id=:image_id
             and r.deleted=0
             and i_r.deleted=0
+            order by title
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -139,9 +141,9 @@ class ImageDao:
             left join images  as i
             on (i_r.image_id=i.id 
             and i_r.deleted=0
-            and i.deleted=0) 
+            and i.deleted=0)
             where i_r.room_id=:room_id
-            order by id asc
+            order by i_r.created_at
             """),{
                     'room_id':room_id
                 }).fetchall()
