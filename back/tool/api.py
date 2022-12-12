@@ -119,6 +119,12 @@ class ApiModel:
             required=False
     )
     
+    auth_password=fields.String(
+            default="1234",
+            description='str_auth_password',
+            required=False
+    )
+    
     search_user_info={
                     'id':fields.Integer,
                     'email':fields.String,
@@ -206,6 +212,9 @@ class ApiModel:
         if 'update_roomlist' in args:
             payload['update_roomlist']=self.update_roomlist
             
+        if 'auth_password' in args:
+            payload['auth_password']=self.auth_password
+            
         if 'imagelist' in args:
             payload['imagelist']=fields.List(
                 fields.Nested(self.api.model("image_model",self.image_info)),
@@ -269,7 +278,7 @@ class ApiModel:
                 }],
                 required=False
             )
-            
+
         if 'access_token' in args:
             payload['access_token']=self.access_token
 
@@ -427,6 +436,22 @@ class ApiError:
         'user_search_no_arg_error':{
             'message':"email성분이 존재하지 않습니다.",
             'status_code':400
+        },
+        'user_email_existance_auth_error':{
+            'message':"해당 이메일은 이미 가입된 이메일입니다.",
+            'status_code':402
+        },
+        'user_email_get_auth_error':{
+            'message':"인증번호를 발급해주세요.",
+            'status_code':404
+        },
+        'user_email_auth_password_error':{
+            'message':"인증번호가 일치하지 않습니다.",
+            'status_code':401
+        },
+        'email_auth_expire_error':{
+            'message':"인증번호가 만료되었습니다.",
+            'status_code':401
         }
         
     }
@@ -501,3 +526,28 @@ class ApiError:
 
     def user_search_no_arg_error_model(self):
         return self.api.model('user_search_no_arg_model',{'message':fields.String(self.errors['user_search_no_arg_error']['message'])}) 
+    
+    def user_email_existance_auth_error(self):
+        return self.errors['user_email_existance_auth_error']
+    
+    def user_email_existance_auth_error_model(self):
+        return self.api.model('user_email_existance_auth_error_model',{'message':fields.String(self.errors['user_email_existance_auth_error']['message'])})
+    
+    def user_email_get_auth_error(self):
+        return self.errors['user_email_get_auth_error']
+    
+    def user_email_get_auth_error_model(self):
+        return self.api.model('user_email_get_auth_error_model',{'message':fields.String(self.errors['user_email_get_auth_error']['message'])})
+    
+    def user_email_auth_password_error(self):
+        return self.errors['user_email_auth_password_error']
+    
+    def user_email_auth_password_error_model(self):
+        return self.api.model('user_email_auth_password_error_model',{'message':fields.String(self.errors['user_email_auth_password_error']['message'])})
+    
+    def email_auth_expire_error(self):
+        return self.errors['email_auth_expire_error']
+
+    def email_auth_expire_error_model(self):
+        return self.api.model('email_auth_expire_error_model',{'message':fields.String(self.errors['email_auth_expire_error']['message'])})
+        

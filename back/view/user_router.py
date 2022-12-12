@@ -42,11 +42,14 @@ def user_router(api,services,config,es):
         @user_namespace.expect(get_user_search_parser,validate=False)
         @user_namespace.response(200,'검색한 유저의 정보를 반환합니다.',get_user_search_response_model)
         @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
-                                 '이메일이 이미 등록 되어있어 실패하였습니다.',
+                                 '해당 필드가 없습니다.',
                                  api_error.user_search_no_arg_error_model())
         def get(self):
+            if 'email' not in request.args:
+                print(api_error.user_search_no_arg_error()['message'])
+                return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
+                                     api_error.user_search_no_arg_error()['status_code'])
             query=request.args['email']
-            print(query)
             tokens=query.split(" ")
             not_allow_tokens=['',' ']
             tokens=[token for token in tokens if token not in not_allow_tokens]
@@ -86,13 +89,36 @@ def user_router(api,services,config,es):
                 return make_response(jsonify({'result':[]}),200)
 
 
-
-    @user_namespace.route("/email/<str:email>/auth")
+    
+    #input
+    #query ->email='tjwjdgus83@naver.com'
+    #output
+    # '1 send mail success'
+    get_user_email_auth=api_parser_module.get_parser(['email'])
+    
+    post_user_email_auth_model=api_model.get_model("post_user_email_auth_model",['auth_password'])
+    post_user_email_auth=api_parser_module.get_parser(['email'])
+    @user_namespace.route("/auth")
     class email_auth(Resource):
-        def post(self,email):
+        @user_namespace.expect(get_user_email_auth,validate=False)
+        @user_namespace.response(200,"1 send mail success")
+        @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
+                                 '해당 필드가 없습니다.',
+                                 api_error.user_search_no_arg_error_model())
+        @user_namespace.response(api_error.user_email_existance_auth_error()['status_code'],
+                                 '해당 필드가 없습니다.',
+                                 api_error.user_email_existance_auth_error_model())
+        def get(self):
+            
+            if 'email' not in request.args:
+                print(api_error.user_search_no_arg_error()['message'])
+                return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
+                                     api_error.user_search_no_arg_error()['status_code'])
+            email=request.args['email']
+            print(email)
             if user_service.is_email_exists(email):
-                return make_response(jsonify({'message':api_error.email_existance_sign_up_error()['message']}),
-                                     api_error.email_existance_sign_up_error()['status_code'])
+                return make_response(jsonify({'message':api_error.user_email_existance_auth_error()['message']}),
+                                     api_error.user_email_existance_auth_error['status_code'])
             
             auth_password=user_service.generate_auth_password()
 
@@ -105,7 +131,50 @@ def user_router(api,services,config,es):
             send_result=user_service.send_email_auth_password(email,auth_password)
 
             return make_response(jsonify({'result':f'{send_result} send mail success'}))
+        
+        #input
+        #query ->email='tjwjdgus83@naver.com'
+        # {
+        #     'auth_password':'1234'
+        # }
+        #output
+        # 'tjwjdgus83@naver.com auth success'
+        @user_namespace.expect(post_user_email_auth,post_user_email_auth_model,validate=False)
+        @user_namespace.response(200,"email:test@test.com has auth success")
+        @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
+                                 '해당 필드가 없습니다.',
+                                 api_error.user_search_no_arg_error_model())
+        @user_namespace.response(api_error.user_email_get_auth_error()['status_code'],
+                                 '먼저 인증번호 발급이 필요합니다.',
+                                 api_error.user_email_get_auth_error_model())
+        @user_namespace.response(api_error.user_email_auth_password_error()['status_code'],
+                                 "인증번호가 일치하지 않습니다.",
+                                 api_error.user_email_auth_password_error_model())
+        def post(self):    
+            if 'email' not in request.args:
+                return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
+                                     api_error.user_search_no_arg_error()['status_code'])
+
+            email=request.args['email']
+            auth_credential=request.json
+            auth_password=auth_credential['auth_password']
+
+            if not user_service.get_email_auth_info(email):
+                return make_response(jsonify({'message':api_error.user_email_get_auth_error()['message']}),
+                                     api_error.user_email_get_auth_error()['status_code'])
+            if user_service.is_email_auth_expired(email):
+                 return make_response(jsonify({'message':api_error.email_auth_expire_error()['message']}),
+                                     api_error.email_auth_expire_error()['status_code'])
+
+            authorized=user_service.authorize_email_auth(email,auth_password)
+
+            if authorized==False:
+                return make_response(jsonify({'message':api_error.user_email_auth_password_error()['message']}),
+                                     api_error.user_email_auth_password_error()['status_code'])
             
+            result=user_service.activate_email_auth(email)
+            
+            return make_response(jsonify({'result':f'email:{email} has auth success'}))        
 
     #input
     # {
