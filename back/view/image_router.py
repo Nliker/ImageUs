@@ -81,7 +81,7 @@ def image_router(api,services):
     #output
     # 1장 삭제 및 2개의 관련 방 권한 삭제 완료
         @image_namespace.expect(delete_image_parser,delete_image_model,vlidate=False)
-        @image_namespace.response(200,'이미지 삭제에 성공하였습니다.',delete_image_response_model)
+        @image_namespace.response(200,'이미지 삭제에 성공하였습니다.')
         @image_namespace.response(api_error.image_existance_error()['status_code'],
                                   '이미지가 존재하지 않습니다.',
                                   api_error.image_existance_error_model())
@@ -103,9 +103,9 @@ def image_router(api,services):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            delete_image_result,delete_image_room_result=image_service.delete_image(delete_image_id)
+            result=image_service.delete_image(delete_image_id)
             
-            return make_response(f'{delete_image_result}장 삭제 및 {delete_image_room_result}개의 관련 방 권한 삭제 완료',200)
+            return make_response(f"{result['delete_image']}장 삭제 및 {result['delete_image_room']}개의 관련 방 권한 삭제 완료",200)
 
     #input
     #output
