@@ -13,7 +13,7 @@ export const Wrapper = styled.div`
     border-radius: 30px;
 
     background: #fff;
-    box-shadow: 0 2px 2px 0 rgb(0 0 0 / 19%);
+    box-shadow: 0px 0px 5px 0px rgb(0 0 0 / 19%);
     .search_btn {
       padding-left: 10px;
       button {
@@ -42,10 +42,36 @@ export const Wrapper = styled.div`
     }
     input:focus {
       outline: none;
+      &::placeholder {
+        color: transparent;
+      }
     }
   }
 `;
 
-export const SearchResult = styled.div`
+export const InputBox = styled.div``;
 
+export const PreviewBox = styled.div`
+  position: absolute;
+  width: calc(100% - 100px);
+  margin-left: 20px;
+
+  border-radius: 5px;
+  box-shadow: rgb(0 0 0 / 30%) 0px 8px 12px 0px;
+  background-color: white;
+
+  p {
+    margin: 0;
+  }
+`;
+
+export const SearchResult = styled.div`
+  display: inline-block;
+
+  width: 100%;
+  margin: 50px 0;
+
+  p {
+    margin: 0;
+  }
 `;
