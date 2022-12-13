@@ -1,40 +1,21 @@
-import React from "react";
+import { IFriendData } from "@typing/db";
+import { deleteUserFriend, getUserFriendList } from "@utils/userFriendFetcher";
+import React, { useCallback } from "react";
+import useSWR from "swr";
+import useSWRMutation from 'swr/mutation';
 import { Wrapper } from "./styles";
 
-const dummyFreindList = [
-    {
-      id: 1,
-      name: '친구1',
-      email: 'email1',
-      type: 'freind',
-    },
-    {
-      id: 2,
-      name: '친구2',
-      email: 'email2',
-      type: 'freind',
-    },
-    {
-      id: 3,
-      name: '친구3',
-      email: 'email3',
-      type: 'freind',
-    },
-    {
-      id: 4,
-      name: '가족1',
-      email: 'email4',
-      type: 'family',
-    },
-    {
-      id: 5,
-      name: '가족2',
-      email: 'email5',
-      type: 'family',
-    },
-  ];
-
 const FriendList = () => {
+  const { data: friendListData, mutate: friendListMutate } = useSWR('friendlist', getUserFriendList, {
+    dedupingInterval: 2000
+  });
+  const { trigger } = useSWRMutation('deleteFriend', deleteUserFriend);
+
+  const handleDeleteFriend = useCallback((friendId: string | undefined) => async () => {
+    await trigger(friendId);
+    await friendListMutate();
+  }, []);
+  
     return (
         <Wrapper>
             <div>
@@ -50,11 +31,11 @@ const FriendList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {dummyFreindList.map((data) => (
+                  {friendListData && friendListData.map((data: IFriendData) => (
                     <tr key={data.id}>
                       <td>{data.name}</td>
                       <td>{data.email}</td>
-                      <td>{data.type}</td>
+                      <td>{data.profile}</td>
                       <td>
                         <div>
                           <button type="button">함께 있는 방 조회</button>
@@ -62,7 +43,7 @@ const FriendList = () => {
                       </td>
                       <td>
                         <div>
-                          <button type="button">삭제</button>
+                          <button type="button" onClick={handleDeleteFriend(data.id)}>삭제</button>
                         </div>
                       </td>
                     </tr>
