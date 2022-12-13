@@ -3,8 +3,9 @@ export interface IRoomData {
     title: string;
 }
 
-export interface ISearchData {
+export interface IFriendData {
     email?: string,
     id?: string,
-    name?: string
+    name?: string,
+    profile?: string
 }
