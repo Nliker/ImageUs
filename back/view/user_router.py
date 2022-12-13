@@ -118,7 +118,7 @@ def user_router(api,services,config,es):
             print(email)
             if user_service.is_email_exists(email):
                 return make_response(jsonify({'message':api_error.user_email_existance_auth_error()['message']}),
-                                     api_error.user_email_existance_auth_error['status_code'])
+                                     api_error.user_email_existance_auth_error()['status_code'])
             
             auth_password=user_service.generate_auth_password()
 
@@ -500,7 +500,7 @@ def user_router(api,services,config,es):
                                      api_error.user_existance_error()['status_code'])
             
             if user_service.is_user_friend(current_user_id,friend_user_id):
-                return make_response(jsonify({'message':api_error.friend_existance_error()['status_code']}),
+                return make_response(jsonify({'message':api_error.friend_existance_error()['message']}),
                                      api_error.friend_existance_error()['status_code'])
             
             result=user_service.create_user_friend(current_user_id,friend_user_id)
