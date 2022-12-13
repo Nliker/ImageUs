@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import jwt
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import random
 
 class UserService:
@@ -64,13 +65,48 @@ class UserService:
         smtp.starttls()
         smtp.login(sender,password)
 
+        msg = MIMEMultipart('alternative')
+        
         try:
-            msg=MIMEText(f"AUTH_PASWORD:{auth_password}")
+            text=f"Hi,This is message for your email authentification of sign-up from ImageUs"
+            html='''
+            <!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+
+                <title>Email_Authentification</title>
+
+                <!-- 합쳐지고 최소화된 최신 CSS -->
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+            </head>
+            <body>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                    <h3 class="panel-title">AUTH-PASSWORD</h3>
+                    </div>
+                    <div class="panel-body">
+                    %s
+                    </div>
+                </div>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+                <script src="js/bootstrap.min.js"></script>
+            </body>
+            </html>
+            ''' % (auth_password)
             msg['Subject']='test_email_send'
             msg['From']=sender
             msg['To']=receiver
-            smtp.sendmail(sender,receiver,msg.as_string())
 
+            part1 = MIMEText(text, 'plain')
+            part2 = MIMEText(html, 'html')
+
+            msg.attach(part1)
+            msg.attach(part2)
+
+            smtp.sendmail(sender,receiver,msg.as_string())
         except Exception as e:
             print('error',e)
             return 0
