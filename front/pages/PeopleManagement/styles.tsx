@@ -67,12 +67,14 @@ export const TabBox = styled.div`
 
       height: 50px;
 
+      color: white;
       box-sizing: border-box;
       border-radius: 15px;
       background-color: #343436;
     }
   }
   a.active_tab {
+    color: black;
     background-color: #fff;
   }
 `;
