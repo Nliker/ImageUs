@@ -1,6 +1,10 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
+  p {
+    margin: 0;
+  }
+
   form {
     position: relative;
     display: flex;
@@ -60,8 +64,11 @@ export const PreviewBox = styled.div`
   box-shadow: rgb(0 0 0 / 30%) 0px 8px 12px 0px;
   background-color: white;
 
-  p {
-    margin: 0;
+  ul li.preview_li {
+    &:hover {
+      background-color: #F7F7F9;
+      cursor: pointer;
+    }
   }
 `;
 
@@ -70,8 +77,4 @@ export const SearchResult = styled.div`
 
   width: 100%;
   margin: 50px 0;
-
-  p {
-    margin: 0;
-  }
 `;
