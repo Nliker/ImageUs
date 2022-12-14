@@ -85,6 +85,14 @@ const config: Configuration = {
         target: 'http://118.42.101.135:5000',
         changeOrigin: true,
       },
+      '/room': {
+        target: 'http://118.42.101.135:5000',
+        changeOrigin: true,
+      },
+      '/image': {
+        target: 'http://118.42.101.135:5000',
+        changeOrigin: true,
+      },
     },
   },
 };
