@@ -23,16 +23,20 @@ class TestUserClass(HttpUser):
         # print(self.test_file_path)
     def on_stop(self):		
         print("end test")		
-    @task
-    def login(self):
-        user_credential={
-            "email": "test1@test.com",
-            "password": "test1"
-        }
+    # @task
+    # def login(self):
+    #     user_credential={
+    #         "email": "test1@test.com",
+    #         "password": "test1"
+    #     }
                 
-        self.client.post("/user/login",
-            json.dumps(user_credential),
-            headers={"Content-Type" : "application/json"})
+    #     self.client.post("/user/login",
+    #         json.dumps(user_credential),
+    #         headers={"Content-Type" : "application/json"})
+        
+    @task
+    def sync_test(self):
+        self.client.get("/sync/test")
         
     # @task
     # def post_image(self):
