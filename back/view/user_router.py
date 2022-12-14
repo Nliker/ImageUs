@@ -1,4 +1,4 @@
-from flask import request,jsonify,make_response
+from flask import request,jsonify,make_response,redirect,url_for
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
@@ -10,7 +10,7 @@ from tool import ParserModule,ApiModel,ApiError
 
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
-def user_router(api,services,config,es):
+def user_router(app,api,services,config,es):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
@@ -324,22 +324,41 @@ def user_router(api,services,config,es):
             '''
             로그인을 합니다.
             '''
-            credential=request.json
+            print(url_for('hidden_login'))
+            return redirect(url_for('hidden_login'),307)
+            # credential=request.json
             
-            if not user_service.is_email_exists(credential['email']):
-                return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
+            # if not user_service.is_email_exists(credential['email']):
+            #     return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
+            #                          api_error.email_existance_login_error()['status_code'])
+            
+            # authorized=user_service.login(credential)
+            # if authorized:
+            #     user_credential=user_service.get_user_id_and_password(credential['email'])
+            #     access_token=user_service.generate_access_token(user_credential['id'])
+            #     return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
+            
+            # else:
+            #     return make_response(jsonify({'message':api_error.credential_error()['message']}),
+            #                          api_error.credential_error()['status_code'])
+
+    @app.route('/async/user/login', methods=['POST'])
+    async def hidden_login():
+        credential=request.json
+            
+        if not user_service.is_email_exists(credential['email']):
+            return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
                                      api_error.email_existance_login_error()['status_code'])
             
-            authorized=user_service.login(credential)
-            if authorized:
-                user_credential=user_service.get_user_id_and_password(credential['email'])
-                access_token=user_service.generate_access_token(user_credential['id'])
-                return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
+        authorized=user_service.login(credential)
+        if authorized:
+            user_credential=user_service.get_user_id_and_password(credential['email'])
+            access_token=user_service.generate_access_token(user_credential['id'])
+            return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
             
-            else:
-                return make_response(jsonify({'message':api_error.credential_error()['message']}),
+        else:
+            return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
-
     #input
     #output
     # {
@@ -484,7 +503,7 @@ def user_router(api,services,config,es):
                                 '이미 친구로 등록되어 있어 실패하였습니다.',
                                 api_error.friend_existance_error_model())
         @login_required
-        def post(self,user_id):
+        def post(self,user_id): 
             '''
             id가 user_id인 유저의 친구를 생성합니다.
             '''
