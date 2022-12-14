@@ -18,7 +18,7 @@ class ImageDao:
         new_image_id=row
         return new_image_id
     
-    def get_user_imagelist(self,user_id):
+    def get_user_imagelist(self,user_id,pages):
         rows=self.db.execute(text("""
             select
                 id,
@@ -28,8 +28,11 @@ class ImageDao:
             where user_id=:user_id
             and deleted=0
             order by created_at
+            limit :start,:limit
             """),{
-                    'user_id':user_id
+                    'user_id':user_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
         user_image_info_list=[

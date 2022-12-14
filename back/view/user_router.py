@@ -339,7 +339,7 @@ def user_router(app,api,services,config,es):
             else:
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
-                                     
+
     #input
     #output
     # {
@@ -356,7 +356,7 @@ def user_router(app,api,services,config,es):
     #         }
     #     ]
     # }
-    get_user_imagelist_parser=api_parser_module.get_parser(['Authorization'])
+    get_user_imagelist_parser=api_parser_module.get_parser(['Authorization','start','limit'])
     get_user_imagelist_response_model=api_model.get_model('get_user_imagelist_response_model',['imagelist'])
     @user_namespace.route("/<int:user_id>/imagelist")
     class user_imagelist(Resource):
@@ -370,6 +370,29 @@ def user_router(app,api,services,config,es):
             '''
             id가 user_id인 유저의 이미지 정보 목록을 불러옵니다.
             '''
+            if 'start' not in request.args or 'limit' not in request.args:
+                return make_response(jsonify({'message':"필수 성분이 없습니다."}),
+                                    405)
+            def check_int(s):
+                if s[0] in ('-', '+'):
+                    return s[1:].isdigit()
+                return s.isdigit()
+            start=request.args['start']
+            limit=request.args['limit']
+            if not check_int(start) or not check_int(limit):
+                return make_response(jsonify({'message':"형태변환 불가능!"}),
+                                     405)
+
+            start=int(start)
+            limit=int(limit)
+            if start < 0 or limit < 0 :
+                return make_response(jsonify({'message':"범위 초과!"}),
+                                    405)
+
+            pages={
+                'start':int(start),
+                'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
+            }
             current_user_id=g.user_id
             
             #current_usre_id와 user_id를 따로 받으면 추후 누가 조회 했는지 알 수 있음
@@ -377,7 +400,7 @@ def user_router(app,api,services,config,es):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            image_list=image_service.get_user_imagelist(current_user_id)
+            image_list=image_service.get_user_imagelist(current_user_id,pages)
 
             return make_response(jsonify({'imagelist':image_list}),200)
     
