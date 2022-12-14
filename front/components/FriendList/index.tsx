@@ -1,5 +1,5 @@
 import { IFriendData } from "@typing/db";
-import { deleteUserFriend, getUserFriendList } from "@utils/userFriendFetcher";
+import { deleteUserFriend, getUserFriendList } from "@utils/userDataFetcher";
 import React, { useCallback } from "react";
 import useSWR from "swr";
 import useSWRMutation from 'swr/mutation';

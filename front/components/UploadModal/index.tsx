@@ -21,10 +21,8 @@ import {
 import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import useSWR from 'swr';
-import getDataFetcher from '@utils/getUserRoomListFetcher';
-import getUserDataFetcher from '@utils/getUserRoomListFetcher';
-import getUserRoomListFetcher from '@utils/getUserRoomListFetcher';
 import { IRoomData } from '@typing/db';
+import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
