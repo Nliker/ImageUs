@@ -50,12 +50,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <Container showModal={showModalState}>
         <TopNavBar />
         {isMobile && <BottomNavBar />}
-        {currentUrl.pathname === '/main_page' && (
+        {/* {currentUrl.pathname === '/main_page' && (
           <>
             <ToolBar handleRoomListBtn={handleRoomListBtn} />
             <SideBar show={showSideBar} />
           </>
-        )}
+        )} */}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
       {showModalState?.upload && <UploadModal />}
