@@ -324,41 +324,22 @@ def user_router(app,api,services,config,es):
             '''
             로그인을 합니다.
             '''
-            print(url_for('hidden_login'))
-            return redirect(url_for('hidden_login'),307)
-            # credential=request.json
+            credential=request.json
             
-            # if not user_service.is_email_exists(credential['email']):
-            #     return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
-            #                          api_error.email_existance_login_error()['status_code'])
-            
-            # authorized=user_service.login(credential)
-            # if authorized:
-            #     user_credential=user_service.get_user_id_and_password(credential['email'])
-            #     access_token=user_service.generate_access_token(user_credential['id'])
-            #     return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
-            
-            # else:
-            #     return make_response(jsonify({'message':api_error.credential_error()['message']}),
-            #                          api_error.credential_error()['status_code'])
-
-    @app.route('/async/user/login', methods=['POST'])
-    async def hidden_login():
-        credential=request.json
-            
-        if not user_service.is_email_exists(credential['email']):
-            return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
+            if not user_service.is_email_exists(credential['email']):
+                return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
                                      api_error.email_existance_login_error()['status_code'])
             
-        authorized=user_service.login(credential)
-        if authorized:
-            user_credential=user_service.get_user_id_and_password(credential['email'])
-            access_token=user_service.generate_access_token(user_credential['id'])
-            return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
+            authorized=user_service.login(credential)
+            if authorized:
+                user_credential=user_service.get_user_id_and_password(credential['email'])
+                access_token=user_service.generate_access_token(user_credential['id'])
+                return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
             
-        else:
-            return make_response(jsonify({'message':api_error.credential_error()['message']}),
+            else:
+                return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
+                                     
     #input
     #output
     # {
