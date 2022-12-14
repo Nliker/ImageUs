@@ -134,13 +134,13 @@ class ImageService:
         image_info=self.image_dao.get_image_info(image_id)
         return image_info
         
-    def get_user_imagelist(self,user_id):
-        image_info_list=self.image_dao.get_user_imagelist(user_id)
+    def get_user_imagelist(self,user_id,pages):
+        image_info_list=self.image_dao.get_user_imagelist(user_id,pages)
         
         return image_info_list
 
-    def get_room_imagelist(self,room_id):
-        image_info_list=self.image_dao.get_room_imagelist(room_id)
+    def get_room_imagelist(self,room_id,pages):
+        image_info_list=self.image_dao.get_room_imagelist(room_id,pages)
 
         return image_info_list
 

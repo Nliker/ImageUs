@@ -19,6 +19,16 @@ class ParserModule:
                                 location='args',
                                 help='email_str',
                                 required=False)
+        if 'start' in args:
+            parser.add_argument('start',type=str,
+                                location='args',
+                                help='page start',
+                                required=False)
+        if 'limit' in args:
+            parser.add_argument('limit',type=str,
+                                location='args',
+                                help='page limit',
+                                required=False)
         return parser
     
 
