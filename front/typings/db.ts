@@ -5,7 +5,7 @@ export interface IRoomData {
 
 export interface IFriendData {
     email?: string,
-    id?: string,
+    id: string,
     name?: string,
     profile?: string
 }
