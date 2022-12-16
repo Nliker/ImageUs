@@ -1,15 +1,9 @@
+import { IFriendData } from '@typing/db';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { MemberDiv } from './styles';
 
-interface Member {
-  member: {
-    id: number;
-    name: string;
-  };
-}
-
-const EachMember = ({ member }: Member) => {
+const EachMember = ({ member }: {member: IFriendData}) => {
   return (
     <MemberDiv>
       <span># {member.name}</span>
