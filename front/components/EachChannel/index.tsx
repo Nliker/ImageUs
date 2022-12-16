@@ -1,9 +1,9 @@
 import { IRoomData } from '@typing/db';
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { NavLink, useLinkClickHandler, useNavigate } from 'react-router-dom';
 import { ChannelDiv } from './styles';
 
-const EachChannel = ({ room }: { room: IRoomData}) => {
+const EachChannel = memo(({ room }: { room: IRoomData}) => {
   const navigate = useNavigate();
 
   const onClickRoom = useCallback(() => {
@@ -15,6 +15,6 @@ const EachChannel = ({ room }: { room: IRoomData}) => {
       <span># {room.title}</span>
     </ChannelDiv>
   );
-};
+});
 
 export default EachChannel;
