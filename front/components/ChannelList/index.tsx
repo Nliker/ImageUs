@@ -1,34 +1,19 @@
 import EachChannel from '@components/EachChannel';
-import getDataFetcher from '@utils/getUserRoomListFetcher';
 import React, { useCallback, useState } from 'react';
 import { IoMdArrowDropright } from 'react-icons/io';
 import useSWR from 'swr';
 import { Collapse, Container, Subtitle } from './styles';
+import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import { IRoomData } from '@typing/db';
 
 const ChannelList = () => {
+  const { data: roomlist, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
+    dedupingInterval: 2000
+  })
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
-  // const { data } = useSWR(`/user/${user_id}/roomlist`, getDataFetcher);
-  // 임시 데이터
-  const channelData = [
-    {
-      id: 1,
-      name: '채널1',
-    },
-    {
-      id: 2,
-      name: '채널2',
-    },
-    {
-      id: 3,
-      name: '채널3',
-    },
-    {
-      id: 4,
-      name: '채널4',
-    },
-  ];
-
   const toggleChannelCollapse = useCallback(() => setChannelCollapse((prev) => !prev), []);
+  // console.log(roomlist);
+
   return (
     <Container>
       <Subtitle onClick={toggleChannelCollapse}>
@@ -39,8 +24,8 @@ const ChannelList = () => {
       </Subtitle>
       <div>
         {channelCollapse &&
-          channelData?.map((channel) => {
-            return <EachChannel key={channel.id} channel={channel} />;
+          roomlist?.map((room: IRoomData) => {
+            return <EachChannel key={room.id} room={room} />;
           })}
       </div>
     </Container>
