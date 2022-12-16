@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { IImageData } from '@typing/db';
+import { getImageListFetcher } from '@utils/roomDataFetcher';
+import { Link, useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { ContentBox, ImageCard, ImageInfo, InfoItem, MainContainer, Wrapper } from './styles';
 
 const dummyImages = [
@@ -24,59 +27,67 @@ interface Props {
 }
 
 interface ImageType {
-  id: number,
-  url: string,
-  name: string
+  id: number;
+  url: string;
+  name: string;
 }
 
 const ContentSection = () => {
-  // 전체 이미지 정보
-  const { mutate: imageInfoMutate } = useSWR('imageInfo');
-  // 클릭한 이미지 정보
-  const { mutate: imageModalMutate } = useSWR('imageModalState');
-  const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
+  const { roomId } = useParams<{ roomId?: string }>();
+  const { data: imageList, mutate: imageListTrigger } = useSWR(['imagelist', roomId], getImageListFetcher, {
+    dedupingInterval: 2000,
+  });
 
+  console.log(imageList, '테스트', roomId);
+  // // 전체 이미지 정보
+  // const { mutate: imageInfoMutate } = useSWR('imageInfo');
+  // // 클릭한 이미지 정보
+  // const { mutate: imageModalMutate } = useSWR('imageModalState');
+  // const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
 
-  useEffect(() => {
-    imageInfoMutate(dummyImages, false);
-  }, []);
-  
-  const onShowImageModal = (image: ImageType) => () => {
-    imageModalMutate({
-      clickImageId: image.id,
-      clickImageUrl: image.url,
-      clickImageName: image.name,
-    }, false);
-    showModalMutate({
-      ...showModalData,
-      image: true
-    }, false);
-  };
+  // useEffect(() => {
+  //   imageInfoMutate(dummyImages, false);
+  // }, []);
 
+  // const onShowImageModal = (image: ImageType) => () => {
+  //   imageModalMutate({
+  //     clickImageId: image.id,
+  //     clickImageUrl: image.url,
+  //     clickImageName: image.name,
+  //   }, false);
+  //   showModalMutate({
+  //     ...showModalData,
+  //     image: true
+  //   }, false);
+  // };
   return (
     <Wrapper>
       <MainContainer>
-        {dummyImages.map((data) => {
-          return (
-            <ContentBox key={data.id} onClick={onShowImageModal(data)}>
-              <div>
-                <Link to="#">
-                  <ImageCard>
-                    <img src={`${data.url}`} alt={`${data.name}`} />
-                  </ImageCard>
-                  <ImageInfo>
-                    <InfoItem>
-                      <span>이미지 1</span>
-                    </InfoItem>
-                    <InfoItem>
-                      <span>2022/ 11/ 25</span>
-                    </InfoItem>
-                  </ImageInfo>
-                </Link>
-              </div>
-            </ContentBox>
-          );
-        })}
+        {!roomId ? (
+          <div>메인화면입니다.</div>
+        ) : (
+          imageList?.map((data: IImageData) => {
+            return (
+              <ContentBox key={data.id}>
+                <div>
+                  <Link to="#">
+                    <ImageCard>
+                      <img src={`${data.link}`} alt={``} />
+                    </ImageCard>
+                    <ImageInfo>
+                      <InfoItem>
+                        <span>이미지 1</span>
+                      </InfoItem>
+                      <InfoItem>
+                        <span>2022/ 11/ 25</span>
+                      </InfoItem>
+                    </ImageInfo>
+                  </Link>
+                </div>
+              </ContentBox>
+            );
+          })
+        )}
       </MainContainer>
     </Wrapper>
   );
