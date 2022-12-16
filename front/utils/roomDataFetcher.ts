@@ -14,11 +14,28 @@ const getImageListFetcher = async (arg: Array<string | undefined>) => {
       },
     });
     const imageListData = response.data.imagelist;
-    console.log(imageListData);
     return imageListData;
   } catch (error) {
     console.log(error);
   }
 };
 
-export { getImageListFetcher };
+const getUserListFetcher = async (arg: Array<string | undefined>) => {
+  const [url, roomId] = arg;
+  // console.log(arg);
+  if (!roomId) return null;
+
+  try {
+    const response = await axios.get(`/room/${roomId}/${url}`, {
+      headers: {
+        Authorization: token
+      }
+    });
+    const userlist = response.data.userlist;
+    return userlist;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { getImageListFetcher, getUserListFetcher };
