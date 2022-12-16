@@ -1,7 +1,8 @@
 import ChannelList from '@components/ChannelList';
 import CreateRoomModal from '@components/CreateRoomModal';
 import MemberList from '@components/MemberList';
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
+import { Route, Routes } from 'react-router';
 import useSWR from 'swr';
 import ActionButton from './ActionButton';
 import { ContentTabs, ContentWrapper, CreateBtn, CreateBtnBox, Tab, Wrapper } from './styles';
@@ -10,7 +11,7 @@ interface SidebarProps {
   show: boolean;
 }
 
-const SideBar = ({ show }: SidebarProps) => {
+const SideBar = memo(({ show }: SidebarProps) => {
   // console.log(isMobile);
   const { data: showModalState, mutate: showModalMutate } = useSWR('showModalState');
 
@@ -55,6 +56,10 @@ const SideBar = ({ show }: SidebarProps) => {
                   <ActionButton btnTitle={'초대하기'} />
                 </CreateBtnBox>
                 <MemberList />
+                {/* <Routes>
+                  <Route index element={<MemberList />} />
+                  <Route path=':roomId' element={<MemberList />} />
+                </Routes> */}
               </div>
             </div>
           </Tab>
@@ -62,6 +67,6 @@ const SideBar = ({ show }: SidebarProps) => {
       </ContentWrapper>
     </Wrapper>
   );
-};
+});
 
 export default SideBar;

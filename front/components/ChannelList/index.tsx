@@ -1,12 +1,12 @@
 import EachChannel from '@components/EachChannel';
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { IoMdArrowDropright } from 'react-icons/io';
 import useSWR from 'swr';
 import { Collapse, Container, Subtitle } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import { IRoomData } from '@typing/db';
 
-const ChannelList = () => {
+const ChannelList = memo(() => {
   const { data: roomlist, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
     dedupingInterval: 2000
   })
@@ -30,6 +30,6 @@ const ChannelList = () => {
       </div>
     </Container>
   );
-};
+});
 
 export default ChannelList;
