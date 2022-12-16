@@ -31,12 +31,15 @@ const App = () => {
       {isLogIn ? (
         <>
           {/* 이하 비회원 접근 불가 페이지 */}
-          <Route path="/main_page" element={<MainPage />} />
+          {/* <Route index element={<MainPage />} /> */}
+          <Route path="/main_page/:roomId" element={<MainPage />} />
+          <Route path="/main_page/*" element={<MainPage />} />
           <Route path="/my_page/*" element={<MyPage />} />
           <Route path="/people_management/*" element={<PeopleManagement />} />
         </>
       ) : (
         <>
+          {/* <Route index element={<LogIn />} /> */}
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
         </>
