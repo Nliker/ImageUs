@@ -6,6 +6,7 @@ import ToolBar from '@components/ToolBar';
 import AppLayout from '@layouts/AppLayout';
 import logInFetcher from '@utils/logInFetcher';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { Route, Routes, useNavigate } from 'react-router';
 import useSWR from 'swr';
 import { ContentWrappper, Wrappper } from './styles';
@@ -17,6 +18,10 @@ const MainPage = () => {
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
+  // const location = useLocation();
+  // useEffect(() => {
+  //   console.log(location);
+  // }, [ location ])
   
   return (
     <AppLayout>
@@ -25,7 +30,8 @@ const MainPage = () => {
       <Wrappper>
         <ContentWrappper>
           <Routes>
-            <Route path={'/main_page/:roomId'} element={<ContentSection />} />
+            <Route index element={<ContentSection />} />
+            <Route path=":roomId" element={<ContentSection />} />
           </Routes>
         </ContentWrappper>
       </Wrappper>
