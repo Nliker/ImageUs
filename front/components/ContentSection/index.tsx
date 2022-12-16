@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import { IImageData } from '@typing/db';
 import { getImageListFetcher } from '@utils/roomDataFetcher';
 import { Link, useParams } from 'react-router-dom';
@@ -32,13 +32,16 @@ interface ImageType {
   name: string;
 }
 
-const ContentSection = () => {
-  const { roomId } = useParams<{ roomId?: string }>();
+const ContentSection = memo(() => {
+  // const { roomId } = useParams<{ roomId?: string }>();
+  const { data: roomId } = useSWR('roomId');
   const { data: imageList, mutate: imageListTrigger } = useSWR(['imagelist', roomId], getImageListFetcher, {
-    dedupingInterval: 2000,
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
 
-  console.log(imageList, '테스트', roomId);
+  // console.log(imageList, '테스트', roomId);
   // // 전체 이미지 정보
   // const { mutate: imageInfoMutate } = useSWR('imageInfo');
   // // 클릭한 이미지 정보
@@ -91,6 +94,6 @@ const ContentSection = () => {
       </MainContainer>
     </Wrapper>
   );
-};
+});
 
 export default ContentSection;
