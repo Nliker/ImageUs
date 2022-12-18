@@ -14,7 +14,7 @@ interface SidebarProps {
 const SideBar = memo(({ show }: SidebarProps) => {
   // console.log(isMobile);
   const { data: showModalState, mutate: showModalMutate } = useSWR('showModalState');
-
+  const { data: roomId } = useSWR('roomId');
   // const [switchTab, setSwitchTab] = useState<boolean>(true);
 
   // const onChangeTab = useCallback(() => {
@@ -29,6 +29,13 @@ const SideBar = memo(({ show }: SidebarProps) => {
   }, [showModalState]);
   // console.log(showModalState);
 
+  const onClickInviteMember = useCallback(() => {
+    showModalMutate({
+      ...showModalState,
+      invite_member: true,
+    });
+  }, []);
+  
   return (
     <Wrapper show={show}>
       <ContentWrapper>
@@ -47,22 +54,18 @@ const SideBar = memo(({ show }: SidebarProps) => {
               </div>
             </div>
           </Tab>
-          <Tab>
+          {roomId && <Tab>
             <input type="radio" id="tab-2" name="tab-group-1" />
             <label htmlFor="tab-2">멤버목록</label>
             <div className="tab_content">
               <div className="tab_content_box">
                 <CreateBtnBox>
-                  <ActionButton btnTitle={'초대하기'} />
+                  <ActionButton onClickBtn={onClickInviteMember} btnTitle={'초대하기'} />
                 </CreateBtnBox>
                 <MemberList />
-                {/* <Routes>
-                  <Route index element={<MemberList />} />
-                  <Route path=':roomId' element={<MemberList />} />
-                </Routes> */}
               </div>
             </div>
-          </Tab>
+          </Tab>}
         </ContentTabs>
       </ContentWrapper>
     </Wrapper>
