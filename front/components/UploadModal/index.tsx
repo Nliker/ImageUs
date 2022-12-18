@@ -73,8 +73,8 @@ interface RoomDataType {
 const UploadModal = () => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
   const user_id = sessionStorage.getItem('USER_ID');
-  const { data: roomList } = useSWR(`/user/${user_id}/roomlist`, getUserRoomListFetcher,{
-    dedupingInterval: 4000
+  const { data: roomList, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
+    dedupingInterval: 2000
   });
   const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
 
