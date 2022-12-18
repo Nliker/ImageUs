@@ -33,7 +33,7 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
   `}
 `;
 
-export const RoomModalWrapper = styled.div`
+export const ModalWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
