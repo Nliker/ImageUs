@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
-import { Container, ContentWrapper, RoomModalWrapper, Wrapper } from './styles';
+import { Container, ContentWrapper, ModalWrapper, Wrapper } from './styles';
 import TopNavBar from '@components/TopNavBar';
 import BottomNavBar from '@components/BottomNavBar';
 import { useMediaQuery } from 'react-responsive';
@@ -10,6 +10,7 @@ import ContentImageModal from '@components/ContentImageModal';
 import useSWR from 'swr';
 import { Route, useLocation } from 'react-router';
 import CreateRoomModal from '@components/CreateRoomModal';
+import InviteMemberModal from '@components/InviteMemberModal';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -61,9 +62,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {showModalState?.upload && <UploadModal />}
       {showModalState?.image && <ContentImageModal />}
       {showModalState?.create_room && (
-        <RoomModalWrapper>
+        <ModalWrapper>
           <CreateRoomModal />
-        </RoomModalWrapper>
+        </ModalWrapper>
+      )}
+      {showModalState?.invite_member && (
+        <ModalWrapper>
+          <InviteMemberModal />
+        </ModalWrapper>
       )}
     </Wrapper>
   );
