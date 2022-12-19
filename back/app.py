@@ -1,4 +1,4 @@
-from flask import Flask,make_response,render_template
+from flask import Flask,make_response,render_template,request,abort
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import UserDao,ImageDao,RoomDao
@@ -6,6 +6,7 @@ from service import UserService,ImageService,RoomService
 from view import user_router,image_router,room_router
 from flask_restx import Api,Resource
 from elasticsearch import Elasticsearch
+import os
 
 class Services:
     pass
@@ -28,6 +29,14 @@ def create_app(test_config=None):
     es=Elasticsearch(hosts=app.config['ELASTIC_URL'])
     print("elastic 데이터베이스 연결 성공")
 
+    @app.before_request
+    def block_method():
+        ip=request.environ.get('REMOTE_ADDR')
+        print("Current IP Address:",ip)
+        print("Current Process:",os.getpid())
+        if ip not in good_ip_list:
+            abort(403)
+    
     @api.route("/search")
     class search_user(Resource):
         def get(self):
