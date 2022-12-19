@@ -32,7 +32,7 @@ def create_app(test_config=None):
 
     @app.before_request
     def block_method():
-        ip=request.environ.get('REMOTE_ADDR')
+        ip=request.headers['x-real-ip']
         print("Current IP Address:",ip,flush=True)
         print("Current Process:",os.getpid(),flush=True)
         if ip not in good_ip_list:
