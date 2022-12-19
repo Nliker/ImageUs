@@ -32,8 +32,8 @@ def create_app(test_config=None):
     @app.before_request
     def block_method():
         ip=request.environ.get('REMOTE_ADDR')
-        print("Current IP Address:",ip)
-        print("Current Process:",os.getpid())
+        print("Current IP Address:",ip,flush=True)
+        print("Current Process:",os.getpid(),flush=True)
     
     @api.route("/search")
     class search_user(Resource):
