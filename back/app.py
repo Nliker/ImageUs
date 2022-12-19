@@ -34,8 +34,6 @@ def create_app(test_config=None):
         ip=request.environ.get('REMOTE_ADDR')
         print("Current IP Address:",ip)
         print("Current Process:",os.getpid())
-        if ip not in good_ip_list:
-            abort(403)
     
     @api.route("/search")
     class search_user(Resource):
