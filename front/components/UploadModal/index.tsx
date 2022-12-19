@@ -23,6 +23,7 @@ import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import useSWR from 'swr';
 import { IRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import axios from 'axios';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
@@ -40,7 +41,6 @@ interface RoomDataType {
   title: string;
   check: boolean;
 }
-
 
 // const dummyData = [
 //   {
@@ -74,7 +74,7 @@ const UploadModal = () => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
   const user_id = sessionStorage.getItem('USER_ID');
   const { data: roomList, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
-    dedupingInterval: 2000
+    dedupingInterval: 2000,
   });
   const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
 
@@ -83,6 +83,7 @@ const UploadModal = () => {
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
+  const [uploadImageFile, setUploadImageFile] = useState<FormData | null>(null);
 
   const headerName = ['사진 업로드', '채널 선택', '결과물'];
 
@@ -94,11 +95,11 @@ const UploadModal = () => {
     const tmpRoomList = roomList.map((data: IRoomData) => {
       return {
         ...data,
-        check: false
-      }
+        check: false,
+      };
     });
     setSelectedRooms([...tmpRoomList]);
-  }, [roomList])
+  }, [roomList]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -148,6 +149,7 @@ const UploadModal = () => {
       image.src = imageURLs;
 
       setTmpImageData(image);
+      setUploadImageFile(formData);
     },
     [imageData],
   );
@@ -180,6 +182,24 @@ const UploadModal = () => {
     });
   }, []);
 
+  const onClickUpload = useCallback(async () => {
+    try {
+      const response = await axios.post(
+        '/image',
+        uploadImageFile,
+        {
+          headers: {
+            'Authorization': `${sessionStorage.getItem('TOKEN')}`,
+            'Content-Type': 'multipart/form-data'
+          },
+        },
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [uploadImageFile]);
+
   // const checkRoomItem = (id: number) => {
   //   const newRoomList = roomList.map((roomData: IRoomData) => {
   //     if (roomData.id === id) {
@@ -198,22 +218,47 @@ const UploadModal = () => {
       if (data.check) {
         // checkRoomItem(data.id);
         setSelectedRooms((prev) => {
-          const newData = prev.filter((room) => {
-            return room.id !== data.id;
+          const newData = prev.map((room) => {
+            if (room.id === data.id) {
+              return {
+                ...room,
+                check: false,
+              };
+            } else {
+              return { ...room };
+            }
           });
           return [...newData];
         });
       } else {
         // checkRoomItem(data.id);
         setSelectedRooms((prev) => {
-          return [...prev, data];
+          const newData = prev.map((room) => {
+            if (room.id === data.id) {
+              return {
+                ...room,
+                check: true,
+              };
+            } else {
+              return { ...room };
+            }
+          });
+          return [...newData];
         });
       }
     },
     [roomList, selectedRooms],
   );
 
-  // console.log(imageData);
+  const getSelectedRoomArray = useCallback(() => {
+    const extractRooms = selectedRooms.filter((room) => {
+      return room.check;
+    });
+    return [...extractRooms];
+  }, [selectedRooms]);
+
+  // console.log(roomList, selectedRooms);
+  console.log(uploadImageFile?.get('image'));
   return (
     <Wrapper>
       <Background />
@@ -231,17 +276,24 @@ const UploadModal = () => {
                   <ModalHeader>
                     <ModalTitle>
                       <h1>{headerName[uploadStep]}</h1>
-                      {/* <h1>채널 선택</h1>
-                      <h1>결과물</h1> */}
                     </ModalTitle>
                     {uploadStep !== 0 && (
                       <div className={'left_btn'} onClick={onClickPrevStep}>
                         <button>이전</button>
                       </div>
                     )}
-                    <div className={'right_btn'} onClick={onClickNextStep}>
-                      <button>다음</button>
-                    </div>
+                    {uploadStep !== 2 && (
+                      <div className={'right_btn'} onClick={onClickNextStep}>
+                        <button>다음</button>
+                      </div>
+                    )}
+                    {uploadStep === 2 && (
+                      <div className={'right_btn'}>
+                        <button type="button" onClick={onClickUpload}>
+                          업로드
+                        </button>
+                      </div>
+                    )}
                   </ModalHeader>
                 </ModalHeaderWrapper>
               </HeaderContainer>
@@ -255,36 +307,35 @@ const UploadModal = () => {
                 {uploadStep === 1 && (
                   <ChannelListBox>
                     <ul>
-                      {roomList  && roomList.map((data: RoomDataType) => {
-                        return (
-                          <li onClick={inputRoom(data)} key={data.id}>
-                            {data.check ? <AiFillCheckCircle /> : <AiOutlineCheckCircle />}
-                            <span>{data.title}</span>
-                          </li>
-                        );
-                      })}
+                      {selectedRooms &&
+                        selectedRooms.map((data: RoomDataType) => {
+                          return (
+                            <li onClick={inputRoom(data)} key={data.id}>
+                              {data.check ? <AiFillCheckCircle /> : <AiOutlineCheckCircle />}
+                              <span>{data.title}</span>
+                            </li>
+                          );
+                        })}
                     </ul>
-                    <div>
+                    {/* <div>
                       <p>현재 선택한 방들</p>
                       {selectedRooms.map((room) => {
                         return <span key={room.id}>{room.title}</span>;
                       })}
-                    </div>
+                    </div> */}
                   </ChannelListBox>
                 )}
                 {uploadStep === 2 && (
                   <div className={'result_box'}>
                     <ImageBox>
                       {/* <h2>업로드 사진</h2> */}
-                      <ImageDiv
-                        image={imageData}
-                      ></ImageDiv>
+                      <ImageDiv image={imageData}></ImageDiv>
                     </ImageBox>
                     <ListBox>
                       <div>
                         <h2>업로드할 채널목록</h2>
                         <ul>
-                          {selectedRooms.map((room) => {
+                          {getSelectedRoomArray().map((room) => {
                             return <li key={room.id}>{room.title}</li>;
                           })}
                         </ul>
