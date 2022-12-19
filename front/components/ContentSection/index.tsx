@@ -32,15 +32,15 @@ interface ImageType {
   name: string;
 }
 
-const ContentSection = memo(() => {
+const ContentSection = memo(({ roomId }: {roomId: string | undefined}) => {
   // const { roomId } = useParams<{ roomId?: string }>();
-  const { data: roomId } = useSWR('roomId');
+  // const { data: roomId } = useSWR('roomId');
   const { data: imageList, mutate: imageListTrigger } = useSWR(['imagelist', roomId], getImageListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-
+  // console.log(roomId, '컨텐츠 섹션');
   // console.log(imageList, '테스트', roomId);
   // // 전체 이미지 정보
   // const { mutate: imageInfoMutate } = useSWR('imageInfo');
