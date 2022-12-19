@@ -66,9 +66,13 @@ export const Modal = styled.div<{ currentStep: number }>`
   overflow: hidden;
   user-select: none;
   .content_box {
-    position: relative;
+    box-sizing: border-box;
+
     width: 100%;
     height: 360px;
+    padding: 20px;
+
+    overflow: auto;
   }
   .result_box {
     display: flex;
@@ -149,7 +153,7 @@ export const ModalImageBox = styled.div`
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지가 load 되고 난 뒤에 값들을 넣어준다.
   ${({ image }) => {
-    console.log(image?.height, image, image?.width);
+    // console.log(image?.height, image, image?.width);
     return `
     background-image: url(${image?.src});
     width: ${image && ((360 / image.height) * image.width).toFixed(3)}px;
@@ -178,11 +182,11 @@ export const ImageCover = styled.div`
 `;
 
 export const ChannelListBox = styled.div`
-  position: relative;
   width: 100%;
   height: 100%;
   ul {
     margin: 0;
+    padding: 0;
   }
   ul li {
     cursor: pointer;
