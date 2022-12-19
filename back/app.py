@@ -10,6 +10,7 @@ import os
 
 class Services:
     pass
+good_ip_list=['127.0.0.1','49.143.162.147']
 
 def create_app(test_config=None):
     
@@ -34,7 +35,9 @@ def create_app(test_config=None):
         ip=request.environ.get('REMOTE_ADDR')
         print("Current IP Address:",ip,flush=True)
         print("Current Process:",os.getpid(),flush=True)
-    
+        if ip not in good_ip_list:
+            abort(403)
+            
     @api.route("/search")
     class search_user(Resource):
         def get(self):
