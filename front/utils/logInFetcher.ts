@@ -14,8 +14,12 @@ const logInFetcher = (url: string) => {
         Authorization: `${sessionStorage.getItem('TOKEN')}`,
       },
     })
-    .then(() => {
+    .then((res) => {
       console.log('토큰 정상');
+      const { user_info } = res.data;
+      sessionStorage.setItem('NAME', user_info.name);
+      sessionStorage.setItem('EMAIL', user_info.email);
+      sessionStorage.setItem('PROFILE', user_info.profile);
       return true;
     })
     .catch(() => {
