@@ -6,10 +6,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
 
+
 class UserService:
     def __init__(self,user_dao,config):
         self.config=config
         self.user_dao=user_dao
+    update_list=['profile','name']
     '''
     userdao
     get_user_id_and_password(email)->{id,password}
@@ -199,3 +201,12 @@ class UserService:
     def delete_user_friend(self,user_id,delete_friend_user_id):
         result=self.user_dao.delete_user_friend(user_id,delete_friend_user_id)
         return result
+    
+    def update_user_info(self,user_id,update_user):
+        result=0
+        for attr, value in update_user.items():
+            if attr in self.update_list:
+                result+=self.user_dao.update_user(user_id,attr,value)
+        
+        return result
+                    
