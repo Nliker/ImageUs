@@ -13,19 +13,20 @@ import useSWR, { mutate } from 'swr';
 import { ContentWrappper, Wrappper } from './styles';
 
 const MainPage = () => {
-  const { roomId } = useParams<{ roomId: string }>();
+  const { roomId } = useParams<{ roomId: string | undefined }>();
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (!roomId) return;
-    console.log(roomId);
-    mutate('roomId', roomId, false);
-  }, [roomId]);
+  // useEffect(() => {
+  //   // if (!roomId) return;
+  //   console.log('메인페이지', roomId);
+  //   mutate('roomId', roomId, true);
+  // }, [roomId]);
 
   const handleRoomListBtn = useCallback(() => {
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
+  console.log(roomId, '메인페이지');
   // const location = useLocation();
   // useEffect(() => {
   //   console.log(location);
@@ -37,7 +38,7 @@ const MainPage = () => {
       <SideBar show={showSideBar} />
       <Wrappper>
         <ContentWrappper>
-          <ContentSection />
+          <ContentSection roomId={roomId}/>
           {/* <Routes>
             <Route index element={<ContentSection />} />
             <Route path=":roomId" element={<ContentSection />} />
