@@ -45,6 +45,9 @@ def user_router(app,api,services,config,es):
                                  '해당 필드가 없습니다.',
                                  api_error.user_search_no_arg_error_model())
         def get(self):
+            '''
+            유저의 이메일을 검색합니다.
+            '''
             if 'email' not in request.args:
                 print(api_error.user_search_no_arg_error()['message'])
                 return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
@@ -94,13 +97,13 @@ def user_router(app,api,services,config,es):
     #query ->email='tjwjdgus83@naver.com'
     #output
     # '1 send mail success'
-    get_user_email_auth=api_parser_module.get_parser(['email'])
+    get_user_email_auth_parser=api_parser_module.get_parser(['email'])
     
     post_user_email_auth_model=api_model.get_model("post_user_email_auth_model",['auth_password'])
-    post_user_email_auth=api_parser_module.get_parser(['email'])
+    post_user_email_auth_parser=api_parser_module.get_parser(['email'])
     @user_namespace.route("/auth")
     class email_auth(Resource):
-        @user_namespace.expect(get_user_email_auth,validate=False)
+        @user_namespace.expect(get_user_email_auth_parser,validate=False)
         @user_namespace.response(200,"1 send mail success")
         @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
                                  '해당 필드가 없습니다.',
@@ -109,7 +112,9 @@ def user_router(app,api,services,config,es):
                                  '해당 필드가 없습니다.',
                                  api_error.user_email_existance_auth_error_model())
         def get(self):
-            
+            '''
+            유저의 이메일 인증 문자를 발송합니다.
+            '''
             if 'email' not in request.args:
                 print(api_error.user_search_no_arg_error()['message'])
                 return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
@@ -139,7 +144,7 @@ def user_router(app,api,services,config,es):
         # }
         #output
         # 'tjwjdgus83@naver.com auth success'
-        @user_namespace.expect(post_user_email_auth,post_user_email_auth_model,validate=False)
+        @user_namespace.expect(post_user_email_auth_parser,post_user_email_auth_model,validate=False)
         @user_namespace.response(200,"email:test@test.com has auth success")
         @user_namespace.response(api_error.user_search_no_arg_error()['status_code'],
                                  '해당 필드가 없습니다.',
@@ -150,7 +155,10 @@ def user_router(app,api,services,config,es):
         @user_namespace.response(api_error.user_email_auth_password_error()['status_code'],
                                  "인증번호가 일치하지 않습니다.",
                                  api_error.user_email_auth_password_error_model())
-        def post(self):    
+        def post(self):
+            '''
+            유저의 이메일 인증을 확인합니다.
+            '''
             if 'email' not in request.args:
                 return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
                                      api_error.user_search_no_arg_error()['status_code'])
@@ -275,12 +283,18 @@ def user_router(app,api,services,config,es):
     #         'profile':'test1user'
     #     }
     # }
-    get_my_response_model_parser=api_parser_module.get_parser(['Authorization'])
+    post_my_parser=api_parser_module.get_parser(['Authorization'])
+    post_my_model=api_model.get_model("post_sign_up_model",
+                                ['name','profile'])
+    post_my_reponse_model=api_model.get_model('get_my_response_model',['user_info'])
+    
+    
+    get_my_parser=api_parser_module.get_parser(['Authorization'])
     get_my_response_model=api_model.get_model('get_my_response_model',['user_info'])
     
     @user_namespace.route("/my")
     class my(Resource):
-        @user_namespace.expect(get_my_response_model_parser,validate=False)
+        @user_namespace.expect(get_my_parser,validate=False)
         @user_namespace.response(200,'유저의 정보를 반환합니다.',get_my_response_model)
         @user_namespace.response(api_error.user_existance_error()['status_code'],
                                  '해당 유저가 존재하지 않습니다.',
@@ -297,6 +311,29 @@ def user_router(app,api,services,config,es):
             else:
                 return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
                                      api_error.user_existance_error()['status_code'])
+
+        @user_namespace.expect(post_my_parser,post_my_model,validate=False)
+        @user_namespace.response(200,'업데이트 된 유저의 정보를 반환합니다.',post_my_reponse_model)
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
+        @login_required
+        def post(self):
+            '''
+            현재 로그인 된 유저의 정보를 변경합니다.
+            '''
+            current_user_id=g.user_id
+            update_user=request.json
+            if not user_service.get_user_info(current_user_id):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
+            
+            result=user_service.update_user_info(current_user_id,update_user)
+            print(result)
+            updated_user_info=user_service.get_user_info(current_user_id)
+
+            return make_response(jsonify({'user_info':updated_user_info}),200)
+            
     
     
     #input
