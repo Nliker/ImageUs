@@ -134,7 +134,7 @@ class ImageDao:
 
         return row
 
-    def get_room_imagelist(self,room_id):
+    def get_room_imagelist(self,room_id,pages):
         rows=self.db.execute(text("""
             select
                 i_r.image_id as id,
@@ -147,8 +147,11 @@ class ImageDao:
             and i.deleted=0)
             where i_r.room_id=:room_id
             order by i_r.created_at
+            limit :start,:limit
             """),{
-                    'room_id':room_id
+                    'room_id':room_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
         room_image_info_list=[{

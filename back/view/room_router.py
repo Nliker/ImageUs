@@ -166,7 +166,7 @@ def room_router(api,services):
     #         }
     #     ]
     # }
-    get_room_imagelist_parser=api_parser_module.get_parser(['Authorization'])
+    get_room_imagelist_parser=api_parser_module.get_parser(['Authorization','start','linit'])
     get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist'])
     @room_namespace.route("/<int:room_id>/imagelist")
     class room_imagelist(Resource):
@@ -192,7 +192,31 @@ def room_router(api,services):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            imagelist=image_service.get_room_imagelist(room_id)
+            if 'start' not in request.args or 'limit' not in request.args:
+                return make_response(jsonify({'message':"필수 성분이 없습니다."}),
+                                    405)
+            def check_int(s):
+                if s[0] in ('-', '+'):
+                    return s[1:].isdigit()
+                return s.isdigit()
+            start=request.args['start']
+            limit=request.args['limit']
+            if not check_int(start) or not check_int(limit):
+                return make_response(jsonify({'message':"형태변환 불가능!"}),
+                                     405)
+
+            start=int(start)
+            limit=int(limit)
+            if start < 0 or limit < 0 :
+                return make_response(jsonify({'message':"범위 초과!"}),
+                                    405)
+
+            pages={
+                'start':int(start),
+                'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
+            }
+
+            imagelist=image_service.get_room_imagelist(room_id,pages)
                 
             return make_response(jsonify({'imagelist':imagelist}),200)
             
