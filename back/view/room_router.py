@@ -166,7 +166,7 @@ def room_router(api,services):
     #         }
     #     ]
     # }
-    get_room_imagelist_parser=api_parser_module.get_parser(['Authorization','start','linit'])
+    get_room_imagelist_parser=api_parser_module.get_parser(['Authorization','start','limit'])
     get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist'])
     @room_namespace.route("/<int:room_id>/imagelist")
     class room_imagelist(Resource):
