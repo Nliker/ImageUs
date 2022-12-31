@@ -91,5 +91,5 @@ class ImageService:
         return image_info
 
     def get_image_link(self,user_id,image_filename):
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{image_filename}"
+        image_link=f"{user_id}/{image_filename}"
         return image_link
