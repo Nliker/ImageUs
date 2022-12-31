@@ -48,7 +48,7 @@ class ImageService:
 
         print(output_path)
         image.save(output_path)
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{output_path.split('/')[-1]}"
+        image_link=f"{user_id}/{output_path.split('/')[-1]}"
         return image_link
 
     def decode_access_code(self,access_token):
