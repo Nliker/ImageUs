@@ -81,19 +81,40 @@ const config: Configuration = {
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
     proxy: {
-      '/user': {
+      '/image-download/*': {
+        target: 'http://118.42.101.135:5001',
+        changeOrigin: true,
+      },
+      '/user/*': {
         target: 'http://118.42.101.135:5000',
         changeOrigin: true,
       },
-      '/room': {
+      '/room/*': {
         target: 'http://118.42.101.135:5000',
         changeOrigin: true,
       },
-      '/image': {
+      '/image/*': {
         target: 'http://118.42.101.135:5000',
         changeOrigin: true,
       },
     },
+
+    // '/user': {
+    //   target: 'http://118.42.101.135:5000',
+    //   changeOrigin: true,
+    // },
+    // '/room': {
+    //   target: 'http://118.42.101.135:5000',
+    //   changeOrigin: true,
+    // },
+    // '/image': {
+    //   target: 'http://118.42.101.135:5000',
+    //   changeOrigin: true,
+    // },
+    // '/image-download': {
+    //   target: 'http://118.42.101.135:5001',
+    //   changeOrigin: true,
+    // },
   },
 };
 
