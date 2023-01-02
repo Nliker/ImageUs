@@ -8,7 +8,9 @@ import { IRoomData } from '@typing/db';
 
 const ChannelList = memo(() => {
   const { data: roomlist, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
-    dedupingInterval: 2000
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
   const toggleChannelCollapse = useCallback(() => setChannelCollapse((prev) => !prev), []);
