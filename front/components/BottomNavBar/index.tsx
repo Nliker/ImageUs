@@ -11,17 +11,20 @@ import useSWR from 'swr';
 //   showModal: (e: any) => void;
 // }
 
-const BottomNavBar = () => {
+const BottomNavBar = ({ roomId }: { roomId?: string }) => {
   // const { mutate: uploadModalMutate } = useSWR('showUploadModal');
   const { data, mutate: showModalMutate } = useSWR('showModalState');
 
   const onClickUploadModal = () => {
-    showModalMutate({
-      ...data,
-      upload: true,
-    }, false);
-  }
-  
+    showModalMutate(
+      {
+        ...data,
+        upload: true,
+      },
+      false,
+    );
+  };
+
   return (
     <Wrapper>
       <BottomContainer>
@@ -46,12 +49,14 @@ const BottomNavBar = () => {
               친구목록 관리
             </NavLink>
           </MobileNavItem>
-          <MobileNavItem>
-            <div className={"upload_btn"} onClick={onClickUploadModal}>
-              <SlCloudUpload />
-              <span>업로드</span>
-            </div>
-          </MobileNavItem>
+          {roomId && (
+            <MobileNavItem>
+              <div className={'upload_btn'} onClick={onClickUploadModal}>
+                <SlCloudUpload />
+                <span>업로드</span>
+              </div>
+            </MobileNavItem>
+          )}
         </MobileNavList>
       </BottomContainer>
     </Wrapper>

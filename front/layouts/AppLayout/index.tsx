@@ -14,9 +14,10 @@ import InviteMemberModal from '@components/InviteMemberModal';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
+  roomId?: string;
 }
 
-const AppLayout = ({ children }: AppLayoutProps) => {
+const AppLayout = ({ children, roomId }: AppLayoutProps) => {
   const { data: showUploadModal } = useSWR('showUploadModal');
   const { data: imageModalState } = useSWR('imageModalState');
   const { data: showModalState } = useSWR('showModalState');
@@ -29,37 +30,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
-  // const showModal = useCallback(() => {
-  //   setshowUploadModal(true);
-  //   // uploadModalMutate(true, false);
-  // }, [showUploadModal]);
-
-  // const onCloseModal = useCallback(() => {
-  //   setshowUploadModal(false);
-  // }, []);
-
-  // const onShowImageModal = useCallback(() => {
-  //   setShowImageModal(true);
-  // }, []);
-
-  // const onCloseImageModal = useCallback(() => {
-  //   setShowImageModal(false);
-  // }, []);
-  // console.log(imageModalState);
   return (
     <Wrapper>
       <Container showModal={showModalState}>
         <TopNavBar />
-        {isMobile && <BottomNavBar />}
-        {/* {currentUrl.pathname === '/main_page' && (
-          <>
-            <ToolBar handleRoomListBtn={handleRoomListBtn} />
-            <SideBar show={showSideBar} />
-          </>
-        )} */}
+        {isMobile && <BottomNavBar roomId={roomId} />}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
-      {showModalState?.upload && <UploadModal />}
+      {showModalState?.upload && <UploadModal roomId={roomId} />}
       {showModalState?.image && <ContentImageModal />}
       {showModalState?.create_room && (
         <ModalWrapper>
