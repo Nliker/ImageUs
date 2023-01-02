@@ -55,8 +55,8 @@ export const ModalBox = styled.div`
   }
 `;
 
-export const Modal = styled.div`
-  width: 495px;
+export const Modal = styled.div<{ currentStep: number }>`
+  ${({ currentStep }) => (currentStep === 2 ? `width: 845px;` : `width: 495px;`)}
   max-width: calc(100vw - 40px);
   min-width: 348px;
   min-height: 391px;
