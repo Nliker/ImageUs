@@ -31,14 +31,14 @@ const MainPage = () => {
   // useEffect(() => {
   //   console.log(location);
   // }, [ location ])
-
+  
   return (
-    <AppLayout roomId={roomId}>
+    <AppLayout>
       <ToolBar handleRoomListBtn={handleRoomListBtn} />
-      <SideBar show={showSideBar} roomId={roomId} />
+      <SideBar show={showSideBar} />
       <Wrappper>
         <ContentWrappper>
-          <ContentSection roomId={roomId} />
+          <ContentSection roomId={roomId}/>
           {/* <Routes>
             <Route index element={<ContentSection />} />
             <Route path=":roomId" element={<ContentSection />} />

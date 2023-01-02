@@ -1,6 +1,5 @@
 import { IRoomData } from '@typing/db';
 import axios from 'axios';
-import { mutate } from 'swr';
 
 const userId = sessionStorage.getItem('USER_ID');
 const token = sessionStorage.getItem('TOKEN');
@@ -20,16 +19,13 @@ const getUserFriendList = async (url: string) => {
   }
 };
 
-const getUserImageList = async (arg: [string, number]) => {
-  const start = arg[1];
-  const limit = 10;
+const getUserImageList = async (url: string) => {
   try {
-    const response = await axios.get(`/user/${userId}/imagelist?start=${start}&limit=${limit}`, {
+    const response = await axios.get(`/user/${userId}/imagelist`, {
       headers: {
         Authorization: token,
       },
     });
-    // mutate('store/userImageLoadNumber', start + limit + 1, false);
     const { imagelist } = await response.data;
     return imagelist;
   } catch (error) {
@@ -37,15 +33,15 @@ const getUserImageList = async (arg: [string, number]) => {
   }
 };
 
-const deleteUserFriend = async (url: string, { arg }: { arg: string }) => {
+const deleteUserFriend = async (url: string, { arg }: {arg: string}) => {
   try {
     const response = await axios.delete(`/user/${userId}/friend`, {
       data: {
-        delete_friend_user_id: arg,
+        "delete_friend_user_id": arg,
       },
       headers: {
-        Authorization: `${sessionStorage.getItem('TOKEN')}`,
-      },
+        Authorization: `${sessionStorage.getItem('TOKEN')}`
+      }
     });
     console.log(response.data);
   } catch (error) {
@@ -65,7 +61,7 @@ const getUserRoomListFetcher = async (url: string) => {
       const roomList = data.roomlist.map((roomData: IRoomData) => {
         return {
           id: roomData.id,
-          title: roomData.title,
+          title: roomData.title
         };
       });
       return roomList;
