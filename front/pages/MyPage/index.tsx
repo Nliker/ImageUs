@@ -8,15 +8,7 @@ import { Routes, Route } from 'react-router';
 import { ContentBox, EachRoomPictureList, ProfileBox, ProfileImage, ProfileInfo, SubMenu, WrapperBox } from './styles';
 import { getUserFriendList, getUserImageList, getUserRoomListFetcher } from '@utils/userDataFetcher';
 import { IImageData } from '@typing/db';
-
-const dummyImages = [
-  { id: 1, name: 'first_image', url: 'image_test.png' },
-  { id: 2, name: 'second_image', url: 'image_test2.jpg' },
-  { id: 3, name: 'third_image', url: 'image_test3.jpg' },
-  { id: 4, name: 'first_image', url: 'image_test.png' },
-  { id: 5, name: 'second_image', url: 'image_test2.jpg' },
-  { id: 6, name: 'third_image', url: 'image_test3.jpg' },
-];
+import { userImageLoadNumber } from '@hooks/swrStore';
 
 const MyPage = () => {
   const { data: roomlist, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
@@ -29,14 +21,19 @@ const MyPage = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  const { data: imageList } = useSWR<Array<IImageData> | undefined>('userImageList', getUserImageList, {
+
+  const { start } = userImageLoadNumber();
+  const { data: imageList } = useSWR<Array<IImageData> | undefined>(['userImageList', start], getUserImageList, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
 
+  // 스크롤이 일어날 때 imageList 요청을 보내서 다음 사진을 받고
+  // mutate(key, start + 개수 + 1, true)로 이미지 로드 시작번호를 업데이트 한다.
+
   console.log(imageList);
-  
+
   return (
     <AppLayout>
       <WrapperBox>
@@ -71,9 +68,7 @@ const MyPage = () => {
           <EachRoomPictureList>
             <SubMenu>
               <NavLink to={`/my_page`} className={({ isActive }) => (isActive ? 'menu_active' : undefined)} end>
-                <div>
-                  사진첩
-                </div>
+                <div>사진첩</div>
               </NavLink>
               <NavLink to={`/my_page/my_profile`} className={({ isActive }) => (isActive ? 'menu_active' : undefined)}>
                 <div>프로필</div>
