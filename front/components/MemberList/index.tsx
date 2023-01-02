@@ -7,35 +7,16 @@ import { Collapse, Subtitle } from './styles';
 import { getUserListFetcher } from '@utils/roomDataFetcher';
 import { IFriendData } from '@typing/db';
 
-const MemberList = memo(() => {
+const MemberList = memo(({ roomId }: { roomId: string }) => {
   // const { roomId } = useParams<{roomId?: string}>();
   // console.log(roomId);
-  const { data: roomId } = useSWR('roomId');
+  // const { data: roomId } = useSWR('roomId');
   const { data: userlist } = useSWR(['userlist', roomId], getUserListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-  } );
+  });
   const [memberCollapse, setMemberCollapse] = useState<boolean>(false);
-  // 임시 데이터
-  // const memberData = [
-  //   {
-  //     id: 1,
-  //     name: '멤버1',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: '멤버2',
-  //   },
-  //   {
-  //     id: 3,
-  //     name: '멤버3',
-  //   },
-  //   {
-  //     id: 4,
-  //     name: '멤버4',
-  //   },
-  // ];
 
   const toggleMemberCollapse = useCallback(() => setMemberCollapse((prev) => !prev), []);
   return (
