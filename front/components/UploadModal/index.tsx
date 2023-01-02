@@ -24,6 +24,8 @@ import useSWR from 'swr';
 import { IRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
@@ -42,50 +44,24 @@ interface RoomDataType {
   check: boolean;
 }
 
-// const dummyData = [
-//   {
-//     id: 1,
-//     name: '채널1',
-//     check: false,
-//   },
-//   {
-//     id: 2,
-//     name: '채널2',
-//     check: false,
-//   },
-//   {
-//     id: 3,
-//     name: '채널3',
-//     check: false,
-//   },
-//   {
-//     id: 4,
-//     name: '채널4',
-//     check: false,
-//   },
-//   {
-//     id: 5,
-//     name: '채널5',
-//     check: false,
-//   },
-// ];
-
-const UploadModal = () => {
+const UploadModal = ({ roomId }: { roomId?: string }) => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
-  const user_id = sessionStorage.getItem('USER_ID');
+  const navigate = useNavigate();
+  // const user_id = sessionStorage.getItem('USER_ID');
+  // const { roomId } = useParams<{roomId?: string}>();
   const { data: roomList, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
     dedupingInterval: 2000,
   });
-  const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
-
   const { data, mutate: showModalMutate } = useSWR('showModalState');
-  const [uploadStep, setUploadStep] = useState<number>(0);
+
+  const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
+  // const [uploadStep, setUploadStep] = useState<number>(0);
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
   const [uploadImageFile, setUploadImageFile] = useState<FormData | null>(null);
 
-  const headerName = ['사진 업로드', '채널 선택', '결과물'];
+  // const headerName = ['사진 업로드', '채널 선택', '결과물'];
 
   // 이미지가 로드되고 난 뒤에 넓이와 높이 값을 전달한다.
   // 업로드 후에 이미지 브라우저 메모리 삭제
@@ -159,42 +135,39 @@ const UploadModal = () => {
     setDragOver(true);
   }, []);
 
-  const onClickPrevStep = useCallback(() => {
-    // 버튼을 누를 때 리사이즈 함수 실행
-    // handleResize();
-    setUploadStep((prev) => {
-      if (prev <= 0) {
-        return 0;
-      } else {
-        return prev - 1;
-      }
-    });
-  }, []);
+  // const onClickPrevStep = useCallback(() => {
+  //   // 버튼을 누를 때 리사이즈 함수 실행
+  //   // handleResize();
+  //   setUploadStep((prev) => {
+  //     if (prev <= 0) {
+  //       return 0;
+  //     } else {
+  //       return prev - 1;
+  //     }
+  //   });
+  // }, []);
 
-  const onClickNextStep = useCallback(() => {
-    // handleResize();
-    setUploadStep((prev) => {
-      if (prev >= 2) {
-        return 2;
-      } else {
-        return prev + 1;
-      }
-    });
-  }, []);
+  // const onClickNextStep = useCallback(() => {
+  //   // handleResize();
+  //   setUploadStep((prev) => {
+  //     if (prev >= 2) {
+  //       return 2;
+  //     } else {
+  //       return prev + 1;
+  //     }
+  //   });
+  // }, []);
 
   const onClickUpload = useCallback(async () => {
     try {
-      const response = await axios.post(
-        '/image',
-        uploadImageFile,
-        {
-          headers: {
-            'Authorization': `${sessionStorage.getItem('TOKEN')}`,
-            'Content-Type': 'multipart/form-data'
-          },
+      const response = await axios.post(`/room/${roomId}/image`, uploadImageFile, {
+        headers: {
+          Authorization: `${sessionStorage.getItem('TOKEN')}`,
+          'Content-Type': 'multipart/form-data',
         },
-      );
+      });
       console.log(response.data);
+      navigate('/');
     } catch (error) {
       console.error(error);
     }
@@ -257,8 +230,7 @@ const UploadModal = () => {
     return [...extractRooms];
   }, [selectedRooms]);
 
-  // console.log(roomList, selectedRooms);
-  console.log(uploadImageFile?.get('image'));
+  // console.log(uploadImageFile?.get('image'));
   return (
     <Wrapper>
       <Background />
@@ -270,14 +242,19 @@ const UploadModal = () => {
         </CloseBtn>
         <ModalContainer>
           <ModalBox>
-            <Modal currentStep={uploadStep}>
+            <Modal>
               <HeaderContainer>
                 <ModalHeaderWrapper>
                   <ModalHeader>
                     <ModalTitle>
-                      <h1>{headerName[uploadStep]}</h1>
+                      <h1>방에 사진 업로드</h1>
                     </ModalTitle>
-                    {uploadStep !== 0 && (
+                    <div className={'right_btn'}>
+                      <button type="button" onClick={onClickUpload}>
+                        업로드
+                      </button>
+                    </div>
+                    {/* {uploadStep !== 0 && (
                       <div className={'left_btn'} onClick={onClickPrevStep}>
                         <button>이전</button>
                       </div>
@@ -293,18 +270,22 @@ const UploadModal = () => {
                           업로드
                         </button>
                       </div>
-                    )}
+                    )} */}
                   </ModalHeader>
                 </ModalHeaderWrapper>
               </HeaderContainer>
               <div className={'content_box'}>
-                {uploadStep === 0 && (
+                <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
+                  <ImageDiv image={imageData}></ImageDiv>
+                  <ImageCover />
+                </ModalImageBox>
+                {/* {uploadStep === 0 && (
                   <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
                     <ImageDiv image={imageData}></ImageDiv>
                     <ImageCover />
                   </ModalImageBox>
-                )}
-                {uploadStep === 1 && (
+                )} */}
+                {/* {uploadStep === 1 && (
                   <ChannelListBox>
                     <ul>
                       {selectedRooms &&
@@ -317,18 +298,11 @@ const UploadModal = () => {
                           );
                         })}
                     </ul>
-                    {/* <div>
-                      <p>현재 선택한 방들</p>
-                      {selectedRooms.map((room) => {
-                        return <span key={room.id}>{room.title}</span>;
-                      })}
-                    </div> */}
                   </ChannelListBox>
                 )}
                 {uploadStep === 2 && (
                   <div className={'result_box'}>
                     <ImageBox>
-                      {/* <h2>업로드 사진</h2> */}
                       <ImageDiv image={imageData}></ImageDiv>
                     </ImageBox>
                     <ListBox>
@@ -342,7 +316,7 @@ const UploadModal = () => {
                       </div>
                     </ListBox>
                   </div>
-                )}
+                )} */}
               </div>
             </Modal>
           </ModalBox>
