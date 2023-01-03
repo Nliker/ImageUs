@@ -97,7 +97,6 @@ CREATE TABLE `images_room_list` (
   `room_id` int NOT NULL,
   `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT, 
-  `public` int not null default 0,
   CURRENT_TIMESTAMP,
   PRIMARY KEY(`image_id`,`room_id`),
   INDEX `room_id` (`room_id`)
