@@ -167,7 +167,7 @@ def room_router(api,services):
     #     ]
     # }
     get_room_imagelist_parser=api_parser_module.get_parser(['Authorization','start','limit'])
-    get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist'])
+    get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist','read_history_row'])
     @room_namespace.route("/<int:room_id>/imagelist")
     class room_imagelist(Resource):
         @room_namespace.expect(get_room_imagelist_parser,validate=False)
@@ -215,18 +215,18 @@ def room_router(api,services):
                 'start':int(start),
                 'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
             }
-            user_read_room_history_info=user_service.get_user_read_room_history_info(current_user_id,room_id)
-            if user_read_room_history_info==None:
-                result=user_service.create_user_read_room_history(current_user_id,room_id)
+            user_room_history_row_info=user_service.get_user_room_history_row_info(current_user_id,room_id)
+            if user_room_history_row_info==None:
+                result=user_service.create_user_room_history_row(current_user_id,room_id)
                 print(result)
                 read_history=0
             else:
-                read_history=user_read_room_history_info['row']
+                read_history=user_room_history_row_info['read_history_row']
 
             imagelist=image_service.get_room_imagelist(room_id,pages)
-            result=user_service.update_user_read_history(current_user_id,room_id,start+limit)
+            result=user_service.update_user_room_history_row_info(current_user_id,room_id,start+limit)
             
-            return make_response(jsonify({'read_history':read_history,'imagelist':imagelist}),200)
+            return make_response(jsonify({'read_history_row':read_history,'imagelist':imagelist}),200)
             
     #input
     #output
