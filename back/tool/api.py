@@ -172,6 +172,12 @@ class ApiModel:
         'delete_result':fields.Integer
     }
     
+    read_history_row=fields.Integer(
+                default=23,
+                description="int_user_read_room_history_row",
+                required=False
+            )
+    
     def __init__(self,api):
         self.api=api
         
@@ -225,6 +231,8 @@ class ApiModel:
         if 'auth_password' in args:
             payload['auth_password']=self.auth_password
             
+        if 'read_history_row' in args:
+            payload['read_history_row']=self.read_history_row
         if 'imagelist' in args:
             payload['imagelist']=fields.List(
                 fields.Nested(self.api.model("image_model",self.image_info)),
@@ -239,7 +247,6 @@ class ApiModel:
                 }],
                 required=False
             )
-            
             
         if 'user_info' in args:
             payload['user_info']=fields.Nested(self.api.model("user_info_model",
