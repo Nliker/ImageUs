@@ -115,11 +115,11 @@ CREATE TABLE `email_auth` (
   PRIMARY KEY (`email`)
 )
 
-8. users_read_room_history
-CREATE TABLE `users_read_room_history` (
+8. users_room_history_row
+CREATE TABLE `users_room_history_row` (
   `user_id` int NOT NULL,
   `room_id` int NOT NULL,
-  `row` int NOT NULL default 0,
+  `read_history_row` int NOT NULL default 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`room_id`,`user_id`)
