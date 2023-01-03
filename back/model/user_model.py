@@ -215,42 +215,40 @@ class UserDao:
         
         return row
     
-    def insert_user_read_room_history(self,user_id,room_id):
+    def insert_user_room_history_row(self,user_id,room_id):
         row=self.db.execute(text("""
-            insert into users(
+            insert into users_room_history_row(
                 user_id,
-                room_id,
-                row
+                room_id
             ) values (
                 :user_id,
-                :room_id,
-                :row,
+                :room_id
             )
             """),{'user_id':user_id,'room_id':room_id}).rowcount
         return row
     
-    def get_user_read_room_history_info(self,user_id,room_id):
+    def get_user_room_history_row_info(self,user_id,room_id):
         row=self.db.execute(text("""
-            select row
-            from users_read_room_history
+            select read_history_row
+            from users_room_history_row
             where room_id=:room_id
             and user_id=:user_id
             """),{'room_id':room_id,'user_id':user_id}).fetchone()
         
         user_read_history={
-            row['row']
+            'read_history_row':row['read_history_row']
         } if row else None
 
         return user_read_history
 
-    def update_user_read_room_history_info(self,user_id,room_id,update_row):
+    def update_user_room_history_row_info(self,user_id,room_id,update_row):
 
         row=self.db.execute(text("""
-            update users_read_room_history
-            set row=:update_row
-            where room_id=:room_id,
+            update users_room_history_row
+            set read_history_row=:update_row
+            where room_id=:room_id
             and user_id=:user_id
-            and row!=update_row
+            and read_history_row!=:update_row
         """),{'room_id':room_id,'user_id':user_id,'update_row':update_row}).rowcount
 
         return row
