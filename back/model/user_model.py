@@ -215,3 +215,42 @@ class UserDao:
         
         return row
     
+    def insert_user_read_room_history(self,user_id,room_id):
+        row=self.db.execute(text("""
+            insert into users(
+                user_id,
+                room_id,
+                row
+            ) values (
+                :user_id,
+                :room_id,
+                :row,
+            )
+            """),{'user_id':user_id,'room_id':room_id}).rowcount
+        return row
+    
+    def get_user_read_room_history_info(self,user_id,room_id):
+        row=self.db.execute(text("""
+            select row
+            from users_read_room_history
+            where room_id=:room_id
+            and user_id=:user_id
+            """),{'room_id':room_id,'user_id':user_id}).fetchone()
+        
+        user_read_history={
+            row['row']
+        } if row else None
+
+        return user_read_history
+
+    def update_user_read_room_history_info(self,user_id,room_id,update_row):
+
+        row=self.db.execute(text("""
+            update users_read_room_history
+            set row=:update_row
+            where room_id=:room_id,
+            and user_id=:user_id
+            and row!=update_row
+        """),{'room_id':room_id,'user_id':user_id,'update_row':update_row}).rowcount
+
+        return row
