@@ -215,10 +215,18 @@ def room_router(api,services):
                 'start':int(start),
                 'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
             }
+            user_read_room_history_info=user_service.get_user_read_room_history_info(current_user_id,room_id)
+            if user_read_room_history_info==None:
+                result=user_service.create_user_read_room_history(current_user_id,room_id)
+                print(result)
+                read_history=0
+            else:
+                read_history=user_read_room_history_info['row']
 
             imagelist=image_service.get_room_imagelist(room_id,pages)
-                
-            return make_response(jsonify({'imagelist':imagelist}),200)
+            result=user_service.update_user_read_history(current_user_id,room_id,start+limit)
+            
+            return make_response(jsonify({'read_history':read_history,'imagelist':imagelist}),200)
             
     #input
     #output
