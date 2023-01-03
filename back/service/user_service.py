@@ -207,6 +207,21 @@ class UserService:
         for attr, value in update_user.items():
             if attr in self.update_list:
                 result+=self.user_dao.update_user(user_id,attr,value)
+    
+        return result
+    
+    def get_user_read_room_history_info(self,user_id,room_id):
+        user_read_room_history_info=self.user_dao.get_user_read_room_history_info(user_id,room_id)
+
+        return user_read_room_history_info
+
+    def create_user_read_room_history(self,user_id,room_id):
+        result=self.user_dao.insert_user_read_room_history(user_id,room_id)
+
+        return result
+
+    def update_user_read_histor(self,user_id,room_id,update_row):
+        result=self.user_dao.update_user_read_room_history_info(user_id,room_id,update_row)
         
         return result
                     
