@@ -7,7 +7,6 @@ const getRoomImageListFetcher = async (arg: Array<string | undefined>) => {
   const [url, roomId, start] = arg;
   if (!roomId) return null;
   const loadNumber = 10;
-  console.log('이미지 리스트', start);
 
   // 이미지를 10개씩 끊어서 불러오고 불러올 이미지의 시작 위치는 마지막 번호 + 1를 저장해서 사용한다.
   try {
@@ -17,8 +16,8 @@ const getRoomImageListFetcher = async (arg: Array<string | undefined>) => {
       },
     });
 
-    console.log(imageInfoResponse.data.imagelist);
-    return imageInfoResponse.data.imagelist;
+    const { imagelist, read_history_row } = imageInfoResponse.data;
+    return { imagelist, read_history_row };
     // 다음 서버에서 불러올 이미지 시작번호 업데이트
     // mutate(start + loadNumber + 1, false);
 
@@ -60,24 +59,51 @@ const getRoomImageListFetcher = async (arg: Array<string | undefined>) => {
   }
 };
 
-const getImageData = async (url: string, { arg }: { arg: Array<{ id: number; link: string; user_id: number }> }) => {
-  // if (!arg) return null;
+const getImageData = async (
+  url: string,
+  { arg }: { arg: { imagelist: Array<{ id: number; link: string; user_id: number }>; read_history_row: number } },
+) => {
   try {
-    const imageDataList = await Promise.all(
-      arg.map(async (imageData) => {
-        if (!imageData.link) return { id: imageData.id, imageData: null };
+    const prevImgData: Array<{ id: number; imageUrl: string }> = [];
+    const nextImgData: Array<{ id: number; imageUrl: string }> = [];
+    const deleteImgData: Array<{ id: number }> = [];
+
+    for (const imageData of arg.imagelist) {
+      if (!imageData.link) {
+        deleteImgData.push({ id: imageData.id });
+      } else {
         const res = await axios.get(`/image-download/${imageData.link}`, {
           headers: {
             Authorization: `${sessionStorage.getItem('TOKEN')}`,
           },
           responseType: 'blob',
         });
-        // const b64image = btoa(data);
+
         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-        console.log(url);
-        return { id: imageData.id, imageUrl: url };
-      }),
-    );
+        prevImgData.push({ id: imageData.id, imageUrl: url });
+      }
+    }
+    // const imageDataList = await Promise.all(
+    //   arg.map(async (imageData) => {
+    //     if (!imageData.link) return { id: imageData.id, imageData: null };
+    //     const res = await axios.get(`/image-download/${imageData.link}`, {
+    //       headers: {
+    //         Authorization: `${sessionStorage.getItem('TOKEN')}`,
+    //       },
+    //       responseType: 'blob',
+    //     });
+
+    //     const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+    //     console.log(url);
+    //     return { id: imageData.id, imageUrl: url };
+    //   }),
+    // );
+    const imageDataList = {
+      prevImgData: [...prevImgData],
+      nextImgData: [...nextImgData],
+      deleteImgData: [...deleteImgData],
+    };
+    console.log(imageDataList);
     return imageDataList;
   } catch (error) {
     console.log(error);
