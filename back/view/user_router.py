@@ -202,7 +202,7 @@ def user_router(app,api,services,config,es):
     #     }
     # }
     post_sign_up_model=api_model.get_model("post_sign_up_model",
-                                ['name','email','password','profile'])
+                                ['email','name','password','profile'])
     post_sign_up_response_model=api_model.get_model('post_sign_up_response_model',['user_info'])
     @user_namespace.route("/sign-up")
     class sign_up(Resource):
@@ -254,7 +254,7 @@ def user_router(app,api,services,config,es):
     #         'profile':<str>,
     #     }
     # }
-    get_user_response_model=api_model.get_model('post_sign_up_response_model',['user_info'])
+    get_user_response_model=api_model.get_model('get_user_response_model',['user_info'])
     @user_namespace.route("/<int:user_id>")
     class user(Resource):
         @user_namespace.response(200,'유저의 정보를 반환합니다.',get_user_response_model)
@@ -284,7 +284,7 @@ def user_router(app,api,services,config,es):
     #     }
     # }
     post_my_parser=api_parser_module.get_parser(['Authorization'])
-    post_my_model=api_model.get_model("post_sign_up_model",
+    post_my_model=api_model.get_model("post_my_model",
                                 ['name','profile'])
     post_my_reponse_model=api_model.get_model('get_my_response_model',['user_info'])
     
