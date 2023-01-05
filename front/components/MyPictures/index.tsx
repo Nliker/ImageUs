@@ -2,27 +2,26 @@ import { IImageData } from '@typing/db';
 import React from 'react';
 import { Wrapper } from './styles';
 
-// const dummyImages = [
-//   { id: 1, name: 'first_image', url: 'image_test.png' },
-//   { id: 2, name: 'second_image', url: 'image_test2.jpg' },
-//   { id: 3, name: 'third_image', url: 'image_test3.jpg' },
-//   { id: 4, name: 'first_image', url: 'image_test.png' },
-//   { id: 5, name: 'second_image', url: 'image_test2.jpg' },
-//   { id: 6, name: 'third_image', url: 'image_test3.jpg' },
-// ];
+interface ImageData {
+  id: number;
+  imageUrl: string;
+}
 
 // Route를 활용해서 만든 컴포넌트
-const MyPictures = ({ imageList }: {imageList?: Array<IImageData>}) => {
-  return (
+const MyPictures = ({ imageList }: { imageList?: Array<ImageData | null> }) => {
+  return !imageList ? (
+    <div>로딩중..</div>
+  ) : (
     <Wrapper>
       <ul>
-        {imageList && imageList.map((image) => (
-          <li key={image.id}>
-            <div>
-              <img src={image.link} alt={`테스트 요청 alt`} />
-            </div>
-          </li>
-        ))}
+        {imageList &&
+          imageList.map((image) => (
+            <li key={image?.id}>
+              <div>
+                <img src={image?.imageUrl} alt={`테스트 요청 alt`} />
+              </div>
+            </li>
+          ))}
       </ul>
     </Wrapper>
   );
