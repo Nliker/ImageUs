@@ -1,4 +1,4 @@
-import { IRoomData } from '@typing/db';
+import { IImageData, IRoomData } from '@typing/db';
 import axios from 'axios';
 import { mutate } from 'swr';
 
@@ -35,6 +35,25 @@ const getUserImageList = async (arg: [string, number]) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const getImageData = async (url: string, { arg }: { arg: Array<IImageData> }) => {
+  const imageDataList = await Promise.all(
+    arg.map(async (imageData) => {
+      if (!imageData.link) return null;
+      const res = await axios.get(`/image-download/${imageData.link}`, {
+        headers: {
+          Authorization: `${sessionStorage.getItem('TOKEN')}`,
+        },
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+      return { id: imageData.id, imageUrl: url };
+    }),
+  );
+
+  return imageDataList;
 };
 
 const deleteUserFriend = async (url: string, { arg }: { arg: string }) => {
@@ -75,4 +94,4 @@ const getUserRoomListFetcher = async (url: string) => {
     });
 };
 
-export { getUserFriendList, deleteUserFriend, getUserRoomListFetcher, getUserImageList };
+export { getUserFriendList, deleteUserFriend, getUserRoomListFetcher, getUserImageList, getImageData };
