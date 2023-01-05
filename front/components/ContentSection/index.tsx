@@ -7,7 +7,6 @@ import useSWRMutation from 'swr/mutation';
 import { ContentBox, ImageCard, ImageInfo, InfoItem, MainContainer, Wrapper } from './styles';
 import { imageLoadNumber } from '@hooks/swrStore';
 import { AxiosResponse } from 'axios';
-import base64 from 'base-64';
 
 /*
     grid로 격자 형식으로 각 div에 너비와 높이를 똑같이 지정해서 보여준다.
@@ -44,13 +43,12 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
     revalidateOnReconnect: false,
   });
   const { data: imageDataList, trigger } = useSWRMutation('/image-download', getImageData);
-  const [b64ImageList, setB64ImageList] = useState<Array<b64Image | null>>([]);
 
   // 스크롤이 일어날 때 imageList 요청을 보내서 다음 사진을 받고
   // mutate(key, start + 개수 + 1, true)로 이미지 로드 시작번호를 업데이트 한다.
 
   console.log(imageList);
-  // console.log(imageDataList);
+  console.log(imageDataList);
 
   useEffect(() => {
     if (!imageList) return;
@@ -105,32 +103,69 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
         ) : isLoading && !imageDataList ? (
           <div>로딩중입니다..</div>
         ) : (
-          imageDataList?.map((data) => {
-            // console.log(data);
-            if (!data) return <div>사진이 없습니다..</div>;
-            return (
-              <ContentBox key={data.id}>
-                <div>
-                  <Link to="#">
-                    <ImageCard>
-                      {/* {data.imageData} */}
-                      <img src={data.imageUrl} />
-                      {/* <img src={`${data.imageData?.data}`} /> */}
-                      {/* {data.imageData?.data} */}
-                    </ImageCard>
-                    <ImageInfo>
-                      <InfoItem>
-                        <span>이미지 1</span>
-                      </InfoItem>
-                      <InfoItem>
-                        <span>2022/ 11/ 25</span>
-                      </InfoItem>
-                    </ImageInfo>
-                  </Link>
-                </div>
-              </ContentBox>
-            );
-          })
+          <div>
+            <div>
+              <span>최신 업로드 이미지</span>
+            </div>
+            {imageDataList?.nextImgData.map((data) => {
+              // console.log(data);
+              return (
+                <ContentBox key={data.id}>
+                  <div>
+                    <Link to="#">
+                      <ImageCard>
+                        <img src={data.imageUrl} />
+                      </ImageCard>
+                      <ImageInfo>
+                        <InfoItem>
+                          <span>이미지 1</span>
+                        </InfoItem>
+                        <InfoItem>
+                          <span>2022/ 11/ 25</span>
+                        </InfoItem>
+                      </ImageInfo>
+                    </Link>
+                  </div>
+                </ContentBox>
+              );
+            })}
+            <div>
+              <span>게시된 이미지</span>
+            </div>
+            {imageDataList?.prevImgData.map((data) => {
+              // console.log(data);
+              return (
+                <ContentBox key={data.id}>
+                  <div>
+                    <Link to="#">
+                      <ImageCard>
+                        <img src={data.imageUrl} />
+                      </ImageCard>
+                      <ImageInfo>
+                        <InfoItem>
+                          <span>이미지 1</span>
+                        </InfoItem>
+                        <InfoItem>
+                          <span>2022/ 11/ 25</span>
+                        </InfoItem>
+                      </ImageInfo>
+                    </Link>
+                  </div>
+                </ContentBox>
+              );
+            })}
+            <div>
+              <span>삭제된 이미지 목록</span>
+            </div>
+            {imageDataList?.deleteImgData.map((data, i) => {
+              // console.log(data);
+              return (
+                <ContentBox key={data.id}>
+                  <div>{i}번째 이미지는 삭제되었습니다..</div>
+                </ContentBox>
+              );
+            })}
+          </div>
         )}
       </MainContainer>
     </Wrapper>
