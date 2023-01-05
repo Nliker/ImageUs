@@ -119,7 +119,6 @@ const UploadModal = ({ roomId }: { roomId?: string }) => {
       // 이미지가 업로드 되면 그 때 revokeObjectURL(src)를 사용해서 메모리 누수를 방지한다.
       // 이미지가 로드되고 난 뒤에 값을 태그에 전달한다. useEffect 활용
 
-      // setImageURLs(URL.createObjectURL(formData.get('image')));
       const imageURLs = URL.createObjectURL(formData.get('image'));
       const image = new Image();
       image.src = imageURLs;
