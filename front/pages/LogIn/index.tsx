@@ -67,7 +67,7 @@ const LogIn = () => {
     const inputValue = e.target.value;
     pwValidation(inputValue);
   }, []);
-  
+
   const onSubmitLoginInfo = useCallback(
     (e: { preventDefault: () => void }) => {
       e.preventDefault();
@@ -90,7 +90,6 @@ const LogIn = () => {
             sessionStorage.setItem('USER_ID', res.data.user_id);
             mutate('/user/my');
             // 페이지 이동
-            console.log('이동');
             navigate('/main_page');
           })
           .catch((err) => {
@@ -141,12 +140,12 @@ const LogIn = () => {
               </ErrorMessage>
             </InputBox>
           </PasswordInputContainer>
-          <CheckBox>
+          {/* <CheckBox>
             <label htmlFor="remember-id" onClick={checkHandler}>
               <input type="checkbox" checked={checked} readOnly />
               로그인 상태 유지하기
             </label>
-          </CheckBox>
+          </CheckBox> */}
           <SubmitBox>
             <NavLink to={'/signup'}>계정 만들기</NavLink>
             <button type="submit">확인</button>
