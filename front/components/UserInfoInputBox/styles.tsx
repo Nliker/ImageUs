@@ -44,6 +44,5 @@ export const OuterContainer = styled.div`
 `;
 
 export const InnerContainer = styled.div`
-  padding-top: 50px;
+  padding-top: 30px;
 `;
-
