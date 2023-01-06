@@ -1,228 +1,345 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import useInput from '@hooks/useInput';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Navigate, redirect, useNavigate } from 'react-router-dom';
-import { ErrorText, InputBox, InputContainer, PasswordCheckBox, SubmitBox } from './styles';
+import {
+  ErrorText,
+  InputContainer,
+  PasswordShowCheckBox,
+  SubmitBox,
+  Input,
+  PasswordBox,
+  NameBox,
+  EmailBox,
+  RequestAuthBox,
+} from './styles';
 
-interface ErrorMessage {
-  nameError: string;
-  emailError: string;
-  pwError: string;
-  pwCheck: string;
+interface ErrorInfo {
+  name: { hasError: boolean; errorMessage: string };
+  email: { hasError: boolean; errorMessage: string; emailAuth: boolean };
+  password: { hasError: boolean; errorMessage: string };
 }
 
 const SignUp = () => {
   const [checked, setChecked] = useState<boolean>(false);
-  // const [hasError, setHasError] = useState<boolean | null>(true);
-  const [errorMessage, setErrorMessage] = useState<ErrorMessage>({
-    nameError: '이름을 입력해주세요.',
-    emailError: '이메일을 입력해주세요.',
-    pwError: '비밀번호를 입력해주세요.',
-    pwCheck: '',
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
+    name: { hasError: true, errorMessage: '이름을 입력해주세요.' },
+    email: { hasError: true, errorMessage: '이메일을 입력해주세요.', emailAuth: false },
+    password: { hasError: true, errorMessage: '비밀번호를 입력해주세요.' },
   });
+  const [isRequestingAuth, setRequestingAuth] = useState(false);
   const [name, setName, nameHandler] = useInput('');
   const [email, setEmail, emailHandler] = useInput('');
-  const [pw, setPw, pwHandler] = useInput('');
-  const [pwCheck, setPwCheck, pwCheckHandler] = useInput('');
+  const [emailAuth, setEmailAuth, emailAuthHandler] = useInput('');
+  const [password, setPassword, passwordHandler] = useInput('');
+  const [passwordCheck, setPasswordCheck, passwordCheckHandler] = useInput('');
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])",
   );
+  const [count, setCount] = useState(60);
+  const [timeLimitId, setTimeLimitId] = useState<NodeJS.Timeout | null>();
   const navigate = useNavigate();
 
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
   }, []);
-  // console.log(hasError);
+
   useEffect(() => {
-    // console.log(name);
     if (!name) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
+      setErrorInfo((prev) => ({
         ...prev,
-        nameError: '이름을 입력해주세요.',
+        name: { hasError: true, errorMessage: '이름을 입력해주세요.' },
       }));
-      return;
+    } else {
+      setErrorInfo((prev) => ({
+        ...prev,
+        name: { hasError: false, errorMessage: '' },
+      }));
     }
-    // setHasError(false);
-    setErrorMessage((prev) => ({
-      ...prev,
-      nameError: '',
-    }));
   }, [name]);
 
   useEffect(() => {
+    if (isRequestingAuth) return;
+
     if (!email) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
+      setErrorInfo((prev) => ({
         ...prev,
-        emailError: '이메일을 입력해주세요.',
+        email: { hasError: true, errorMessage: '이메일을 입력해주세요.', emailAuth: false },
       }));
-      return;
     } else if (!emailRegex.test(email)) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
+      setErrorInfo((prev) => ({
         ...prev,
-        emailError: '이메일 형식에 맞지 않습니다.',
+        email: { hasError: true, errorMessage: '이메일 형식에 맞지 않습니다.', emailAuth: false },
       }));
-      return;
+    } else {
+      setErrorInfo((prev) => ({
+        ...prev,
+        email: { hasError: true, errorMessage: '인증 요청버튼을 클릭하세요.', emailAuth: true },
+      }));
     }
-    // setHasError(false);
-    setErrorMessage((prev) => ({
-      ...prev,
-      emailError: '',
-    }));
   }, [email]);
 
   useEffect(() => {
-    // console.log(pw, errorMessage);
-    if (!pw) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
+    if (!password) {
+      setErrorInfo((prev) => ({
         ...prev,
-        pwError: '비밀번호를 입력해주세요.',
+        password: { hasError: true, errorMessage: '비밀번호를 입력해주세요.' },
       }));
       return;
-    } else if (pw.length < 8) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
+    } else if (password.length < 8) {
+      setErrorInfo((prev) => ({
         ...prev,
-        pwError: '비밀번호는 8자리 이상입니다.',
+        password: { hasError: true, errorMessage: '비밀번호는 8자리 이상입니다.' },
       }));
       return;
+    } else if (password !== passwordCheck) {
+      setErrorInfo((prev) => ({
+        ...prev,
+        password: { hasError: true, errorMessage: '비밀번호가 일치하지 않습니다.' },
+      }));
+    } else {
+      setErrorInfo((prev) => ({
+        ...prev,
+        password: { hasError: false, errorMessage: '' },
+      }));
     }
-    setErrorMessage((prev) => ({
-      ...prev,
-      pwError: '',
-    }));
-    if (pw !== pwCheck) {
-      // setHasError(true);
-      setErrorMessage((prev) => ({
-        ...prev,
-        pwCheck: '비밀번호가 일치하지 않습니다.',
-      }));
-      return;
-    }
-    setErrorMessage((prev) => ({
-      ...prev,
-      pwCheck: '',
-    }));
-    // setHasError(false);
-  }, [pw, pwCheck]);
+  }, [password, passwordCheck]);
 
-  const checkErrorValue = () => {
-    for (const key in errorMessage) {
-      if (errorMessage[key as keyof ErrorMessage] !== '') {
-        // setHasError(true);
-        return true;
+  useEffect(() => {
+    if (!timeLimitId) return;
+    if (count <= 0) {
+      clearInterval(timeLimitId);
+      setTimeLimitId(null);
+      setCount(60);
+      setEmailAuth('');
+      setErrorInfo((prev) => ({
+        ...prev,
+        email: { hasError: true, errorMessage: '만료되었습니다..다시 요청해주세요!', emailAuth: true },
+      }));
+      setRequestingAuth(false);
+    }
+  }, [timeLimitId, count]);
+
+  const countTimeLimit = () => {
+    console.log(timeLimitId);
+    if (timeLimitId) return;
+    const Id = setInterval(() => {
+      setCount((prev) => prev - 1);
+    }, 1000);
+    setTimeLimitId(Id);
+  };
+
+  const requestEmailAuthNum = useCallback(async () => {
+    try {
+      await axios.get(`/user/auth?email=${email}`);
+      alert('이메일 인증요청을 보냈습니다.');
+
+      setRequestingAuth(true);
+      countTimeLimit();
+      setErrorInfo((prev) => ({
+        ...prev,
+        email: { hasError: true, errorMessage: '이메일 인증번호를 입력해주세요.', emailAuth: true },
+      }));
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const { message } = err.response?.data;
+        if (err.response?.status === 402) {
+          setErrorInfo((prev) => ({
+            ...prev,
+            email: { hasError: true, errorMessage: message, emailAuth: false },
+          }));
+        } else {
+          console.error(err);
+          alert('오류가 발생했습니다..');
+          location.reload();
+        }
       }
     }
-    // setHasError(false);
+  }, [email, timeLimitId]);
+
+  const checkEmailAuth = useCallback(async () => {
+    try {
+      if (!emailAuth) {
+        setErrorInfo((prev) => ({
+          ...prev,
+          email: { hasError: true, errorMessage: '인증 번호가 입력되지 않았습니다.', emailAuth: true },
+        }));
+      } else {
+        await axios.post(`/user/auth?email=${email}`, {
+          auth_password: emailAuth,
+        });
+        if (timeLimitId) {
+          clearInterval(timeLimitId);
+          setTimeLimitId(null);
+          setCount(60);
+          setEmailAuth('');
+          setRequestingAuth(false);
+          setErrorInfo((prev) => ({
+            ...prev,
+            email: { hasError: false, errorMessage: '인증 되었습니다.', emailAuth: false },
+          }));
+        }
+      }
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const { message } = err.response?.data;
+        // console.log(err.response);
+        if (err.response?.status === 401) {
+          setErrorInfo((prev) => ({
+            ...prev,
+            email: { hasError: true, errorMessage: message, emailAuth: true },
+          }));
+        } else {
+          if (timeLimitId) clearInterval(timeLimitId);
+          console.error(err);
+          alert('오류가 발생했습니다..');
+          location.reload();
+        }
+      }
+    }
+  }, [emailAuth]);
+
+  const cancelEmailAuth = useCallback(() => {
+    if (timeLimitId) clearInterval(timeLimitId);
+    setTimeLimitId(null);
+    setCount(60);
+    setEmailAuth('');
+    setRequestingAuth(false);
+    setErrorInfo((prev) => ({
+      ...prev,
+      email: { hasError: true, errorMessage: '인증 요청버튼을 클릭하세요.', emailAuth: true },
+    }));
+  }, [isRequestingAuth, timeLimitId, emailAuth, count]);
+
+  const checkErrorValue = () => {
+    for (const key in errorInfo) {
+      if (errorInfo[key as keyof ErrorInfo].hasError) return true;
+    }
     return false;
   };
 
   const handleSubmit = useCallback(
-    (e: { preventDefault: () => void }) => {
+    async (e: { preventDefault: () => void }) => {
       e.preventDefault();
+
       const hasError = checkErrorValue();
-      // setHasError(checkErrorValue());
-      // console.log(hasError, errorMessage);
       if (hasError) {
         alert('양식을 다시 확인해 주세요.');
         return;
       }
-      // axios 요청
-      axios.post('user/sign-up', {
-        name,
-        email,
-        profile: 'test1',
-        password: pw 
-      }).then((res) => {
-        console.log(res);
-        alert('회원가입되었습니다.');
-        navigate('/login');
-        // return redirect('/login');
-      }).catch((err) => {
-        console.log(err.response.data.message);
-      });
+
+      await axios
+        .post('user/sign-up', {
+          name,
+          email,
+          password,
+          profile: 'test1',
+        })
+        .then((res) => {
+          console.log(res);
+          alert('회원가입되었습니다.');
+          navigate('/login');
+        })
+        .catch((err) => {
+          console.log(err.response.data.message);
+        });
     },
-    [checkErrorValue, errorMessage],
+    [checkErrorValue, errorInfo],
   );
 
   return (
     <div>
       <UserInfoInputBox pageName={'회원가입'}>
         <InputContainer>
-          <form onSubmit={handleSubmit}>
-            <InputBox>
-              <label htmlFor="name-input">
-                {/* <span>이름을 입력하세요.</span> */}
-                <div>
-                  <input
-                    type="text"
-                    name="name-input"
-                    value={name}
-                    onChange={nameHandler}
-                    placeholder="이름을 입력하세요."
+          <NameBox>
+            <div className="input_box">
+              <Input
+                type="text"
+                name="name-input"
+                value={name}
+                onChange={nameHandler}
+                placeholder="이름을 입력하세요."
+              />
+            </div>
+            <ErrorText>
+              <span>{errorInfo.name.errorMessage}</span>
+            </ErrorText>
+          </NameBox>
+          <EmailBox>
+            <div className="input_box">
+              <Input
+                type="text"
+                name="email-input"
+                value={email}
+                onChange={emailHandler}
+                placeholder="이메일을 입력하세요."
+              />
+            </div>
+            {errorInfo.email.emailAuth &&
+              (isRequestingAuth ? (
+                <RequestAuthBox className="input_box">
+                  <Input
+                    type="password"
+                    name="email-auth"
+                    value={emailAuth}
+                    onChange={emailAuthHandler}
+                    placeholder="인증번호"
                   />
+                  <button type="button" onClick={checkEmailAuth}>
+                    확인
+                  </button>
+                  <button type="button" onClick={cancelEmailAuth}>
+                    취소
+                  </button>
+                  <div>
+                    <span>남은 시간: {count}</span>
+                  </div>
+                </RequestAuthBox>
+              ) : (
+                <div className="email_err_message">
+                  <button onClick={requestEmailAuthNum}>인증 요청</button>
                 </div>
-                <ErrorText><span>{errorMessage.nameError}</span></ErrorText>
-              </label>
-            </InputBox>
-            <InputBox>
-              <label htmlFor="email-input">
-                {/* <span>이메일을 입력하세요.</span> */}
-                <div>
-                  <input
-                    type="text"
-                    name="email-input"
-                    value={email}
-                    onChange={emailHandler}
-                    placeholder="이메일을 입력하세요."
-                  />
-                </div>
-                <ErrorText><span>{errorMessage.emailError}</span></ErrorText>
-              </label>
-            </InputBox>
-            <InputBox>
-              <label htmlFor="pw-input">
-                {/* <span>비밀번호를 입력하세요.</span> */}
-                <div>
-                  <input
-                    type={checked ? 'text' : 'password'}
-                    name="pw-input"
-                    value={pw}
-                    onChange={pwHandler}
-                    placeholder="비밀번호를 입력하세요."
-                  />
-                </div>
-                <ErrorText><span>{errorMessage.pwError}</span></ErrorText>
-              </label>
-              <label htmlFor="pw-check">
-                {/* <span>비밀번호 확인</span> */}
-                <div>
-                  <input
-                    type={checked ? 'text' : 'password'}
-                    name="pw-check"
-                    value={pwCheck}
-                    onChange={pwCheckHandler}
-                    placeholder="비밀번호를 한 번 더 입력하세요."
-                  />
-                </div>
-                <ErrorText><span>{errorMessage.pwCheck}</span></ErrorText>
-              </label>
-              <PasswordCheckBox>
-                <label htmlFor="show-pw" className="pwcheck-label" onClick={checkHandler}>
-                  <input type="checkbox" name="show-pw" checked={checked} readOnly />
-                  비밀번호 표시
-                </label>
-              </PasswordCheckBox>
-            </InputBox>
-            <SubmitBox>
-              <button type="submit">제출</button>
-            </SubmitBox>
-          </form>
+              ))}
+            <ErrorText>
+              <span>{errorInfo.email.errorMessage}</span>
+            </ErrorText>
+          </EmailBox>
+          <PasswordBox>
+            <div className="wrap_password_input">
+              <div className="input_box">
+                <Input
+                  type={checked ? 'text' : 'password'}
+                  name="password-input"
+                  value={password}
+                  onChange={passwordHandler}
+                  placeholder="비밀번호를 입력하세요."
+                />
+                <Input
+                  type={checked ? 'text' : 'password'}
+                  name="password-check"
+                  value={passwordCheck}
+                  onChange={passwordCheckHandler}
+                  placeholder="한 번 더 입력하세요."
+                />
+              </div>
+              <ErrorText>
+                <span>{errorInfo.password.errorMessage}</span>
+              </ErrorText>
+            </div>
+            <PasswordShowCheckBox onClick={checkHandler}>
+              <input type="checkbox" name="show-password" checked={checked} readOnly />
+              비밀번호 표시
+            </PasswordShowCheckBox>
+          </PasswordBox>
+          <SubmitBox>
+            <Link to={'/login'}>로그인 화면으로 이동</Link>
+            <button type="button" onClick={handleSubmit}>
+              제출
+            </button>
+          </SubmitBox>
         </InputContainer>
       </UserInfoInputBox>
     </div>
