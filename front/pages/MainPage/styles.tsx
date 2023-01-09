@@ -5,11 +5,30 @@ import styled from '@emotion/styled';
 // export const LogOutButton = styled.button``;
 
 export const Wrappper = styled.div`
-  height: calc(100% - 55px);
   overflow: auto;
   font-size: 0.85rem;
 `;
 
 export const ContentWrappper = styled.div`
-  padding: 1.5rem 1rem;
+  height: calc(100vh - 85px);
+`;
+
+export const MainIntroduction = styled.section`
+  padding: 6rem 0;
+
+  h1 {
+    text-align: center;
+
+    font-size: 2.75rem;
+
+    .brand_logo {
+      color: #ecb22e;
+    }
+  }
+
+  // .action_box {
+  //   display: flex;
+  //   justify-content: center;
+  //   gap: 3rem;
+  // }
 `;
