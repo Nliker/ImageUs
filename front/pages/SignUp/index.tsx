@@ -1,7 +1,7 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import useInput from '@hooks/useInput';
 import axios, { AxiosError } from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navigate, redirect, useNavigate } from 'react-router-dom';
@@ -56,7 +56,7 @@ const SignUp = () => {
     } else {
       setErrorInfo((prev) => ({
         ...prev,
-        name: { hasError: false, errorMessage: '' },
+        name: { hasError: false, errorMessage: '잘 입력하셨습니다!' },
       }));
     }
   }, [name]);
@@ -103,7 +103,7 @@ const SignUp = () => {
     } else {
       setErrorInfo((prev) => ({
         ...prev,
-        password: { hasError: false, errorMessage: '' },
+        password: { hasError: false, errorMessage: '잘 입력하셨습니다!' },
       }));
     }
   }, [password, passwordCheck]);
@@ -135,10 +135,8 @@ const SignUp = () => {
   const requestEmailAuthNum = useCallback(async () => {
     try {
       await axios.get(`/user/auth?email=${email}`);
-      alert('이메일 인증요청을 보냈습니다.');
-
-      setRequestingAuth(true);
       countTimeLimit();
+      setRequestingAuth(true);
       setErrorInfo((prev) => ({
         ...prev,
         email: { hasError: true, errorMessage: '이메일 인증번호를 입력해주세요.', emailAuth: true },
@@ -250,6 +248,13 @@ const SignUp = () => {
     [checkErrorValue, errorInfo],
   );
 
+  const correctMessageStyle = useMemo(
+    () => (hasError: boolean) => {
+      if (!hasError) return { color: 'dodgerblue' };
+    },
+    [errorInfo],
+  );
+
   return (
     <div>
       <UserInfoInputBox pageName={'회원가입'}>
@@ -265,7 +270,7 @@ const SignUp = () => {
               />
             </div>
             <ErrorText>
-              <span>{errorInfo.name.errorMessage}</span>
+              <span style={correctMessageStyle(errorInfo.name.hasError)}>{errorInfo.name.errorMessage}</span>
             </ErrorText>
           </NameBox>
           <EmailBox>
@@ -304,7 +309,7 @@ const SignUp = () => {
                 </div>
               ))}
             <ErrorText>
-              <span>{errorInfo.email.errorMessage}</span>
+              <span style={correctMessageStyle(errorInfo.email.hasError)}>{errorInfo.email.errorMessage}</span>
             </ErrorText>
           </EmailBox>
           <PasswordBox>
@@ -326,7 +331,7 @@ const SignUp = () => {
                 />
               </div>
               <ErrorText>
-                <span>{errorInfo.password.errorMessage}</span>
+                <span style={correctMessageStyle(errorInfo.password.hasError)}>{errorInfo.password.errorMessage}</span>
               </ErrorText>
             </div>
             <PasswordShowCheckBox onClick={checkHandler}>
