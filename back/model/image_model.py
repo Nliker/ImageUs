@@ -209,3 +209,21 @@ class ImageDao:
         } for row in rows]
 
         return image_room_userlist
+    
+    def get_room_imagelist_len(self,room_id):
+        rows=self.db.execute(text("""
+            select
+                count(*)
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0)
+            where i_r.room_id=:room_id
+            order by i_r.created_at
+            """),{
+                    'room_id':room_id
+                }).scalar()
+        return rows
+    
+    
