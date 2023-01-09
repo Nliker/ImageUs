@@ -17,23 +17,21 @@ const App = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  
-  // useEffect(() => {
-  //   console.log('test');
-  // }, []);
+
   console.log('app', isLogIn, isValidating);
-  // const isLogIn = true;
+
   return isValidating ? (
     <div>로딩중...</div>
   ) : (
     <Routes>
-      <Route path="/" element={isLogIn ? <Navigate to="/main_page" /> : <Navigate to="/login" />} />
+      <Route path="/" element={<Navigate to="/main_page" />} />
+      <Route path="/main_page" element={<MainPage isLogIn={isLogIn} />} />
+      <Route path="/main_page/:roomId" element={<MainPage isLogIn={isLogIn} />} />
       {isLogIn ? (
         <>
           {/* 이하 비회원 접근 불가 페이지 */}
-          {/* <Route index element={<MainPage />} /> */}
-          <Route path="/main_page/:roomId" element={<MainPage />} />
-          <Route path="/main_page/*" element={<MainPage />} />
+          {/* <Route path="/main_page/:roomId" element={<MainPage />} />
+          <Route path="/main_page/*" element={<MainPage />} /> */}
           <Route path="/my_page/*" element={<MyPage />} />
           <Route path="/people_management/*" element={<PeopleManagement />} />
         </>
