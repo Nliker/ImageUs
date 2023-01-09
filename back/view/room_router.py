@@ -62,7 +62,7 @@ def room_router(api,services):
                     real_room_userlist.append(user_id)
             
             result=room_service.create_room_users(new_room_id,real_room_userlist)
-
+            
             return make_response(jsonify({
                 'room_info':room_info,
                 'success':result}),200)
@@ -167,7 +167,7 @@ def room_router(api,services):
     #     ]
     # }
     get_room_imagelist_parser=api_parser_module.get_parser(['Authorization','start','limit'])
-    get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist','read_history_row'])
+    get_room_imagelist_response_model=api_model.get_model('get_room_imagelist_response_model',['imagelist'])
     @room_namespace.route("/<int:room_id>/imagelist")
     class room_imagelist(Resource):
         @room_namespace.expect(get_room_imagelist_parser,validate=False)
@@ -210,24 +210,101 @@ def room_router(api,services):
             if start < 0 or limit < 0 :
                 return make_response(jsonify({'message':"범위 초과!"}),
                                     405)
+            pages={
+                    'start':int(start),
+                    'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
+                }
+ 
+            room_user_history_info=room_service.get_room_user_history_info(room_id,current_user_id)
+            images_len=image_service.get_room_imagelist_len(room_id)
+      
+            if pages['start']==0:
+                pages['start']=images_len-(pages['start']+pages['limit'])
+                if pages['start']<0:
+                    pages['start']=0
+                imagelist=image_service.get_room_imagelist(room_id,pages)
+                
+                result=room_service.update_room_user_history_start(room_id,current_user_id,images_len)
+            else:
+                if pages['start']>room_user_history_info['read_start_row']:
+                    imagelist=[]
+                else:
+                    pages['start']=room_user_history_info['read_start_row']-(pages['start']+pages['limit'])+1
+                    if pages['start']<0:
+                        pages['limit']=pages['limit']+pages['start']
+                        pages['start']=0
+                    imagelist=image_service.get_room_imagelist(room_id,pages)
+                    print(len(imagelist))
+            return make_response(jsonify({'imagelist':imagelist}),200)
+
+    get_room_unread_imagelist_parser=api_parser_module.get_parser(['Authorization'])
+    get_room_unread_imagelist_response_model=api_model.get_model('get_room_unread_imagelist_response_model',['imagelist'])
+    @room_namespace.route("/<int:room_id>/unread-imagelist")
+    class room_unread_imagelist(Resource):
+        @room_namespace.expect(get_room_unread_imagelist_parser,validate=False)
+        @room_namespace.response(200,'읽지 않은 이미지의 정보 목록을 불러옵니다.',get_room_unread_imagelist_response_model)
+        @room_namespace.response(api_error.room_existance_error()['status_code'],
+                                 '방이 존재하지 않습니다.',
+                                 api_error.room_existance_error_model())
+        @room_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        @login_required
+        def get(self,room_id):
+            '''
+            id가 room_id인 방의 유저가 읽지 않은 이미지리스트를 불러옵니다.
+            '''
+            current_user_id=g.user_id
+            if not room_service.get_room_info(room_id):
+                return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
+                                     api_error.room_existance_error()['status_code'])
+            
+            if not room_service.is_room_user(room_id,current_user_id):
+                return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
+                                     api_error.authorizaion_error()['status_code'])
+
+            room_user_history_info=room_service.get_room_user_history_info(room_id,current_user_id)
+            images_len=image_service.get_room_imagelist_len(room_id)
 
             pages={
-                'start':int(start),
-                'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
+                'start':room_user_history_info['last_unread_row'],
+                'limit':images_len-room_user_history_info['last_unread_row']
             }
-            user_room_history_row_info=user_service.get_user_room_history_row_info(current_user_id,room_id)
-            if user_room_history_row_info==None:
-                result=user_service.create_user_room_history_row(current_user_id,room_id)
-                print(result)
-                read_history=0
-            else:
-                read_history=user_room_history_row_info['read_history_row']
-
             imagelist=image_service.get_room_imagelist(room_id,pages)
-            result=user_service.update_user_room_history_row_info(current_user_id,room_id,start+limit)
+            result=room_service.update_room_user_history_last_unread_row(room_id,current_user_id,pages['start']+pages['limit'])
+
+            return make_response(jsonify({'imagelist':imagelist}),200)
+    get_room_marker_parser=api_parser_module.get_parser(['Authorization'])
+    get_room_marker_response_model=api_model.get_model('get_room_marker_response_model',['marker'])
+    @room_namespace.route("/<int:room_id>/marker")
+    class room_marker(Resource):
+        @room_namespace.expect(get_room_marker_parser,validate=False)
+        @room_namespace.response(200,'마지막으로 불러온 행 기록을 불러옵니다.',get_room_marker_response_model)
+        @room_namespace.response(api_error.room_existance_error()['status_code'],
+                                 '방이 존재하지 않습니다.',
+                                 api_error.room_existance_error_model())
+        @room_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        @login_required
+        def get(self,room_id):
+            '''
+            id가 room_id인 방의 유저가 읽은 행을 불러옵니다.
+            '''
+            current_user_id=g.user_id
+            if not room_service.get_room_info(room_id):
+                return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
+                                     api_error.room_existance_error()['status_code'])
             
-            return make_response(jsonify({'read_history_row':read_history,'imagelist':imagelist}),200)
-            
+            if not room_service.is_room_user(room_id,current_user_id):
+                return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
+                                     api_error.authorizaion_error()['status_code'])
+            room_user_history_info=room_service.get_room_user_history_info(room_id,current_user_id)
+
+            marker=room_user_history_info['marker_row']
+
+            return make_response(jsonify({'marker':marker}),200)
+
     #input
     #output
     # {
