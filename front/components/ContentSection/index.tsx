@@ -98,9 +98,7 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
   return (
     <Wrapper>
       <MainContainer>
-        {!roomId ? (
-          <div>메인화면입니다.</div>
-        ) : isLoading && !imageDataList ? (
+        {isLoading && !imageDataList ? (
           <div>로딩중입니다..</div>
         ) : (
           <div>
