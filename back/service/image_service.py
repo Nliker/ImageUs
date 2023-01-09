@@ -204,3 +204,7 @@ class ImageService:
             if room_userlist['user_id']==user_id:
                 return True
         return False
+
+    def get_room_imagelist_len(self,room_id):
+        imagelist_len=self.image_dao.get_room_imagelist_len(room_id)
+        return imagelist_len
