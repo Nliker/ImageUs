@@ -79,29 +79,32 @@
 
 # if __name__ == '__main__':
 #     asyncio.run(process_async())
-import config
-import smtplib
-from email.mime.text import MIMEText
+# import config
+# import smtplib
+# from email.mime.text import MIMEText
 
-sender=config.GOOGLE_MAIL_USER
-password=config.GOOGLE_MAIL_PASSWORD
+# sender=config.GOOGLE_MAIL_USER
+# password=config.GOOGLE_MAIL_PASSWORD
 
-receiver='yon1997@naver.com'
+# receiver='yon1997@naver.com'
 
-smtp=smtplib.SMTP('smtp.gmail.com',587)
-smtp.ehlo()
-smtp.starttls()
-smtp.login(sender,password)
-try:
-    msg=MIMEText("it's test email")
-    msg['Subject']='test_email_send'
-    msg['From']=sender
-    msg['To']=receiver
-    smtp.sendmail(sender,receiver,msg.as_string())
-except Exception as e:
-    print('error',e)
-finally:
-    if smtp is not None:
-        smtp.quit()
+# smtp=smtplib.SMTP('smtp.gmail.com',587)
+# smtp.ehlo()
+# smtp.starttls()
+# smtp.login(sender,password)
+# try:
+#     msg=MIMEText("it's test email")
+#     msg['Subject']='test_email_send'
+#     msg['From']=sender
+#     msg['To']=receiver
+#     smtp.sendmail(sender,receiver,msg.as_string())
+# except Exception as e:
+#     print('error',e)
+# finally:
+#     if smtp is not None:
+#         smtp.quit()
     
+a="asd"
+if "as" in a:
+    print("good")
     
