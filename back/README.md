@@ -114,16 +114,38 @@ CREATE TABLE `email_auth` (
   PRIMARY KEY (`email`)
 )
 
-8. users_room_history_row
-CREATE TABLE `users_room_history_row` (
-  `user_id` int NOT NULL,
+8. rooms_user_history
+CREATE TABLE `rooms_user_history` (
   `room_id` int NOT NULL,
-  `read_history_row` int NOT NULL default 0,
+  `user_id` int NOT NULL,
+  `last_unread_row` int NOT NULL default 0,
+  `read_start_row` int NOT NULL default -1,
+  `marker_row` int NOT NULL default 0,
+  `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(`room_id`,`user_id`)
 )
 
+0,-1,0,len:5->0,10요청->start:0,limit:10,
+last_unread_row:5,
+read_start_row:4,
+marker_row:5-1
+
+0,-1,0,len:15->0,10요청->start:5,limit:10,
+last_unread_row:15,
+read_start_row:14,
+marker_row:0
+
+15,14,0 len:27->0,10요청->start17,:limit:10
+last_unread_row:27,
+read_start_row:26,
+marker_row:12
+
+27,26,15 len:30->0,10요청->start 20,:limit:10 10,1010
+last_unread_row:30,
+read_start_row:29,
+marker_row:27
 <!-- 아래는 추후 완성 기능 -->
 <!-- 7. albums
 CREATE TABLE `albums` (
