@@ -234,7 +234,7 @@ def room_router(api,services):
                         pages['limit']=pages['limit']+pages['start']
                         pages['start']=0
                     imagelist=image_service.get_room_imagelist(room_id,pages)
-                    print(len(imagelist))
+                    
             return make_response(jsonify({'imagelist':imagelist}),200)
 
     get_room_unread_imagelist_parser=api_parser_module.get_parser(['Authorization'])
