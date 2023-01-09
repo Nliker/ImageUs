@@ -165,6 +165,12 @@ class ApiModel:
         required=False
     )
     
+    marker=fields.Integer(
+        default=2,
+        description='int_marker',
+        required=False
+    )
+
     image_room_update_result={
         'addlist':fields.List(fields.Integer),
         'add_result':fields.Integer,
@@ -403,7 +409,9 @@ class ApiModel:
                 ],
                 required=False
             )
-                        
+        if 'marker' in args:
+            payload['marker']=self.marker
+    
         api_model=self.api.model(modelname,payload)
         
         return api_model
