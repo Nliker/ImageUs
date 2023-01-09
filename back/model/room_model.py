@@ -136,3 +136,58 @@ class RoomDao:
         }if row else None
 
         return room_user
+
+    def insert_room_user_history(self,room_id,user_id):
+        row=self.db.execute(text("""
+            insert into rooms_user_history(
+                user_id,
+                room_id
+            ) values (
+                :user_id,
+                :room_id
+            )
+            """),{'user_id':user_id,'room_id':room_id}).rowcount
+        return row
+    
+    def get_room_user_history_info(self,room_id,user_id):
+        row=self.db.execute(text("""
+            select *
+            from rooms_user_history
+            where room_id=:room_id
+            and user_id=:user_id
+            """),{'room_id':room_id,'user_id':user_id}).fetchone()
+        
+        user_read_history={
+            'user_id':row['user_id'],
+            'room_id':row['room_id'],
+            'last_unread_row':row['last_unread_row'],
+            'read_start_row':row['read_start_row'],
+            'marker_row':row['marker_row']
+        } if row else None
+
+        return user_read_history
+
+    def update_room_user_history_start(self,room_id,user_id,images_len):
+
+        row=self.db.execute(text("""
+            update rooms_user_history
+            set marker_row=:images_len-last_unread_row
+            ,last_unread_row=:images_len
+            ,read_start_row=:images_len-1
+            where room_id=:room_id
+            and user_id=:user_id
+            and deleted=0            
+        """),{'room_id':room_id,'user_id':user_id,'images_len':images_len}).rowcount
+
+        return row
+        
+    def update_room_user_history_last_unread_row(self,room_id,user_id,last_unread_row):
+        row=self.db.execute(text("""
+            update rooms_user_history
+            set last_unread_row=:last_unread_row
+            where room_id=:room_id
+            and user_id=:user_id
+            and deleted=0
+        """),{'room_id':room_id,'user_id':user_id,'last_unread_row':last_unread_row}).rowcount
+        
+        return row
