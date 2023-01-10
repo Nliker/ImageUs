@@ -24,7 +24,7 @@ class ImageDao:
                 id,
                 link,
                 user_id,
-                DATE_FORMAT(CONVERT_TZ(created_at, @@session.time_zone, '+11:00'), '%Y-%m-%d %p %h:%i:%s') as created_at
+                created_at
             from images
             where user_id=:user_id
             and deleted=0
@@ -53,19 +53,19 @@ class ImageDao:
                 id,
                 link,
                 user_id,
-                DATE_FORMAT(CONVERT_TZ(created_at, @@session.time_zone, '+11:00'), '%Y-%m-%d %p %h:%i:%s') as created_at
+                created_at
             from images
             where id=:image_id
             and deleted=0
             """),{
                     'image_id':image_id
                 }).fetchone()
-
+        
         image_info={
             'id':row['id'],
             'link':row['link'],
             'user_id':row['user_id'],
-            'created_at':row['created_at']
+            'created_at':row['created_at'],
         } if row else None
 
         return image_info
@@ -144,7 +144,7 @@ class ImageDao:
                 i_r.image_id as id,
                 i.link,
                 i.user_id,
-                DATE_FORMAT(CONVERT_TZ(i.created_at, @@session.time_zone, '+11:00'), '%Y-%m-%d %p %h:%i:%s') as created_at
+                i.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
