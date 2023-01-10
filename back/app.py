@@ -37,7 +37,11 @@ def create_app(test_config=None):
             ip=request.environ.get('REMOTE_ADDR')
         print("Current IP Address:",ip,flush=True)
         print("Current Process:",os.getpid(),flush=True)
-        if ip not in app.config['GOOD_IP_LIST']:
+
+        splited_ip=ip.split('.')
+        ip_range=splited_ip[0]+'.'+splited_ip[1]
+    
+        if ip not in app.config['GOOD_IP_LIST'] and ip_range not in app.config['GOOD_IP_RANGE']:
             abort(403)
             
     @api.route("/search")
