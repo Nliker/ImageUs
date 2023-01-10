@@ -211,7 +211,7 @@ class ImageDao:
         return image_room_userlist
     
     def get_room_imagelist_len(self,room_id):
-        rows=self.db.execute(text("""
+        row_count=self.db.execute(text("""
             select
                 count(*)
             from images_room_list as i_r
@@ -220,10 +220,21 @@ class ImageDao:
             and i_r.deleted=0
             and i.deleted=0)
             where i_r.room_id=:room_id
-            order by i_r.created_at
             """),{
                     'room_id':room_id
                 }).scalar()
-        return rows
+        return row_count
+    
+    def get_user_imagelist_len(self,user_id):
+        row_count=self.db.execute(text("""
+            select
+                count(*)
+            from images
+            where deleted=0
+            and user_id=:user_id
+            """),{
+                    'user_id':user_id
+                }).scalar()
+        return row_count
     
     
