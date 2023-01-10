@@ -225,3 +225,8 @@ class ImageService:
         imagelist_len=self.image_dao.get_room_imagelist_len(room_id)
 
         return imagelist_len
+    
+    def get_user_imagelist_len(self,user_id):
+        imagelist_len=self.image_dao.get_user_imagelist_len(user_id)
+
+        return imagelist_len
