@@ -147,14 +147,17 @@ class ImageService:
         for image_info in image_info_list:
             image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
+        image_info_list.reverse()
         return image_info_list
 
     def get_room_imagelist(self,room_id,pages):
         image_info_list=self.image_dao.get_room_imagelist(room_id,pages)
-        
+
         for image_info in image_info_list:
             image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
+        image_info_list.reverse()
+        
         return image_info_list
 
     def update_image_room(self,image_id,update_roomlist):
@@ -220,4 +223,5 @@ class ImageService:
 
     def get_room_imagelist_len(self,room_id):
         imagelist_len=self.image_dao.get_room_imagelist_len(room_id)
+
         return imagelist_len
