@@ -1,2 +1,4 @@
 config.py
 wsgi.py
+access.log
+nohup.out
