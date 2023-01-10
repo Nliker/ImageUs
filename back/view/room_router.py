@@ -274,6 +274,7 @@ def room_router(api,services):
             result=room_service.update_room_user_history_last_unread_row(room_id,current_user_id,pages['start']+pages['limit'])
 
             return make_response(jsonify({'imagelist':imagelist}),200)
+            
     get_room_marker_parser=api_parser_module.get_parser(['Authorization'])
     get_room_marker_response_model=api_model.get_model('get_room_marker_response_model',['marker'])
     @room_namespace.route("/<int:room_id>/marker")
