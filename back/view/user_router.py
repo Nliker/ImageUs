@@ -437,9 +437,19 @@ def user_router(app,api,services,config,es):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            image_list=image_service.get_user_imagelist(current_user_id,pages)
 
-            return make_response(jsonify({'imagelist':image_list}),200)
+            images_len=image_service.get_user_imagelist_len(current_user_id)
+
+            if pages['start']>images_len:
+                user_imagelist=[]
+            else:
+                pages['start']=images_len-(pages['start']+pages['limit'])
+                if pages['start']<0:
+                    pages['limit']=pages['limit']+pages['start']
+                    pages['start']=0
+                user_imagelist=image_service.get_user_imagelist(user_id,pages)
+
+            return make_response(jsonify({'imagelist':user_imagelist}),200)
     
     #input
     #output
