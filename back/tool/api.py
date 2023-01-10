@@ -152,6 +152,7 @@ class ApiModel:
                     'id':fields.Integer,
                     'link':fields.String,
                     'user_id':fields.Integer,
+                    'created_at':fields.String
                 }
 
     room_info={
@@ -244,12 +245,14 @@ class ApiModel:
                 fields.Nested(self.api.model("image_model",self.image_info)),
                 default=[{
                     'id':1,
-                    'link':'http://example1.com',
+                    'link':'11/example1.jpg',
                     'user_id':1,
+                    'created_at':'2023-01-01 01:01:01 UTC+09:00'
                 },{
                     'id':2,
-                    'link':'http://example2.com',
+                    'link':'20/example2.jpg',
                     'user_id':1,
+                    'created_at':'2023-01-01 10:10:10 UTC+09:00'
                 }],
                 required=False
             )
@@ -365,8 +368,9 @@ class ApiModel:
             ),
             default={
                 'id':3,
-                'link':'http://example3.com',
-                'user_id':2
+                'link':'30/example3.jpg',
+                'user_id':2,
+                'created_at':'2023-01-01 10:10:10 UTC+09:00'
             },
             required=False
             )
