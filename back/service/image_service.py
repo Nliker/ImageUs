@@ -1,12 +1,13 @@
 import requests
 import jwt
-
+from datetime import timezone,timedelta
+import pytz
 
 class ImageService:
     def __init__(self,image_dao,config):
         self.config=config
         self.image_dao=image_dao
-        
+
     '''
     get_user_imagelist(user_id)->[
         {
@@ -54,7 +55,11 @@ class ImageService:
         }
     ]
     '''
-    
+    def insert_datetime_timezone(self,datetime_no_timezone):
+        custom_timezone=timezone(timedelta(hours=self.config['MYSQL_TIMEZONE']))
+        datetime_with_timezone=datetime_no_timezone.replace(tzinfo=custom_timezone).strftime('%Y-%m-%d %H:%M:%S %Z')
+        return datetime_with_timezone
+
     # image server의 이미지 파일 구조 
     # 1>  profile_images>image.pngs
     #     images>image.pngs
@@ -132,15 +137,23 @@ class ImageService:
         
     def get_image_info(self,image_id):
         image_info=self.image_dao.get_image_info(image_id)
+        image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
+
         return image_info
         
     def get_user_imagelist(self,user_id,pages):
         image_info_list=self.image_dao.get_user_imagelist(user_id,pages)
-        
+
+        for image_info in image_info_list:
+            image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
+
         return image_info_list
 
     def get_room_imagelist(self,room_id,pages):
         image_info_list=self.image_dao.get_room_imagelist(room_id,pages)
+        
+        for image_info in image_info_list:
+            image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
         return image_info_list
 
