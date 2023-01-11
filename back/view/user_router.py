@@ -668,3 +668,32 @@ def user_router(app,api,services,config,es):
             result=room_service.delete_user_room(current_user_id,delete_user_room_id)
 
             return make_response(f"{result}개 방 삭제 성공",200)
+        
+    delete_user_parser=api_parser_module.get_parser(['Authorization'])   
+    delete_user_model=api_model.get_model("delete_user_room_model",['delete_user_id'])
+    @user_namespace.route("")
+    class user_delete(Resource):
+        @user_namespace.expect(delete_user_parser,delete_user_model)
+        @user_namespace.response(200,'회원 삭제에 성공하였습니다.')
+        @user_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
+        @login_required
+        def delete(self):
+            delete_user_id=request.json['delete_user_id']
+            current_user_id=g.user_id
+            
+            if not user_service.get_user_info(delete_user_id):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
+                     
+            if current_user_id != delete_user_id:
+                return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
+                                     api_error.authorizaion_error()['status_code'])
+                
+            result=user_service.delete_user(delete_user_id)
+            
+            return make_response(f"회원삭제에 성공하였습니다.")
