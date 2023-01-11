@@ -5,7 +5,6 @@ import styled from '@emotion/styled';
 // export const LogOutButton = styled.button``;
 
 export const Wrappper = styled.div`
-  overflow: auto;
   font-size: 0.85rem;
 `;
 
@@ -31,4 +30,19 @@ export const MainIntroduction = styled.section`
   //   justify-content: center;
   //   gap: 3rem;
   // }
+`;
+
+export const MainRoomList = styled.div`
+  text-align: center;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    li {
+      cursor: pointer;
+    }
+  }
 `;
