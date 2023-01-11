@@ -3,7 +3,7 @@ import { CgUserList } from 'react-icons/cg';
 import { SlCloudUpload } from 'react-icons/sl';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { BottomContainer, MobileNavItem, MobileNavList, UploadBtn, Wrapper } from './styles';
 import useSWR from 'swr';
 
@@ -11,8 +11,8 @@ import useSWR from 'swr';
 //   showModal: (e: any) => void;
 // }
 
-const BottomNavBar = ({ roomId }: { roomId?: string }) => {
-  // const { mutate: uploadModalMutate } = useSWR('showUploadModal');
+const BottomNavBar = () => {
+  const { roomId } = useParams<{ roomId: string | undefined }>();
   const { data, mutate: showModalMutate } = useSWR('showModalState');
 
   const onClickUploadModal = () => {
