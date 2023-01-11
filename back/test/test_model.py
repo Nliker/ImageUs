@@ -1,7 +1,7 @@
 import pytest
 import sys,os
 import bcrypt
-
+from datetime import datetime
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 import config
 
@@ -10,6 +10,28 @@ from sqlalchemy import create_engine,text
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
+image_args=['id','user_id','link']
+
+def extract_arguments_from_data(data,args):
+    if isinstance(data,dict):
+        result={}
+        for key in args:
+            if key in data:
+                result[key]=data[key]
+
+        return result
+
+    if isinstance(data,list):
+        result=[]
+        for dic in data:
+            temp_dic={}
+            for key in args:
+                if key in dic:
+                    temp_dic[key]=dic[key]
+            result.append(temp_dic)
+            
+        return result
+    
 @pytest.fixture
 def user_dao():
     return UserDao(database)
@@ -38,17 +60,29 @@ def setup_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
     """))
+    database.execute(text("""
+        truncate email_auth
+    """))
+
     print("초기화 완료")
     print("샘플 기입")
+
     hashed_password=bcrypt.hashpw(
         "test_password".encode('utf-8'),
         bcrypt.gensalt()
     )
+    new_email_auths=[{
+        'email':"test_auth1@naver.com",
+        'auth_password':"1234"
+    }]
     new_users=[{
         'id':1,
         'name':'test1',
@@ -134,6 +168,17 @@ def setup_function():
         'image_id':3,
         'room_id':2
     }]
+    
+    database.execute(text("""
+        insert into email_auth(
+            email,
+            auth_password
+        ) values (
+            :email,
+            :auth_password
+        )
+    """),new_email_auths)
+
     database.execute(text("""
         insert into users (
             id,
@@ -198,6 +243,7 @@ def setup_function():
             :room_id
         )
     """),new_images_room_list)
+    
     print("샘플 기입 완료")
     print("======================")
 
@@ -217,10 +263,16 @@ def teardown_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate email_auth
     """))
     print("초기화 완료")
     print("======================")
@@ -339,24 +391,30 @@ def get_user_roomlist(user_id):
 
     return user_room_info_list
 
-def get_user_imagelist(user_id):
+def get_user_imagelist(user_id,pages):
     rows=database.execute(text("""
             select
                 id,
                 link,
-                user_id
+                user_id,
+                created_at
             from images
             where user_id=:user_id
             and deleted=0
+            order by created_at
+            limit :start,:limit
             """),{
-                    'user_id':user_id
+                    'user_id':user_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
     user_image_info_list=[
             {
                 'id':user_image_info['id'],
                 'link':user_image_info['link'],
-                'user_id':user_image_info['user_id']
+                'user_id':user_image_info['user_id'],
+                'created_at':user_image_info['created_at']
             } for user_image_info in rows
         ]
         
@@ -367,18 +425,20 @@ def get_image_info(image_id):
             select
                 id,
                 link,
-                user_id
+                user_id,
+                created_at
             from images
             where id=:image_id
             and deleted=0
             """),{
                     'image_id':image_id
                 }).fetchone()
-
+        
     image_info={
             'id':row['id'],
             'link':row['link'],
-            'user_id':row['user_id']
+            'user_id':row['user_id'],
+            'created_at':row['created_at'],
         } if row else None
 
     return image_info
@@ -395,6 +455,7 @@ def get_image_roomlist(image_id):
             where i_r.image_id=:image_id
             and r.deleted=0
             and i_r.deleted=0
+            order by title
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -407,31 +468,75 @@ def get_image_roomlist(image_id):
 
     return image_room_info_list
 
-def get_room_imagelist(room_id):
+def get_room_imagelist(room_id,pages):
     rows=database.execute(text("""
             select
                 i_r.image_id as id,
                 i.link,
-                i.user_id
+                i.user_id,
+                i.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
             and i_r.deleted=0
-            and i.deleted=0) 
+            and i.deleted=0)
             where i_r.room_id=:room_id
-            order by id asc
+            order by i_r.created_at
+            limit :start,:limit
             """),{
-                    'room_id':room_id
+                    'room_id':room_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
     room_image_info_list=[{
             'id':room_image_info['id'],
             'link':room_image_info['link'],
-            'user_id':room_image_info['user_id']
+            'user_id':room_image_info['user_id'],
+            'created_at':room_image_info['created_at']
         } for room_image_info in rows]
 
     return room_image_info_list
+
+def get_image_room_userlist(image_id):
+        rows=database.execute(text("""
+            select
+                i_r.room_id as room_id,
+                r_u.user_id as user_id
+            from images_room_list as i_r
+            join rooms_user_list as r_u
+            on (i_r.room_id=r_u.room_id
+            and i_r.deleted=0
+            and r_u.deleted=0)
+            where i_r.image_id=:image_id
+            """),{'image_id':image_id}).fetchall()
+
+        image_room_userlist=[{
+            'room_id':row['room_id'],
+            'user_id':row['user_id']
+        } for row in rows]
+
+        return image_room_userlist
+
+def get_email_auth_info(email):
+    row=database.execute(text("""
+            select
+                email,
+                auth_password,
+                activated
+            from email_auth
+            where email=:email
+        """),{'email':email}).fetchone()
     
+    email_auth={
+            'email':row['email'],
+            'auth_password':row['auth_password'],
+            'activated':row['activated']
+        } if row else None
+
+    return email_auth
+    
+
 def test_setup():
     assert True
 
@@ -456,26 +561,6 @@ def test_insert_user(user_dao):
         'profile':new_user['profile']
     }
 
-def get_image_room_userlist(image_id):
-        rows=database.execute(text("""
-            select
-                i_r.room_id as room_id,
-                r_u.user_id as user_id
-            from images_room_list as i_r
-            join rooms_user_list as r_u
-            on (i_r.room_id=r_u.room_id
-            and i_r.deleted=0
-            and r_u.deleted=0)
-            where i_r.image_id=:image_id
-            """),{'image_id':image_id}).fetchall()
-
-        image_room_userlist=[{
-            'room_id':row['room_id'],
-            'user_id':row['user_id']
-        } for row in rows]
-
-        return image_room_userlist
-
 #1번 유저의 민감 정보 검증
 def test_get_user_id_and_password(user_dao):
     #1번 유저의 민감 정보 확인
@@ -487,7 +572,6 @@ def test_get_user_id_and_password(user_dao):
     #존재하지 않는 유저 민감 정보 확인
     user_credential=user_dao.get_user_id_and_password('test100@naver.com')
     assert user_credential==None
-    
     
 #2번 유저의 정보 검증
 def test_get_user_info(user_dao):
@@ -900,16 +984,16 @@ def test_get_room_user(room_dao):
     room_user=room_dao.get_room_user(1,100)
     assert room_user==None
 
-
 #이미지 삽입 확인
 def test_insert_image(image_dao):
+    datetime_now=datetime.now()
     new_image={
         'link':'testlink5',
-        'user_id':1
+        'user_id':1,
     }
     new_image_id=image_dao.insert_image(new_image)
     image_info=get_image_info(new_image_id)
-    assert image_info=={
+    assert extract_arguments_from_data(image_info,image_args)=={
         'id':new_image_id,
         'link':new_image['link'],
         'user_id':new_image['user_id']
@@ -918,8 +1002,8 @@ def test_insert_image(image_dao):
 #유저의 이미지 정보 목록 확인
 def test_get_user_imagelist(image_dao):
     #1유저의 이미지 정보 목록 확인
-    user_image_info_list=image_dao.get_user_imagelist(1)
-    assert user_image_info_list==[
+    user_image_info_list=image_dao.get_user_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -927,8 +1011,8 @@ def test_get_user_imagelist(image_dao):
         },
     ]
     #3번 유저의 이미지 정보 목록 확인
-    user_image_info_list=image_dao.get_user_imagelist(3)
-    assert user_image_info_list==[
+    user_image_info_list=image_dao.get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
         {
             'id':3,
             'link':'testlink3',
@@ -945,14 +1029,14 @@ def test_get_user_imagelist(image_dao):
 def test_get_image_info(image_dao):
     #1번 이미지 정보 확인
     image_info=image_dao.get_image_info(1)
-    assert image_info=={
+    assert extract_arguments_from_data(image_info,image_args)=={
         'id':1,
         'link':'testlink1',
         'user_id':1
     }
     #4번 이미지 정보 확인
     image_info=image_dao.get_image_info(4)
-    assert image_info=={
+    assert extract_arguments_from_data(image_info,image_args)=={
         'id':4,
         'link':'testlink4',
         'user_id':3
@@ -964,8 +1048,8 @@ def test_get_image_info(image_dao):
 #이미지 삭제 확인
 def test_delete_image(image_dao):
     #3번 유저의 이미지 정보 목록 확인
-    user_image_info_list=get_user_imagelist(3)
-    assert user_image_info_list==[
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
         {
             'id':3,
             'link':'testlink3',
@@ -980,8 +1064,8 @@ def test_delete_image(image_dao):
     #1번 이미지 삭제 및 유저의 이미지 리스트 확인
     result=image_dao.delete_image(3)
     assert result==1
-    user_image_info_list=get_user_imagelist(3)
-    assert user_image_info_list==[
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
         {
             'id':4,
             'link':'testlink4',
@@ -1027,8 +1111,8 @@ def test_get_image_roomlist(image_dao):
 #방에 이미지 삽입 확인
 def test_insert_room_image(image_dao):
     #1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1051,8 +1135,8 @@ def test_insert_room_image(image_dao):
     #1번방에 3번 이미지를 추가 후 1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
     result=image_dao.insert_room_image(1,3)
     assert result==1
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1085,7 +1169,7 @@ def test_insert_room_image(image_dao):
     #방에 이미 삽입된 사진 중복 삽입 확인
     result=image_dao.insert_room_image(1,3)
     assert result==0
-    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1)]
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1,{'start':0,'limit':10})]
     assert room_imagelist==[1,2,3]
     image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
     assert image_roomlist==[1,2]
@@ -1093,8 +1177,8 @@ def test_insert_room_image(image_dao):
 #방의 이미지 삭제 확인
 def test_delete_room_image(image_dao):
     #1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1122,8 +1206,8 @@ def test_delete_room_image(image_dao):
     #1번 방에서 2번 이미지 삭제 후 1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
     result=image_dao.delete_room_image(1,2)
     assert result==1
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1146,8 +1230,8 @@ def test_delete_room_image(image_dao):
     #방에서 이미 삭제한 이미지 중복 삭제 확인
     result=image_dao.delete_room_image(1,2)
     assert result==0
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1171,8 +1255,8 @@ def test_delete_room_image(image_dao):
 #방의 이미지 정보 목록 확인
 def test_get_room_imagelist(image_dao):
     #1번방의 이미지 정보 정보 확인
-    room_image_info_list=image_dao.get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1184,8 +1268,8 @@ def test_get_room_imagelist(image_dao):
             'user_id':2
         }
     ]
-    room_image_info_list=image_dao.get_room_imagelist(2)
-    assert room_image_info_list==[
+    room_image_info_list=image_dao.get_room_imagelist(2,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':2,
             'link':'testlink2',
@@ -1201,8 +1285,8 @@ def test_get_room_imagelist(image_dao):
 #방의 특정 유저의 이미지 모두 삭제 확인
 def test_delete_room_user_image(image_dao):
     #1번 방의 이미지 목록과 2번 사진의 방 목록 확인
-    room_image_info_list=image_dao.get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1231,8 +1315,8 @@ def test_delete_room_user_image(image_dao):
     #1번방의 2번 유저 사진 삭제 확인
     result=image_dao.delete_room_user_image(1,2)
     assert result==1
-    room_image_info_list=image_dao.get_room_imagelist(1)
-    assert room_image_info_list==[
+    room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
         {
             'id':1,
             'link':'testlink1',
@@ -1255,14 +1339,15 @@ def test_delete_room_user_image(image_dao):
     result=image_dao.delete_room_user_image(1,2)
     assert result==0
     
-    
+#이미지가 속한 방을 삭제
 def test_delete_image_room(image_dao):
     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
     assert image_roomlist==[1,2]
     result=image_dao.delete_image_room(2)
     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
     assert image_roomlist==[]
-    
+
+
 def test_image_room_userlist(image_dao):
     image_room_userlist=get_image_room_userlist(1)
     assert image_room_userlist==[
@@ -1352,6 +1437,78 @@ def test_image_room_userlist(image_dao):
     ]
     image_room_userlist=get_image_room_userlist(4)
     assert image_room_userlist==[]
+
+def test_insert_email_auth(user_dao):
+    new_email="test_auth24@test.com"
+    auth_password="1234"
+    result=user_dao.insert_email_auth(new_email,auth_password)
+    
+    assert result==1
+    
+    new_email_auth_info=get_email_auth_info(new_email)
+    assert new_email_auth_info=={
+        'email':new_email,
+        'auth_password':auth_password,
+        'activated':0
+    }
+    
+def test_get_email_auth_time_diff(user_dao):
+    sample_email="test_auth1@naver.com"
+    sample_password="1234"
+    email_auth_info=user_dao.get_email_auth_info(sample_email)
+    assert email_auth_info=={
+        'email':sample_email,
+        'auth_password':sample_password,
+        'activated':0
+    }
+
+def test_get_email_auth_time_diff(user_dao):
+    sample_email="test_auth1@naver.com"
+    time_diff=user_dao.get_email_auth_time_diff(sample_email)
+    assert isinstance(time_diff,int)
+
+def test_update_email_auth(user_dao):
+    sample_email="test_auth1@naver.com"
+    sample_password="5678"
+    result=user_dao.update_email_auth(sample_email,sample_password)
+    email_auth_info=get_email_auth_info(sample_email)
+    assert email_auth_info=={
+        'email':sample_email,
+        'auth_password':sample_password,
+        'activated':0
+    }
+    
+def test_update_email_auth_activate(user_dao):
+    sample_email="test_auth1@naver.com"
+
+    result=user_dao.update_email_auth_activate(sample_email)
+    email_auth_info=get_email_auth_info(sample_email)
+    assert email_auth_info=={
+        'email':sample_email,
+        'auth_password':"1234",
+        'activated':1
+    }
+    
+def test_update_user(user_dao):
+    sample_user_id=1
+    sample_attr='profile'
+    sample_value="im updating user profile"
+    result=user_dao.update_user(sample_user_id,sample_attr,sample_value)
+
+    user_info=get_user_info(sample_user_id)
+    assert user_info=={
+        'id':1,
+        'email':'test1@naver.com',
+        'profile':sample_value,
+        'name':'test1'
+    }
+
+def test_delete_user(user_dao):
+    sample_user_id=1
+    result=user_dao.delete_user(sample_user_id)
+    user_info=get_user_info(sample_user_id)
+    assert user_info==None
+
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
