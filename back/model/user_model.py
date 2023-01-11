@@ -214,3 +214,13 @@ class UserDao:
         row=self.db.execute(query).rowcount
         
         return row
+
+    def delete_user(self,delete_user_id):
+        row=self.db.execute(text("""
+           update users
+           set deleted=1
+           where id=:delete_user_id
+           and deleted=0
+        """),{'delete_user_id':delete_user_id}).rowcount
+        
+        return row
