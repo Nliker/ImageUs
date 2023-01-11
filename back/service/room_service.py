@@ -100,3 +100,12 @@ class RoomService:
 
         return result
     
+    def delete_user_roomlist(self,user_id):
+        result=self.room_dao.delete_user_rooms(user_id)
+        
+        return result
+    
+    def delete_user_room_history(self,user_id):
+        result=self.room_dao.delete_user_room_history(user_id)
+        print(result)
+        return result

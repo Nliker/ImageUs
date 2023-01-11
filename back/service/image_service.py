@@ -137,7 +137,8 @@ class ImageService:
         
     def get_image_info(self,image_id):
         image_info=self.image_dao.get_image_info(image_id)
-        image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
+        if image_info!=None:
+            image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
         return image_info
         
@@ -154,7 +155,8 @@ class ImageService:
         image_info_list=self.image_dao.get_room_imagelist(room_id,pages)
 
         for image_info in image_info_list:
-            image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
+            if image_info['created_at']!=None:
+                image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
         image_info_list.reverse()
         
@@ -230,3 +232,8 @@ class ImageService:
         imagelist_len=self.image_dao.get_user_imagelist_len(user_id)
 
         return imagelist_len
+    
+    def delete_user_imagelist(self,user_id):
+        result=self.image_dao.delete_user_imagelist(user_id)
+        
+        return result
