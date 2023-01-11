@@ -41,7 +41,7 @@ def image_router(api,services):
     
     delete_image_parser=api_parser_model.get_parser(['Authorization'])
     delete_image_model=api_model.get_model("delete_image_model",['delete_image_id'])
-    delete_image_response_model=api_model.get_model("delete_image_response_model",['delete_image_id'])
+    # delete_image_response_model=api_model.get_model("delete_image_response_model",['delete_image_id'])
     @image_namespace.route("")
     class image(Resource):
         @image_namespace.expect(post_image_parser,validate=False)
