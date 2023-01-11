@@ -1,9 +1,8 @@
 import { IImageData } from '@typing/db';
 import axios, { AxiosResponse } from 'axios';
 
-const token = sessionStorage.getItem('TOKEN');
-
 const getRoomImageListFetcher = async (arg: Array<string | undefined>) => {
+  const token = sessionStorage.getItem('TOKEN');
   const [url, roomId, start] = arg;
   if (!roomId) return null;
   const loadNumber = 10;
@@ -111,7 +110,7 @@ const getImageData = async (
       nextImgData: [...nextImgData],
       deleteImgData: [...deleteImgData],
     };
-    console.log(imageDataList);
+    // console.log(imageDataList);
     return imageDataList;
   } catch (error) {
     console.log(error);
@@ -119,6 +118,7 @@ const getImageData = async (
 };
 
 const getUserListFetcher = async (arg: Array<string | undefined>) => {
+  const token = sessionStorage.getItem('TOKEN');
   const [url, roomId] = arg;
   if (!roomId) return null;
 
@@ -139,6 +139,7 @@ const inviteFriendFetcher = async (
   url: string,
   { arg }: { arg: { invite_userlist: Array<string>; roomId: string } },
 ) => {
+  const token = sessionStorage.getItem('TOKEN');
   const { roomId, invite_userlist } = arg;
   try {
     const response = await axios.post(
