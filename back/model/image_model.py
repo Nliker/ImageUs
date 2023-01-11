@@ -237,4 +237,12 @@ class ImageDao:
                 }).scalar()
         return row_count
     
-    
+    def delete_user_imagelist(self,user_id):
+        row=self.db.execute(text("""
+            update images
+            set deleted=1
+            where user_id=:user_id
+            and deleted=0
+            """),{'user_id':user_id}).rowcount
+        
+        return row

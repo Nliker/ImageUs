@@ -191,3 +191,23 @@ class RoomDao:
         """),{'room_id':room_id,'user_id':user_id,'last_unread_row':last_unread_row}).rowcount
         
         return row
+    
+    def delete_user_rooms(self,user_id):
+        row=self.db.execute(text("""
+            update rooms_user_list
+            set deleted=1
+            where user_id=:user_id
+            and deleted=0
+        """),{'user_id':user_id}).rowcount
+
+        return row
+
+    def delete_user_room_history(self,user_id):
+        row=self.db.execute(text("""
+            update rooms_user_history
+            set deleted=1
+            where user_id=:user_id
+            and deleted=0
+        """),{'user_id':user_id}).rowcount
+
+        return row
