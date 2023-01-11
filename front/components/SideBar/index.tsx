@@ -10,9 +10,10 @@ import { ContentTabs, ContentWrapper, CreateBtn, CreateBtnBox, Tab, Wrapper } fr
 interface SidebarProps {
   show: boolean;
   roomId?: string;
+  close: () => void;
 }
 
-const SideBar = memo(({ show, roomId }: SidebarProps) => {
+const SideBar = memo(({ show, roomId, close }: SidebarProps) => {
   // console.log(isMobile);
   const { data: showModalState, mutate: showModalMutate } = useSWR('showModalState');
   // const { data: roomId } = useSWR('roomId');
@@ -36,7 +37,7 @@ const SideBar = memo(({ show, roomId }: SidebarProps) => {
       invite_member: true,
     });
   }, []);
-  // console.log(roomId);
+
   return (
     <Wrapper show={show}>
       <ContentWrapper>
@@ -51,24 +52,22 @@ const SideBar = memo(({ show, roomId }: SidebarProps) => {
                 <CreateBtnBox>
                   <ActionButton onClickBtn={onClickCreateRoomBtn} btnTitle={'생성하기'} />
                 </CreateBtnBox>
-                <ChannelList />
+                <ChannelList closeSidebar={close} />
               </div>
             </div>
           </Tab>
-          {roomId && (
-            <Tab>
-              <input type="radio" id="tab-2" name="tab-group-1" />
-              <label htmlFor="tab-2">멤버목록</label>
-              <div className="tab_content">
-                <div className="tab_content_box">
-                  <CreateBtnBox>
-                    <ActionButton onClickBtn={onClickInviteMember} btnTitle={'초대하기'} />
-                  </CreateBtnBox>
-                  <MemberList roomId={roomId} />
-                </div>
+          <Tab>
+            <input type="radio" id="tab-2" name="tab-group-1" />
+            <label htmlFor="tab-2">멤버목록</label>
+            <div className="tab_content">
+              <div className="tab_content_box">
+                <CreateBtnBox>
+                  <ActionButton onClickBtn={onClickInviteMember} btnTitle={'초대하기'} />
+                </CreateBtnBox>
+                <MemberList roomId={roomId} />
               </div>
-            </Tab>
-          )}
+            </div>
+          </Tab>
         </ContentTabs>
       </ContentWrapper>
     </Wrapper>

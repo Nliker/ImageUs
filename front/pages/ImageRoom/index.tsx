@@ -6,18 +6,20 @@ import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router';
 
 const ImageRoom = () => {
-  const { roomId } = useParams<{ roomId: string | undefined }>();
+  const { roomId } = useParams<{ roomId: string }>();
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
-  const handleSidebar = useCallback(() => {
+  const toggleSidebar = useCallback(() => {
     setshowSideBar((prev) => !prev);
   }, [showSideBar]);
 
-  console.log(roomId);
+  const closeSidebar = useCallback(() => {
+    setshowSideBar(false);
+  }, [showSideBar]);
 
   return (
     <AppLayout>
-      <ToolBar handleSidebar={handleSidebar} />
-      <SideBar show={showSideBar} />
+      <ToolBar handleSidebar={toggleSidebar} />
+      <SideBar show={showSideBar} roomId={roomId} close={closeSidebar} />
       <ContentSection roomId={roomId} />
     </AppLayout>
   );
