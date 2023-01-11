@@ -70,9 +70,15 @@ class ApiModel:
     
     delete_friend_user_id=fields.Integer(
                 default=1,
-                description="int_delete_user_id",
+                description="int_delete_friend_user_id",
                 required=False
             )
+    
+    delete_user_id=fields.Integer(
+                default=1,
+                description="int_delete_user_id",
+                required=False        
+    )
     
     delete_user_room_id=fields.Integer(
                 default=1,
@@ -213,6 +219,9 @@ class ApiModel:
 
         if 'delete_user_room_id' in args:
             payload['delete_user_room_id']=self.delete_user_room_id
+
+        if 'delete_user_id' in args:
+            payload['delete_user_id']=self.delete_user_id
 
         if 'userlist' in args:
             payload['userlist']=self.userlist
