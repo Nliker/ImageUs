@@ -35,7 +35,7 @@ const MyPage = () => {
   // 스크롤이 일어날 때 imageList 요청을 보내서 다음 사진을 받고
   // mutate(key, start + 개수 + 1, true)로 이미지 로드 시작번호를 업데이트 한다.
 
-  console.log(imageList);
+  // console.log(imageList);
 
   useEffect(() => {
     if (!imageList) return;
