@@ -17,7 +17,7 @@ interface AppLayoutProps {
   roomId?: string;
 }
 
-const AppLayout = ({ children, roomId }: AppLayoutProps) => {
+const AppLayout = ({ children }: AppLayoutProps) => {
   const { data: showUploadModal } = useSWR('showUploadModal');
   const { data: imageModalState } = useSWR('imageModalState');
   const { data: showModalState } = useSWR('showModalState');
@@ -34,10 +34,10 @@ const AppLayout = ({ children, roomId }: AppLayoutProps) => {
     <Wrapper>
       <Container showModal={showModalState}>
         <TopNavBar />
-        {isMobile && <BottomNavBar roomId={roomId} />}
+        {isMobile && <BottomNavBar />}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
-      {showModalState?.upload && <UploadModal roomId={roomId} />}
+      {showModalState?.upload && <UploadModal />}
       {showModalState?.image && <ContentImageModal />}
       {showModalState?.create_room && (
         <ModalWrapper>
