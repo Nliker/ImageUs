@@ -6,21 +6,22 @@ import { RiListSettingsLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi';
 import { NavLink, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
-import logInFetcher from '@utils/logInFetcher';
+import { logInCheckFetcher } from '@utils/logInFetcher';
 import { Link } from 'react-router-dom';
 import { Node } from 'typescript';
+import { useParams } from 'react-router';
 
 interface Props {
-  handleRoomListBtn: (e: any) => void;
-  isLogIn?: boolean;
-  roomId?: string;
+  handleSidebar?: (e: any) => void;
 }
 
-const ToolBar = ({ handleRoomListBtn, isLogIn, roomId }: Props) => {
+const ToolBar = ({ handleSidebar }: Props) => {
+  const { data: isLogIn } = useSWR('/user/my');
+  const { roomId } = useParams<{ roomId: string | undefined }>();
   const isMobile = useMediaQuery({ maxWidth: 1023 });
   const [showUserBox, setShowUserBox] = useState<boolean | null>(null);
-  const el = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const el = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.addEventListener('click', handleCloseUserBox);
@@ -40,9 +41,12 @@ const ToolBar = ({ handleRoomListBtn, isLogIn, roomId }: Props) => {
 
   const onClickLogOut = useCallback(() => {
     sessionStorage.clear();
-    mutate('/user/my');
+    // 이 부분이 mutate 하자마자 false로 바꿔주는 것인지 확인 필요
+    mutate('/user/my', false);
     navigate('/');
   }, []);
+
+  console.log('toolBar', '로그인 유무:', isLogIn);
 
   return (
     <Wrapper>
@@ -63,7 +67,7 @@ const ToolBar = ({ handleRoomListBtn, isLogIn, roomId }: Props) => {
           {roomId && (
             <LeftIcon className="toolbar_icon">
               <span>
-                <MdOutlineSpaceDashboard onClick={handleRoomListBtn} />
+                <MdOutlineSpaceDashboard onClick={handleSidebar} />
               </span>
             </LeftIcon>
           )}
