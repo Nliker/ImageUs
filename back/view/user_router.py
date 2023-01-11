@@ -694,6 +694,8 @@ def user_router(app,api,services,config,es):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
                 
-            result=user_service.delete_user(delete_user_id)
+            delete_user_result=user_service.delete_user(delete_user_id)
+            delete_user_imagelist_result=image_service.delete_user_imagelist(delete_user_id)
+            delete_user_roomlist_result=room_service.delete_user_roomlist(delete_user_id)
             
             return make_response(f"회원삭제에 성공하였습니다.")
