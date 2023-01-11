@@ -67,6 +67,7 @@ class RoomService:
         for user_id in userlist:
             if not (self.room_dao.get_room_user(room_id,user_id)):
                 result+=self.room_dao.insert_room_user(room_id,user_id)
+                self.room_dao.insert_room_user_history(room_id,user_id)
             
         return result
     
@@ -84,3 +85,18 @@ class RoomService:
     def delete_room_user(self,room_id,delete_room_user_id):
         result=self.room_dao.delete_room_user(room_id,delete_room_user_id)
         return result
+    
+    def get_room_user_history_info(self,room_id,user_id):
+        room_user_history_info=self.room_dao.get_room_user_history_info(room_id,user_id)
+        return room_user_history_info
+    
+    def update_room_user_history_start(self,room_id,user_id,imageslist_len):
+        result=self.room_dao.update_room_user_history_start(room_id,user_id,imageslist_len)
+
+        return result
+    
+    def update_room_user_history_last_unread_row(self,room_id,user_id,last_unread_row):
+        result=self.room_dao.update_room_user_history_last_unread_row(room_id,user_id,last_unread_row)
+
+        return result
+    

@@ -137,3 +137,90 @@ class UserDao:
             return 1
         else:
             return 0
+    
+    def get_email_auth_time_diff(self,email):
+        row=self.db.execute(text("""
+            select
+                TIMESTAMPDIFF(SECOND,updated_at,CURRENT_TIMESTAMP())
+            from email_auth
+            where email=:email
+            """),{'email':email}).fetchone()
+        (time_diff,)=row if row else None
+
+        return time_diff
+        
+    
+    def get_email_auth_info(self,email):
+        row=self.db.execute(text("""
+            select
+                email,
+                auth_password,
+                activated
+            from email_auth
+            where email=:email
+        """),{'email':email}).fetchone()
+    
+        email_auth={
+            'email':row['email'],
+            'auth_password':row['auth_password'],
+            'activated':row['activated']
+        } if row else None
+
+        return email_auth
+    
+    def update_email_auth(self,email,auth_password):
+        row=self.db.execute(text("""
+            update email_auth
+            set 
+                auth_password=:auth_password,
+                activated=0
+            where email=:email
+        """),{'email':email,'auth_password':auth_password}).rowcount
+        
+        return row
+
+    def update_email_auth_activate(self,email):
+        row=self.db.execute(text("""
+            update email_auth
+            set
+                activated=1
+            where email=:email
+            and activated!=1
+            """),{'email':email}).rowcount
+        
+        return row
+        
+        
+    def insert_email_auth(self,email,auth_password):
+        row=self.db.execute(text("""
+            insert into email_auth(
+                email,
+                auth_password
+            ) values (
+                :email,
+                :auth_password
+            )
+        """),{'email':email,'auth_password':auth_password}).rowcount
+
+        return row
+    def update_user(self,user_id,attr,value):
+        query="""
+            update users
+            set
+                %s='%s'
+            where id=%d
+            and %s!='%s'
+        """ % (attr,value,user_id,attr,value)
+        row=self.db.execute(query).rowcount
+        
+        return row
+
+    def delete_user(self,delete_user_id):
+        row=self.db.execute(text("""
+           update users
+           set deleted=1
+           where id=:delete_user_id
+           and deleted=0
+        """),{'delete_user_id':delete_user_id}).rowcount
+        
+        return row
