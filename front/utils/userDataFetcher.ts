@@ -1,13 +1,11 @@
 import { IImageData, IRoomData } from '@typing/db';
-import axios from 'axios';
-import { mutate } from 'swr';
-
-const userId = sessionStorage.getItem('USER_ID');
-const token = sessionStorage.getItem('TOKEN');
+import axios, { AxiosError } from 'axios';
 
 const getUserFriendList = async (url: string) => {
   console.log('freindlist');
   try {
+    const userId = sessionStorage.getItem('USER_ID');
+    const token = sessionStorage.getItem('TOKEN');
     const response = await axios.get(`/user/${userId}/${url}`, {
       headers: {
         Authorization: token,
@@ -15,12 +13,17 @@ const getUserFriendList = async (url: string) => {
     });
     const { friendlist } = await response.data;
     return friendlist;
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return false;
   }
 };
 
 const getUserImageList = async (arg: [string, number]) => {
+  const userId = sessionStorage.getItem('USER_ID');
+  const token = sessionStorage.getItem('TOKEN');
   const start = arg[1];
   const limit = 10;
   try {
@@ -32,32 +35,43 @@ const getUserImageList = async (arg: [string, number]) => {
     // mutate('store/userImageLoadNumber', start + limit + 1, false);
     const { imagelist } = await response.data;
     return imagelist;
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return false;
   }
 };
 
 const getImageData = async (url: string, { arg }: { arg: Array<IImageData> }) => {
-  const imageDataList = await Promise.all(
-    arg.map(async (imageData) => {
-      if (!imageData.link) return null;
-      const res = await axios.get(`/image-download/${imageData.link}`, {
-        headers: {
-          Authorization: `${sessionStorage.getItem('TOKEN')}`,
-        },
-        responseType: 'blob',
-      });
+  try {
+    const imageDataList = await Promise.all(
+      arg.map(async (imageData) => {
+        if (!imageData.link) return null;
+        const res = await axios.get(`/image-download/${imageData.link}`, {
+          headers: {
+            Authorization: `${sessionStorage.getItem('TOKEN')}`,
+          },
+          responseType: 'blob',
+        });
 
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-      return { id: imageData.id, imageUrl: url };
-    }),
-  );
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+        return { id: imageData.id, imageUrl: url };
+      }),
+    );
 
-  return imageDataList;
+    return imageDataList;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return undefined;
+  }
 };
 
 const deleteUserFriend = async (url: string, { arg }: { arg: string }) => {
   try {
+    const userId = sessionStorage.getItem('USER_ID');
     const response = await axios.delete(`/user/${userId}/friend`, {
       data: {
         delete_friend_user_id: arg,
@@ -67,31 +81,37 @@ const deleteUserFriend = async (url: string, { arg }: { arg: string }) => {
       },
     });
     console.log(response.data);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return false;
   }
 };
 
 const getUserRoomListFetcher = async (url: string) => {
-  return axios
-    .get(`/user/${userId}/${url}`, {
+  try {
+    const userId = sessionStorage.getItem('USER_ID');
+    const token = sessionStorage.getItem('TOKEN');
+
+    const response = await axios.get(`/user/${userId}/${url}`, {
       headers: {
-        Authorization: `${sessionStorage.getItem('TOKEN')}`,
+        Authorization: `${token}`,
       },
-    })
-    .then((res) => {
-      const { data } = res;
-      const roomList = data.roomlist.map((roomData: IRoomData) => {
-        return {
-          id: roomData.id,
-          title: roomData.title,
-        };
-      });
-      return roomList;
-    })
-    .catch((err) => {
-      console.log(err);
     });
+    const roomList = response.data.roomlist.map((roomData: IRoomData) => {
+      return {
+        id: roomData.id,
+        title: roomData.title,
+      };
+    });
+    return roomList;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return null;
+  }
 };
 
 export { getUserFriendList, deleteUserFriend, getUserRoomListFetcher, getUserImageList, getImageData };
