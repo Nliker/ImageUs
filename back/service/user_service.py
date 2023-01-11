@@ -224,4 +224,9 @@ class UserService:
         result=self.user_dao.update_user_room_history_row_info(user_id,room_id,update_row)
 
         return result
+    
+    def delete_user(self,delete_user_id):
+        result=self.user_dao.delete_user(delete_user_id)
+        print(result)
+        return result
                     
