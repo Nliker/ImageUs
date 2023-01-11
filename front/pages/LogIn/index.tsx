@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import {
   CheckBox,
@@ -12,9 +12,12 @@ import {
 import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useSWR, { mutate } from 'swr';
-import logInFetcher from '@utils/logInFetcher';
+import useSWRMutation from 'swr/mutation';
+import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 
 const LogIn = () => {
+  const { data: logInSuccess, trigger } = useSWRMutation('/user/login', logInRequestFetcher);
+
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -69,7 +72,7 @@ const LogIn = () => {
   }, []);
 
   const onSubmitLoginInfo = useCallback(
-    (e: { preventDefault: () => void }) => {
+    async (e: { preventDefault: () => void }) => {
       e.preventDefault();
       const emailCheck = emailValidation(emailValue);
       const pwCheck = pwValidation(passwordValue);
@@ -80,25 +83,16 @@ const LogIn = () => {
       } else if (!pwCheck) {
         alert('비밀번호를 다시 확인해주세요.');
       } else {
-        axios
-          .post('/user/login', {
-            email: emailValue,
-            password: passwordValue,
-          })
-          .then((res) => {
-            sessionStorage.setItem('TOKEN', res.data.access_token);
-            sessionStorage.setItem('USER_ID', res.data.user_id);
-            mutate('/user/my');
-            // 페이지 이동
-            navigate('/main_page');
-          })
-          .catch((err) => {
-            alert(err.response.data.message);
-          });
+        await trigger({ email: emailValue, password: passwordValue });
+        await mutate('/user/my');
       }
     },
     [emailValue, passwordValue],
   );
+
+  useEffect(() => {
+    if (logInSuccess) navigate('/main_page');
+  }, [logInSuccess]);
 
   return (
     <div>
