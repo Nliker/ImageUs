@@ -6,7 +6,11 @@ import { Collapse, Container, Subtitle } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import { IRoomData } from '@typing/db';
 
-const ChannelList = memo(() => {
+interface Props {
+  closeSidebar: () => void;
+}
+
+const ChannelList = memo(({ closeSidebar }: Props) => {
   const { data: roomlist, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
@@ -14,7 +18,6 @@ const ChannelList = memo(() => {
   });
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
   const toggleChannelCollapse = useCallback(() => setChannelCollapse((prev) => !prev), []);
-  // console.log(roomlist);
 
   return (
     <Container>
@@ -27,7 +30,7 @@ const ChannelList = memo(() => {
       <div>
         {channelCollapse &&
           roomlist?.map((room: IRoomData) => {
-            return <EachChannel key={room.id} room={room} />;
+            return <EachChannel key={room.id} room={room} closeSidebar={closeSidebar} />;
           })}
       </div>
     </Container>

@@ -3,13 +3,19 @@ import React, { memo, useCallback } from 'react';
 import { NavLink, useLinkClickHandler, useNavigate } from 'react-router-dom';
 import { ChannelDiv } from './styles';
 
-const EachChannel = memo(({ room }: { room: IRoomData}) => {
+interface Props {
+  room: IRoomData;
+  closeSidebar: () => void;
+}
+
+const EachChannel = memo(({ room, closeSidebar }: Props) => {
   const navigate = useNavigate();
 
   const onClickRoom = useCallback(() => {
-    navigate(`/main_page/${room.id}`);
+    closeSidebar();
+    navigate(`/booth/${room.id}`);
   }, [room]);
-  
+
   return (
     <ChannelDiv onClick={onClickRoom}>
       <span># {room.title}</span>
