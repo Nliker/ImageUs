@@ -61,11 +61,18 @@ const getRoomImageListFetcher = async (arg: Array<string | undefined>) => {
 
 const getImageData = async (
   url: string,
-  { arg }: { arg: { imagelist: Array<{ id: number; link: string; user_id: number }>; read_history_row: number } },
+  {
+    arg,
+  }: {
+    arg: {
+      imagelist: Array<{ created_at: string; id: number; link: string; user_id: number }>;
+      read_history_row: number;
+    };
+  },
 ) => {
   try {
-    const prevImgData: Array<{ id: number; imageUrl: string }> = [];
-    const nextImgData: Array<{ id: number; imageUrl: string }> = [];
+    const prevImgData: Array<{ id: number; imageUrl: string; create_date: string }> = [];
+    const nextImgData: Array<{ id: number; imageUrl: string; create_date: string }> = [];
     const deleteImgData: Array<{ id: number }> = [];
 
     for (const imageData of arg.imagelist) {
@@ -79,8 +86,9 @@ const getImageData = async (
           responseType: 'blob',
         });
 
+        const create_date = imageData.created_at.split(' ')[0];
         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-        prevImgData.push({ id: imageData.id, imageUrl: url });
+        prevImgData.push({ id: imageData.id, imageUrl: url, create_date: create_date });
       }
     }
     // const imageDataList = await Promise.all(
