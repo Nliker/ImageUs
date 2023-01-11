@@ -47,6 +47,10 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
   // 스크롤이 일어날 때 imageList 요청을 보내서 다음 사진을 받고
   // mutate(key, start + 개수 + 1, true)로 이미지 로드 시작번호를 업데이트 한다.
 
+  // const exactDate = () => {
+
+  // }
+
   console.log(imageList);
   console.log(imageDataList);
 
@@ -98,7 +102,7 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
   return (
     <Wrapper>
       <MainContainer>
-        {isLoading && !imageDataList ? (
+        {isLoading ? (
           <div>로딩중입니다..</div>
         ) : (
           <div>
@@ -119,7 +123,7 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
                           <span>이미지 1</span>
                         </InfoItem>
                         <InfoItem>
-                          <span>2022/ 11/ 25</span>
+                          <span>{data.create_date}</span>
                         </InfoItem>
                       </ImageInfo>
                     </Link>
@@ -144,7 +148,7 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
                           <span>이미지 1</span>
                         </InfoItem>
                         <InfoItem>
-                          <span>2022/ 11/ 25</span>
+                          <span>{data.create_date}</span>
                         </InfoItem>
                       </ImageInfo>
                     </Link>
