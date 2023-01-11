@@ -19,32 +19,18 @@ const MainPage = () => {
   const { data: isLogIn } = useSWR('/user/my');
   const { data: roomlist, trigger, isMutating } = useSWRMutation('roomlist', getUserRoomListFetcher);
   const navigate = useNavigate();
-  // const { data: roomlist, isLoading } = useSWR('roomlist', getUserRoomListFetcher, {
-  //   revalidateIfStale: false,
-  //   revalidateOnFocus: false,
-  //   revalidateOnReconnect: false,
-  // });
-  // const { data: room}
-
-  // const { roomId } = useParams<{ roomId: string | undefined }>();
-  // const [showSideBar, setshowSideBar] = useState<boolean>(false);
-  // const handleRoomListBtn = useCallback(() => {
-  //   setshowSideBar((prev) => !prev);
-  // }, [showSideBar]);
-
-  // const onClickRoomList = useCallback(() => {}, [roomlist]);
 
   useEffect(() => {
     if (!isLogIn) return;
     trigger();
   }, [isLogIn]);
 
-  console.log('메인페이지', '로그인 유무:', isLogIn);
+  console.log('메인페이지 로그인:', isLogIn);
+  console.log('메인페이지 룸리스트:', roomlist);
 
   return (
     <AppLayout>
       <ToolBar />
-      {/* {roomId && <SideBar show={showSideBar} roomId={roomId} />} */}
       <Wrappper>
         <ContentWrappper>
           <main>
@@ -73,10 +59,6 @@ const MainPage = () => {
               </section>
             )}
           </main>
-          {/* {roomId ? (
-            <ContentSection roomId={roomId} />
-          ) : (
-          )} */}
         </ContentWrappper>
       </Wrappper>
     </AppLayout>
