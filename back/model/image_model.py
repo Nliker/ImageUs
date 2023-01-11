@@ -18,24 +18,30 @@ class ImageDao:
         new_image_id=row
         return new_image_id
     
-    def get_user_imagelist(self,user_id):
+    def get_user_imagelist(self,user_id,pages):
         rows=self.db.execute(text("""
             select
                 id,
                 link,
-                user_id
+                user_id,
+                created_at
             from images
             where user_id=:user_id
             and deleted=0
+            order by created_at
+            limit :start,:limit
             """),{
-                    'user_id':user_id
+                    'user_id':user_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
         user_image_info_list=[
             {
                 'id':user_image_info['id'],
                 'link':user_image_info['link'],
-                'user_id':user_image_info['user_id']
+                'user_id':user_image_info['user_id'],
+                'created_at':user_image_info['created_at']
             } for user_image_info in rows
         ]
         
@@ -46,18 +52,20 @@ class ImageDao:
             select
                 id,
                 link,
-                user_id
+                user_id,
+                created_at
             from images
             where id=:image_id
             and deleted=0
             """),{
                     'image_id':image_id
                 }).fetchone()
-
+        
         image_info={
             'id':row['id'],
             'link':row['link'],
-            'user_id':row['user_id']
+            'user_id':row['user_id'],
+            'created_at':row['created_at'],
         } if row else None
 
         return image_info
@@ -85,6 +93,7 @@ class ImageDao:
             where i_r.image_id=:image_id
             and r.deleted=0
             and i_r.deleted=0
+            order by title
             """),{
                     'image_id':image_id
                 }).fetchall()
@@ -129,27 +138,32 @@ class ImageDao:
 
         return row
 
-    def get_room_imagelist(self,room_id):
+    def get_room_imagelist(self,room_id,pages):
         rows=self.db.execute(text("""
             select
                 i_r.image_id as id,
                 i.link,
-                i.user_id
+                i.user_id,
+                i.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
             and i_r.deleted=0
-            and i.deleted=0) 
+            and i.deleted=0)
             where i_r.room_id=:room_id
-            order by id asc
+            order by i_r.created_at
+            limit :start,:limit
             """),{
-                    'room_id':room_id
+                    'room_id':room_id,
+                    'limit':pages['limit'],
+                    'start':pages['start']
                 }).fetchall()
 
         room_image_info_list=[{
             'id':room_image_info['id'],
             'link':room_image_info['link'],
-            'user_id':room_image_info['user_id']
+            'user_id':room_image_info['user_id'],
+            'created_at':room_image_info['created_at']
         } for room_image_info in rows]
 
         return room_image_info_list
@@ -195,3 +209,32 @@ class ImageDao:
         } for row in rows]
 
         return image_room_userlist
+    
+    def get_room_imagelist_len(self,room_id):
+        row_count=self.db.execute(text("""
+            select
+                count(*)
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0)
+            where i_r.room_id=:room_id
+            """),{
+                    'room_id':room_id
+                }).scalar()
+        return row_count
+    
+    def get_user_imagelist_len(self,user_id):
+        row_count=self.db.execute(text("""
+            select
+                count(*)
+            from images
+            where deleted=0
+            and user_id=:user_id
+            """),{
+                    'user_id':user_id
+                }).scalar()
+        return row_count
+    
+    

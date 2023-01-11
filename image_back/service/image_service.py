@@ -43,13 +43,12 @@ class ImageService:
 
         output_path=image_path_and_name
         while os.path.exists(output_path):
-            print("이미지 이름 처리중")
             output_path=f"{image_dir_and_name}({uniq}){image_ext}"
             uniq+=1
 
         print(output_path)
         image.save(output_path)
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{output_path.split('/')[-1]}"
+        image_link=f"{user_id}/{output_path.split('/')[-1]}"
         return image_link
 
     def decode_access_code(self,access_token):
@@ -92,5 +91,5 @@ class ImageService:
         return image_info
 
     def get_image_link(self,user_id,image_filename):
-        image_link=f"{self.config['IMAGE_DOWNLOAD_URL']}{user_id}/{image_filename}"
+        image_link=f"{user_id}/{image_filename}"
         return image_link
