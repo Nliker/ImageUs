@@ -2,15 +2,11 @@ import EachMember from '@components/EachMember';
 import React, { memo, useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { IoMdArrowDropright } from 'react-icons/io';
-import { useParams } from 'react-router-dom';
 import { Collapse, Subtitle } from './styles';
 import { getUserListFetcher } from '@utils/roomDataFetcher';
 import { IFriendData } from '@typing/db';
 
-const MemberList = memo(({ roomId }: { roomId: string }) => {
-  // const { roomId } = useParams<{roomId?: string}>();
-  // console.log(roomId);
-  // const { data: roomId } = useSWR('roomId');
+const MemberList = memo(({ roomId }: { roomId?: string }) => {
   const { data: userlist } = useSWR(['userlist', roomId], getUserListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,

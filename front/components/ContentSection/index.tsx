@@ -47,58 +47,11 @@ const ContentSection = memo(({ roomId }: { roomId: string | undefined }) => {
   // 스크롤이 일어날 때 imageList 요청을 보내서 다음 사진을 받고
   // mutate(key, start + 개수 + 1, true)로 이미지 로드 시작번호를 업데이트 한다.
 
-  // const exactDate = () => {
-
-  // }
-
-  console.log(imageList);
-  console.log(imageDataList);
-
   useEffect(() => {
     if (!imageList) return;
     trigger(imageList);
   }, [imageList]);
 
-  // useEffect(() => {
-  //   console.log(imageDataList);
-  //   // if (b64ImageList.length === 0) return;
-  //   if (!imageDataList) return;
-  //   setB64ImageList(() => {
-  //     // if (!imageDataList) return [...prev];
-  //     const newData = imageDataList.map((data) => {
-  //       if (!data.imageData) return { ...data };
-  //       // const b64image = btoa(unescape(encodeURIComponent(data.imageData.data)));
-  //       // console.log(b64image);
-
-  //       return { ...data, imageUrl: b64image };
-  //     });
-  //     // console.log(newData);
-  //     return [...newData];
-  //   });
-  // }, [imageDataList]);
-  // console.log(roomId, '컨텐츠 섹션');
-  // console.log(imageList, '테스트', roomId);
-  // // 전체 이미지 정보
-  // const { mutate: imageInfoMutate } = useSWR('imageInfo');
-  // // 클릭한 이미지 정보
-  // const { mutate: imageModalMutate } = useSWR('imageModalState');
-  // const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
-
-  // useEffect(() => {
-  //   imageInfoMutate(dummyImages, false);
-  // }, []);
-
-  // const onShowImageModal = (image: ImageType) => () => {
-  //   imageModalMutate({
-  //     clickImageId: image.id,
-  //     clickImageUrl: image.url,
-  //     clickImageName: image.name,
-  //   }, false);
-  //   showModalMutate({
-  //     ...showModalData,
-  //     image: true
-  //   }, false);
-  // };
   return (
     <Wrapper>
       <MainContainer>
