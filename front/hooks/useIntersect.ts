@@ -10,7 +10,7 @@ const useIntersect = (onIntersect: IntersectHandler, options?: IntersectionObser
       entries.forEach((entry) => {
         if (entry.isIntersecting) onIntersect(entry, observer);
       });
-    }),
+    }, 200),
     [onIntersect],
   );
 
