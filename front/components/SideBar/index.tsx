@@ -3,7 +3,7 @@ import CreateRoomModal from '@components/CreateRoomModal';
 import MemberList from '@components/MemberList';
 import React, { memo, useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import ActionButton from './ActionButton';
 import { ContentTabs, ContentWrapper, CreateBtn, CreateBtnBox, Tab, Wrapper } from './styles';
 
@@ -14,14 +14,8 @@ interface SidebarProps {
 }
 
 const SideBar = memo(({ show, roomId, close }: SidebarProps) => {
-  // console.log(isMobile);
   const { data: showModalState, mutate: showModalMutate } = useSWR('showModalState');
-  // const { data: roomId } = useSWR('roomId');
-  // const [switchTab, setSwitchTab] = useState<boolean>(true);
-
-  // const onChangeTab = useCallback(() => {
-  //   setSwitchTab(prev => !prev);
-  // }, [])
+  const { mutate } = useSWRConfig();
 
   const onClickCreateRoomBtn = useCallback(() => {
     showModalMutate({
@@ -29,7 +23,6 @@ const SideBar = memo(({ show, roomId, close }: SidebarProps) => {
       create_room: true,
     });
   }, [showModalState]);
-  // console.log(showModalState);
 
   const onClickInviteMember = useCallback(() => {
     showModalMutate({
@@ -37,6 +30,8 @@ const SideBar = memo(({ show, roomId, close }: SidebarProps) => {
       invite_member: true,
     });
   }, []);
+
+  // console.log('사이드바 룸아이디:', roomId);
 
   return (
     <Wrapper show={show}>
