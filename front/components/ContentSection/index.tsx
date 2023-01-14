@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, MutableRefObject, useCallback, useEffect, useState } from 'react';
+import React, { CSSProperties, forwardRef, memo, MutableRefObject, useCallback, useEffect, useState } from 'react';
 import { IImageData } from '@typing/db';
 import { getImageData, getMarkerFetcher, getRoomImageListFetcher } from '@utils/roomDataFetcher';
 import { Link, useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { AxiosResponse } from 'axios';
 import useIntersect from '@hooks/useIntersect';
 import Scrollbars from 'react-custom-scrollbars';
 import ImageContentList from '@components/ImageContentList';
+import { SyncLoader } from 'react-spinners';
 
 interface ImageData {
   id: number;
@@ -20,6 +21,12 @@ interface ImageData {
 interface Props {
   roomId?: string;
 }
+
+const spinnerCSS: CSSProperties = {
+  display: 'block',
+  margin: '1rem auto',
+  textAlign: 'center',
+};
 
 const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => {
   const [readStartNumber, setReadStartNumber] = useState(0);
@@ -38,15 +45,20 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
   } = useSWRMutation('/image-download', getImageData);
   const { data: markerNumber, trigger: markerTrigger } = useSWRMutation(`/room/${roomId}/marker`, getMarkerFetcher);
 
-  const observerRef = useIntersect(async (entry, observer) => {
-    observer.unobserve(entry.target);
+  const observerRef = useIntersect(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
 
-    // 데이터 fetching 중이 아니고 다음 로드할 데이터가 남아있다면 데이터를 부른다.(imageList 요청)
-    if (!imageListLoading && !imageDataLoading && imageList?.imagelist.length === 12) {
-      console.log('인터섹션 데이터 패칭 요청');
-      imageListTrigger({ roomId, start: readStartNumber });
-    }
-  });
+      // 데이터 fetching 중이 아니고 다음 로드할 데이터가 남아있다면 데이터를 부른다.(imageList 요청)
+      if (!imageListLoading && !imageDataLoading && imageList?.imagelist.length === 12) {
+        console.log('인터섹션 데이터 패칭 요청');
+        imageListTrigger({ roomId, start: readStartNumber });
+      }
+    },
+    {
+      threshold: 0.5,
+    },
+  );
 
   // 처음 마운트 됐을 때
   useEffect(() => {
@@ -121,15 +133,10 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
                 <span>게시된 이미지</span>
               </div>
               <PostImage>
-                {imageDataList?.imgData.length === 0 ? (
-                  <div>
-                    <span>게시된 이미지가 없습니다.</span>
-                  </div>
-                ) : (
-                  <ImageContentList allImageData={allImageData} observerRef={observerRef} />
-                )}
+                <ImageContentList allImageData={allImageData} observerRef={observerRef} />
               </PostImage>
             </div>
+            {(imageListLoading || imageDataLoading) && <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />}
             {/* allImageData.map((data, index, thisArr) => {
                 return (
                   <ContentBox key={data.id} ref={thisArr.length - 1 === index ? observerRef : undefined}>
