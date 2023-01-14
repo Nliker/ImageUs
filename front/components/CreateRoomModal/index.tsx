@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useInput from '@hooks/useInput';
 import {
   ActionBtn,
@@ -32,6 +32,7 @@ import { IFriendData } from '@typing/db';
 import { useLinkClickHandler } from 'react-router-dom';
 
 const CreateRoomModal = () => {
+  const { mutate } = useSWRConfig();
   const { data: modalState, mutate: modalMutate } = useSWR('showModalState');
   const { data: friendList, mutate: mutateFriendList } = useSWR('friendlist', getUserFriendList, {
     dedupingInterval: 2000,
@@ -97,9 +98,9 @@ const CreateRoomModal = () => {
           },
         },
       )
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         onClickCloseBtn();
+        mutate('roomlist');
         alert('방을 생성했습니다!');
       })
       .catch((err) => {
