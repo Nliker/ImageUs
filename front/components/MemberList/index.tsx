@@ -1,5 +1,5 @@
 import EachMember from '@components/EachMember';
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { Collapse, Subtitle } from './styles';
@@ -7,14 +7,22 @@ import { getUserListFetcher } from '@utils/roomDataFetcher';
 import { IFriendData } from '@typing/db';
 
 const MemberList = memo(({ roomId }: { roomId?: string }) => {
-  const { data: userlist } = useSWR(['userlist', roomId], getUserListFetcher, {
+  const { data: userlist, mutate: userlistMutate } = useSWR(['userlist', roomId], getUserListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
   const [memberCollapse, setMemberCollapse] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (!roomId) return;
+    userlistMutate();
+  }, [roomId]);
+
   const toggleMemberCollapse = useCallback(() => setMemberCollapse((prev) => !prev), []);
+
+  // console.log('멤버리스트 룸아이디:', roomId, userlist);
+
   return (
     <>
       <Subtitle onClick={toggleMemberCollapse}>
