@@ -18,13 +18,9 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const { data: showUploadModal } = useSWR('showUploadModal');
-  const { data: imageModalState } = useSWR('imageModalState');
   const { data: showModalState } = useSWR('showModalState');
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
-  const currentUrl = useLocation();
   const isMobile = useMediaQuery({ maxWidth: 1023 });
-  // console.log(currentUrl);
 
   const handleRoomListBtn = useCallback(() => {
     setshowSideBar((prev) => !prev);
