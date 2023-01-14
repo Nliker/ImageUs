@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { LeftIcon, LogoutBtn, RightIcons, UserBox, UserInfo, Wrapper } from './styles';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
@@ -100,4 +100,4 @@ const ToolBar = ({ handleSidebar }: Props) => {
   );
 };
 
-export default ToolBar;
+export default memo(ToolBar);
