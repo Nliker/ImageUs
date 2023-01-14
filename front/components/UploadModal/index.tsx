@@ -21,11 +21,13 @@ import {
 import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { IRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router';
+import { postUploadImage } from '@utils/imageFetcher';
 
 /*
     백엔드 완성 시 채널에 키값을 id로 설정해주게 수정해야됨,
@@ -46,36 +48,18 @@ interface RoomDataType {
 
 const UploadModal = () => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
-  const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string | undefined }>();
-  // const user_id = sessionStorage.getItem('USER_ID');
-  const { data: roomList, mutate: mutateRoomList } = useSWR('roomlist', getUserRoomListFetcher, {
-    dedupingInterval: 2000,
-  });
-  const { data, mutate: showModalMutate } = useSWR('showModalState');
+  const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
+  const { trigger: uploadImageTrigger } = useSWRMutation(`/room/${roomId}/image`, postUploadImage);
 
   const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
-  // const [uploadStep, setUploadStep] = useState<number>(0);
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
   const [uploadImageFile, setUploadImageFile] = useState<FormData | null>(null);
 
-  // const headerName = ['사진 업로드', '채널 선택', '결과물'];
-
   // 이미지가 로드되고 난 뒤에 넓이와 높이 값을 전달한다.
   // 업로드 후에 이미지 브라우저 메모리 삭제
-
-  useEffect(() => {
-    if (!roomList) return;
-    const tmpRoomList = roomList.map((data: IRoomData) => {
-      return {
-        ...data,
-        check: false,
-      };
-    });
-    setSelectedRooms([...tmpRoomList]);
-  }, [roomList]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -84,16 +68,25 @@ const UploadModal = () => {
     return () => clearTimeout(debounce);
   }, [tmpImageData]);
 
-  const onClickCloseModal = () => {
+  const closeUploadModal = useCallback(() => {
     showModalMutate(
       {
-        ...data,
+        ...showModalData,
         upload: false,
-        image: false,
       },
       false,
     );
-  };
+  }, [showModalData]);
+
+  const onClickUpload = useCallback(() => {
+    if (!uploadImageFile) {
+      alert('이미지를 등록해주세요');
+      return;
+    }
+    uploadImageTrigger({ uploadImageFile });
+    closeUploadModal();
+    location.reload();
+  }, [uploadImageFile]);
 
   const onDropData = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
@@ -134,6 +127,13 @@ const UploadModal = () => {
     setDragOver(true);
   }, []);
 
+  // const getSelectedRoomArray = useCallback(() => {
+  //   const extractRooms = selectedRooms.filter((room) => {
+  //     return room.check;
+  //   });
+  //   return [...extractRooms];
+  // }, [selectedRooms]);
+
   // const onClickPrevStep = useCallback(() => {
   //   // 버튼을 누를 때 리사이즈 함수 실행
   //   // handleResize();
@@ -157,21 +157,6 @@ const UploadModal = () => {
   //   });
   // }, []);
 
-  const onClickUpload = useCallback(async () => {
-    try {
-      const response = await axios.post(`/room/${roomId}/image`, uploadImageFile, {
-        headers: {
-          Authorization: `${sessionStorage.getItem('TOKEN')}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-      navigate('/');
-    } catch (error) {
-      console.error(error);
-    }
-  }, [uploadImageFile]);
-
   // const checkRoomItem = (id: number) => {
   //   const newRoomList = roomList.map((roomData: IRoomData) => {
   //     if (roomData.id === id) {
@@ -185,49 +170,42 @@ const UploadModal = () => {
   //   setChannelList([...newRoomList]);
   // };
 
-  const inputRoom = useCallback(
-    (data: RoomDataType) => () => {
-      if (data.check) {
-        // checkRoomItem(data.id);
-        setSelectedRooms((prev) => {
-          const newData = prev.map((room) => {
-            if (room.id === data.id) {
-              return {
-                ...room,
-                check: false,
-              };
-            } else {
-              return { ...room };
-            }
-          });
-          return [...newData];
-        });
-      } else {
-        // checkRoomItem(data.id);
-        setSelectedRooms((prev) => {
-          const newData = prev.map((room) => {
-            if (room.id === data.id) {
-              return {
-                ...room,
-                check: true,
-              };
-            } else {
-              return { ...room };
-            }
-          });
-          return [...newData];
-        });
-      }
-    },
-    [roomList, selectedRooms],
-  );
-
-  const getSelectedRoomArray = useCallback(() => {
-    const extractRooms = selectedRooms.filter((room) => {
-      return room.check;
-    });
-    return [...extractRooms];
-  }, [selectedRooms]);
+  // const inputRoom = useCallback(
+  //   (data: RoomDataType) => () => {
+  //     if (data.check) {
+  //       // checkRoomItem(data.id);
+  //       setSelectedRooms((prev) => {
+  //         const newData = prev.map((room) => {
+  //           if (room.id === data.id) {
+  //             return {
+  //               ...room,
+  //               check: false,
+  //             };
+  //           } else {
+  //             return { ...room };
+  //           }
+  //         });
+  //         return [...newData];
+  //       });
+  //     } else {
+  //       // checkRoomItem(data.id);
+  //       setSelectedRooms((prev) => {
+  //         const newData = prev.map((room) => {
+  //           if (room.id === data.id) {
+  //             return {
+  //               ...room,
+  //               check: true,
+  //             };
+  //           } else {
+  //             return { ...room };
+  //           }
+  //         });
+  //         return [...newData];
+  //       });
+  //     }
+  //   },
+  //   [roomList, selectedRooms],
+  // );
 
   // console.log(uploadImageFile?.get('image'));
   return (
@@ -235,7 +213,7 @@ const UploadModal = () => {
       <Background />
       <Container>
         <CloseBtn>
-          <div onClick={onClickCloseModal}>
+          <div onClick={closeUploadModal}>
             <CgCloseO />
           </div>
         </CloseBtn>
