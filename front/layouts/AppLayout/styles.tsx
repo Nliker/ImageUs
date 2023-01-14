@@ -7,7 +7,9 @@ export const Wrapper = styled.div`
   user-select: none;
 `;
 
-export const Container = styled.div<{ showModal: undefined | {upload: boolean, image: boolean, create_room: boolean}}>`
+export const Container = styled.div<{
+  showModal: undefined | { upload: boolean; image: boolean; create_room: boolean };
+}>`
   height: 100%;
   width: 100%;
   ${({ showModal }) =>
@@ -21,7 +23,7 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
   height: calc(100vh - 55px);
   background-color: rgb(237, 241, 245);
-  overflow-y: auto;
+  // overflow-y: auto;
 
   transition: transform 0.5s;
   transform: translateX(0px);
@@ -39,4 +41,4 @@ export const ModalWrapper = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-` 
+`;
