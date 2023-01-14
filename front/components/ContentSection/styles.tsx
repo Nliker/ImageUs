@@ -1,13 +1,11 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.section``;
-
-export const MainContainer = styled.main`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(100px, auto));
-  // grid-template-rows: repeat(3, minmax(100px, auto));
-  gap: 1.5rem;
+export const Wrapper = styled.section`
+  height: calc(100% - 40px);
+  // overflow-y: auto;
 `;
+
+export const MainContainer = styled.main``;
 
 export const ContentBox = styled.div`
   border-radius: 12px;
@@ -41,9 +39,18 @@ export const ImageInfo = styled.div`
   background-color: whitesmoke;
 `;
 
-export const InfoItem = styled.div`
-  // & > span:first-of-type {
-  //   position: absolute;
-  //   left: 0;
-  // }
-`
+export const InfoItem = styled.div``;
+
+export const PostImage = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 1rem;
+
+  @media screen and (min-width: 450px) {
+    grid-template-columns: repeat(3, auto);
+  }
+
+  @media screen and (min-width: 1024px) {
+    grid-template-columns: repeat(4, auto);
+  }
+`;
