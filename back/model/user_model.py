@@ -203,6 +203,7 @@ class UserDao:
         """),{'email':email,'auth_password':auth_password}).rowcount
 
         return row
+    
     def update_user(self,user_id,attr,value):
         query="""
             update users
