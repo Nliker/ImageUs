@@ -48,7 +48,7 @@
     "@babel/preset-env": "^7",
     "@babel/preset-react": "^7",
     "@babel/preset-typescript": "^7",
-    "@pmmmwh/react-refresh-webpack-plugin": "*",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@types/autosize": "^3",
     "@types/loadable__component": "^5",
     "@types/lodash": "^4.14.189",
@@ -80,8 +80,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "fork-ts-checker-webpack-plugin": "^6",
     "prettier": "^2",
-    "react-refresh": "^0.10",
+    "react-refresh": "^0.10.0",
     "ts-standard": "^12.0.1",
+    "type-fest": "^3.5.2",
     "webpack": "^5",
     "webpack-dev-server": "^4"
   }
