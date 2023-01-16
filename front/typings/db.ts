@@ -13,7 +13,8 @@ export interface IFriendData {
 }
 
 export interface IImageData {
+  created_at: string | null;
   id: number;
-  link: string;
-  user_id?: number;
+  link: string | null;
+  user_id?: number | null;
 }
