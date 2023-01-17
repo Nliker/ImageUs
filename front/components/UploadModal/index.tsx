@@ -50,7 +50,10 @@ const UploadModal = () => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
   const { roomId } = useParams<{ roomId: string | undefined }>();
   const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
-  const { trigger: uploadImageTrigger } = useSWRMutation(`/room/${roomId}/image`, postUploadImage);
+  const { trigger: uploadImageTrigger, isMutating: isUploadingImage } = useSWRMutation(
+    `/room/${roomId}/image`,
+    postUploadImage,
+  );
 
   const [selectedRooms, setSelectedRooms] = useState<Array<RoomDataType>>([]);
   const [dragOver, setDragOver] = useState<boolean>(false);
@@ -85,7 +88,7 @@ const UploadModal = () => {
     }
     uploadImageTrigger({ uploadImageFile });
     closeUploadModal();
-    location.reload();
+    // pageRefresh();
   }, [uploadImageFile]);
 
   const onDropData = useCallback(
