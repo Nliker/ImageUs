@@ -2,7 +2,6 @@ import { IImageData } from '@typing/db';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const getRoomImageListFetcher = async (url: string, { arg }: { arg: { roomId?: string; start: number } }) => {
-  // 이미지를 10개씩 끊어서 불러오고 불러올 이미지의 시작 위치는 마지막 번호 + 1를 저장해서 사용한다.
   try {
     const token = sessionStorage.getItem('TOKEN');
     const { roomId, start } = arg;
@@ -16,7 +15,29 @@ const getRoomImageListFetcher = async (url: string, { arg }: { arg: { roomId?: s
     });
 
     const { imagelist } = imageInfoResponse.data;
-    return { imagelist };
+    const nowImageList: IImageData[] = [];
+    const todayImageList: IImageData[] = [];
+    const previousImageList: IImageData[] = [];
+    // 날짜 00-00-00 형태로 바꾸어 넣기
+    const currentDate = new Date();
+    const os = currentDate.getTimezoneOffset();
+    const currentDateFormat = new Date(currentDate.getTime() - os * 60 * 1000).toJSON().slice(0, 10);
+    for (const imageInfo of imagelist) {
+      if (!imageInfo.link) continue;
+      const infoDate = imageInfo.created_at.split(' ')[0];
+      const createTime = new Date(imageInfo.created_at).getTime();
+
+      // 1시간 안에 올라온 게시물은 nowImageList에 넣음
+      if (currentDate.getTime() <= createTime + 60 * 60 * 1000) {
+        nowImageList.push(imageInfo);
+      } else if (infoDate === currentDateFormat) {
+        todayImageList.push(imageInfo);
+      } else {
+        previousImageList.push(imageInfo);
+      }
+    }
+
+    return { nowImageList, todayImageList, previousImageList, loadDataLength: imagelist.length };
   } catch (error) {
     console.log(error);
   }
@@ -28,35 +49,33 @@ const getImageData = async (
     arg,
   }: {
     arg: {
-      imagelist: Array<{ created_at: string; id: number; link: string; user_id: number }>;
+      imagelist: Array<IImageData>;
     };
   },
 ) => {
   try {
-    const imgData: Array<{ id: number; imageUrl: string; create_date: string }> = [];
-    const deleteImgData: Array<{ id: number }> = [];
+    if (arg.imagelist.length === 0) return [];
+
+    const imgData: Array<{ id: number; imageUrl: string; create_date: string | null; name: string | null }> = [];
+    // const deleteImgData: Array<{ id: number }> = [];
 
     for (const imageData of arg.imagelist) {
-      if (!imageData.link) {
-        deleteImgData.push({ id: imageData.id });
-      } else {
-        const res = await axios.get(`/image-download/${imageData.link}`, {
-          headers: {
-            Authorization: `${sessionStorage.getItem('TOKEN')}`,
-          },
-          responseType: 'blob',
-        });
+      const res = await axios.get(`/image-download/${imageData.link}`, {
+        headers: {
+          Authorization: `${sessionStorage.getItem('TOKEN')}`,
+        },
+        responseType: 'blob',
+      });
 
-        const create_date = imageData.created_at.split(' ')[0];
-        const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-        imgData.push({ id: imageData.id, imageUrl: url, create_date: create_date });
-      }
+      const { id, user_name } = imageData;
+      const create_date = imageData.created_at !== null ? imageData.created_at.split(' ')[0] : null;
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+      imgData.push({ id, imageUrl: url, create_date: create_date, name: user_name });
     }
-    const imageDataList = {
-      imgData: [...imgData],
-      deleteImgData: [...deleteImgData],
-    };
-    return imageDataList;
+    // const imageDataList = {
+    //   imgData: [...imgData],
+    // };
+    return [...imgData];
   } catch (error) {
     console.log(error);
   }
@@ -112,7 +131,8 @@ const getMarkerFetcher = async (url: string) => {
     });
 
     // console.log(response);
-    return response.data;
+    const { marker } = response.data;
+    return marker;
   } catch (err) {
     if (err instanceof AxiosError) {
       alert(err.response?.data.message);
@@ -121,4 +141,25 @@ const getMarkerFetcher = async (url: string) => {
   }
 };
 
-export { getRoomImageListFetcher, getUserListFetcher, inviteFriendFetcher, getImageData, getMarkerFetcher };
+const getUnreadImageList = async (url: string) => {
+  try {
+    const token = sessionStorage.getItem('TOKEN');
+    const response = await axios.get(url, {
+      headers: { Authorization: token },
+    });
+    return [...response.data.imagelist];
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+  }
+};
+
+export {
+  getRoomImageListFetcher,
+  getUserListFetcher,
+  inviteFriendFetcher,
+  getImageData,
+  getMarkerFetcher,
+  getUnreadImageList,
+};
