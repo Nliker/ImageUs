@@ -5,14 +5,15 @@ import { ContentBox, ImageCard, ImageInfo, InfoItem } from './styles';
 interface ImageData {
   id: number;
   imageUrl: string;
-  create_date: string;
+  create_date: string | null;
+  name: string | null;
 }
 
 interface Props {
   data: ImageData;
   index: number;
   thisArr: ImageData[];
-  observerRef: React.MutableRefObject<null>;
+  observerRef?: React.MutableRefObject<null>;
 }
 
 const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
@@ -25,7 +26,7 @@ const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
           </ImageCard>
           <ImageInfo>
             <InfoItem>
-              <span>이미지 1</span>
+              <span>{data.name}</span>
             </InfoItem>
             <InfoItem>
               <span>{data.create_date}</span>
