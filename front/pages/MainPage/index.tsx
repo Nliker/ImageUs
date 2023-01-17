@@ -26,7 +26,7 @@ const MainPage = () => {
   }, [isLogIn]);
 
   console.log('메인페이지 로그인:', isLogIn);
-  console.log('메인페이지 룸리스트:', roomlist);
+  // console.log('메인페이지 룸리스트:', roomlist);
 
   return (
     <AppLayout>
