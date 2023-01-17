@@ -8,7 +8,7 @@ const postUploadImage = async (url: string, { arg }: { arg: { uploadImageFile: F
         'Content-Type': 'multipart/form-data',
       },
     });
-    alert('이미지를 업로드했습니다!');
+    // location.reload();
   } catch (err) {
     if (err instanceof AxiosError) {
       alert('오류가 발생했습니다..');
