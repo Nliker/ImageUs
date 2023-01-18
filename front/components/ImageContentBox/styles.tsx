@@ -24,12 +24,31 @@ export const ImageCard = styled.div`
   position: relative;
 `;
 
-export const ImageInfo = styled.div`
+export const InfoContainer = styled.div`
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   text-align: center;
   background-color: whitesmoke;
 `;
 
-export const InfoItem = styled.div``;
+export const ImageInfo = styled.div`
+  width: 100%;
+`;
+
+export const EditBtn = styled.div`
+  position: absolute;
+
+  width: 25px;
+  right: 10px;
+  height: 100%;
+
+  cursor: pointer;
+
+  svg {
+    display: block;
+
+    width: 25px;
+    height: 100%;
+  }
+`;
