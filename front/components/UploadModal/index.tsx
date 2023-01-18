@@ -20,7 +20,7 @@ import {
 } from './styles';
 import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
-import useSWR from 'swr';
+import useSWR, { SWRConfig, useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { IRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
@@ -49,6 +49,7 @@ interface RoomDataType {
 const UploadModal = () => {
   // 백에서 정보를 받아서 check 키값을 추가해서 roomList 객체로 만든다.
   const { roomId } = useParams<{ roomId: string | undefined }>();
+  const { mutate } = useSWRConfig();
   const { data: showModalData, mutate: showModalMutate } = useSWR('showModalState');
   const { trigger: uploadImageTrigger, isMutating: isUploadingImage } = useSWRMutation(
     `/room/${roomId}/image`,
@@ -86,9 +87,10 @@ const UploadModal = () => {
       alert('이미지를 등록해주세요');
       return;
     }
-    uploadImageTrigger({ uploadImageFile });
+    uploadImageTrigger({ uploadImageFile }).then(() => {
+      mutate(`/room/${roomId}/unread-imagelist`);
+    });
     closeUploadModal();
-    // pageRefresh();
   }, [uploadImageFile]);
 
   const onDropData = useCallback(
@@ -118,7 +120,7 @@ const UploadModal = () => {
       const imageURLs = URL.createObjectURL(formData.get('image'));
       const image = new Image();
       image.src = imageURLs;
-
+      console.log(imageURLs);
       setTmpImageData(image);
       setUploadImageFile(formData);
     },
