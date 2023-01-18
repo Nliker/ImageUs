@@ -1,39 +1,34 @@
+import { CImageData } from '@typing/client';
 import React, { memo } from 'react';
-import { Link } from 'react-router-dom';
-import { ContentBox, ImageCard, ImageInfo, InfoItem } from './styles';
-
-interface ImageData {
-  id: number;
-  imageUrl: string;
-  create_date: string | null;
-  name: string | null;
-}
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { ContentBox, EditBtn, ImageCard, ImageInfo, InfoContainer } from './styles';
 
 interface Props {
-  data: ImageData;
+  data: CImageData;
   index: number;
-  thisArr: ImageData[];
+  thisArr: CImageData[];
   observerRef?: React.MutableRefObject<null>;
 }
 
 const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
   return (
     <ContentBox key={data.id} ref={thisArr.length - 1 === index ? observerRef : undefined}>
-      <div>
-        <Link to="#">
-          <ImageCard>
-            <img src={data.imageUrl} />
-          </ImageCard>
-          <ImageInfo>
-            <InfoItem>
-              <span>{data.name}</span>
-            </InfoItem>
-            <InfoItem>
-              <span>{data.create_date}</span>
-            </InfoItem>
-          </ImageInfo>
-        </Link>
-      </div>
+      <ImageCard>
+        <img src={data.link} />
+      </ImageCard>
+      <InfoContainer>
+        <ImageInfo>
+          <div>
+            <span>작성자: {data.user_name}</span>
+          </div>
+          <div>
+            <span>작성일: {data.created_at}</span>
+          </div>
+        </ImageInfo>
+        <EditBtn>
+          <BsThreeDotsVertical />
+        </EditBtn>
+      </InfoContainer>
     </ContentBox>
   );
 };
