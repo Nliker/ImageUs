@@ -4,7 +4,7 @@ import { IoMdArrowDropright } from 'react-icons/io';
 import useSWR from 'swr';
 import { Collapse, Container, Subtitle } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
-import { IRoomData } from '@typing/db';
+import { DRoomData } from '@typing/db';
 
 interface Props {
   closeSidebar: () => void;
@@ -29,7 +29,7 @@ const ChannelList = memo(({ closeSidebar }: Props) => {
       </Subtitle>
       <div>
         {channelCollapse &&
-          roomlist?.map((room: IRoomData) => {
+          roomlist?.map((room: DRoomData) => {
             return <EachChannel key={room.id} room={room} closeSidebar={closeSidebar} />;
           })}
       </div>

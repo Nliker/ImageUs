@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { Collapse, Subtitle } from './styles';
 import { getUserListFetcher } from '@utils/roomDataFetcher';
-import { IFriendData } from '@typing/db';
+import { DFriendData } from '@typing/db';
 
 const MemberList = memo(({ roomId }: { roomId?: string }) => {
   const { data: userlist, mutate: userlistMutate } = useSWR(['userlist', roomId], getUserListFetcher, {
@@ -33,7 +33,7 @@ const MemberList = memo(({ roomId }: { roomId?: string }) => {
       </Subtitle>
       <div>
         {memberCollapse &&
-          userlist?.map((member: IFriendData) => {
+          userlist?.map((member: DFriendData) => {
             return <EachMember key={member.id} member={member} />;
           })}
       </div>

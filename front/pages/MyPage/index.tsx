@@ -9,7 +9,7 @@ import { NavLink } from 'react-router-dom';
 import { Routes, Route } from 'react-router';
 import { ContentBox, EachRoomPictureList, ProfileBox, ProfileImage, ProfileInfo, SubMenu, WrapperBox } from './styles';
 import { getImageData, getUserFriendList, getUserImageList, getUserRoomListFetcher } from '@utils/userDataFetcher';
-import { IImageData } from '@typing/db';
+import { DImageData } from '@typing/db';
 import { userImageLoadNumber } from '@hooks/swrStore';
 
 const MyPage = () => {
@@ -25,7 +25,7 @@ const MyPage = () => {
   });
 
   const { start } = userImageLoadNumber();
-  const { data: imageList } = useSWR<Array<IImageData> | undefined>(['userImageList', start], getUserImageList, {
+  const { data: imageList } = useSWR<Array<DImageData> | undefined>(['userImageList', start], getUserImageList, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
