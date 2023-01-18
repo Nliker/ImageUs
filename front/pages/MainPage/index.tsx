@@ -4,7 +4,7 @@ import CreateRoomModal from '@components/CreateRoomModal';
 import SideBar from '@components/SideBar';
 import ToolBar from '@components/ToolBar';
 import AppLayout from '@layouts/AppLayout';
-import { IRoomData } from '@typing/db';
+import { DRoomData } from '@typing/db';
 import { logInCheckFetcher } from '@utils/logInFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -49,7 +49,7 @@ const MainPage = () => {
                   <strong>방에 입장하기</strong>
                   <ul>
                     {!isMutating &&
-                      roomlist?.map((roomData: IRoomData) => (
+                      roomlist?.map((roomData: DRoomData) => (
                         <li key={roomData.id}>
                           <Link to={`/booth/${roomData.id}`}>{roomData.title}</Link>
                         </li>

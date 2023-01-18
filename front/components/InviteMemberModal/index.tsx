@@ -3,8 +3,8 @@ import useSWR, { useSWRConfig } from 'swr';
 import { AiOutlineClose } from 'react-icons/ai';
 import { CloseBtn, Container, Content, ListBox, Title, Wrapper } from './styles';
 import { getUserFriendList } from '@utils/userDataFetcher';
-import { IFriendData } from '@typing/db';
-import useSWRMutation from 'swr/mutation'
+import { DFriendData } from '@typing/db';
+import useSWRMutation from 'swr/mutation';
 import { inviteFriendFetcher } from '@utils/roomDataFetcher';
 
 const InviteMemberModal = () => {
@@ -28,11 +28,14 @@ const InviteMemberModal = () => {
     );
   }, []);
 
-  const onClickInviteBtn = useCallback((friendId: string) => async () => {
-    await trigger({ invite_userlist: [friendId], roomId });
-    await mutate(['userlist', roomId]);
-  }, []);
-  
+  const onClickInviteBtn = useCallback(
+    (friendId: string) => async () => {
+      await trigger({ invite_userlist: [friendId], roomId });
+      await mutate(['userlist', roomId]);
+    },
+    [],
+  );
+
   return (
     <Wrapper>
       <Container>
@@ -46,12 +49,14 @@ const InviteMemberModal = () => {
           <ListBox>
             <ul>
               {friendList &&
-                friendList.map((data: IFriendData) => (
+                friendList.map((data: DFriendData) => (
                   <li key={data.id}>
                     <div>
                       <p>{data.name}</p>
                       <p>{data.email}</p>
-                      <button type='button' onClick={onClickInviteBtn(data.id)}>초대하기</button>
+                      <button type="button" onClick={onClickInviteBtn(data.id)}>
+                        초대하기
+                      </button>
                     </div>
                   </li>
                 ))}

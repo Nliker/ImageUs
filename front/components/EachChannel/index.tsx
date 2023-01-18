@@ -1,10 +1,10 @@
-import { IRoomData } from '@typing/db';
+import { DRoomData } from '@typing/db';
 import React, { memo, useCallback } from 'react';
 import { NavLink, useLinkClickHandler, useNavigate } from 'react-router-dom';
 import { ChannelDiv } from './styles';
 
 interface Props {
-  room: IRoomData;
+  room: DRoomData;
   closeSidebar: () => void;
 }
 

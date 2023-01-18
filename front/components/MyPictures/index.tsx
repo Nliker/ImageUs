@@ -1,4 +1,4 @@
-import { IImageData } from '@typing/db';
+import { DImageData } from '@typing/db';
 import React from 'react';
 import { Wrapper } from './styles';
 
