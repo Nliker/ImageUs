@@ -22,7 +22,7 @@ import { CgCloseO } from 'react-icons/cg';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import useSWR, { SWRConfig, useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { IRoomData } from '@typing/db';
+import { DRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
@@ -163,7 +163,7 @@ const UploadModal = () => {
   // }, []);
 
   // const checkRoomItem = (id: number) => {
-  //   const newRoomList = roomList.map((roomData: IRoomData) => {
+  //   const newRoomList = roomList.map((roomData: DRoomData) => {
   //     if (roomData.id === id) {
   //       // 불변성을 유지하기 위해서 아래처럼 새로운 변수에 값을 넣어서 리턴해야 한다.
   //       // 그렇지 않고 위와 같이 쓰면 원래 state의 값이 변경된다. 객체의 참초값을 쓰게 됨으로

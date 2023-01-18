@@ -1,5 +1,5 @@
 import useInput from '@hooks/useInput';
-import { IFriendData } from '@typing/db';
+import { DFriendData } from '@typing/db';
 import searchFetcher from '@utils/searchFetcher';
 import axios from 'axios';
 import React, { FocusEvent, FocusEventHandler, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
@@ -30,7 +30,7 @@ const SearchBox = () => {
       e.preventDefault();
 
       // setSearchResult(() => {
-      //   const newData = searchData.map((data: IFriendData) => {
+      //   const newData = searchData.map((data: DFriendData) => {
       //     return {
       //       email: data.email,
       //       name: data.name
@@ -60,21 +60,28 @@ const SearchBox = () => {
     [],
   );
 
-  const onClickAddFriend = useCallback((friendId: string | undefined) => async () => {
-    const userId = sessionStorage.getItem('USER_ID');
-    try {
-      const response = await axios.post(`/user/${userId}/friend`, {
-        "friend_user_id": friendId
-      }, {
-        headers: {
-          Authorization: `${sessionStorage.getItem('TOKEN')}`
-        }
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const onClickAddFriend = useCallback(
+    (friendId: string | undefined) => async () => {
+      const userId = sessionStorage.getItem('USER_ID');
+      try {
+        const response = await axios.post(
+          `/user/${userId}/friend`,
+          {
+            friend_user_id: friendId,
+          },
+          {
+            headers: {
+              Authorization: `${sessionStorage.getItem('TOKEN')}`,
+            },
+          },
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [],
+  );
 
   return (
     <Wrapper>
@@ -102,7 +109,7 @@ const SearchBox = () => {
           <PreviewBox>
             <ul>
               {searchData && searchData?.length !== 0 ? (
-                searchData.map((data: IFriendData) => (
+                searchData.map((data: DFriendData) => (
                   <li key={data.id} className={'preview_li'} onMouseDown={onClickPreviewItem(data.email)}>
                     <span>
                       이름: {data.name}, email: {data.email}
@@ -121,14 +128,16 @@ const SearchBox = () => {
       <SearchResult>
         <ul>
           {searchData && searchData.length !== 0 ? (
-            searchData.map((data: IFriendData) => {
+            searchData.map((data: DFriendData) => {
               return (
                 <li key={data.id}>
                   <div>
                     <span>
                       이름은 {data.name}, 이메일은 {data.email}입니다.
                     </span>
-                    <button type='button' onClick={onClickAddFriend(data.id)}>친구 추가하기</button>
+                    <button type="button" onClick={onClickAddFriend(data.id)}>
+                      친구 추가하기
+                    </button>
                   </div>
                 </li>
               );

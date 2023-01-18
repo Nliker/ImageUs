@@ -1,4 +1,4 @@
-import { IImageData, IRoomData } from '@typing/db';
+import { DImageData, DRoomData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
 
 const getUserFriendList = async (url: string) => {
@@ -43,7 +43,7 @@ const getUserImageList = async (arg: [string, number]) => {
   }
 };
 
-const getImageData = async (url: string, { arg }: { arg: Array<IImageData> }) => {
+const getImageData = async (url: string, { arg }: { arg: Array<DImageData> }) => {
   try {
     const imageDataList = await Promise.all(
       arg.map(async (imageData) => {
@@ -99,7 +99,7 @@ const getUserRoomListFetcher = async (url: string) => {
         Authorization: `${token}`,
       },
     });
-    const roomList = response.data.roomlist.map((roomData: IRoomData) => {
+    const roomList = response.data.roomlist.map((roomData: DRoomData) => {
       return {
         id: roomData.id,
         title: roomData.title,

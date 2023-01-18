@@ -28,7 +28,7 @@ import {
 } from './styles';
 import axios from 'axios';
 import { getUserFriendList } from '@utils/userDataFetcher';
-import { IFriendData } from '@typing/db';
+import { DFriendData } from '@typing/db';
 import { useLinkClickHandler } from 'react-router-dom';
 
 const CreateRoomModal = () => {
@@ -42,7 +42,7 @@ const CreateRoomModal = () => {
   const [roomName, setRoomName, handleRoomName] = useInput('');
 
   const [selectedMemberId, setSelectedMemberId] = useState<Array<string>>([]);
-  const [checkedMember, setCheckedMember] = useState<Array<IFriendData>>([]);
+  const [checkedMember, setCheckedMember] = useState<Array<DFriendData>>([]);
 
   useEffect(() => {
     if (!friendList) return;
@@ -64,7 +64,7 @@ const CreateRoomModal = () => {
       // }
       // setSelectedMemberId([...selectData]);
       // console.log(selectedMemberId);
-      const selectFriends = friendList.filter((data: IFriendData) => {
+      const selectFriends = friendList.filter((data: DFriendData) => {
         return selectedMemberId.includes(data.id);
       });
       setCheckedMember([...selectFriends]);
@@ -125,7 +125,7 @@ const CreateRoomModal = () => {
     [selectedMemberId],
   );
 
-  const EachCheckBox = memo(({ friendData }: { friendData: IFriendData }) => {
+  const EachCheckBox = memo(({ friendData }: { friendData: DFriendData }) => {
     return (
       <>
         <div>
@@ -162,7 +162,7 @@ const CreateRoomModal = () => {
               </RoomName>
               <MemeberList>
                 {friendList &&
-                  friendList.map((friend: IFriendData) => {
+                  friendList.map((friend: DFriendData) => {
                     return <EachCheckBox key={friend.id} friendData={friend} />;
                   })}
                 <ActionBtn>
@@ -185,7 +185,7 @@ const CreateRoomModal = () => {
                   <label htmlFor="member_list">초대할 멤버</label>
                   <div id="member_list">
                     {checkedMember &&
-                      checkedMember.map((friend: IFriendData) => {
+                      checkedMember.map((friend: DFriendData) => {
                         return (
                           <div key={friend.id}>
                             <label htmlFor={friend.name}>
