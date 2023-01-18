@@ -1,5 +1,4 @@
 import React, { CSSProperties, forwardRef, memo, MutableRefObject, useCallback, useEffect, useState } from 'react';
-import { IImageData } from '@typing/db';
 import { getImageData, getMarkerFetcher, getRoomImageListFetcher, getUnreadImageList } from '@utils/roomDataFetcher';
 import { Link, useParams } from 'react-router-dom';
 import useSWR, { useSWRConfig } from 'swr';
@@ -11,13 +10,7 @@ import useIntersect from '@hooks/useIntersect';
 import Scrollbars from 'react-custom-scrollbars';
 import ImageContentList from '@components/ImageContentList';
 import { SyncLoader } from 'react-spinners';
-
-interface ImageData {
-  id: number;
-  imageUrl: string;
-  create_date: string | null;
-  name: string | null;
-}
+import { CImageData } from '@typing/client';
 
 interface Props {
   roomId?: string;
@@ -33,9 +26,10 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
   const [readStartNumber, setReadStartNumber] = useState(0);
 
   // 1시간 전에 업데이트 된 이미지는 방금 업데이트된 이미지에 들어간다.
-  const [nowImage, setNowImage] = useState<ImageData[]>([]);
-  const [todayImage, setTodayImage] = useState<ImageData[]>([]);
-  const [previousImage, setPreviousImage] = useState<ImageData[]>([]);
+  const [nowImage, setNowImage] = useState<CImageData[]>([]);
+  const [todayImage, setTodayImage] = useState<CImageData[]>([]);
+  ``;
+  const [previousImage, setPreviousImage] = useState<CImageData[]>([]);
   const [scrollHeight, setScrollHeight] = useState();
 
   const { mutate } = useSWRConfig();
@@ -88,7 +82,13 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
       데이터 fetching 중이 아니고 다음 로드할 데이터가 남아있다면 데이터를 부른다.(imageList 요청)
 
       */
-      if (!imageListLoading && !todayImageLoading && !previousImageLoading && imageList?.loadDataLength === 12) {
+      if (
+        !imageListLoading &&
+        !nowImageLoading &&
+        !todayImageLoading &&
+        !previousImageLoading &&
+        imageList?.loadDataLength === 12
+      ) {
         console.log('인터섹션 데이터 패칭 요청');
         imageListTrigger({ roomId, start: readStartNumber });
       }
@@ -205,7 +205,7 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
                 <ImageContentList ImageData={previousImage} observerRef={observerConverter(2)} />
               </PostImage>
             </div>
-            {(imageListLoading || todayImageLoading || previousImageLoading) && (
+            {(imageListLoading || nowImageLoading || todayImageLoading || previousImageLoading) && (
               <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
             )}
           </div>
