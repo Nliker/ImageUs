@@ -1,4 +1,5 @@
-import { IImageData } from '@typing/db';
+import { CImageData } from '@typing/client';
+import { DImageData } from '@typing/db';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const getRoomImageListFetcher = async (url: string, { arg }: { arg: { roomId?: string; start: number } }) => {
@@ -15,9 +16,9 @@ const getRoomImageListFetcher = async (url: string, { arg }: { arg: { roomId?: s
     });
 
     const { imagelist } = imageInfoResponse.data;
-    const nowImageList: IImageData[] = [];
-    const todayImageList: IImageData[] = [];
-    const previousImageList: IImageData[] = [];
+    const nowImageList: DImageData[] = [];
+    const todayImageList: DImageData[] = [];
+    const previousImageList: DImageData[] = [];
     // 날짜 00-00-00 형태로 바꾸어 넣기
     const currentDate = new Date();
     const os = currentDate.getTimezoneOffset();
@@ -49,33 +50,28 @@ const getImageData = async (
     arg,
   }: {
     arg: {
-      imagelist: Array<IImageData>;
+      imagelist: Array<DImageData>;
     };
   },
 ) => {
   try {
     if (arg.imagelist.length === 0) return [];
 
-    const imgData: Array<{ id: number; imageUrl: string; create_date: string | null; name: string | null }> = [];
-    // const deleteImgData: Array<{ id: number }> = [];
+    const imgDataList: CImageData[] = [];
 
-    for (const imageData of arg.imagelist) {
-      const res = await axios.get(`/image-download/${imageData.link}`, {
+    for (const imageInfo of arg.imagelist) {
+      const res = await axios.get(`/image-download/${imageInfo.link}`, {
         headers: {
           Authorization: `${sessionStorage.getItem('TOKEN')}`,
         },
         responseType: 'blob',
       });
 
-      const { id, user_name } = imageData;
-      const create_date = imageData.created_at !== null ? imageData.created_at.split(' ')[0] : null;
+      const created_at = imageInfo.created_at !== null ? imageInfo.created_at.split(' ')[0] : null;
       const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-      imgData.push({ id, imageUrl: url, create_date: create_date, name: user_name });
+      imgDataList.push({ ...imageInfo, link: url, created_at });
     }
-    // const imageDataList = {
-    //   imgData: [...imgData],
-    // };
-    return [...imgData];
+    return [...imgDataList];
   } catch (error) {
     console.log(error);
   }
