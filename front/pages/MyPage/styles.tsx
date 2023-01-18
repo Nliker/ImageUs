@@ -4,12 +4,17 @@ export const WrapperBox = styled.section`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  min-height: 100vh;
+
+  height: 100%;
+
   overflow-x: hidden;
 `;
 
 export const ContentBox = styled.main`
-  padding: 2rem;
+  box-sizing: border-box;
+
+  padding: 0 2rem;
+
   h2,
   ul {
     margin: 0;
@@ -22,9 +27,13 @@ export const ContentBox = styled.main`
 
 export const ProfileBox = styled.div`
   display: flex;
+
+  margin-top: 2rem;
 `;
 
 export const EachRoomPictureList = styled.div`
+  margin-bottom: 2rem;
+
   a {
     text-decoration: none;
     color: black;
