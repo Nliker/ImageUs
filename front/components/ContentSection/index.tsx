@@ -23,12 +23,6 @@ interface Props {
   roomId?: string;
 }
 
-interface ObserverRefObj {
-  now?: React.MutableRefObject<null>;
-  today?: React.MutableRefObject<null>;
-  previous?: React.MutableRefObject<null>;
-}
-
 const spinnerCSS: CSSProperties = {
   display: 'block',
   margin: '1rem auto',
@@ -103,13 +97,14 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
       threshold: 0.5,
     },
   );
-  const [observerRefObj, setObserverRefObj] = useState<ObserverRefObj>({});
+  const [observerRefPos, setObserverRefPos] = useState<number>();
 
   /*
 
    처음 마운트 됐을 때
 
   */
+
   useEffect(() => {
     console.log('컨텐트 섹션 처음 마운트 룸아이디', roomId);
     imageListTrigger({ roomId, start: readStartNumber });
@@ -121,6 +116,7 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
     분할 요청해서 화면에 보여준다.
 
   */
+
   useEffect(() => {
     if (!imageList) return;
 
@@ -132,6 +128,15 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
     nowImageDataTrigger({ imagelist: imageList.nowImageList });
     todayImageDataTrigger({ imagelist: imageList.todayImageList });
     previousImageDataTrigger({ imagelist: imageList.previousImageList });
+
+    // 인터섹션 옵저버 위치 변경
+    if (imageList.previousImageList.length !== 0) {
+      setObserverRefPos(2);
+    } else if (imageList.todayImageList.length !== 0) {
+      setObserverRefPos(1);
+    } else {
+      setObserverRefPos(0);
+    }
   }, [imageList]);
 
   useEffect(() => {
@@ -163,22 +168,13 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
     setNowImage((prev) => [...realTimeImageData, ...prev]);
   }, [realTimeImageData]);
 
-  /*
-
-    옵저버의 타킷을 변경해주는 Effect
-
-  */
-
-  useEffect(() => {
-    console.log('nowImage:', nowImage);
-    if (todayImage?.length === 0) {
-      setObserverRefObj((prev) => ({ ...prev, now: observerRef, today: undefined, previous: undefined }));
-    } else if (previousImage?.length === 0) {
-      setObserverRefObj((prev) => ({ ...prev, now: undefined, today: observerRef, previous: undefined }));
-    } else {
-      setObserverRefObj((prev) => ({ ...prev, now: undefined, today: undefined, previous: observerRef }));
-    }
-  }, [nowImage, todayImage, previousImage]);
+  const observerConverter = useCallback(
+    (sectionOrder: number) => {
+      const value = sectionOrder === observerRefPos ? observerRef : undefined;
+      return value;
+    },
+    [observerRefPos],
+  );
 
   return (
     <Wrapper>
@@ -190,7 +186,7 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
                 <span>방금 업데이트된 이미지</span>
               </div>
               <PostImage>
-                <ImageContentList ImageData={nowImage} observerRef={observerRefObj.now} />
+                <ImageContentList ImageData={nowImage} observerRef={observerConverter(0)} />
               </PostImage>
             </div>
             <div>
@@ -198,7 +194,7 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
                 <span>오늘 업데이트된 이미지</span>
               </div>
               <PostImage>
-                <ImageContentList ImageData={todayImage} observerRef={observerRefObj.today} />
+                <ImageContentList ImageData={todayImage} observerRef={observerConverter(1)} />
               </PostImage>
             </div>
             <div>
@@ -206,7 +202,7 @@ const ContentSection = forwardRef<Scrollbars, Props>(({ roomId }, scrollRef) => 
                 <span>이전에 업데이트된 이미지</span>
               </div>
               <PostImage>
-                <ImageContentList ImageData={previousImage} observerRef={observerRefObj.previous} />
+                <ImageContentList ImageData={previousImage} observerRef={observerConverter(2)} />
               </PostImage>
             </div>
             {(imageListLoading || todayImageLoading || previousImageLoading) && (
