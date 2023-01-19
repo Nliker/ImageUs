@@ -18,14 +18,14 @@ def animate(i):
             
     plt.tight_layout()
     
-if os.path.isfile(np_file_path):
-    y=np.load(np_file_path)
+# if os.path.isfile(np_file_path):
+y=np.load(np_file_path)
 
-    ani=FuncAnimation(plt.gcf(),animate,interval=100)
-    plt.show()
-else:
-    while True:
-        memory_use_percent=psutil.virtual_memory().percent
-        print(memory_use_percent)
+ani=FuncAnimation(plt.gcf(),animate,interval=100)
+plt.show()
+# else:
+#     while True:
+#         memory_use_percent=psutil.virtual_memory().percent
+#         print(memory_use_percent)
         
-        time.sleep(1)
+#         time.sleep(1)
