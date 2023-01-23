@@ -4,12 +4,24 @@ import React, { memo } from 'react';
 
 interface Props {
   ImageData: CImageData[];
+  sectionName: string;
   observerRef?: React.MutableRefObject<null>;
 }
 
-const ImageContentList = ({ ImageData, observerRef }: Props) => {
-  const imageCard = (data: CImageData, index: number, thisArr: CImageData[]) => (
-    <ImageContentBox key={data.id} data={data} index={index} thisArr={thisArr} observerRef={observerRef} />
+const ImageContentList = ({ ImageData, observerRef, sectionName }: Props) => {
+  const imageCard = (
+    data: CImageData,
+    index: number,
+    thisArr: CImageData[],
+  ) => (
+    <ImageContentBox
+      key={data.id}
+      sectionName={sectionName}
+      data={data}
+      index={index}
+      thisArr={thisArr}
+      observerRef={observerRef}
+    />
   );
   return <>{ImageData.map(imageCard)}</>;
 };
