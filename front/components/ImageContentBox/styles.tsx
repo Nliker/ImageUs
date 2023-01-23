@@ -1,8 +1,11 @@
 import styled from '@emotion/styled';
 
 export const ContentBox = styled.div`
+  position: relative;
+  overflow: visible;
+
   border-radius: 12px;
-  overflow: hidden;
+
   a {
     text-decoration: none;
     color: black;
@@ -25,7 +28,6 @@ export const ImageCard = styled.div`
 `;
 
 export const InfoContainer = styled.div`
-  position: relative;
   display: flex;
   flex-direction: row;
   text-align: center;
@@ -40,8 +42,8 @@ export const EditBtn = styled.div`
   position: absolute;
 
   width: 25px;
+  height: 40px;
   right: 10px;
-  height: 100%;
 
   cursor: pointer;
 
@@ -50,5 +52,42 @@ export const EditBtn = styled.div`
 
     width: 25px;
     height: 100%;
+  }
+`;
+
+export const EditImageMenu = styled.div`
+  position: absolute;
+  bottom: 45px;
+
+  width: 150px;
+  left: 218px;
+  z-index: 100;
+
+  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
+    0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
+  border-radius: 12px;
+  background-color: mintcream;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0.65em;
+
+    width: 0;
+    height: 0;
+
+    border: 0.55rem solid transparent;
+    border-bottom: none;
+    border-top-color: mintcream;
+    filter: drop-shadow(0 0.125rem 0.0625rem rgba(0, 0, 0, 0.1));
+  }
+
+  .delete_img {
+    cursor: pointer;
+
+    &:hover {
+      background-color: red;
+    }
   }
 `;
