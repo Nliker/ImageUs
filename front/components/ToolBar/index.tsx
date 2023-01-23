@@ -1,5 +1,14 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { LeftIcon, LogoutBtn, RightIcons, UserBox, UserInfo, Wrapper } from './styles';
+import {
+  LeaveRoom,
+  LeftIcon,
+  LogoutBtn,
+  RightIcons,
+  SettingBox,
+  UserBox,
+  UserInfo,
+  Wrapper,
+} from './styles';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
@@ -10,6 +19,8 @@ import { logInCheckFetcher } from '@utils/logInFetcher';
 import { Link } from 'react-router-dom';
 import { Node } from 'typescript';
 import { useParams } from 'react-router';
+import { leaveRoomFetcher } from '@utils/roomDataFetcher';
+import { AxiosError } from 'axios';
 
 interface Props {
   handleSidebar?: (e: any) => void;
@@ -20,46 +31,82 @@ const ToolBar = ({ handleSidebar }: Props) => {
   const { roomId } = useParams<{ roomId: string | undefined }>();
   const isMobile = useMediaQuery({ maxWidth: 1023 });
   const [showUserBox, setShowUserBox] = useState<boolean | null>(null);
+  const [showSettingBox, setShowSettingBox] = useState<boolean | null>(null);
   const navigate = useNavigate();
-  const el = useRef<HTMLDivElement>(null);
+  const userInfoEl = useRef<HTMLDivElement>(null);
+  const roomSettingEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.addEventListener('click', handleCloseUserBox);
+    window.addEventListener('click', handleCloseBox);
     return () => {
-      window.removeEventListener('click', handleCloseUserBox);
+      window.removeEventListener('click', handleCloseBox);
     };
-  }, [showUserBox]);
+  }, [showUserBox, showSettingBox]);
 
-  const handleClickUserBox = useCallback(() => setShowUserBox(true), [showUserBox]);
-
-  const handleCloseUserBox = useCallback(
+  const handleCloseBox = useCallback(
     (e: MouseEvent) => {
-      if (e.target instanceof HTMLElement && showUserBox && !el.current?.contains(e.target)) setShowUserBox(false);
+      if (
+        (e.target instanceof HTMLElement || e.target instanceof SVGElement) &&
+        showUserBox &&
+        !userInfoEl.current?.contains(e.target)
+      ) {
+        setShowUserBox(false);
+      }
+
+      if (
+        (e.target instanceof HTMLElement || e.target instanceof SVGElement) &&
+        showSettingBox &&
+        !roomSettingEl.current?.contains(e.target)
+      ) {
+        setShowSettingBox(false);
+      }
     },
-    [showUserBox],
+    [showUserBox, showSettingBox],
   );
+
+  const onClickSettingBtn = useCallback(
+    () => setShowSettingBox(true),
+    [showSettingBox],
+  );
+
+  const onClickUserBtn = useCallback(() => setShowUserBox(true), [showUserBox]);
 
   const onClickLogOut = useCallback(() => {
     sessionStorage.clear();
-    // 이 부분이 mutate 하자마자 false로 바꿔주는 것인지 확인 필요
     mutate('/user/my', false);
     navigate('/');
   }, []);
 
-  console.log('toolBar', '로그인 유무:', isLogIn);
+  const onClickLeaveBtn = useCallback(() => {
+    if (!roomId) {
+      alert('올바르지 못한 접속입니다.');
+      navigate('/');
+      return;
+    }
+    leaveRoomFetcher(roomId)
+      .then(() => {
+        navigate('/');
+      })
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          alert(err.response?.data);
+        }
+        alert('오류가 발생하였습니다..');
+      });
+  }, []);
 
   return (
     <Wrapper>
       {isLogIn ? (
         <>
           <RightIcons className="toolbar_icon">
-            {/* <div>
-              <span>
+            <div>
+              <span onClick={onClickSettingBtn}>
                 <RiListSettingsLine />
               </span>
-            </div> */}
+            </div>
             <div>
-              <span onClick={handleClickUserBox}>
+              <span onClick={onClickUserBtn}>
                 <BiUserCircle />
               </span>
             </div>
@@ -81,7 +128,7 @@ const ToolBar = ({ handleSidebar }: Props) => {
 
       {/* 로그아웃 상자 토글 버튼 */}
       {showUserBox && (
-        <UserBox ref={el}>
+        <UserBox ref={userInfoEl}>
           <UserInfo>
             {/* <img src="image_test.png" alt="test_img" /> */}
             <div className={'info_words'}>
@@ -95,6 +142,14 @@ const ToolBar = ({ handleSidebar }: Props) => {
             <span onClick={onClickLogOut}>로그아웃</span>
           </LogoutBtn>
         </UserBox>
+      )}
+
+      {showSettingBox && (
+        <SettingBox ref={roomSettingEl}>
+          <div className="leave_room" onClick={onClickLeaveBtn}>
+            <span>방에서 나가기</span>
+          </div>
+        </SettingBox>
       )}
     </Wrapper>
   );
