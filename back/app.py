@@ -67,7 +67,7 @@ def create_app(test_config=None):
     services.image_service=ImageService(image_dao,app.config)
     services.room_service=RoomService(room_dao,app.config)
 
-    user_router(app,api,services,app.config,es)
+    user_router(api,services,app.config,es)
     room_router(api,services)
     image_router(api,services)
     

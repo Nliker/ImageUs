@@ -10,7 +10,7 @@ from tool import ParserModule,ApiModel,ApiError
 
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
-def user_router(app,api,services,config,es):
+def user_router(api,services,config,es):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
