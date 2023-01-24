@@ -141,6 +141,12 @@ class ApiModel:
             required=False
     )
     
+    imagelist_len=fields.Integer(
+                default=10,
+                description="int_imagelist_len",
+                required=False
+    )
+    
     search_user_info={
                     'id':fields.Integer,
                     'email':fields.String,
@@ -249,6 +255,10 @@ class ApiModel:
             
         if 'read_history_row' in args:
             payload['read_history_row']=self.read_history_row
+            
+        if 'imagelist_len' in args:
+            payload['imagelist_len']=self.imagelist_len  
+
         if 'imagelist' in args:
             payload['imagelist']=fields.List(
                 fields.Nested(self.api.model("image_model",self.image_info)),
