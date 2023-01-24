@@ -689,7 +689,7 @@ def user_router(app,api,services,config,es):
             return make_response(f"{result}개 방 삭제 성공",200)
         
     delete_user_parser=api_parser_module.get_parser(['Authorization'])   
-    delete_user_model=api_model.get_model("delete_user_room_model",['delete_user_id'])
+    delete_user_model=api_model.get_model("delete_user_model",['delete_user_id'])
     @user_namespace.route("")
     class user_delete(Resource):
         @user_namespace.expect(delete_user_parser,delete_user_model)
