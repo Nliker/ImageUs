@@ -7,7 +7,7 @@ class UserDao:
         self.db=database
         
     def insert_user(self,new_user):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             insert into users(
                 name,
                 email,
@@ -19,25 +19,32 @@ class UserDao:
                 :profile,
                 :hashed_password
             )
-            """),new_user).lastrowid
+            """),new_user)
+        row=result.lastrowid
+        result.close()
+        
         return row
 
     def get_user_id_and_password(self,email):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 id,
                 hashed_password
             from users
             where email=:email
-            """),{'email':email}).fetchone()
+            """),{'email':email})
+        row=result.fetchone()
+        result.close()
+
         user_id_and_password={
             'id':row['id'],
             'hashed_password':row['hashed_password']
         } if row else None
+        
         return user_id_and_password
     
     def get_user_info(self,user_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 id,
                 name,
@@ -46,18 +53,23 @@ class UserDao:
             from users
             where id=:user_id
             and deleted=0
-            """),{'user_id':user_id}).fetchone()
+            """),{'user_id':user_id})
+        
+        row=result.fetchone()
+        result.close()
+       
         user_info={
             'id':row['id'],
             'name':row['name'],
             'email':row['email'],
             'profile':row['profile']
         } if row else None
+        
         return user_info
 
     def insert_user_friend(self,user_id,friend_user_id):
         try:
-            row=self.db.execute(text("""
+            result=self.db.execute(text("""
                 insert into users_friend_list(
                     user_id,
                     friend_user_id
@@ -71,13 +83,15 @@ class UserDao:
                     },{
                         'user_id':friend_user_id,
                         'friend_user_id':user_id
-                    }]).rowcount
+                    }])
+            row=result.fetchone()
+            result.close()
             return 1
         except IntegrityError as e:
             return 0
     
     def get_user_friend(self,user_id,friend_user_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 user_id,
                 friend_user_id
@@ -85,7 +99,9 @@ class UserDao:
             where user_id=:user_id 
             and friend_user_id=:friend_user_id
             and deleted=0
-            """),{'user_id':user_id,'friend_user_id':friend_user_id}).fetchone()
+            """),{'user_id':user_id,'friend_user_id':friend_user_id})
+        row=result.fetchone()
+        result.close()
 
         user_friend={
             'user_id':row['user_id'],
@@ -95,7 +111,7 @@ class UserDao:
         return user_friend
     
     def get_user_friendlist(self,user_id):
-        rows=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 u_f.friend_user_id as id,
                 u.name,
@@ -107,7 +123,9 @@ class UserDao:
             where u_f.user_id=:user_id
             and u.deleted=0
             and u_f.deleted=0
-            """),{'user_id':user_id}).fetchall()
+            """),{'user_id':user_id})
+        rows=result.fetchall()
+        result.close()
 
         user_friend_info_list=[
             {
@@ -121,7 +139,7 @@ class UserDao:
         return user_friend_info_list
     
     def delete_user_friend(self,user_id,delete_friend_user_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update users_friend_list
             set deleted=1
             where (user_id=:user_id
@@ -132,33 +150,39 @@ class UserDao:
             """),{
                     'user_id':user_id,
                     'delete_friend_user_id':delete_friend_user_id
-                }).rowcount
+                })
+        row=result.rowcount
+        result.close()
         if row>=2:
             return 1
         else:
             return 0
     
     def get_email_auth_time_diff(self,email):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 TIMESTAMPDIFF(SECOND,updated_at,CURRENT_TIMESTAMP())
             from email_auth
             where email=:email
-            """),{'email':email}).fetchone()
+            """),{'email':email})
+        row=result.fetchone()
+        result.close()
         (time_diff,)=row if row else None
 
         return time_diff
         
     
     def get_email_auth_info(self,email):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 email,
                 auth_password,
                 activated
             from email_auth
             where email=:email
-        """),{'email':email}).fetchone()
+        """),{'email':email})
+        row=result.fetchone()
+        result.close()
     
         email_auth={
             'email':row['email'],
@@ -169,30 +193,34 @@ class UserDao:
         return email_auth
     
     def update_email_auth(self,email,auth_password):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update email_auth
             set 
                 auth_password=:auth_password,
                 activated=0
             where email=:email
-        """),{'email':email,'auth_password':auth_password}).rowcount
+        """),{'email':email,'auth_password':auth_password})
+        row=result.rowcount
+        result.close()
         
         return row
 
     def update_email_auth_activate(self,email):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update email_auth
             set
                 activated=1
             where email=:email
             and activated!=1
-            """),{'email':email}).rowcount
+            """),{'email':email})
+        row=result.rowcount
+        result.close()
         
         return row
         
         
     def insert_email_auth(self,email,auth_password):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             insert into email_auth(
                 email,
                 auth_password
@@ -200,7 +228,9 @@ class UserDao:
                 :email,
                 :auth_password
             )
-        """),{'email':email,'auth_password':auth_password}).rowcount
+        """),{'email':email,'auth_password':auth_password})
+        row=result.rowcount
+        result.close()
 
         return row
     
@@ -212,16 +242,20 @@ class UserDao:
             where id=%d
             and %s!='%s'
         """ % (attr,value,user_id,attr,value)
-        row=self.db.execute(query).rowcount
+        result=self.db.execute(query)
+        row=result.rowcount
+        result.close()
         
         return row
 
     def delete_user(self,delete_user_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
            update users
            set deleted=1
            where id=:delete_user_id
            and deleted=0
-        """),{'delete_user_id':delete_user_id}).rowcount
+        """),{'delete_user_id':delete_user_id})
+        row=result.rowcount
+        result.close()
         
         return row
