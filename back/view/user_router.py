@@ -699,7 +699,8 @@ def user_router(api,services,config,es):
             room_userlist=room_service.get_room_userlist(delete_user_room_id)
             if result==1:
                 if len(room_userlist)>=1:
-                    change_result=room_service.change_room_host_user_id(room_userlist[0]['id'],delete_user_room_id)
+                    if room_info['host_user_id']==current_user_id:
+                        change_result=room_service.change_room_host_user_id(room_userlist[0]['id'],delete_user_room_id)
                 else:
                     result=room_service.delete_room(delete_user_room_id)
 
