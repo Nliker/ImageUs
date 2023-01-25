@@ -456,12 +456,15 @@ def user_router(api,services,config,es):
     @user_namespace.route("/<int:user_id>/imagelist-len")
     class user_imagelist_len(Resource):
         @user_namespace.expect(get_user_imagelist_len_parser,validate=False)
-        @user_namespace.response(200,'유저의 이미지 정보 목록의 길이를 반환합니다..',get_user_imagelist_len_response_model)
+        @user_namespace.response(200,'유저의 이미지 정보 목록의 길이를 반환합니다.',get_user_imagelist_len_response_model)
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
                                 api_error.authorizaion_error_model())
         @login_required
         def get(self,user_id):
+            '''
+            유저의 이미지 정보 목록의 길이를 반환합니다.
+            '''
             current_user_id=g.user_id
             if current_user_id != user_id:
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
