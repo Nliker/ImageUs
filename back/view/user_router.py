@@ -671,20 +671,34 @@ def user_router(api,services,config,es):
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
                                 api_error.authorizaion_error_model())
+        @user_namespace.response(api_error.room_existance_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.room_existance_error_model())
         @login_required
         def delete(self,user_id):
             '''
             id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
             '''
             current_user_id=g.user_id
+            delete_user_room_id=request.json['delete_user_room_id']
             
-            if current_user_id != user_id:
+            if current_user_id != user_id or not room_service.is_room_user(delete_user_room_id,current_user_id):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            delete_user_room_id=request.json['delete_user_room_id']
+
+            room_info=room_service.get_room_info(delete_user_room_id)
+            if not room_info:
+                return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
+                                     api_error.room_existance_error()['status_code'])                
 
             result=room_service.delete_user_room(current_user_id,delete_user_room_id)
+            room_userlist=room_service.get_room_userlist(delete_user_room_id)
+            if result==1:
+                if len(room_userlist)>=1:
+                    change_result=room_service.change_room_host_user_id(room_userlist[0]['id'],delete_user_room_id)
+                else:
+                    result=room_service.delete_room(delete_user_room_id)
 
             return make_response(f"{result}개 방 삭제 성공",200)
         

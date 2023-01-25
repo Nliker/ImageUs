@@ -109,3 +109,18 @@ class RoomService:
         result=self.room_dao.delete_user_room_history(user_id)
         print(result)
         return result
+    
+    def change_room_host_user_id(self,user_id,room_id):
+        result=self.room_dao.update_user_room_host_user_id(user_id,room_id)
+        
+        return result
+    
+    def delete_room(self,delete_room_id):
+        result=self.room_dao.delete_room(delete_room_id)
+
+        return result
+
+
+        
+
+        
