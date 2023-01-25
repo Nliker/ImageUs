@@ -73,15 +73,16 @@ class RoomDao:
         result=self.db.execute(text("""
             select
                 r_u.user_id as id,
-                u.name,
-                u.email,
-                u.profile
+                u.name as name,
+                u.email as email,
+                u.profile as profile
             from rooms_user_list as r_u
             left join users as u
             on r_u.user_id=u.id
             where r_u.room_id=:room_id
             and u.deleted=0
             and r_u.deleted=0
+            order by name
             """),{
                 'room_id':room_id
             })
@@ -141,6 +142,7 @@ class RoomDao:
             from rooms_user_list
             where room_id=:room_id
             and user_id=:user_id
+            and deleted=0
             """),{'room_id':room_id,'user_id':user_id})
         row=result.fetchone()
         result.close()
@@ -235,6 +237,30 @@ class RoomDao:
             where user_id=:user_id
             and deleted=0
         """),{'user_id':user_id})
+        row=result.rowcount
+        result.close()
+
+        return row
+    
+    def update_user_room_host_user_id(self,host_user_id,room_id):
+        result=self.db.execute(text("""
+            update rooms
+            set host_user_id=:host_user_id
+            where id=:room_id
+            and deleted=0
+        """),{'room_id':room_id,'host_user_id':host_user_id})
+        row=result.rowcount
+        result.close()
+        
+        return row
+    
+    def delete_room(self,delete_room_id):
+        result=self.db.execute(text("""
+            update rooms
+            set deleted=1
+            where id=:delete_room_id
+            and deleted=0
+        """),{'delete_room_id':delete_room_id})
         row=result.rowcount
         result.close()
 
