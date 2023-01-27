@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const ContentBox = styled.div`
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 
   border-radius: 12px;
 
@@ -32,6 +32,31 @@ export const InfoContainer = styled.div`
   flex-direction: row;
   text-align: center;
   background-color: whitesmoke;
+`;
+
+export const HoverBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  background: rgba(0, 0, 0, 0.3);
+
+  .btn_group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 1rem;
+
+    button {
+      cursor: pointer;
+    }
+  }
 `;
 
 export const ImageInfo = styled.div`
@@ -90,4 +115,14 @@ export const EditImageMenu = styled.div`
       background-color: red;
     }
   }
+`;
+
+export const AertContainer = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  background-color: grey;
 `;
