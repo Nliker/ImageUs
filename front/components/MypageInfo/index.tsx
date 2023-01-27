@@ -1,32 +1,32 @@
 import useInput from '@hooks/useInput';
+import { logInCheckFetcher } from '@utils/logInFetcher';
+import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { InfoTable } from './styles';
 
-function getUserInfo() {
-  const email = sessionStorage.getItem('EMAIL');
-  const name = sessionStorage.getItem('NAME');
-  const profile = sessionStorage.getItem('PROFILE');
+const MypageInfo = () => {
+  const { data: userInfo } = useSWR('/user/my', logInCheckFetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const { trigger: postUserInfoTrigger } = useSWRMutation(
+    '/user/my',
+    postUserInfoFetcher,
+  );
 
-  return {
-    userInfo: {
-      email,
-      name,
-      profile,
-    },
-  };
-}
-
-const MypageInfo = memo(() => {
   const [profileState, setProfileState] = useState({
     intro: false,
     name: false,
   });
-  const [introductionInput, setIntroductionInput, handleIntroInput] = useInput('');
+  const [introductionInput, setIntroductionInput, handleIntroInput] =
+    useInput('');
   const [nameInput, setNameInput, handleNameInput] = useInput('');
-  const { userInfo } = useMemo(getUserInfo, []);
+  // const { userInfo } = useMemo(getUserInfo, []);
 
-  const onClickChangeIntroBtn = useCallback(() => {
+  const changeIntroBox = useCallback(() => {
     setProfileState((prev) => {
       return {
         ...prev,
@@ -35,7 +35,7 @@ const MypageInfo = memo(() => {
     });
   }, [profileState]);
 
-  const onClickChangeNameBtn = useCallback(() => {
+  const changeNameBox = useCallback(() => {
     setProfileState((prev) => {
       return {
         ...prev,
@@ -43,6 +43,19 @@ const MypageInfo = memo(() => {
       };
     });
   }, [profileState]);
+
+  const onClickPostIntro = useCallback(
+    (postTitle: string) => () => {
+      if (postTitle === 'profile') {
+        postUserInfoTrigger({ [postTitle]: introductionInput });
+      } else if (postTitle === 'name') {
+        postUserInfoTrigger({ [postTitle]: nameInput });
+      } else {
+        alert('잘못된 요청입니다.');
+      }
+    },
+    [introductionInput, nameInput],
+  );
 
   return (
     <section>
@@ -56,7 +69,7 @@ const MypageInfo = memo(() => {
           <tr>
             <th>이메일</th>
             <td colSpan={2}>
-              <strong>{userInfo.email}</strong>
+              <strong>{userInfo?.user_info.email}</strong>
             </td>
           </tr>
           <tr>
@@ -64,10 +77,10 @@ const MypageInfo = memo(() => {
             {!profileState.intro ? (
               <>
                 <td>
-                  <div>{userInfo.profile}</div>
+                  <div>{userInfo?.user_info.profile}</div>
                 </td>
                 <td>
-                  <button type="button" onClick={onClickChangeIntroBtn}>
+                  <button type="button" onClick={changeIntroBox}>
                     소개글 변경
                   </button>
                 </td>
@@ -91,7 +104,9 @@ const MypageInfo = memo(() => {
                   </div>
                 </td>
                 <td>
-                  <button type="button">완료</button>
+                  <button type="button" onClick={onClickPostIntro('profile')}>
+                    완료
+                  </button>
                   <button
                     type="button"
                     onClick={() =>
@@ -114,10 +129,10 @@ const MypageInfo = memo(() => {
             {!profileState.name ? (
               <>
                 <td>
-                  <div>{userInfo.name}</div>
+                  <div>{userInfo?.user_info.name}</div>
                 </td>
                 <td>
-                  <button type="button" onClick={onClickChangeNameBtn}>
+                  <button type="button" onClick={changeNameBox}>
                     이름 변경
                   </button>
                 </td>
@@ -141,7 +156,9 @@ const MypageInfo = memo(() => {
                   </div>
                 </td>
                 <td>
-                  <button type="button">완료</button>
+                  <button type="button" onClick={onClickPostIntro('name')}>
+                    완료
+                  </button>
                   <button
                     type="button"
                     onClick={() =>
@@ -172,6 +189,6 @@ const MypageInfo = memo(() => {
       </InfoTable>
     </section>
   );
-});
+};
 
 export default MypageInfo;
