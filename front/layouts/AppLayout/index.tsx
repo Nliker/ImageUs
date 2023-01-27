@@ -11,6 +11,9 @@ import useSWR from 'swr';
 import { Route, useLocation } from 'react-router';
 import CreateRoomModal from '@components/CreateRoomModal';
 import InviteMemberModal from '@components/InviteMemberModal';
+import AlertBox from '@components/AlertBox';
+import DetailPictureInfo from '@components/DetailPictureInfo';
+import ModalLayout from '@layouts/ModalLayout';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -22,10 +25,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
   const isMobile = useMediaQuery({ maxWidth: 1023 });
 
-  const handleRoomListBtn = useCallback(() => {
-    setshowSideBar((prev) => !prev);
-  }, [showSideBar]);
-
   return (
     <Wrapper>
       <Container showModal={showModalState}>
@@ -33,17 +32,26 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {isMobile && <BottomNavBar />}
         <ContentWrapper show={showSideBar}>{children}</ContentWrapper>
       </Container>
-      {showModalState?.upload && <UploadModal />}
-      {showModalState?.image && <ContentImageModal />}
-      {showModalState?.create_room && (
+      {showModalState?.detailPicture && (
+        <ModalLayout modalName={'detailPicture'}>
+          <DetailPictureInfo />
+        </ModalLayout>
+      )}
+      {showModalState?.alert && (
         <ModalWrapper>
-          <CreateRoomModal />
+          <AlertBox />
         </ModalWrapper>
       )}
+      {showModalState?.upload && <UploadModal />}
+      {showModalState?.create_room && (
+        <ModalLayout modalName={'create_room'}>
+          <CreateRoomModal />
+        </ModalLayout>
+      )}
       {showModalState?.invite_member && (
-        <ModalWrapper>
+        <ModalLayout modalName={'invite_member'}>
           <InviteMemberModal />
-        </ModalWrapper>
+        </ModalLayout>
       )}
     </Wrapper>
   );
