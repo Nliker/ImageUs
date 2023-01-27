@@ -12,24 +12,24 @@ import axios, { AxiosError } from 'axios';
 const logInCheckFetcher = async (url: string) => {
   if (!sessionStorage.getItem('TOKEN')) {
     console.log('토큰 없음');
-    return false;
+    return;
   }
 
   try {
-    await axios.get(url, {
+    const response = await axios.get(url, {
       headers: {
         Authorization: `${sessionStorage.getItem('TOKEN')}`,
       },
     });
+    const { user_info } = response.data;
 
-    console.log('토큰 정상');
-    return true;
+    return { logInState: true, user_info };
   } catch (err) {
     console.log('유효하지 않은 접근입니다.');
     if (err instanceof AxiosError) {
       alert(err.response?.data.message);
     }
-    return false;
+    return;
   }
   // return axios
   //   .get(url, {
@@ -60,7 +60,10 @@ const logInCheckFetcher = async (url: string) => {
 
 */
 
-const logInRequestFetcher = async (url: string, { arg }: { arg: { email: string; password: string } }) => {
+const logInRequestFetcher = async (
+  url: string,
+  { arg }: { arg: { email: string; password: string } },
+) => {
   try {
     const response = await axios.post(url, {
       email: arg.email,
