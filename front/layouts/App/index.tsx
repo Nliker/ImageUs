@@ -13,13 +13,17 @@ const ImageRoom = loadable(() => import('@pages/ImageRoom'));
 
 const App = () => {
   // 한 번만 요청하도록 옵션 추가
-  const { data: isLogIn, isValidating } = useSWR('/user/my', logInCheckFetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { data: userInfo, isValidating } = useSWR(
+    '/user/my',
+    logInCheckFetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
 
-  console.log('app', isLogIn, isValidating);
+  console.log('app', userInfo?.logInState, isValidating);
 
   return isValidating ? (
     <div>로딩중...</div>
@@ -28,7 +32,7 @@ const App = () => {
       <Route path="/main_page" element={<MainPage />} />
       {/* <Route path="/" element={<Navigate to="/main_page" />} /> */}
       {/* <Route path="/main_page/:roomId" element={<MainPage isLogIn={isLogIn} />} /> */}
-      {isLogIn ? (
+      {userInfo?.logInState ? (
         <>
           {/* 이하 비회원 접근 불가 페이지 */}
           {/* <Route path="/main_page/:roomId" element={<MainPage />} />
