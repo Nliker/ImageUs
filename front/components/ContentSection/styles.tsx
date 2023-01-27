@@ -41,16 +41,16 @@ export const ImageInfo = styled.div`
 
 export const InfoItem = styled.div``;
 
-export const PostImage = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 1rem;
+// export const PostImage = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(2, auto);
+//   gap: 1rem;
 
-  @media screen and (min-width: 450px) {
-    grid-template-columns: repeat(3, auto);
-  }
+//   @media screen and (min-width: 450px) {
+//     grid-template-columns: repeat(3, auto);
+//   }
 
-  @media screen and (min-width: 1024px) {
-    grid-template-columns: repeat(4, auto);
-  }
-`;
+//   @media screen and (min-width: 1024px) {
+//     grid-template-columns: repeat(4, auto);
+//   }
+// `;

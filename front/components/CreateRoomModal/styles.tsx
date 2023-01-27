@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 
 export const ModalBoxContainer = styled.div`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // position: absolute;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
 
-  width: 100%;
-  height: 100%;
-  z-index: 1002;
+  // width: 100%;
+  // height: 100%;
+  // z-index: 1002;
 
   border-radius: 6px;
 `;
@@ -51,8 +51,7 @@ export const ContentBox = styled.div`
   padding: 20px;
 `;
 
-export const Content = styled.div`
-`;
+export const Content = styled.div``;
 
 export const RoomName = styled.div`
   display: flex;
