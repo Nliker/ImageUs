@@ -176,7 +176,7 @@ const getUnreadImageList = async (url: string) => {
   }
 };
 
-const deleteImageFetcher = async (url: string, { arg }: { arg: number }) => {
+const deleteImageFetcher = async ([url, arg]: [string, number]) => {
   try {
     const token = sessionStorage.getItem('TOKEN');
     const response = await axios.delete(url, {
@@ -186,6 +186,7 @@ const deleteImageFetcher = async (url: string, { arg }: { arg: number }) => {
       },
     });
     alert(response.data);
+    return arg;
   } catch (err) {
     if (err instanceof AxiosError) {
       if (err.response?.status === 403 || err.response?.status === 404) {
@@ -203,7 +204,7 @@ const leaveRoomFetcher = async (roomId: string) => {
     const userId = sessionStorage.getItem('USER_ID');
     const response = await axios.delete(`/user/${userId}/room`, {
       headers: { Authorization: token },
-      data: { delete_user_id: roomId },
+      data: { delete_user_room_id: roomId },
     });
 
     alert(response.data.message);
