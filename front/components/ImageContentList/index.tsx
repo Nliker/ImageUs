@@ -1,10 +1,11 @@
 import ImageContentBox from '@components/ImageContentBox';
 import { CImageData } from '@typing/client';
 import React, { memo } from 'react';
+import { ImageLayout } from './styles';
 
 interface Props {
   ImageData: CImageData[];
-  sectionName: string;
+  sectionName?: string;
   observerRef?: React.MutableRefObject<null>;
 }
 
@@ -23,7 +24,7 @@ const ImageContentList = ({ ImageData, observerRef, sectionName }: Props) => {
       observerRef={observerRef}
     />
   );
-  return <>{ImageData.map(imageCard)}</>;
+  return <ImageLayout>{ImageData.map(imageCard)}</ImageLayout>;
 };
 
 export default memo(ImageContentList);
