@@ -1,28 +1,21 @@
+import ImageContentList from '@components/ImageContentList';
+import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
 import React from 'react';
 import { Wrapper } from './styles';
 
-interface ImageData {
-  id: number;
-  imageUrl: string;
+interface Props {
+  imageList?: CImageData[];
+  observerRef?: React.MutableRefObject<null>;
 }
 
 // Route를 활용해서 만든 컴포넌트
-const MyPictures = ({ imageList }: { imageList?: Array<ImageData | null> }) => {
+const MyPictures = ({ imageList, observerRef }: Props) => {
   return !imageList ? (
     <div>로딩중..</div>
   ) : (
     <Wrapper>
-      <ul>
-        {imageList &&
-          imageList.map((image) => (
-            <li key={image?.id}>
-              <div>
-                <img src={image?.imageUrl} alt={`테스트 요청 alt`} />
-              </div>
-            </li>
-          ))}
-      </ul>
+      <ImageContentList ImageData={imageList} observerRef={observerRef} />
     </Wrapper>
   );
 };
