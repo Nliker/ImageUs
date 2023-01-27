@@ -8,12 +8,26 @@ export const Wrapper = styled.div`
 `;
 
 export const Container = styled.div<{
-  showModal: undefined | { upload: boolean; image: boolean; create_room: boolean };
+  showModal:
+    | undefined
+    | {
+        upload: boolean;
+        image: boolean;
+        create_room: boolean;
+        alert: boolean;
+        detailPicture: boolean;
+        invite_member: boolean;
+      };
 }>`
   height: 100%;
   width: 100%;
   ${({ showModal }) =>
-    (showModal?.upload || showModal?.image || showModal?.create_room) &&
+    (showModal?.upload ||
+      showModal?.image ||
+      showModal?.create_room ||
+      showModal?.alert ||
+      showModal?.detailPicture ||
+      showModal?.invite_member) &&
     `
     position: fixed;
   `}
@@ -36,6 +50,10 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
 `;
 
 export const ModalWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   position: fixed;
   top: 0;
   left: 0;
