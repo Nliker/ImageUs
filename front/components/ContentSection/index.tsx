@@ -22,7 +22,6 @@ import {
   ImageInfo,
   InfoItem,
   MainContainer,
-  PostImage,
   Wrapper,
 } from './styles';
 import { imageLoadNumber } from '@hooks/swrStore';
@@ -224,37 +223,31 @@ const ContentSection = forwardRef<Scrollbars, Props>(
                 <div>
                   <span>방금 업데이트된 이미지</span>
                 </div>
-                <PostImage>
-                  <ImageContentList
-                    ImageData={nowImage}
-                    sectionName={'now'}
-                    observerRef={observerConverter(0)}
-                  />
-                </PostImage>
+                <ImageContentList
+                  ImageData={nowImage}
+                  sectionName={'now'}
+                  observerRef={observerConverter(0)}
+                />
               </div>
               <div>
                 <div>
                   <span>오늘 업데이트된 이미지</span>
                 </div>
-                <PostImage>
-                  <ImageContentList
-                    ImageData={todayImage}
-                    sectionName={'today'}
-                    observerRef={observerConverter(1)}
-                  />
-                </PostImage>
+                <ImageContentList
+                  ImageData={todayImage}
+                  sectionName={'today'}
+                  observerRef={observerConverter(1)}
+                />
               </div>
               <div>
                 <div>
                   <span>이전에 업데이트된 이미지</span>
                 </div>
-                <PostImage>
-                  <ImageContentList
-                    ImageData={previousImage}
-                    sectionName={'previous'}
-                    observerRef={observerConverter(2)}
-                  />
-                </PostImage>
+                <ImageContentList
+                  ImageData={previousImage}
+                  sectionName={'previous'}
+                  observerRef={observerConverter(2)}
+                />
               </div>
               {(imageListLoading || getImageLoading) && (
                 <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
