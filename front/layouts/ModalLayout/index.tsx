@@ -1,34 +1,48 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { CgCloseO } from 'react-icons/cg';
 import useSWR from 'swr';
 import { Background, CloseBtn, Container, Wrapper } from './styles';
 
 interface Props {
+  modalName: string;
   children?: React.ReactNode;
 }
 
-const ModalLayout = ({ children }: Props) => {
-  const { mutate: showModalMutate } = useSWR('showModalState');
+const ModalLayout = ({ children, modalName }: Props) => {
+  const { data: modalState, mutate: mutateModalState } =
+    useSWR('showModalState');
+  const modalEl = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    window.addEventListener('click', onClickOuterModal);
+    return () => {
+      window.removeEventListener('click', onClickOuterModal);
+    };
+  }, [modalName]);
+
+  const onClickOuterModal = (e: MouseEvent) => {
+    console.log('클릭한 요소: ', e.target);
+    if (
+      e.target instanceof HTMLElement &&
+      !modalEl.current?.contains(e.target)
+    ) {
+      mutateModalState({ ...modalState, [modalName]: false });
+    }
+  };
 
   const onClickCloseModal = () => {
-    showModalMutate({
-      upload: false,
-      image: false,
-      create_room: false
-    });
+    mutateModalState({ ...modalState, [modalName]: false });
   };
 
   return (
     <Wrapper>
       <Background />
-      <Container>
-        <CloseBtn>
-          <div onClick={onClickCloseModal}>
-            <CgCloseO />
-          </div>
-        </CloseBtn>
-        {children}
-      </Container>
+      <CloseBtn>
+        <div onClick={onClickCloseModal}>
+          <CgCloseO />
+        </div>
+      </CloseBtn>
+      <Container ref={modalEl}>{children}</Container>
     </Wrapper>
   );
 };

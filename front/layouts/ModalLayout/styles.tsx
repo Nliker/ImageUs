@@ -1,25 +1,23 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100%;
-  z-index: 1002;
-  ul {
-    margin: 0;
-    padding: 0;
-  }
-  li {
-    list-style: none;
-  }
-`;
+  align-items: center;
 
-export const Container = styled.div`
-  width: 100%;
   height: 100%;
+  // position: relative;
+  // flex-direction: column;
+  // align-items: center;
+  // justify-content: center;
+  // z-index: 1002;
+  // ul {
+  //   margin: 0;
+  //   padding: 0;
+  // }
+  // li {
+  //   list-style: none;
+  // }
 `;
 
 export const Background = styled.div`
@@ -32,13 +30,25 @@ export const Background = styled.div`
   background-color: rgba(0, 0, 0, 0.65);
 `;
 
+export const Container = styled.div`
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+
+  // width: 100%;
+  // height: 100%;
+  z-index: 1001;
+`;
+
 export const CloseBtn = styled.div`
   position: absolute;
   display: flex;
+
   z-index: 1003;
   top: 10px;
   right: 10px;
   padding: 8px;
+
   & > div {
     display: flex;
   }
