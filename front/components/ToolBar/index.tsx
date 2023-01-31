@@ -12,6 +12,7 @@ import {
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { RiListSettingsLine } from 'react-icons/ri';
+import { TbDoorExit } from 'react-icons/tb';
 import { BiUserCircle } from 'react-icons/bi';
 import { NavLink, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
@@ -102,7 +103,7 @@ const ToolBar = ({ handleSidebar }: Props) => {
           <RightIcons className="toolbar_icon">
             <div>
               <span onClick={onClickSettingBtn}>
-                <RiListSettingsLine />
+                <TbDoorExit />
               </span>
             </div>
             <div>
