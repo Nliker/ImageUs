@@ -6,9 +6,15 @@ import useSWRMutation from 'swr/mutation';
 import { Wrapper } from './styles';
 
 const FriendList = () => {
-  const { data: friendListData, mutate: friendListMutate } = useSWR('friendlist', getUserFriendList, {
-    dedupingInterval: 2000,
-  });
+  const { data: friendListData, mutate: friendListMutate } = useSWR(
+    'friendlist',
+    getUserFriendList,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
   const { trigger } = useSWRMutation('deleteFriend', deleteUserFriend);
 
   const handleDeleteFriend = useCallback(
@@ -29,7 +35,7 @@ const FriendList = () => {
               <th scope="col">이름</th>
               <th scope="col">이메일</th>
               <th scope="col">관계</th>
-              <th scope="col">조회</th>
+              {/* <th scope="col">조회</th> */}
               <th scope="col">목록에서 삭제</th>
             </tr>
           </thead>
@@ -42,12 +48,10 @@ const FriendList = () => {
                   <td>{data.profile}</td>
                   <td>
                     <div>
-                      <button type="button">함께 있는 방 조회</button>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <button type="button" onClick={handleDeleteFriend(data.id)}>
+                      <button
+                        type="button"
+                        onClick={handleDeleteFriend(data.id)}
+                      >
                         삭제
                       </button>
                     </div>
