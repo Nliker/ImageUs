@@ -37,7 +37,7 @@ export const ContentWrapper = styled.div<{ show: boolean }>`
   width: 100%;
   height: calc(100vh - 55px);
   background-color: rgb(237, 241, 245);
-  // overflow-y: auto;
+  overflow-y: auto;
 
   transition: transform 0.5s;
   transform: translateX(0px);
