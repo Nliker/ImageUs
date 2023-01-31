@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // position: absolute;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
 
-  width: 100%;
-  height: 100%;
-  z-index: 1002;
+  // width: 100%;
+  // height: 100%;
+  // z-index: 1002;
 
   border-radius: 6px;
 `;
@@ -55,4 +55,3 @@ export const ListBox = styled.div`
   height: 300px;
   overflow: auto;
 `;
-
