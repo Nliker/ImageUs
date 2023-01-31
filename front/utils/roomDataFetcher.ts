@@ -122,13 +122,14 @@ const getUserListFetcher = async (arg: Array<string | undefined>) => {
 
 const inviteFriendFetcher = async (
   url: string,
-  { arg }: { arg: { invite_userlist: Array<string>; roomId: string } },
+  { arg: invite_userlist }: { arg: Array<string> },
 ) => {
-  const token = sessionStorage.getItem('TOKEN');
-  const { roomId, invite_userlist } = arg;
   try {
+    if (invite_userlist.length === 0) return;
+
+    const token = sessionStorage.getItem('TOKEN');
     const response = await axios.post(
-      `/room/${roomId}/user`,
+      url,
       {
         invite_userlist,
       },
@@ -219,6 +220,33 @@ const leaveRoomFetcher = async (roomId: string) => {
   }
 };
 
+const createRoomFetcher = async (
+  url: string,
+  { arg }: { arg: { selectMemberIdList: string[]; roomName: string } },
+) => {
+  try {
+    const { selectMemberIdList, roomName } = arg;
+    const response = await axios.post(
+      url,
+      {
+        userlist: selectMemberIdList,
+        title: roomName,
+      },
+      {
+        headers: {
+          Authorization: `${sessionStorage.getItem('TOKEN')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    alert('방을 생성하였습니다.');
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+  }
+};
+
 export {
   getRoomImageListFetcher,
   getUserListFetcher,
@@ -228,4 +256,5 @@ export {
   getUnreadImageList,
   deleteImageFetcher,
   leaveRoomFetcher,
+  createRoomFetcher,
 };
