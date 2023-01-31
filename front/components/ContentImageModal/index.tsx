@@ -15,17 +15,21 @@ interface ImageInfoProps {
 
 const ContentImageModal = () => {
   const { data: imageInfo, mutate: imageInfoMutate } = useSWR('imageInfo');
-  const { data: imageModalState, mutate: imageModalMutate } = useSWR('imageModalState');
+  const { data: imageModalState, mutate: imageModalMutate } =
+    useSWR('imageModalState');
 
   // console.log(imageModalState);
   return (
-    <ModalLayout>
+    <ModalLayout modalName="detailPicture">
       <ModalBoxContainer>
         <ModalBox>
           <ul>
             <li key={imageModalState.clickImageId}>
               <div>
-                <img src={imageModalState.clickImageUrl} alt={imageModalState.clickImageName} />
+                <img
+                  src={imageModalState.clickImageUrl}
+                  alt={imageModalState.clickImageName}
+                />
               </div>
             </li>
           </ul>
