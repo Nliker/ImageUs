@@ -13,32 +13,38 @@ import { Route, Routes, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { ContentWrappper, MainIntroduction, MainRoomList, Wrappper } from './styles';
+import {
+  ContentWrappper,
+  MainIntroduction,
+  MainRoomList,
+  Wrappper,
+} from './styles';
 
 const MainPage = () => {
-  const { data: isLogIn } = useSWR('/user/my');
-  const { data: roomlist, trigger, isMutating } = useSWRMutation('roomlist', getUserRoomListFetcher);
-  const navigate = useNavigate();
+  const { data: logInInfo } = useSWR('/user/my');
+  const { data: roomlist, isValidating: roomListValidating } = useSWR(
+    'roomlist',
+    getUserRoomListFetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
 
-  useEffect(() => {
-    if (!isLogIn) return;
-    trigger();
-  }, [isLogIn]);
-
-  console.log('메인페이지 로그인:', isLogIn);
-  // console.log('메인페이지 룸리스트:', roomlist);
+  console.log('메인페이지 로그인:', logInInfo);
 
   return (
     <AppLayout>
-      <ToolBar />
       <Wrappper>
         <ContentWrappper>
           <main>
-            {!isLogIn ? (
+            {!logInInfo.logInState ? (
               <MainIntroduction>
                 <header>
                   <h1>
-                    지인들과의 사진을 <span className="brand_logo">ImageUS</span>와
+                    지인들과의 사진을{' '}
+                    <span className="brand_logo">ImageUS</span>와
                     <br /> 공유하고 간직하세요!
                   </h1>
                 </header>
@@ -48,10 +54,12 @@ const MainPage = () => {
                 <MainRoomList>
                   <strong>방에 입장하기</strong>
                   <ul>
-                    {!isMutating &&
+                    {!roomListValidating &&
                       roomlist?.map((roomData: DRoomData) => (
                         <li key={roomData.id}>
-                          <Link to={`/booth/${roomData.id}`}>{roomData.title}</Link>
+                          <Link to={`/booth/${roomData.id}`}>
+                            {roomData.title}
+                          </Link>
                         </li>
                       ))}
                   </ul>
