@@ -10,12 +10,11 @@ import axios, { AxiosError } from 'axios';
 */
 
 const logInCheckFetcher = async (url: string) => {
-  if (!sessionStorage.getItem('TOKEN')) {
-    console.log('토큰 없음');
-    return;
-  }
-
   try {
+    if (!sessionStorage.getItem('TOKEN')) {
+      console.log('토큰 없음');
+      return { logInState: false };
+    }
     const response = await axios.get(url, {
       headers: {
         Authorization: `${sessionStorage.getItem('TOKEN')}`,
