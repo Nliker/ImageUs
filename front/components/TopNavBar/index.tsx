@@ -17,57 +17,31 @@ const TopNavBar = () => {
   };
   const isMobile = useMediaQuery({ maxWidth: 1023 });
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const onClickUserProfile = useCallback((e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    setShowUserMenu((prev) => !prev);
-  }, []);
 
   return (
     <Wrapper>
-      <DesktopNav>
-        <DesktopContainer>
-          <h1>
-            <NavLink to={'/main_page'}>
-              <HiOutlineHome />
-              Cloudy
+      <DesktopContainer>
+        <h1>
+          <NavLink to={'/main_page'}>
+            <HiOutlineHome />
+            Cloudy
+          </NavLink>
+        </h1>
+        <NavList>
+          <NavItem>
+            <NavLink to={'/my_page'}>
+              <MdOutlineManageAccounts />
+              마이 페이지
             </NavLink>
-          </h1>
-          <NavList>
-            <NavItem>
-              <NavLink to={'/my_page'}>
-                <MdOutlineManageAccounts />
-                마이 페이지
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink to={'/magnagement_page'}>
-                <BsPeople />
-                친구목록 관리
-              </NavLink>
-            </NavItem>
-          </NavList>
-          {/* <ProfileIconWrapper>
-            <span>
-              <button onClick={onClickUserProfile}>프로필 이미지</button>
-            </span>
-            {showUserMenu && <Menu show={showUserMenu} onCloseModal={onClickUserProfile}></Menu>}
-          </ProfileIconWrapper> */}
-        </DesktopContainer>
-      </DesktopNav>
-      {/* <MobileNav>
-        <MobileContainer>
-          <TopContainer>
-            <div>
-              <h1>
-                <NavLink to={'/main_page'}>
-                  <HiOutlineHome />
-                  Cloudy
-                </NavLink>
-              </h1>
-            </div>
-          </TopContainer>
-        </MobileContainer>
-      </MobileNav> */}
+          </NavItem>
+          <NavItem>
+            <NavLink to={'/magnagement_page'}>
+              <BsPeople />
+              친구목록 관리
+            </NavLink>
+          </NavItem>
+        </NavList>
+      </DesktopContainer>
     </Wrapper>
   );
 };
