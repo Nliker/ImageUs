@@ -203,12 +203,12 @@ const leaveRoomFetcher = async (roomId: string) => {
   try {
     const token = sessionStorage.getItem('TOKEN');
     const userId = sessionStorage.getItem('USER_ID');
-    const response = await axios.delete(`/user/${userId}/room`, {
+    await axios.delete(`/user/${userId}/room`, {
       headers: { Authorization: token },
       data: { delete_user_room_id: roomId },
     });
 
-    alert(response.data.message);
+    alert('성공적으로 나갔습니다.');
   } catch (err) {
     if (err instanceof AxiosError) {
       if (err.response?.status === 403) {
