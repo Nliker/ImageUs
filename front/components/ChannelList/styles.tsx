@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.div`
-`;
+export const Container = styled.div``;
 
 export const Subtitle = styled.div`
   display: inline-flex;
@@ -24,4 +23,9 @@ export const Collapse = styled.span<{ collapse: boolean }>`
     transform: rotate(90deg);
     `}
   }
+`;
+
+export const CreateBtnBox = styled.div`
+  padding: 1rem;
+  text-align: center;
 `;
