@@ -14,9 +14,13 @@ import axios from 'axios';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
+import { Button } from '@styles/Button';
 
 const LogIn = () => {
-  const { data: logInSuccess, trigger } = useSWRMutation('/user/login', logInRequestFetcher);
+  const { data: logInSuccess, trigger } = useSWRMutation(
+    '/user/login',
+    logInRequestFetcher,
+  );
 
   const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
@@ -65,11 +69,14 @@ const LogIn = () => {
     emailValidation(inputValue);
   }, []);
 
-  const onChangePasswordInput = useCallback((e: { target: { value: string } }) => {
-    setPwValue(e.target.value);
-    const inputValue = e.target.value;
-    pwValidation(inputValue);
-  }, []);
+  const onChangePasswordInput = useCallback(
+    (e: { target: { value: string } }) => {
+      setPwValue(e.target.value);
+      const inputValue = e.target.value;
+      pwValidation(inputValue);
+    },
+    [],
+  );
 
   const onSubmitLoginInfo = useCallback(
     async (e: { preventDefault: () => void }) => {
@@ -134,15 +141,13 @@ const LogIn = () => {
               </ErrorMessage>
             </InputBox>
           </PasswordInputContainer>
-          {/* <CheckBox>
-            <label htmlFor="remember-id" onClick={checkHandler}>
-              <input type="checkbox" checked={checked} readOnly />
-              로그인 상태 유지하기
-            </label>
-          </CheckBox> */}
           <SubmitBox>
-            <NavLink to={'/signup'}>계정 만들기</NavLink>
-            <button type="submit">확인</button>
+            <NavLink to={'/signup'}>
+              <Button type="button" className="warning">
+                계정 만들기
+              </Button>
+            </NavLink>
+            <Button type="submit">확인</Button>
           </SubmitBox>
         </form>
       </UserInfoInputBox>
