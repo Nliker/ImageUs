@@ -8,6 +8,7 @@ import { DRoomData } from '@typing/db';
 import { logInCheckFetcher } from '@utils/logInFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import React, { useCallback, useEffect, useState } from 'react';
+import Scrollbars from 'react-custom-scrollbars';
 import { useLocation } from 'react-router';
 import { Route, Routes, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -50,21 +51,23 @@ const MainPage = () => {
                 </header>
               </MainIntroduction>
             ) : (
-              <section>
-                <MainRoomList>
-                  <strong>방에 입장하기</strong>
-                  <ul>
-                    {!roomListValidating &&
-                      roomlist?.map((roomData: DRoomData) => (
-                        <li key={roomData.id}>
+              <MainRoomList>
+                <header>
+                  <h1>방에 입장하기</h1>
+                </header>
+                <div className="content_box">
+                  <Scrollbars>
+                    <ul className="room_list">
+                      {!roomListValidating &&
+                        roomlist?.map((roomData: DRoomData) => (
                           <Link to={`/booth/${roomData.id}`}>
-                            {roomData.title}
+                            <li key={roomData.id}>{roomData.title}</li>
                           </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </MainRoomList>
-              </section>
+                        ))}
+                    </ul>
+                  </Scrollbars>
+                </div>
+              </MainRoomList>
             )}
           </main>
         </ContentWrappper>
