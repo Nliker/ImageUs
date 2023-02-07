@@ -1,18 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import {
-  AiFillCheckCircle,
-  AiOutlineCheckCircle,
-  AiOutlineClose,
-} from 'react-icons/ai';
-import {
-  CloseBtn,
-  Container,
-  Content,
-  ListBox,
-  Title,
-  Wrapper,
-} from './styles';
+import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
+import { Container, Content, Title, Wrapper } from './styles';
 import { getUserFriendList } from '@utils/userDataFetcher';
 import { DFriendData } from '@typing/db';
 import useSWRMutation from 'swr/mutation';
@@ -22,6 +11,7 @@ import {
 } from '@utils/roomDataFetcher';
 import { useParams } from 'react-router';
 import { AxiosError } from 'axios';
+import { Button } from '@styles/Button';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
@@ -78,7 +68,7 @@ const InviteMemberModal = () => {
     return selectMemberName.join(' ');
   }, [notInvitedFriends]);
 
-  const onClickFriendList = (dataId: string) => () => {
+  const onClickFriendList = (dataId: number) => () => {
     const newData = notInvitedFriends.map((data) => {
       if (data.id === dataId) {
         return { ...data, check: !data.check };
@@ -116,32 +106,45 @@ const InviteMemberModal = () => {
           <h1>친구 초대하기</h1>
         </Title>
         <Content>
-          <ListBox>
-            <h2>초대할 친구 목록</h2>
-            <ul>
+          <div className="content_box">
+            <div className="content_subname">
+              <h2>초대할 친구 목록</h2>
+            </div>
+            <ul className="not_selected_ul">
               {notInvitedFriends &&
                 notInvitedFriends.map((data: AppendCheckFriendData) => (
                   <li key={data.id} onClick={onClickFriendList(data.id)}>
-                    <div>
-                      {data.check ? (
-                        <AiFillCheckCircle />
-                      ) : (
-                        <AiOutlineCheckCircle />
-                      )}
-                      <p>{data.name}</p>
-                      <p>{data.email}</p>
+                    <div className="list_layout">
+                      <div className="list_check_icon">
+                        {data.check ? (
+                          <AiFillCheckCircle />
+                        ) : (
+                          <AiOutlineCheckCircle />
+                        )}
+                      </div>
+                      <div className="list_info">
+                        <p>이름: {data.name}</p>
+                        <p>이메일: {data.email}</p>
+                      </div>
                     </div>
                   </li>
                 ))}
             </ul>
-            <article>
+            <div className="content_subname">
               <h2>선택한 친구들</h2>
-              <p>{getSelectFriends()}</p>
-            </article>
-            <button type="button" onClick={onClickInviteFriends}>
-              초대하기
-            </button>
-          </ListBox>
+            </div>
+            <ul className="selected_member_ul">
+              {notInvitedFriends &&
+                notInvitedFriends
+                  .filter((data) => data.check)
+                  .map((data) => <li key={data.id}>{data.name}</li>)}
+            </ul>
+            <div className="content_btn">
+              <Button type="button" onClick={onClickInviteFriends}>
+                초대하기
+              </Button>
+            </div>
+          </div>
         </Content>
       </Container>
     </Wrapper>
