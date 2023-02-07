@@ -31,7 +31,8 @@ export const Background = styled.div`
 `;
 
 export const Container = styled.div`
-  width: 80%;
+  width: 70%;
+  height: 80%;
   z-index: 1001;
 `;
 
