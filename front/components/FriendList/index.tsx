@@ -18,7 +18,7 @@ const FriendList = () => {
   const { trigger } = useSWRMutation('deleteFriend', deleteUserFriend);
 
   const handleDeleteFriend = useCallback(
-    (friendId: string | undefined) => async () => {
+    (friendId: number | undefined) => async () => {
       await trigger(friendId);
       await friendListMutate();
     },
