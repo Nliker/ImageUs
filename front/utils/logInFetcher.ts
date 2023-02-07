@@ -28,7 +28,7 @@ const logInCheckFetcher = async (url: string) => {
     if (err instanceof AxiosError) {
       alert(err.response?.data.message);
     }
-    return;
+    return { logInState: false };
   }
   // return axios
   //   .get(url, {
