@@ -36,6 +36,8 @@ import { getUserFriendList } from '@utils/userDataFetcher';
 import { DFriendData } from '@typing/db';
 import { useLinkClickHandler } from 'react-router-dom';
 import { createRoomFetcher } from '@utils/roomDataFetcher';
+import { Button } from '@styles/Button';
+import Scrollbars from 'react-custom-scrollbars';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
@@ -110,7 +112,7 @@ const CreateRoomModal = () => {
     [selectListState, roomName],
   );
 
-  const onClickFriendList = (friendId: string) => () => {
+  const onClickFriendList = (friendId: number) => () => {
     // const changeCheckList = friendListState.map((data: AddCheckFriendData) => {
     //   if (data.id === friendId) return {...data, check: true};
     //   return {...data};
@@ -148,10 +150,7 @@ const CreateRoomModal = () => {
     <ModalBoxContainer>
       <ModalBox>
         <Title>
-          <span>방 생성하기</span>
-          {/* <CloseBtn onClick={closeModal}>
-            <AiOutlineClose />
-          </CloseBtn> */}
+          <h1>방 생성하기</h1>
         </Title>
         {currentStage === 0 ? (
           <ContentBox>
@@ -166,62 +165,63 @@ const CreateRoomModal = () => {
                 />
               </RoomName>
               <MemeberList>
-                {friendListState &&
-                  friendListState.map((friendData: AddCheckFriendData) => (
-                    <div
-                      key={friendData.id}
-                      onClick={onClickFriendList(friendData.id)}
-                    >
-                      {friendData.check ? (
-                        <AiFillCheckCircle />
-                      ) : (
-                        <AiOutlineCheckCircle />
-                      )}
-                      <p>{friendData.name}</p>
-                      <p>{friendData.email}</p>
-                    </div>
-                  ))}
-                <ActionBtn>
-                  <button type="button" onClick={onClickNext}>
-                    다음
-                  </button>
-                </ActionBtn>
+                <Scrollbars>
+                  <div className="member_list">
+                    {friendListState &&
+                      friendListState.map((friendData: AddCheckFriendData) => (
+                        <div
+                          key={friendData.id}
+                          className="friend_info_row"
+                          onClick={onClickFriendList(friendData.id)}
+                        >
+                          {friendData.check ? (
+                            <AiFillCheckCircle />
+                          ) : (
+                            <AiOutlineCheckCircle />
+                          )}
+                          <div>
+                            <p>이름: {friendData.name}</p>
+                            <p>이메일: {friendData.email}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </Scrollbars>
               </MemeberList>
             </Content>
+            <ActionBtn>
+              <Button type="button" onClick={onClickNext}>
+                다음
+              </Button>
+            </ActionBtn>
           </ContentBox>
         ) : (
           currentStage === 1 && (
             <ContentBox>
-              <Content>
+              <div className="result_content">
                 <ResultRoomName>
-                  <label htmlFor="room_name">방 이름</label>
-                  <div id="room_name">{roomName}</div>
+                  <h2>방 이름</h2>
+                  <p>{roomName}</p>
                 </ResultRoomName>
                 <ResultMembers>
-                  <label htmlFor="member_list">초대할 멤버</label>
-                  <div id="member_list">
+                  <h2>초대할 멤버</h2>
+                  <ul>
                     {friendListState &&
                       friendListState
                         .filter((data) => data.check)
                         .map((friendData: AddCheckFriendData) => {
-                          return (
-                            <div key={friendData.id}>
-                              <label htmlFor={friendData.name}>
-                                <p>{friendData.name}</p>
-                              </label>
-                            </div>
-                          );
+                          return <li key={friendData.id}>{friendData.name}</li>;
                         })}
-                  </div>
+                  </ul>
                 </ResultMembers>
-              </Content>
+              </div>
               <ResultActionBtn>
-                <button type="button" onClick={onClickPrevStage}>
+                <Button type="button" onClick={onClickPrevStage}>
                   이전
-                </button>
-                <button type="button" onClick={onClickCreateRequest}>
+                </Button>
+                <Button type="button" onClick={onClickCreateRequest}>
                   생성하기
-                </button>
+                </Button>
               </ResultActionBtn>
             </ContentBox>
           )
