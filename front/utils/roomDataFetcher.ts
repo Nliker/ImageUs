@@ -122,7 +122,7 @@ const getUserListFetcher = async (arg: Array<string | undefined>) => {
 
 const inviteFriendFetcher = async (
   url: string,
-  { arg: invite_userlist }: { arg: Array<string> },
+  { arg: invite_userlist }: { arg: number[] },
 ) => {
   try {
     if (invite_userlist.length === 0) return;
@@ -222,7 +222,7 @@ const leaveRoomFetcher = async (roomId: string) => {
 
 const createRoomFetcher = async (
   url: string,
-  { arg }: { arg: { selectMemberIdList: string[]; roomName: string } },
+  { arg }: { arg: { selectMemberIdList: number[]; roomName: string } },
 ) => {
   try {
     const { selectMemberIdList, roomName } = arg;
