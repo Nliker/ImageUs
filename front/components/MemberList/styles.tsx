@@ -22,3 +22,8 @@ export const Collapse = styled.span<{ collapse: boolean }>`
     `}
   }
 `;
+
+export const CreateBtnBox = styled.div`
+  padding: 1rem;
+  text-align: center;
+`;
