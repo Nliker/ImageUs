@@ -1,5 +1,4 @@
 import ChannelList from '@components/ChannelList';
-import CreateRoomModal from '@components/CreateRoomModal';
 import MemberList from '@components/MemberList';
 import React, {
   memo,
@@ -13,12 +12,10 @@ import React, {
 import { useParams } from 'react-router';
 import { Route, Routes } from 'react-router';
 import useSWR, { useSWRConfig } from 'swr';
-import ActionButton from './ActionButton';
 import {
   Background,
   ContentTabs,
   ContentWrapper,
-  CreateBtnBox,
   Tab,
   Wrapper,
 } from './styles';
@@ -29,8 +26,6 @@ interface SidebarProps {
 }
 
 const SideBar = memo(({ show, close }: SidebarProps) => {
-  const { data: showModalState, mutate: showModalMutate } =
-    useSWR('showModalState');
   const { roomId } = useParams<{ roomId: string }>();
   const sideBarEl = useRef<HTMLDivElement>(null);
   const backgroundEl = useRef<HTMLDivElement>(null);
@@ -56,20 +51,6 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
     [show],
   );
 
-  const onClickCreateRoomBtn = useCallback(() => {
-    showModalMutate({
-      ...showModalState,
-      create_room: true,
-    });
-  }, [showModalState]);
-
-  const onClickInviteMember = useCallback(() => {
-    showModalMutate({
-      ...showModalState,
-      invite_member: true,
-    });
-  }, [showModalState]);
-
   return (
     <>
       {show && <Background ref={backgroundEl} />}
@@ -83,30 +64,22 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
                 name="tab-group-1"
                 defaultChecked
               />
-              <label htmlFor="tab-1">방 목록</label>
+              <label className="tab_label" htmlFor="tab-1">
+                방 목록
+              </label>
               <div className="tab_content">
                 <div className="tab_content_box">
-                  <CreateBtnBox>
-                    <ActionButton
-                      onClickBtn={onClickCreateRoomBtn}
-                      btnTitle={'생성하기'}
-                    />
-                  </CreateBtnBox>
                   <ChannelList closeSidebar={close} />
                 </div>
               </div>
             </Tab>
             <Tab>
               <input type="radio" id="tab-2" name="tab-group-1" />
-              <label htmlFor="tab-2">멤버목록</label>
+              <label className="tab_label" htmlFor="tab-2">
+                멤버목록
+              </label>
               <div className="tab_content">
                 <div className="tab_content_box">
-                  <CreateBtnBox>
-                    <ActionButton
-                      onClickBtn={onClickInviteMember}
-                      btnTitle={'초대하기'}
-                    />
-                  </CreateBtnBox>
                   <MemberList roomId={roomId} />
                 </div>
               </div>
