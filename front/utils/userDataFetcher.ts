@@ -3,7 +3,6 @@ import { DImageData, DRoomData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
 
 const getUserFriendList = async (url: string) => {
-  console.log('freindlist');
   try {
     const userId = sessionStorage.getItem('USER_ID');
     const token = sessionStorage.getItem('TOKEN');
@@ -83,7 +82,7 @@ const getImageData = async (
   }
 };
 
-const deleteUserFriend = async (url: string, { arg }: { arg: string }) => {
+const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
   try {
     const userId = sessionStorage.getItem('USER_ID');
     const response = await axios.delete(`/user/${userId}/friend`, {

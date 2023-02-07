@@ -7,8 +7,8 @@ export interface DRoomData {
 
 export interface DFriendData {
   email?: string;
-  id: string;
-  name?: string;
+  id: number;
+  name: string;
   profile?: string;
 }
 
