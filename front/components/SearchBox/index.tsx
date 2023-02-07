@@ -2,7 +2,15 @@ import useInput from '@hooks/useInput';
 import { DFriendData } from '@typing/db';
 import searchFetcher from '@utils/searchFetcher';
 import axios from 'axios';
-import React, { FocusEvent, FocusEventHandler, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  FocusEvent,
+  FocusEventHandler,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useLinkClickHandler } from 'react-router-dom';
 import useSWR from 'swr';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
@@ -11,11 +19,15 @@ const SearchBox = () => {
   const [queryParams, setQueryParams] = useState('');
   const [focusSearchBox, setFocusSearchBox] = useState(false);
   const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
-  const { data: searchData, mutate: searchMutate } = useSWR(['/user/search', queryParams], searchFetcher, {
-    revalidateOnFocus: false,
-    revalidateOnMount: false,
-    revalidateOnReconnect: false,
-  });
+  const { data: searchData, mutate: searchMutate } = useSWR(
+    ['/user/search', queryParams],
+    searchFetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: false,
+      revalidateOnReconnect: false,
+    },
+  );
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -61,7 +73,7 @@ const SearchBox = () => {
   );
 
   const onClickAddFriend = useCallback(
-    (friendId: string | undefined) => async () => {
+    (friendId: number | undefined) => async () => {
       const userId = sessionStorage.getItem('USER_ID');
       try {
         const response = await axios.post(
@@ -110,7 +122,11 @@ const SearchBox = () => {
             <ul>
               {searchData && searchData?.length !== 0 ? (
                 searchData.map((data: DFriendData) => (
-                  <li key={data.id} className={'preview_li'} onMouseDown={onClickPreviewItem(data.email)}>
+                  <li
+                    key={data.id}
+                    className={'preview_li'}
+                    onMouseDown={onClickPreviewItem(data.email)}
+                  >
                     <span>
                       이름: {data.name}, email: {data.email}
                     </span>
