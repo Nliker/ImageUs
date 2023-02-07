@@ -1,11 +1,24 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div<{ show: boolean }>`
-  width: 300px;
-  height: calc(100vh - 85px);
-  box-sizing: border-box;
+export const Background = styled.div`
   position: fixed;
+  z-index: 10;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+`;
+
+export const Wrapper = styled.div<{ show: boolean }>`
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+
+  width: 300px;
+  height: calc(100vh - 55px);
   z-index: 100;
+
   background-color: transparent;
   box-shadow: rgb(0 0 0 / 8%) 2px 0px 2px;
   user-select: none;
@@ -17,7 +30,6 @@ export const Wrapper = styled.div<{ show: boolean }>`
     show &&
     `
     visibility: visible;
-    transition: transform 0.5s;
     transform: translate3d(0, 0, 0);
     `}
 `;
@@ -45,41 +57,43 @@ export const Tab = styled.li`
   width: calc(100% / 2);
   height: 40px;
 
-  & label {
+  & .tab_label {
     position: relative;
     display: inline-block;
+
     box-sizing: border-box;
     width: 100%;
     height: 100%;
     padding: 8px 20px;
+
     border: 1px solid #ccc;
     background: #eee;
+    cursor: pointer;
   }
 
-  & [type='radio'] {
+  & [name='tab-group-1'] {
     display: none;
   }
 
   & .tab_content {
     position: absolute;
-    height: calc(100% - 40px);
-    top: 39px;
+    top: 40px;
+    bottom: 0;
     left: 0;
     right: 0;
     padding: 0;
 
+    box-sizing: border-box;
     background: white;
     overflow-y: auto;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
   }
 
   & .tab_content > .tab_content_box {
-    height: 400px;
+    height: 100%;
+    box-sizing: border-box;
     padding: 10px;
 
     transform: translateX(-100%);
-    // transition: all 0.5s ease-in-out;
   }
 
   & [type='radio']:checked ~ label {
@@ -95,78 +109,5 @@ export const Tab = styled.li`
   & [type='radio']:checked + label + .tab_content > .tab_content_box {
     display: block;
     transform: translateX(0);
-  }
-`;
-
-export const CreateBtnBox = styled.div`
-  padding: 1rem;
-  text-align: center;
-`;
-
-export const CreateBtn = styled.button`
-  position: relative;
-
-  padding: 0;
-  width: 80px;
-  height: 50px;
-
-  border: 4px solid #888888;
-  outline: none;
-  background-color: #f4f5f6;
-  border-radius: 40px;
-  transition: 0.13s ease-in-out;
-  cursor: pointer;
-
-  &:active {
-    box-shadow: none;
-    .btn_content {
-      box-shadow: none;
-      .btn_icon,
-      .btn_text {
-        transform: translate3d(0px, 0px, 0px);
-      }
-    }
-  }
-  .btn_content {
-    position: relative;
-
-    width: 100%;
-    height: 100%;
-
-    border-radius: 40px;
-    box-shadow: inset 0px -8px 0px #dddddd, 0px -8px 0px #f4f5f6;
-    transition: 0.13s ease-in-out;
-
-    z-index: 1;
-  }
-  .btn_icon {
-    position: relative;
-    display: flex;
-    justify-content: center;
-
-    transform: translate3d(0px, -4px, 0px);
-    grid-column: 4;
-    align-self: start;
-    justify-self: end;
-    height: 32px;
-    transition: 0.13s ease-in-out;
-  }
-  .btn_text {
-    position: relative;
-
-    grid-column: 1/5;
-    grid-row: 2;
-    align-self: end;
-    margin: 0;
-    text-align: center;
-
-    background-color: #888888;
-    color: transparent;
-    text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-    background-clip: text;
-    transition: 0.13s ease-in-out;
-    transform: translate3d(0px, -4px, 0px);
   }
 `;
