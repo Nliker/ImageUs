@@ -35,6 +35,15 @@ export const Wrapper = styled.div<{ isImageRoom?: boolean }>`
   }
 `;
 
+export const LogInBtnBox = styled.div`
+  display: flex;
+
+  gap: 1rem;
+  button.success {
+    font-size: 0.8rem;
+  }
+`;
+
 export const IconBox = styled.div`
   display: flex;
 `;

@@ -9,6 +9,7 @@ import {
   UserInfo,
   Wrapper,
   IconBox,
+  LogInBtnBox,
 } from './styles';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
@@ -191,10 +192,18 @@ const ToolBar = ({ handleSidebar, isImageRoom }: Props) => {
           </RightIcons>
         </>
       ) : (
-        <div className="action_box">
-          <Link to={'/login'}>로그인</Link>
-          <Link to={'/signup'}>회원가입</Link>
-        </div>
+        <LogInBtnBox>
+          <Link to={'/login'}>
+            <Button type="button" className="success">
+              로그인
+            </Button>
+          </Link>
+          <Link to={'/signup'}>
+            <Button type="button" className="success">
+              회원가입
+            </Button>
+          </Link>
+        </LogInBtnBox>
       )}
     </Wrapper>
   );
