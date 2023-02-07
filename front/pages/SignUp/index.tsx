@@ -1,5 +1,6 @@
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import useInput from '@hooks/useInput';
+import { Button } from '@styles/Button';
 import axios, { AxiosError } from 'axios';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useEffect } from 'react';
@@ -27,7 +28,11 @@ const SignUp = () => {
   const [checked, setChecked] = useState<boolean>(false);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
     name: { hasError: true, errorMessage: '이름을 입력해주세요.' },
-    email: { hasError: true, errorMessage: '이메일을 입력해주세요.', emailAuth: false },
+    email: {
+      hasError: true,
+      errorMessage: '이메일을 입력해주세요.',
+      emailAuth: false,
+    },
     password: { hasError: true, errorMessage: '비밀번호를 입력해주세요.' },
   });
   const [isRequestingAuth, setRequestingAuth] = useState(false);
@@ -67,17 +72,29 @@ const SignUp = () => {
     if (!email) {
       setErrorInfo((prev) => ({
         ...prev,
-        email: { hasError: true, errorMessage: '이메일을 입력해주세요.', emailAuth: false },
+        email: {
+          hasError: true,
+          errorMessage: '이메일을 입력해주세요.',
+          emailAuth: false,
+        },
       }));
     } else if (!emailRegex.test(email)) {
       setErrorInfo((prev) => ({
         ...prev,
-        email: { hasError: true, errorMessage: '이메일 형식에 맞지 않습니다.', emailAuth: false },
+        email: {
+          hasError: true,
+          errorMessage: '이메일 형식에 맞지 않습니다.',
+          emailAuth: false,
+        },
       }));
     } else {
       setErrorInfo((prev) => ({
         ...prev,
-        email: { hasError: true, errorMessage: '인증 요청버튼을 클릭하세요.', emailAuth: true },
+        email: {
+          hasError: true,
+          errorMessage: '인증 요청버튼을 클릭하세요.',
+          emailAuth: true,
+        },
       }));
     }
   }, [email]);
@@ -92,13 +109,19 @@ const SignUp = () => {
     } else if (password.length < 8) {
       setErrorInfo((prev) => ({
         ...prev,
-        password: { hasError: true, errorMessage: '비밀번호는 8자리 이상입니다.' },
+        password: {
+          hasError: true,
+          errorMessage: '비밀번호는 8자리 이상입니다.',
+        },
       }));
       return;
     } else if (password !== passwordCheck) {
       setErrorInfo((prev) => ({
         ...prev,
-        password: { hasError: true, errorMessage: '비밀번호가 일치하지 않습니다.' },
+        password: {
+          hasError: true,
+          errorMessage: '비밀번호가 일치하지 않습니다.',
+        },
       }));
     } else {
       setErrorInfo((prev) => ({
@@ -117,7 +140,11 @@ const SignUp = () => {
       setEmailAuth('');
       setErrorInfo((prev) => ({
         ...prev,
-        email: { hasError: true, errorMessage: '만료되었습니다..다시 요청해주세요!', emailAuth: true },
+        email: {
+          hasError: true,
+          errorMessage: '만료되었습니다..다시 요청해주세요!',
+          emailAuth: true,
+        },
       }));
       setRequestingAuth(false);
     }
@@ -139,7 +166,11 @@ const SignUp = () => {
       setRequestingAuth(true);
       setErrorInfo((prev) => ({
         ...prev,
-        email: { hasError: true, errorMessage: '이메일 인증번호를 입력해주세요.', emailAuth: true },
+        email: {
+          hasError: true,
+          errorMessage: '이메일 인증번호를 입력해주세요.',
+          emailAuth: true,
+        },
       }));
     } catch (err) {
       if (err instanceof AxiosError) {
@@ -163,7 +194,11 @@ const SignUp = () => {
       if (!emailAuth) {
         setErrorInfo((prev) => ({
           ...prev,
-          email: { hasError: true, errorMessage: '인증 번호가 입력되지 않았습니다.', emailAuth: true },
+          email: {
+            hasError: true,
+            errorMessage: '인증 번호가 입력되지 않았습니다.',
+            emailAuth: true,
+          },
         }));
       } else {
         await axios.post(`/user/auth?email=${email}`, {
@@ -177,7 +212,11 @@ const SignUp = () => {
           setRequestingAuth(false);
           setErrorInfo((prev) => ({
             ...prev,
-            email: { hasError: false, errorMessage: '인증 되었습니다.', emailAuth: false },
+            email: {
+              hasError: false,
+              errorMessage: '인증 되었습니다.',
+              emailAuth: false,
+            },
           }));
         }
       }
@@ -208,7 +247,11 @@ const SignUp = () => {
     setRequestingAuth(false);
     setErrorInfo((prev) => ({
       ...prev,
-      email: { hasError: true, errorMessage: '인증 요청버튼을 클릭하세요.', emailAuth: true },
+      email: {
+        hasError: true,
+        errorMessage: '인증 요청버튼을 클릭하세요.',
+        emailAuth: true,
+      },
     }));
   }, [isRequestingAuth, timeLimitId, emailAuth, count]);
 
@@ -270,7 +313,9 @@ const SignUp = () => {
               />
             </div>
             <ErrorText>
-              <span style={correctMessageStyle(errorInfo.name.hasError)}>{errorInfo.name.errorMessage}</span>
+              <span style={correctMessageStyle(errorInfo.name.hasError)}>
+                {errorInfo.name.errorMessage}
+              </span>
             </ErrorText>
           </NameBox>
           <EmailBox>
@@ -309,7 +354,9 @@ const SignUp = () => {
                 </div>
               ))}
             <ErrorText>
-              <span style={correctMessageStyle(errorInfo.email.hasError)}>{errorInfo.email.errorMessage}</span>
+              <span style={correctMessageStyle(errorInfo.email.hasError)}>
+                {errorInfo.email.errorMessage}
+              </span>
             </ErrorText>
           </EmailBox>
           <PasswordBox>
@@ -331,19 +378,30 @@ const SignUp = () => {
                 />
               </div>
               <ErrorText>
-                <span style={correctMessageStyle(errorInfo.password.hasError)}>{errorInfo.password.errorMessage}</span>
+                <span style={correctMessageStyle(errorInfo.password.hasError)}>
+                  {errorInfo.password.errorMessage}
+                </span>
               </ErrorText>
             </div>
             <PasswordShowCheckBox onClick={checkHandler}>
-              <input type="checkbox" name="show-password" checked={checked} readOnly />
+              <input
+                type="checkbox"
+                name="show-password"
+                checked={checked}
+                readOnly
+              />
               비밀번호 표시
             </PasswordShowCheckBox>
           </PasswordBox>
           <SubmitBox>
-            <Link to={'/login'}>로그인 화면으로 이동</Link>
-            <button type="button" onClick={handleSubmit}>
+            <Link to={'/login'}>
+              <Button type="button" className="warning">
+                로그인 화면으로 이동
+              </Button>
+            </Link>
+            <Button type="button" onClick={handleSubmit}>
               제출
-            </button>
+            </Button>
           </SubmitBox>
         </InputContainer>
       </UserInfoInputBox>
