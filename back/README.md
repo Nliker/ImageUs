@@ -39,6 +39,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `name` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL DEFAULT 'image_us'
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 )
@@ -127,25 +128,6 @@ CREATE TABLE `rooms_user_history` (
   PRIMARY KEY(`room_id`,`user_id`)
 )
 
-0,-1,0,len:5->0,10요청->start:0,limit:10,
-last_unread_row:5,
-read_start_row:4,
-marker_row:5-1
-
-0,-1,0,len:15->0,10요청->start:5,limit:10,
-last_unread_row:15,
-read_start_row:14,
-marker_row:0
-
-15,14,0 len:27->0,10요청->start17,:limit:10
-last_unread_row:27,
-read_start_row:26,
-marker_row:12
-
-27,26,15 len:30->0,10요청->start 20,:limit:10 10,1010
-last_unread_row:30,
-read_start_row:29,
-marker_row:27
 <!-- 아래는 추후 완성 기능 -->
 <!-- 7. albums
 CREATE TABLE `albums` (
