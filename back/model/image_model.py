@@ -160,7 +160,7 @@ class ImageDao:
                 i.link,
                 i.user_id,
                 u.name,
-                i.created_at
+                i_r.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
@@ -187,6 +187,47 @@ class ImageDao:
             'created_at':room_image_info['created_at']
         } for room_image_info in rows]
 
+        return room_image_info_list
+    
+    def get_room_imagelist_by_date(self,room_id,dates,pages):
+        result=self.db.execute(text("""
+            select
+                i_r.image_id as id,
+                i.link,
+                i.user_id,
+                u.name,
+                i_r.created_at
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0)
+            left join users as u
+            on (i.user_id=u.id)
+            where i_r.room_id=:room_id
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')>=:start_date
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')<=:end_date
+            order by i_r.created_at
+            limit :start,:limit
+            """),{
+                    'room_id':room_id,
+                    'start_date':dates['start_date'],
+                    'end_date':dates['end_date'],
+                    'limit':pages['limit'],
+                    'start':pages['start']
+                })
+    
+        rows=result.fetchall()
+        result.close()
+
+        room_image_info_list=[{
+            'id':room_image_info['id'],
+            'link':room_image_info['link'],
+            'user_id':room_image_info['user_id'],
+            'user_name':room_image_info['name'],
+            'created_at':room_image_info['created_at']
+        } for room_image_info in rows]
+        
         return room_image_info_list
     
     def delete_room_user_image(self,room_id,user_id):
