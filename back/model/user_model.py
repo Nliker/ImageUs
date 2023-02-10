@@ -12,12 +12,14 @@ class UserDao:
                 name,
                 email,
                 profile,
-                hashed_password
+                hashed_password,
+                type
             ) values (
                 :name,
                 :email,
                 :profile,
-                :hashed_password
+                :hashed_password,
+                :type
             )
             """),new_user)
         row=result.lastrowid
@@ -25,14 +27,15 @@ class UserDao:
         
         return row
 
-    def get_user_id_and_password(self,email):
+    def get_user_id_and_password(self,email,type):
         result=self.db.execute(text("""
             select
                 id,
                 hashed_password
             from users
             where email=:email
-            """),{'email':email})
+            and type=:type
+            """),{'email':email,'type':type})
         row=result.fetchone()
         result.close()
 
