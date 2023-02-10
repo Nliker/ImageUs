@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import Scrollbars from 'react-custom-scrollbars';
 import { useParams } from 'react-router';
 import { Route, Routes } from 'react-router';
 import useSWR, { useSWRConfig } from 'swr';
@@ -68,9 +69,11 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
                 방 목록
               </label>
               <div className="tab_content">
-                <div className="tab_content_box">
-                  <ChannelList closeSidebar={close} />
-                </div>
+                <Scrollbars>
+                  <div className="tab_content_box">
+                    <ChannelList closeSidebar={close} />
+                  </div>
+                </Scrollbars>
               </div>
             </Tab>
             <Tab>
@@ -79,9 +82,11 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
                 멤버목록
               </label>
               <div className="tab_content">
-                <div className="tab_content_box">
-                  <MemberList roomId={roomId} />
-                </div>
+                <Scrollbars>
+                  <div className="tab_content_box">
+                    <MemberList roomId={roomId} />
+                  </div>
+                </Scrollbars>
               </div>
             </Tab>
           </ContentTabs>
