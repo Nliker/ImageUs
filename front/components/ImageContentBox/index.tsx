@@ -45,7 +45,7 @@ const ImageContentBox = ({
   const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
   const { roomId } = useParams<{ roomId: string }>();
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
-    `/image/${roomId}/${sectionName}`,
+    `/image/${roomId}`,
   );
   const { data: deleteRoomImageId, isLoading: roomImageDeleting } = useSWR(
     'roomImageDelete',
@@ -89,43 +89,8 @@ const ImageContentBox = ({
     const filteredList = userImageList.filter(
       (image: CImageData) => image.id !== data.id,
     );
-    console.log(filteredList);
     fetchUserImage([...filteredList], false);
   }, [deleteUserImageId]);
-
-  // useEffect(() => {
-  //   window.addEventListener('click', handleCloseEditBox);
-  //   return () => {
-  //     window.removeEventListener('click', handleCloseEditBox);
-  //   };
-  // });
-
-  // const handleCloseEditBox = useCallback(
-  //   (e: MouseEvent) => {
-  //     if (
-  //       e.target instanceof HTMLElement ||
-  //       (e.target instanceof SVGElement &&
-  //         showEditBox &&
-  //         !imageDeleteEl.current?.contains(e.target))
-  //     ) {
-  //       setShowEditBox(false);
-  //     }
-  //   },
-  //   [showEditBox],
-  // );
-
-  // const onClickEditBtn = useCallback(() => {
-  //   setShowEditBox(true);
-  // }, [showEditBox]);
-
-  // const deleteImage = useCallback(async () => {
-  //   deleteTrigger(data.id).then(() => {
-  //     const filteredList = roomImageList.filter(
-  //       (image: CImageData) => image.id !== data.id,
-  //     );
-  //     fetchRoomImage([...filteredList], false);
-  //   });
-  // }, [data]);
 
   const onClickShowAlertBox = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
