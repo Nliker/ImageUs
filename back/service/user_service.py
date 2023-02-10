@@ -159,8 +159,8 @@ class UserService:
 
         return user
 
-    def login(self,credential):
-        user_credential=self.user_dao.get_user_id_and_password(credential['email'])
+    def login(self,credential,type="image_us"):
+        user_credential=self.user_dao.get_user_id_and_password(credential['email'],type)
         authorized=bcrypt.checkpw(credential['password'].encode('utf-8'),user_credential['hashed_password'].encode('utf-8')) if user_credential else None
 
         return authorized
