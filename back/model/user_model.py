@@ -87,7 +87,7 @@ class UserDao:
                         'user_id':friend_user_id,
                         'friend_user_id':user_id
                     }])
-            row=result.fetchone()
+            row=result.rowcount
             result.close()
             return 1
         except IntegrityError as e:
