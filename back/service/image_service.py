@@ -1,6 +1,6 @@
 import requests
 import jwt
-from datetime import timezone,timedelta
+from datetime import timezone,timedelta,datetime
 import pytz
 
 class ImageService:
@@ -159,6 +159,15 @@ class ImageService:
                 image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
 
         image_info_list.reverse()
+        
+        return image_info_list
+    
+    def get_room_imagelist_by_date(self,room_id,dates,pages):
+        image_info_list=self.image_dao.get_room_imagelist_by_date(room_id,dates,pages)
+
+        for image_info in image_info_list:
+            if image_info['created_at']!=None:
+                image_info['created_at']=self.insert_datetime_timezone(image_info['created_at'])
         
         return image_info_list
 
