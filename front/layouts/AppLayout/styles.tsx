@@ -36,7 +36,7 @@ export const OuterContainer = styled.div<{
 
 export const InnerContainer = styled.div`
   width: 100%;
-  height: calc(100vh - 55px);
+  height: calc(100% - 55px);
 
   background-color: rgb(255, 255, 255);
 `;
