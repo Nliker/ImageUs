@@ -139,17 +139,18 @@ class UserService:
         return result
         
     
-    def is_email_exists(self,email):
-        user=self.user_dao.get_user_id_and_password(email)
+    def is_email_exists(self,email,type="image_us"):
+        user=self.user_dao.get_user_id_and_password(email,type)
         #유저가 없다면 False,있으면 True
         if user:
             return True
         else:
             return False
         
-    def create_new_user(self,new_user):
+    def create_new_user(self,new_user,type="image_us"):
         password=new_user['password']
         new_user['hashed_password']=bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+        new_user['type']=type
         new_user_id=self.user_dao.insert_user(new_user)
         return new_user_id
 
@@ -175,8 +176,8 @@ class UserService:
 
         return access_token
     
-    def get_user_id_and_password(self,email):
-        user_credential=self.user_dao.get_user_id_and_password(email)
+    def get_user_id_and_password(self,email,type="image_us"):
+        user_credential=self.user_dao.get_user_id_and_password(email,type)
 
         return user_credential
 
