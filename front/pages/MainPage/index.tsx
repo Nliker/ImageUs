@@ -60,7 +60,7 @@ const MainPage = () => {
                     <ul className="room_list">
                       {!roomListValidating &&
                         roomlist?.map((roomData: DRoomData) => (
-                          <Link to={`/booth/${roomData.id}`}>
+                          <Link key={roomData.id} to={`/booth/${roomData.id}`}>
                             <li key={roomData.id}>{roomData.title}</li>
                           </Link>
                         ))}
