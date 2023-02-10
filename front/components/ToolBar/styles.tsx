@@ -70,7 +70,7 @@ export const UserBox = styled.div`
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
     0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
 
-  z-index: 1;
+  z-index: 1000;
   background-color: white;
 
   &::before {
@@ -135,7 +135,7 @@ export const LeaveBox = styled.div`
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
     0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
 
-  z-index: 1;
+  z-index: 1000;
   background-color: white;
 
   &::before {
