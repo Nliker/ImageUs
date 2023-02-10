@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const Background = styled.div`
   position: fixed;
-  z-index: 10;
+  z-index: 100;
   right: 0;
   bottom: 0;
   left: 0;
@@ -16,7 +16,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   box-sizing: border-box;
 
   width: 300px;
-  height: calc(100vh - 55px);
+  height: 100%;
   z-index: 100;
 
   background-color: transparent;
@@ -103,7 +103,7 @@ export const Tab = styled.li`
   }
 
   & [type='radio']:checked + label + .tab_content {
-    z-index: 1;
+    z-index: 10;
   }
 
   & [type='radio']:checked + label + .tab_content > .tab_content_box {
