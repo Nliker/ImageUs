@@ -12,6 +12,7 @@ import {
 import { useParams } from 'react-router';
 import { AxiosError } from 'axios';
 import { Button } from '@styles/Button';
+import Scrollbars from 'react-custom-scrollbars';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
@@ -105,47 +106,53 @@ const InviteMemberModal = () => {
         <Title>
           <h1>친구 초대하기</h1>
         </Title>
-        <Content>
-          <div className="content_box">
-            <div className="content_subname">
-              <h2>초대할 친구 목록</h2>
+        <Scrollbars>
+          <Content>
+            <div className="content_box">
+              <div className="content_select_box">
+                <div className="content_subname">
+                  <h2>초대할 친구 목록</h2>
+                </div>
+                <ul className="not_selected_ul">
+                  {notInvitedFriends &&
+                    notInvitedFriends.map((data: AppendCheckFriendData) => (
+                      <li key={data.id} onClick={onClickFriendList(data.id)}>
+                        <div className="list_layout">
+                          <div className="list_check_icon">
+                            {data.check ? (
+                              <AiFillCheckCircle />
+                            ) : (
+                              <AiOutlineCheckCircle />
+                            )}
+                          </div>
+                          <div className="list_info">
+                            <p>이름: {data.name}</p>
+                            <p>이메일: {data.email}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+              <div className="content_selected_box">
+                <div className="content_subname">
+                  <h2>선택한 친구들</h2>
+                </div>
+                <ul className="selected_member_ul">
+                  {notInvitedFriends &&
+                    notInvitedFriends
+                      .filter((data) => data.check)
+                      .map((data) => <li key={data.id}>{data.name}</li>)}
+                </ul>
+              </div>
+              <div className="content_btn">
+                <Button type="button" onClick={onClickInviteFriends}>
+                  초대하기
+                </Button>
+              </div>
             </div>
-            <ul className="not_selected_ul">
-              {notInvitedFriends &&
-                notInvitedFriends.map((data: AppendCheckFriendData) => (
-                  <li key={data.id} onClick={onClickFriendList(data.id)}>
-                    <div className="list_layout">
-                      <div className="list_check_icon">
-                        {data.check ? (
-                          <AiFillCheckCircle />
-                        ) : (
-                          <AiOutlineCheckCircle />
-                        )}
-                      </div>
-                      <div className="list_info">
-                        <p>이름: {data.name}</p>
-                        <p>이메일: {data.email}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-            <div className="content_subname">
-              <h2>선택한 친구들</h2>
-            </div>
-            <ul className="selected_member_ul">
-              {notInvitedFriends &&
-                notInvitedFriends
-                  .filter((data) => data.check)
-                  .map((data) => <li key={data.id}>{data.name}</li>)}
-            </ul>
-            <div className="content_btn">
-              <Button type="button" onClick={onClickInviteFriends}>
-                초대하기
-              </Button>
-            </div>
-          </div>
-        </Content>
+          </Content>
+        </Scrollbars>
       </Container>
     </Wrapper>
   );

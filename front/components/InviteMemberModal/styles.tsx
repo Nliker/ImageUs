@@ -17,8 +17,6 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.div`
-  flex: 1;
-
   text-align: center;
   font-size: 18px;
   padding: 5px 0;
@@ -29,11 +27,10 @@ export const Title = styled.div`
 `;
 
 export const Content = styled.div`
-  flex: 6;
-
   width: 100%;
-  padding: 20px 0;
+  padding-bottom: 20px;
   box-sizing: border-box;
+  overflow: auto;
 
   .content_box {
     position: relative;
@@ -41,71 +38,78 @@ export const Content = styled.div`
     flex-direction: column;
     align-items: center;
 
-    height: 100%;
     margin: 0 40px;
 
-    overflow: auto;
-  }
+    .content_select_box {
+      width: 100%;
 
-  .content_subname {
-    display: inline-block;
-  }
+      .not_selected_ul {
+        display: table;
 
-  .not_selected_ul {
-    display: table;
+        margin: auto;
+        padding: 0;
+        min-width: 150px;
+        border-spacing: 20px;
 
-    margin: 0;
-    padding: 0;
-    min-width: 150px;
-    border-spacing: 20px;
+        li {
+          display: table-row;
 
-    li {
-      display: table-row;
+          vertical-align: middle;
 
-      vertical-align: middle;
+          list-style: none;
+          cursor: pointer;
 
-      list-style: none;
-      cursor: pointer;
+          &:hover {
+            background-color: whitesmoke;
+          }
 
-      &:hover {
-        background-color: whitesmoke;
+          .list_layout {
+            display: flex;
+            gap: 1rem;
+          }
+
+          .list_check_icon {
+            display: flex;
+            align-items: center;
+          }
+
+          .list_info > p {
+            margin: 0;
+
+            &:first-child {
+              margin-bottom: 0.5rem;
+            }
+          }
+        }
       }
+    }
 
-      .list_layout {
-        display: flex;
-        gap: 1rem;
-      }
+    .content_selected_box {
+      width: 100%;
+      text-align: center;
 
-      .list_check_icon {
-        display: flex;
-        align-items: center;
-      }
+      .selected_member_ul {
+        display: inline-block;
 
-      .list_info > p {
+        min-width: 100px;
         margin: 0;
 
-        &:first-child {
+        li {
+          list-style: circle;
+        }
+
+        & > li:not(& > li:last-child) {
           margin-bottom: 0.5rem;
         }
       }
     }
   }
 
-  .selected_member_ul {
-    margin: 0;
-
-    li {
-      list-style: circle;
-    }
-
-    & > li:not(& > li:last-child) {
-      margin-bottom: 0.5rem;
-    }
+  .content_subname {
+    text-align: center;
   }
 
   .content_btn {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    margin-top: 40px;
   }
 `;
