@@ -29,6 +29,19 @@ class ParserModule:
                                 location='args',
                                 help='page limit',
                                 required=False)
+        
+        if 'start_date' in args:
+            parser.add_argument('start_date',type=str,
+                                location='args',
+                                help='start date',
+                                required=False)
+            
+        if 'end_date' in args:
+            parser.add_argument('end_date',type=str,
+                                location='args',
+                                help='end date',
+                                required=False)
+        
         return parser
     
 
@@ -197,6 +210,7 @@ class ApiModel:
                 required=False
             )
     
+    
     def __init__(self,api):
         self.api=api
         
@@ -204,7 +218,7 @@ class ApiModel:
         payload={}
         if 'id' in args:
             payload['id']=self.id
-            
+        
         if 'name' in args:
             payload['name']=self.name
             
