@@ -706,7 +706,7 @@ def user_router(api,services,config,es):
             if user_service.is_user_friend(current_user_id,friend_user_id):
                 return make_response(jsonify({'message':api_error.friend_existance_error()['message']}),
                                      api_error.friend_existance_error()['status_code'])
-            
+                
             result=user_service.create_user_friend(current_user_id,friend_user_id)
 
             return make_response(f"{result}명 친구 생성 성공")
