@@ -112,7 +112,43 @@ class UserDao:
         } if row else None
         
         return user_friend
-    
+    def get_deleted_user_friend(self,user_id,friend_user_id):
+        result=self.db.execute(text("""
+            select
+                user_id,
+                friend_user_id
+            from users_friend_list
+            where user_id=:user_id 
+            and friend_user_id=:friend_user_id
+            and deleted=1
+            """),{'user_id':user_id,'friend_user_id':friend_user_id})
+        row=result.fetchone()
+        result.close()
+
+        user_friend={
+            'user_id':row['user_id'],
+            'friend_user_id':row['friend_user_id']
+        } if row else None
+        
+        return user_friend
+    def update_user_deleted_friend(self,user_id,friend_user_id):
+        result=self.db.execute(text("""
+            update users_friend_list
+            set deleted=0
+            where (user_id=:user_id
+            and friend_user_id=:friend_user_id)
+            or (user_id=:friend_user_id
+            and friend_user_id=:user_id)
+            and deleted=1
+            """),{'user_id':user_id,'friend_user_id':friend_user_id})
+        row=result.rowcount
+        result.close()
+        
+        if row>=1:
+            return 1
+        else:
+            return 0
+        
     def get_user_friendlist(self,user_id):
         result=self.db.execute(text("""
             select
@@ -156,7 +192,7 @@ class UserDao:
                 })
         row=result.rowcount
         result.close()
-        if row>=2:
+        if row>=1:
             return 1
         else:
             return 0

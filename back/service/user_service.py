@@ -190,7 +190,14 @@ class UserService:
             return False
     
     def create_user_friend(self,user_id,friend_user_id):
-        result=self.user_dao.insert_user_friend(user_id,friend_user_id)
+        if user_id==friend_user_id:
+            return 0
+
+        if self.user_dao.get_deleted_user_friend(user_id,friend_user_id) or self.user_dao.get_deleted_user_friend(friend_user_id,user_id):
+            result=self.user_dao.update_user_deleted_friend(user_id,friend_user_id)
+        
+        else:    
+            result=self.user_dao.insert_user_friend(user_id,friend_user_id)
 
         return result
         
