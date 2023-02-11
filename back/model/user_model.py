@@ -135,10 +135,10 @@ class UserDao:
         result=self.db.execute(text("""
             update users_friend_list
             set deleted=0
-            where (user_id=:user_id
+            where ((user_id=:user_id
             and friend_user_id=:friend_user_id)
             or (user_id=:friend_user_id
-            and friend_user_id=:user_id)
+            and friend_user_id=:user_id))
             and deleted=1
             """),{'user_id':user_id,'friend_user_id':friend_user_id})
         row=result.rowcount
@@ -181,10 +181,10 @@ class UserDao:
         result=self.db.execute(text("""
             update users_friend_list
             set deleted=1
-            where (user_id=:user_id
+            where ((user_id=:user_id
             and friend_user_id=:delete_friend_user_id)
             or (user_id=:delete_friend_user_id
-            and friend_user_id=:user_id)
+            and friend_user_id=:user_id))
             and deleted=0
             """),{
                     'user_id':user_id,
