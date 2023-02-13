@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route } from 'react-router';
+import { Routes, Route, useLocation } from 'react-router';
 import {
   ContentBox,
   EachRoomPictureList,
@@ -19,6 +19,7 @@ import {
 import {
   getImageData,
   getUserFriendList,
+  getUserImageLen,
   getUserImageList,
   getUserRoomListFetcher,
 } from '@utils/userDataFetcher';
@@ -26,9 +27,13 @@ import { DImageData } from '@typing/db';
 import { userImageLoadNumber } from '@hooks/swrStore';
 import { CImageData } from '@typing/client';
 import useIntersect from '@hooks/useIntersect';
+import { BiUserCircle } from 'react-icons/bi';
+import { IconContext } from 'react-icons/lib';
+import Scrollbars from 'react-custom-scrollbars';
 
 const MyPage = () => {
   const userId = sessionStorage.getItem('USER_ID');
+  const { pathname } = useLocation();
 
   const { data: roomlist, mutate: mutateRoomList } = useSWR(
     'roomlist',
@@ -48,18 +53,29 @@ const MyPage = () => {
       revalidateOnReconnect: false,
     },
   );
-  const { data: userImageList, mutate: mutateImageList } = useSWR<CImageData[]>(
-    '/user/imageDataList',
+  const { data: userImageList, mutate: mutateUserImageList } = useSWR<
+    CImageData[]
+  >('/user/imageDataList', {
+    fallbackData: [],
+  });
+  const { data: allImageLen } = useSWR(
+    `/user/${userId}/imagelist-len`,
+    getUserImageLen,
     {
-      fallbackData: [],
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     },
   );
 
+  const { data: loginInfo } = useSWR('/user/my');
+
   const {
-    data: imageListInfo,
+    data: requestImageList,
     trigger: requestImageListInfo,
-    isMutating: imageInfoLoading,
+    isMutating: requestImageLoading,
   } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
+
   const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
     useSWRMutation('/user/image-download', getImageData);
 
@@ -68,15 +84,10 @@ const MyPage = () => {
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      /*
-
-    데이터 fetching 중이 아니고 다음 로드할 데이터가 남아있다면 데이터를 부른다.(imageList 요청)
-
-    */
       if (
-        !imageInfoLoading &&
+        !requestImageLoading &&
         !imageDataLoading &&
-        imageListInfo?.loadDataLength === 12
+        requestImageList?.loadDataLength === 12
       ) {
         console.log('인터섹션 데이터 패칭 요청');
         requestImageListInfo(readStartNumber);
@@ -87,77 +98,83 @@ const MyPage = () => {
     },
   );
 
+  // 페이지 url이 바뀔 때 다시 마운트 시킨다.
   useEffect(() => {
+    if (pathname !== '/my_page') return;
     requestImageListInfo(readStartNumber);
 
     return () => {
       console.log('마이페이지 언마운트');
       setReadStartNumber(0);
-      mutateImageList([], false);
+      mutateUserImageList([]);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
-    if (!imageListInfo || !userImageList) return;
+    if (!requestImageList || requestImageLoading || !userImageList) return;
 
     setReadStartNumber((prev) => prev + 12);
-    imageDataTrigger(imageListInfo.imagelist).then((newImage) => {
-      if (newImage) mutateImageList([...userImageList, ...newImage]);
+    imageDataTrigger(requestImageList.imagelist).then((newImage) => {
+      if (newImage) mutateUserImageList([...userImageList, ...newImage]);
     });
-  }, [imageListInfo]);
+  }, [requestImageList]);
 
   return (
     <AppLayout>
       <WrapperBox>
-        <ContentBox>
-          <ProfileBox>
-            <ProfileImage>
-              <img src="" alt="프로필 사진" />
-            </ProfileImage>
-            <ProfileInfo>
-              <div>
-                <h2>이름</h2>
-              </div>
-              <ul>
-                <li>
-                  <div>
-                    게시물<span>{imageListInfo?.loadDataLength}</span>
-                  </div>
-                </li>
-                <li>
-                  <div>
-                    등록된 방<span>{roomlist?.length}</span>
-                  </div>
-                </li>
-                <li>
-                  <div>
-                    친구수<span>{friendList?.length}</span>
-                  </div>
-                </li>
-              </ul>
-            </ProfileInfo>
-          </ProfileBox>
-          <EachRoomPictureList>
-            <SubMenu>
-              <NavLink
-                to={`/my_page`}
-                className={({ isActive }) =>
-                  isActive ? 'menu_active' : undefined
-                }
-                end
-              >
-                <div>사진첩</div>
-              </NavLink>
-              <NavLink
-                to={`/my_page/my_profile`}
-                className={({ isActive }) =>
-                  isActive ? 'menu_active' : undefined
-                }
-              >
-                <div>프로필</div>
-              </NavLink>
-            </SubMenu>
-            <div>
+        <Scrollbars>
+          <ContentBox>
+            <ProfileBox>
+              <ProfileImage>
+                <IconContext.Provider
+                  value={{ size: '100%', style: { display: 'inline-block' } }}
+                >
+                  <BiUserCircle />
+                </IconContext.Provider>
+              </ProfileImage>
+              <ProfileInfo>
+                <div>
+                  <h2>{loginInfo.user_info.name}</h2>
+                </div>
+                <ul>
+                  <li>
+                    <div>
+                      게시물 <span>{allImageLen?.imagelist_len ?? 0}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>
+                      등록된 방 <span>{roomlist?.length ?? 0}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>
+                      친구수 <span>{friendList?.length ?? 0}</span>
+                    </div>
+                  </li>
+                </ul>
+              </ProfileInfo>
+            </ProfileBox>
+            <EachRoomPictureList>
+              <SubMenu>
+                <NavLink
+                  to={`/my_page`}
+                  className={({ isActive }) =>
+                    isActive ? 'menu_active' : undefined
+                  }
+                  end
+                >
+                  <div>사진첩</div>
+                </NavLink>
+                <NavLink
+                  to={`/my_page/my_profile`}
+                  className={({ isActive }) =>
+                    isActive ? 'menu_active' : undefined
+                  }
+                >
+                  <div>프로필</div>
+                </NavLink>
+              </SubMenu>
               {/* 여기를 Route를 활용해서 만든다. */}
               <Routes>
                 <Route
@@ -171,9 +188,9 @@ const MyPage = () => {
                 />
                 <Route path="my_profile" element={<MypageInfo />} />
               </Routes>
-            </div>
-          </EachRoomPictureList>
-        </ContentBox>
+            </EachRoomPictureList>
+          </ContentBox>
+        </Scrollbars>
       </WrapperBox>
     </AppLayout>
   );
