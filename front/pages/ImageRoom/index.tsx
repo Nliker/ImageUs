@@ -7,15 +7,13 @@ import { ContentSectionWrapper } from './styles';
 
 const ImageRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const scrollbarRef = useRef<Scrollbars>(null);
-
   console.log('룸 룸아이디:', roomId);
 
   return (
     <AppLayout isImageRoom>
       {/* 키를 줌으로서 룸아이디에 따라서 컴포넌트를 unmount 시키고 remount 시킬 수 있다. */}
       <ContentSectionWrapper>
-        <ContentSection key={roomId} roomId={roomId} ref={scrollbarRef} />
+        <ContentSection key={roomId} roomId={roomId} />
       </ContentSectionWrapper>
     </AppLayout>
   );
