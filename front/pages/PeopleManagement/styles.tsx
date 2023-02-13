@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  height: 100%;
+  height: calc(100% - 40px);
+
   h1,
   h2,
   ul {
@@ -19,6 +20,10 @@ export const Wrapper = styled.div`
       color: black;
     }
   }
+
+  .content_wrapper {
+    padding-bottom: 40px;
+  }
 `;
 
 export const Header = styled.header`
@@ -33,7 +38,9 @@ export const Header = styled.header`
 `;
 
 export const ContentBox = styled.div`
-  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   table {
     width: 100%;
@@ -52,43 +59,58 @@ export const ContentBox = styled.div`
       border-bottom: 1px solid #a39485;
     }
 
-    tr:not(:last-of-type) td {
+    tr td {
       border-bottom: 1px solid #e5e5e5;
     }
   }
 `;
 
 export const TabBox = styled.div`
+  position: relative;
+  top: 18px;
+  right: 130px;
+  z-index: 1;
+
   ul {
     display: inline-flex;
-    gap: 0.75em;
+    gap: 1rem;
+
+    li {
+      text-align: center;
+      line-height: 45px;
+    }
+
     a {
       display: block;
 
-      height: 50px;
-
-      color: white;
-      box-sizing: border-box;
+      width: 100px;
+      height: 60px;
       border-radius: 15px;
-      background-color: #343436;
+
+      color: #111;
+      box-sizing: border-box;
+      background-color: #ccc;
+      box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
     }
-  }
-  a.active_tab {
-    color: black;
-    background-color: #fff;
+
+    a.active_tab {
+      color: black;
+      background-color: white;
+      box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
+    }
   }
 `;
 
 export const TabContent = styled.div`
-  position: absolute;
-  z-index: 1000;
+  position: relative;
+  z-index: 10;
 
-  width: calc(100% - 60px);
-  margin-top: -20px;
+  min-width: 561px;
+  max-width: 800px;
+  height: 400px;
+  margin: auto;
 
   background-color: white;
   border-radius: 15px;
-  box-shadow: 0px 10px 10px rgb(0 0 0 / 40%);
-
-  overflow: hidden;
+  box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
 `;
