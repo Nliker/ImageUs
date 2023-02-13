@@ -2,17 +2,22 @@ import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-const getRoomImageListFetcher = async (
+const getDefaultImgFetcher = async (
   url: string,
-  { arg }: { arg: { roomId?: string; start: number } },
+  {
+    arg,
+  }: {
+    arg: {
+      start: number;
+    };
+  },
 ) => {
   try {
     const token = sessionStorage.getItem('TOKEN');
-    const { roomId, start } = arg;
-
-    if (!roomId) return null;
+    const { start } = arg;
     const loadNumber = 12;
-    const imageInfoResponse = await axios.get(
+
+    const response = await axios.get(
       `${url}?start=${start}&limit=${loadNumber}`,
       {
         headers: {
@@ -21,57 +26,58 @@ const getRoomImageListFetcher = async (
       },
     );
 
-    const { imagelist } = imageInfoResponse.data;
-    const nowImageList: DImageData[] = [];
-    const todayImageList: DImageData[] = [];
-    const previousImageList: DImageData[] = [];
-    // 날짜 00-00-00 형태로 바꾸어 넣기
-    const currentDate = new Date();
-    const os = currentDate.getTimezoneOffset();
-    const currentDateFormat = new Date(currentDate.getTime() - os * 60 * 1000)
-      .toJSON()
-      .slice(0, 10);
-    for (const imageInfo of imagelist) {
-      if (!imageInfo.link) continue;
-      const infoDate = imageInfo.created_at.split(' ')[0];
-      const createTime = new Date(imageInfo.created_at).getTime();
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
 
-      // 1시간 안에 올라온 게시물은 nowImageList에 넣음
-      if (currentDate.getTime() <= createTime + 60 * 60 * 1000) {
-        nowImageList.push(imageInfo);
-      } else if (infoDate === currentDateFormat) {
-        todayImageList.push(imageInfo);
-      } else {
-        previousImageList.push(imageInfo);
-      }
+    return { imagelist: [...newDataList], loadDataLength: imagelist.length };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
     }
+    return {};
+  }
+};
 
-    return {
-      nowImageList,
-      todayImageList,
-      previousImageList,
-      loadDataLength: imagelist.length,
-    };
-  } catch (error) {
-    console.log(error);
+const getFilterImgFetcher = async (
+  url: string,
+  { arg }: { arg: { start: number; start_date?: string; end_date?: string } },
+) => {
+  try {
+    const { start, start_date, end_date } = arg;
+    const token = sessionStorage.getItem('TOKEN');
+    const limit = 12;
+
+    const response = await axios.get(
+      `${url}?start=${start}&limit=${limit}&start_date=${start_date}&end_date=${end_date}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
+
+    return { imagelist: [...newDataList], loadDataLength: imagelist.length };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return {};
   }
 };
 
 const getImageData = async (
-  key: string,
-  {
-    arg: imageList,
-  }: {
-    arg: DImageData[];
-  },
+  url: string,
+  { arg: imageList }: { arg: DImageData[] },
 ) => {
   try {
-    // const currentData = arg.currentData ?? [];
-
-    // if (arg.imagelist.length === 0) return [...currentData];
     if (imageList.length === 0) return [];
 
-    const imgDataList: CImageData[] = await Promise.all(
+    const imgDataList: CImageData[] = [];
+
+    const imgDataStateList = await Promise.allSettled(
       imageList.map(async (imageInfo) => {
         const res = await axios.get(`/image-download/${imageInfo.link}`, {
           headers: {
@@ -91,8 +97,16 @@ const getImageData = async (
       }),
     );
 
-    // if (arg.realTime) return [...imgDataList, ...currentData];
-    // return [...currentData, ...imgDataList];
+    // console.log('요청리스트', imgDataStateList);
+
+    imgDataStateList.forEach((data) => {
+      if (data.status === 'fulfilled') {
+        imgDataList.push(data.value);
+      }
+    });
+
+    // console.log('결과 리스트', imgDataList);
+
     return [...imgDataList];
   } catch (err) {
     if (err instanceof AxiosError) {
@@ -248,7 +262,8 @@ const createRoomFetcher = async (
 };
 
 export {
-  getRoomImageListFetcher,
+  getDefaultImgFetcher,
+  getFilterImgFetcher,
   getUserListFetcher,
   inviteFriendFetcher,
   getImageData,
