@@ -1,7 +1,7 @@
 import ImageContentList from '@components/ImageContentList';
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
-import React from 'react';
+import React, { memo } from 'react';
 import { Wrapper } from './styles';
 
 interface Props {
@@ -20,4 +20,4 @@ const MyPictures = ({ imageList, observerRef }: Props) => {
   );
 };
 
-export default MyPictures;
+export default memo(MyPictures);
