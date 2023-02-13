@@ -1,3 +1,4 @@
+import { Button } from '@styles/Button';
 import { DFriendData } from '@typing/db';
 import { deleteUserFriend, getUserFriendList } from '@utils/userDataFetcher';
 import React, { useCallback } from 'react';
@@ -48,12 +49,12 @@ const FriendList = () => {
                   <td>{data.profile}</td>
                   <td>
                     <div>
-                      <button
+                      <Button
                         type="button"
                         onClick={handleDeleteFriend(data.id)}
                       >
                         삭제
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
