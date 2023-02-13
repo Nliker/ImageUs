@@ -25,12 +25,6 @@ interface Props {
   sectionName?: string;
 }
 
-/*
-
-  swrMutation은 전역 상태관리로 사용할 수 없다.
-
-*/
-
 const ImageContentBox = ({
   data,
   index,
@@ -44,6 +38,7 @@ const ImageContentBox = ({
   const { mutate: mutateDeleteImageInfo } = useSWR('deleteImageInfo');
   const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
   const { roomId } = useParams<{ roomId: string }>();
+
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
     `/image/${roomId}`,
   );
@@ -55,18 +50,11 @@ const ImageContentBox = ({
       revalidateOnReconnect: false,
     },
   );
-
   const { data: userImageList, mutate: fetchUserImage } = useSWR(
     '/user/imageDataList',
   );
-  const { data: deleteUserImageId, isLoading: userImageDeleting } = useSWR(
-    'userImageDelete',
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data: deleteUserImageId, isLoading: userImageDeleting } =
+    useSWR('userImageDelete');
 
   const [isHover, setIsHover] = useState(false);
   const imageDeleteEl = useRef<HTMLDivElement>(null);
