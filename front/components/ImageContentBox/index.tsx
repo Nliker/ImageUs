@@ -92,6 +92,8 @@ const ImageContentBox = ({
     mutateDetailImageInfo({ index, data });
   };
 
+  // console.log('말단', thisArr, index);
+
   return (
     <>
       <ContentBox

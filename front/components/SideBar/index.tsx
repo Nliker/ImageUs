@@ -32,7 +32,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
   const backgroundEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log(backgroundEl);
+    // console.log(backgroundEl);
     backgroundEl.current?.addEventListener('click', handleCloseSidebar);
     return () => {
       backgroundEl.current?.removeEventListener('click', handleCloseSidebar);
