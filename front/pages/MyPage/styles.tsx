@@ -3,9 +3,10 @@ import styled from '@emotion/styled';
 export const WrapperBox = styled.section`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
 
-  height: 100%;
+  height: calc(100% - 40px);
+  /* padding-bottom: 30px; */
+  box-sizing: border-box;
 
   overflow-x: hidden;
 `;
@@ -14,6 +15,8 @@ export const ContentBox = styled.main`
   box-sizing: border-box;
 
   padding: 0 2rem;
+
+  overflow: hidden;
 
   h2,
   ul {
@@ -27,12 +30,17 @@ export const ContentBox = styled.main`
 
 export const ProfileBox = styled.div`
   display: flex;
+  justify-content: center;
 
-  margin-top: 2rem;
+  padding: 2rem 0 4rem 0;
 `;
 
 export const EachRoomPictureList = styled.div`
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 40px;
 
   a {
     text-decoration: none;
@@ -45,22 +53,27 @@ export const EachRoomPictureList = styled.div`
 
 export const SubMenu = styled.div`
   display: flex;
+
   gap: 1rem;
+  font-size: 1.1rem;
+
   a.menu_active {
     border-top: 1px solid rgb(38, 38, 38);
   }
 `;
 
 export const ProfileImage = styled.div`
+  width: 100px;
+  height: 100px;
   margin-right: 30px;
 `;
 
 export const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  gap: 1rem;
-  margin-bottom: 44px;
+  justify-content: space-around;
+  flex-basis: 50%;
+
   ul {
     display: flex;
     gap: 1rem;
