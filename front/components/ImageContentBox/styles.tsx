@@ -48,6 +48,7 @@ export const HoverBox = styled.div`
 
   .btn_group {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 
