@@ -1,7 +1,9 @@
 import useInput from '@hooks/useInput';
+import { Button } from '@styles/Button';
 import { DFriendData } from '@typing/db';
 import searchFetcher from '@utils/searchFetcher';
 import axios from 'axios';
+import { VscSearchStop } from 'react-icons/vsc';
 import React, {
   FocusEvent,
   FocusEventHandler,
@@ -13,86 +15,71 @@ import React, {
 } from 'react';
 import { useLinkClickHandler } from 'react-router-dom';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
+import { IconContext } from 'react-icons/lib';
+import { postNewFriend } from '@utils/userDataFetcher';
 
 const SearchBox = () => {
   const [queryParams, setQueryParams] = useState('');
   const [focusSearchBox, setFocusSearchBox] = useState(false);
+  const [searchData, setSearchData] = useState<DFriendData>();
   const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
-  const { data: searchData, mutate: searchMutate } = useSWR(
-    ['/user/search', queryParams],
+
+  const { data: prevSearchDataList } = useSWR(
+    `/user/search?email=${queryParams}`,
     searchFetcher,
     {
       revalidateOnFocus: false,
       revalidateOnMount: false,
       revalidateOnReconnect: false,
+      keepPreviousData: true,
     },
+  );
+  const { trigger: registerFriendTrigger } = useSWRMutation(
+    '/user/friend',
+    postNewFriend,
   );
 
   useEffect(() => {
     const debounce = setTimeout(() => {
+      console.log('디바운싱 부분');
       setQueryParams(tmpInputData);
-      searchMutate();
-    }, 700);
+    }, 300);
     return () => clearTimeout(debounce);
   }, [tmpInputData]);
 
   const onSubmitSearchData = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      // setSearchResult(() => {
-      //   const newData = searchData.map((data: DFriendData) => {
-      //     return {
-      //       email: data.email,
-      //       name: data.name
-      //     }
-      //   });
-      //   return newData;
-      // })
+      const clickItemData = prevSearchDataList?.find(
+        (data) => data.email === tmpInputData,
+      );
+      setSearchData(clickItemData);
     },
-    [tmpInputData],
+    [tmpInputData, queryParams, prevSearchDataList],
   );
-
-  const onFocusSearchBox = useCallback(() => {
-    setFocusSearchBox(true);
-  }, []);
-
-  const onBlurSearchBox = useCallback(() => {
-    setFocusSearchBox(false);
-  }, []);
 
   const onClickPreviewItem = useCallback(
     (searchEmail: string | undefined) => () => {
       if (searchEmail) {
         setTmpInputData(searchEmail);
         setFocusSearchBox(false);
+
+        const clickItemData = prevSearchDataList?.find(
+          (data) => data.email === searchEmail,
+        );
+        setSearchData(clickItemData);
       }
     },
-    [],
+    [prevSearchDataList],
   );
 
   const onClickAddFriend = useCallback(
-    (friendId: number | undefined) => async () => {
-      const userId = sessionStorage.getItem('USER_ID');
-      try {
-        const response = await axios.post(
-          `/user/${userId}/friend`,
-          {
-            friend_user_id: friendId,
-          },
-          {
-            headers: {
-              Authorization: `${sessionStorage.getItem('TOKEN')}`,
-            },
-          },
-        );
-        console.log(response.data);
-      } catch (error) {
-        console.error(error);
-      }
+    (friendId?: number) => () => {
+      registerFriendTrigger(friendId);
     },
-    [],
+    [searchData],
   );
 
   return (
@@ -108,33 +95,36 @@ const SearchBox = () => {
               autoComplete="off"
               placeholder="검색할 유저의 이메일을 입력하세요.."
               onChange={handleTmpInputData}
-              onFocus={onFocusSearchBox}
-              onBlur={onBlurSearchBox}
+              onFocus={() => setFocusSearchBox(true)}
+              onBlur={() => setFocusSearchBox(false)}
               value={tmpInputData}
             />
           </div>
           <div className="search_btn">
-            <button type="submit">검색</button>
+            <Button type="submit">검색</Button>
           </div>
         </form>
         {focusSearchBox && (
           <PreviewBox>
             <ul>
-              {searchData && searchData?.length !== 0 ? (
-                searchData.map((data: DFriendData) => (
+              {prevSearchDataList && prevSearchDataList?.length !== 0 ? (
+                prevSearchDataList.map((data: DFriendData) => (
                   <li
                     key={data.id}
                     className={'preview_li'}
                     onMouseDown={onClickPreviewItem(data.email)}
                   >
-                    <span>
-                      이름: {data.name}, email: {data.email}
-                    </span>
+                    <div className="search_result_space">
+                      <span>email: {data.email}</span>
+                      <span>이름: {data.name}</span>
+                    </div>
                   </li>
                 ))
               ) : (
                 <li>
-                  <p>검색 결과가 없습니다.</p>
+                  <div>
+                    <span>검색 결과가 없습니다.</span>
+                  </div>
                 </li>
               )}
             </ul>
@@ -142,28 +132,29 @@ const SearchBox = () => {
         )}
       </InputBox>
       <SearchResult>
-        <ul>
-          {searchData && searchData.length !== 0 ? (
-            searchData.map((data: DFriendData) => {
-              return (
-                <li key={data.id}>
-                  <div>
-                    <span>
-                      이름은 {data.name}, 이메일은 {data.email}입니다.
-                    </span>
-                    <button type="button" onClick={onClickAddFriend(data.id)}>
-                      친구 추가하기
-                    </button>
-                  </div>
-                </li>
-              );
-            })
-          ) : (
-            <li>
-              <p>검색 결과가 없습니다.</p>
-            </li>
-          )}
-        </ul>
+        {searchData ? (
+          <div className="search_result_box">
+            <h2>검색결과</h2>
+            <div className="search_result">
+              <span>이름: {searchData?.name}</span>
+              <span>이메일: {searchData?.email}입니다.</span>
+              <Button type="button" onClick={onClickAddFriend(searchData?.id)}>
+                친구 추가하기
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="not_found">
+            <IconContext.Provider
+              value={{ size: '30%', style: { display: 'inline-block' } }}
+            >
+              <VscSearchStop />
+            </IconContext.Provider>
+            <div className="not_found_text">
+              <span>검색 결과가 없습니다.</span>
+            </div>
+          </div>
+        )}
       </SearchResult>
     </Wrapper>
   );
