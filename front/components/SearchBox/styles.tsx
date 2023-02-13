@@ -1,6 +1,14 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  padding: 40px 0;
+  box-sizing: border-box;
+
   p {
     margin: 0;
   }
@@ -21,7 +29,8 @@ export const Wrapper = styled.div`
     .search_btn {
       padding-left: 10px;
       button {
-        width: 50px;
+        width: 60px;
+        font-size: 0.5rem;
       }
     }
   }
@@ -53,28 +62,78 @@ export const Wrapper = styled.div`
   }
 `;
 
-export const InputBox = styled.div``;
+export const InputBox = styled.div`
+  margin: 0 40px;
+`;
 
 export const PreviewBox = styled.div`
   position: absolute;
-  width: calc(100% - 100px);
+
+  width: calc(100% - 180px);
   margin-left: 20px;
 
   border-radius: 5px;
   box-shadow: rgb(0 0 0 / 30%) 0px 8px 12px 0px;
   background-color: white;
 
+  ul li {
+    padding: 10px 0;
+
+    .search_result_space {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      span:first-of-type {
+        margin-bottom: 5px;
+      }
+    }
+  }
+
   ul li.preview_li {
     &:hover {
-      background-color: #F7F7F9;
+      background-color: #f7f7f9;
       cursor: pointer;
     }
   }
 `;
 
 export const SearchResult = styled.div`
-  display: inline-block;
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 100%;
-  margin: 50px 0;
+  margin-top: 30px;
+
+  .search_result_box {
+    align-self: flex-start;
+
+    ul {
+      margin-top: 20px;
+    }
+  }
+
+  .search_result {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 1.5rem;
+    margin-top: 15px;
+
+    button {
+      font-size: 0.8rem;
+    }
+  }
+
+  .not_found {
+    text-align: center;
+
+    .not_found_text {
+      margin-top: 20px;
+    }
+  }
 `;
