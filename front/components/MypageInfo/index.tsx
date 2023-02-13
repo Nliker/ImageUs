@@ -1,10 +1,11 @@
 import useInput from '@hooks/useInput';
+import { Button } from '@styles/Button';
 import { logInCheckFetcher } from '@utils/logInFetcher';
 import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { InfoTable } from './styles';
+import { InfoSection, InfoTable } from './styles';
 
 const MypageInfo = () => {
   const { data: userInfo } = useSWR('/user/my', logInCheckFetcher, {
@@ -58,11 +59,11 @@ const MypageInfo = () => {
   );
 
   return (
-    <section>
+    <InfoSection>
       <InfoTable>
         <colgroup>
-          <col width={'30%'} />
-          <col width={'40%'} />
+          <col width={'20%'} />
+          <col width={'50%'} />
           <col width={'30%'} />
         </colgroup>
         <tbody>
@@ -79,10 +80,10 @@ const MypageInfo = () => {
                 <td>
                   <div>{userInfo?.user_info.profile}</div>
                 </td>
-                <td>
-                  <button type="button" onClick={changeIntroBox}>
+                <td className="btn_group">
+                  <Button type="button" onClick={changeIntroBox}>
                     소개글 변경
-                  </button>
+                  </Button>
                 </td>
               </>
             ) : (
@@ -103,11 +104,11 @@ const MypageInfo = () => {
                     </label>
                   </div>
                 </td>
-                <td>
-                  <button type="button" onClick={onClickPostIntro('profile')}>
+                <td className="btn_group">
+                  <Button type="button" onClick={onClickPostIntro('profile')}>
                     완료
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() =>
                       setProfileState((prev) => {
@@ -119,7 +120,7 @@ const MypageInfo = () => {
                     }
                   >
                     취소
-                  </button>
+                  </Button>
                 </td>
               </>
             )}
@@ -131,10 +132,10 @@ const MypageInfo = () => {
                 <td>
                   <div>{userInfo?.user_info.name}</div>
                 </td>
-                <td>
-                  <button type="button" onClick={changeNameBox}>
+                <td className="btn_group">
+                  <Button type="button" onClick={changeNameBox}>
                     이름 변경
-                  </button>
+                  </Button>
                 </td>
               </>
             ) : (
@@ -155,11 +156,11 @@ const MypageInfo = () => {
                     </label>
                   </div>
                 </td>
-                <td>
-                  <button type="button" onClick={onClickPostIntro('name')}>
+                <td className="btn_group">
+                  <Button type="button" onClick={onClickPostIntro('name')}>
                     완료
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() =>
                       setProfileState((prev) => {
@@ -171,23 +172,23 @@ const MypageInfo = () => {
                     }
                   >
                     취소
-                  </button>
+                  </Button>
                 </td>
               </>
             )}
           </tr>
-          <tr style={{ borderTop: '1px solid black' }}>
+          <tr>
             <th>비밀번호</th>
             <td>
               <strong>********</strong>
             </td>
-            <td>
-              <button type="button">비밀번호 변경</button>
+            <td className="btn_group">
+              <Button type="button">비밀번호 변경</Button>
             </td>
           </tr>
         </tbody>
       </InfoTable>
-    </section>
+    </InfoSection>
   );
 };
 
