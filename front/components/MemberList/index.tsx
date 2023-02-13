@@ -23,11 +23,6 @@ const MemberList = memo(({ roomId }: { roomId?: string }) => {
   );
   const [memberCollapse, setMemberCollapse] = useState<boolean>(true);
 
-  useEffect(() => {
-    if (!roomId) return;
-    userlistMutate();
-  }, [roomId]);
-
   const toggleMemberCollapse = useCallback(
     () => setMemberCollapse((prev) => !prev),
     [],
