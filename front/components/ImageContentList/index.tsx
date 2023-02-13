@@ -1,7 +1,15 @@
 import ImageContentBox from '@components/ImageContentBox';
 import { CImageData } from '@typing/client';
 import React, { memo } from 'react';
-import { ImageLayout } from './styles';
+import { IconContext } from 'react-icons/lib';
+import {
+  MdImageNotSupported,
+  MdOutlineHideImage,
+  MdOutlineImageNotSupported,
+} from 'react-icons/md';
+import { FcRemoveImage } from 'react-icons/fc';
+import { CiImageOff } from 'react-icons/ci';
+import { ImageLayout, NotImageData } from './styles';
 
 interface Props {
   ImageData: CImageData[];
@@ -24,7 +32,22 @@ const ImageContentList = ({ ImageData, observerRef, sectionName }: Props) => {
       observerRef={observerRef}
     />
   );
-  return <ImageLayout>{ImageData.map(imageCard)}</ImageLayout>;
+  return (
+    <>
+      {ImageData.length !== 0 ? (
+        <ImageLayout>{ImageData.map(imageCard)}</ImageLayout>
+      ) : (
+        <NotImageData>
+          <IconContext.Provider
+            value={{ size: '30%', style: { display: 'inline-block' } }}
+          >
+            <FcRemoveImage />
+          </IconContext.Provider>
+          <span>이미지가 없습니다.</span>
+        </NotImageData>
+      )}
+    </>
+  );
 };
 
 export default memo(ImageContentList);

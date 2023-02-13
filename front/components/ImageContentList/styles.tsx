@@ -13,3 +13,13 @@ export const ImageLayout = styled.div`
     grid-template-columns: repeat(4, auto);
   }
 `;
+
+export const NotImageData = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 30px;
+  font-size: 1.3rem;
+`;
