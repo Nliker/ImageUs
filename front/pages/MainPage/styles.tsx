@@ -46,7 +46,7 @@ export const MainRoomList = styled.article`
   margin: auto;
   text-align: center;
 
-  box-shadow: 0 0 40px -10px rgb(0 0 0 / 40%);
+  box-shadow: 2px 2px 4px 2px rgb(0 0 0 / 30%);
 
   .content_box {
     display: inline-block;
