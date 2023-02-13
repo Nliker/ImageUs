@@ -49,6 +49,26 @@ const getUserImageList = async (
   }
 };
 
+const getUserImageLen = async (url: string) => {
+  try {
+    const token = sessionStorage.getItem('TOKEN');
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const { imagelist_len } = response.data;
+
+    return { imagelist_len };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
+    return;
+  }
+};
+
 const getImageData = async (
   url: string,
   { arg: newImageList }: { arg: DImageData[] },
@@ -171,12 +191,47 @@ const deleteUserImage = async (imageId: number) => {
   }
 };
 
+const postNewFriend = async (
+  url: string,
+  { arg: friendId }: { arg: number },
+) => {
+  try {
+    const userId = sessionStorage.getItem('USER_ID');
+    const token = sessionStorage.getItem('TOKEN');
+
+    const response = await axios.post(
+      `/user/${userId}/friend`,
+      {
+        friend_user_id: friendId,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+    if (response.data === '0명 친구 생성 성공') {
+      alert('자신을 친구로 추가할 수 없습니다.');
+    } else {
+      alert('성공적으로 추가하였습니다');
+    }
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      console.log(err);
+      alert('오류가 발생했습니다..');
+    }
+    return;
+  }
+};
+
 export {
   getUserFriendList,
   deleteUserFriend,
   getUserRoomListFetcher,
   getUserImageList,
+  getUserImageLen,
   getImageData,
   postUserInfoFetcher,
   deleteUserImage,
+  postNewFriend,
 };
