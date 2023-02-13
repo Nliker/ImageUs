@@ -1,23 +1,25 @@
 import React, {
+  ChangeEvent,
   CSSProperties,
   forwardRef,
-  memo,
-  MutableRefObject,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {
+  getDefaultImgFetcher,
+  getFilterImgFetcher,
   getImageData,
   getMarkerFetcher,
-  getRoomImageListFetcher,
   getUnreadImageList,
 } from '@utils/roomDataFetcher';
-import { Link, useParams } from 'react-router-dom';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   ContentBox,
+  FilterBox,
+  FilteringOption,
   ImageCard,
   ImageInfo,
   InfoItem,
@@ -25,23 +27,23 @@ import {
   Wrapper,
 } from './styles';
 import { imageLoadNumber } from '@hooks/swrStore';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import useIntersect from '@hooks/useIntersect';
 import Scrollbars from 'react-custom-scrollbars';
 import ImageContentList from '@components/ImageContentList';
 import { SyncLoader } from 'react-spinners';
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
+import { Button } from '@styles/Button';
 
 interface Props {
   roomId?: string;
 }
 
-interface ImageList {
-  nowImageList: DImageData[];
-  todayImageList: DImageData[];
-  previousImageList: DImageData[];
-  loadDataLength: any;
+interface SelectTerm {
+  startDate?: string;
+  endDate?: string;
 }
 
 const spinnerCSS: CSSProperties = {
@@ -50,213 +52,323 @@ const spinnerCSS: CSSProperties = {
   textAlign: 'center',
 };
 
-const ContentSection = forwardRef<Scrollbars, Props>(
-  ({ roomId }, scrollRef) => {
-    const [readStartNumber, setReadStartNumber] = useState(0);
-    const [scrollHeight, setScrollHeight] = useState();
+const ContentSection = ({ roomId }: { roomId?: string }) => {
+  const [readStartNumber, setReadStartNumber] = useState(0);
 
-    const { mutate } = useSWRConfig();
-    const {
-      data: imageList,
-      trigger: imageListTrigger,
-      isMutating: imageListLoading,
-    } = useSWRMutation(`/room/${roomId}/imagelist`, getRoomImageListFetcher);
+  const {
+    data: defaultImageList,
+    trigger: defaultImgListTrigger,
+    isMutating: defaultImgListLoading,
+  } = useSWRMutation(`/room/${roomId}/imagelist`, getDefaultImgFetcher);
 
-    const { data: realTimeImageList, isLoading: realTimeImgLoading } = useSWR(
-      `/room/${roomId}/unread-imagelist`,
-      getUnreadImageList,
-      {
-        revalidateOnFocus: false,
-        revalidateOnMount: false,
-        revalidateOnReconnect: false,
-        refreshInterval: 5000,
-      },
-    );
-    const {
-      data: getImage,
-      trigger: getImageTrigger,
-      isMutating: getImageLoading,
-    } = useSWRMutation('/image-download', getImageData);
+  const {
+    data: filterImageList,
+    trigger: filterImgListTrigger,
+    isMutating: filterImgListLoading,
+  } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
 
-    const { data: nowImage, mutate: mutateNowImage } = useSWR<CImageData[]>(
-      `/image/${roomId}/now`,
-      {
-        fallbackData: [],
-      },
-    );
-    const { data: todayImage, mutate: mutateTodayImage } = useSWR<CImageData[]>(
-      `/image/${roomId}/today`,
-      {
-        fallbackData: [],
-      },
-    );
-    const { data: previousImage, mutate: mutatePrevImage } = useSWR<
-      CImageData[]
-    >(`/image/${roomId}/previous`, {
+  const { data: realTimeImageList, isLoading: realTimeImgLoading } = useSWR(
+    `/room/${roomId}/unread-imagelist`,
+    getUnreadImageList,
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 10000,
+    },
+  );
+
+  const { trigger: imgDataListTrigger, isMutating: imgDataLoading } =
+    useSWRMutation('/room/imageData', getImageData);
+
+  const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
+    `/image/${roomId}`,
+    {
       fallbackData: [],
-    });
+    },
+  );
 
-    const markerAPI = `/room/${roomId}/marker`;
-    const { data: markerNumber } = useSWR(markerAPI);
+  const { data: filterImage, mutate: mutateFilterImage } = useSWR<CImageData[]>(
+    `/image/${roomId}/filter`,
+    {
+      fallbackData: [],
+    },
+  );
 
-    const [observerRefPos, setObserverRefPos] = useState<number>();
-    const observerRef = useIntersect(
-      async (entry, observer) => {
-        observer.unobserve(entry.target);
-        /*
+  const [filterBoxState, setFilterBoxState] = useState(false);
+  const [filterName, setFilterName] = useState('기본 게시물');
+  const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>();
 
-      데이터 fetching 중이 아니고 다음 로드할 데이터가 남아있다면 데이터를 부른다.(imageList 요청)
+  const filterStartDateInputRef = useRef<HTMLInputElement>(null);
+  const filterEndDateInputRef = useRef<HTMLInputElement>(null);
+  const observerRef = useIntersect(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
 
-      */
-        if (
-          !imageListLoading &&
-          !getImageLoading &&
-          imageList?.loadDataLength === 12
-        ) {
-          console.log('인터섹션 데이터 패칭 요청, 옵저버:', observerRefPos);
-          imageListTrigger({ roomId, start: readStartNumber });
-        }
-      },
-      {
-        threshold: 0.5,
-      },
-    );
+      if (
+        !filterSelectTerm &&
+        !defaultImgListLoading &&
+        !imgDataLoading &&
+        defaultImageList?.loadDataLength === 12
+      ) {
+        console.log('일반 이미지 인터섹션 데이터 패칭 요청');
+        defaultImgListTrigger({
+          start: readStartNumber,
+        });
+      }
 
-    if (!nowImage || !todayImage || !previousImage) {
-      return <div>로딩중...</div>;
-    }
+      if (
+        filterSelectTerm &&
+        !filterImgListLoading &&
+        !imgDataLoading &&
+        filterImageList?.loadDataLength === 12
+      ) {
+        console.log('필터 이미지 인터섹션 데이터 패칭 요청');
+        filterImgListTrigger({
+          start: readStartNumber,
+          start_date: filterSelectTerm.startDate,
+          end_date: filterSelectTerm.endDate,
+        });
+      }
+    },
+    {
+      threshold: 0.5,
+    },
+  );
 
-    /*
+  if (!postedImage || !filterImage) {
+    return <div>로딩중...</div>;
+  }
+
+  /*
 
    방에 처음 들어가서 마운트 됐을 때
+   구분없이 전체 이미지를 보여준다.
 
   */
 
-    useEffect(() => {
-      console.log('컨텐트 섹션 처음 마운트 룸아이디', roomId);
-      imageListTrigger({ roomId, start: readStartNumber });
+  useEffect(() => {
+    console.log('컨텐트 섹션 룸아이디', roomId, filterSelectTerm);
 
-      return () => {
-        mutateNowImage([], false);
-        mutateTodayImage([], false);
-        mutatePrevImage([], false);
-      };
-    }, [roomId]);
-
-    /*
-
-    이미지 리스트 요청을 보내고 실제 이미지 데이터를 
-    분할 요청해서 화면에 보여준다.
-
-  */
-
-    useEffect(() => {
-      if (!imageList) return;
-
-      if (readStartNumber === 0) {
-        mutate(markerAPI, getMarkerFetcher(markerAPI));
-      }
-
-      setReadStartNumber((prev) => prev + 12);
-
-      fetchImages(imageList);
-
-      // 인터섹션 옵저버 위치 변경
-      if (imageList.previousImageList.length !== 0) {
-        setObserverRefPos(2);
-      } else if (imageList.todayImageList.length !== 0) {
-        setObserverRefPos(1);
-      } else {
-        setObserverRefPos(0);
-      }
-    }, [imageList]);
-
-    const fetchImages = async (imageList: ImageList) => {
-      if (imageList.nowImageList.length !== 0) {
-        getImageTrigger(imageList.nowImageList).then((newImage) => {
-          if (newImage) mutateNowImage([...nowImage, ...newImage]);
-        });
-      }
-      if (imageList.todayImageList.length !== 0) {
-        getImageTrigger(imageList.todayImageList).then((newImage) => {
-          if (newImage) mutateTodayImage([...todayImage, ...newImage]);
-        });
-      }
-      if (imageList.previousImageList.length !== 0) {
-        getImageTrigger(imageList.previousImageList).then((newImage) => {
-          if (newImage) mutatePrevImage([...previousImage, ...newImage]);
-        });
-      }
-    };
-
-    /*
-
-    실시간 이미지 업데이트
-
-  */
-
-    useEffect(() => {
-      if (realTimeImgLoading || !realTimeImageList) return;
-
-      getImageTrigger(realTimeImageList).then((newImage) => {
-        if (newImage) mutateNowImage([...newImage, ...nowImage]);
+    if (!filterSelectTerm) {
+      defaultImgListTrigger({
+        start: readStartNumber,
       });
-    }, [realTimeImageList]);
+    } else {
+      filterImgListTrigger({
+        start: readStartNumber,
+        start_date: filterSelectTerm?.startDate,
+        end_date: filterSelectTerm?.endDate,
+      });
+    }
 
-    const observerConverter = useCallback(
-      (sectionOrder: number) => {
-        const value = sectionOrder === observerRefPos ? observerRef : undefined;
-        return value;
+    return () => {
+      mutatePostedImage([], false);
+      mutateFilterImage([], false);
+    };
+  }, [roomId, filterSelectTerm]);
+
+  useEffect(() => {
+    if (!defaultImageList?.imagelist) return;
+
+    setReadStartNumber((prev) => prev + 12);
+
+    mutatePostedImage(
+      async () => await imgDataListTrigger(defaultImageList.imagelist),
+      {
+        populateCache: (newData, currentData) => {
+          if (currentData) {
+            return [...currentData, ...newData];
+          } else {
+            return [...newData];
+          }
+        },
+        revalidate: false,
       },
-      [observerRefPos],
     );
+  }, [defaultImageList]);
 
-    // console.log('이미지 리스트: ', imageList);
-    // console.log('컨텐트 섹션: ', previousImage);
+  useEffect(() => {
+    if (!filterImageList?.imagelist) return;
 
-    return (
+    setReadStartNumber((prev) => prev + 12);
+
+    mutateFilterImage(
+      async () => await imgDataListTrigger(filterImageList.imagelist),
+      {
+        populateCache: (newData, currentData) => {
+          if (currentData) {
+            return [...currentData, ...newData];
+          } else {
+            return [...newData];
+          }
+        },
+        revalidate: false,
+      },
+    );
+  }, [filterImageList]);
+
+  // 실시간 데이터 업데이트
+  useEffect(() => {
+    if (!realTimeImageList) return;
+
+    mutatePostedImage(async () => await imgDataListTrigger(realTimeImageList), {
+      populateCache: (newData, currentData) => {
+        if (currentData) {
+          return [...newData, ...currentData];
+        } else {
+          return [...newData];
+        }
+      },
+      revalidate: false,
+    });
+  }, [realTimeImageList]);
+
+  const getDateString = (dateValue: Date) => {
+    const startDate = `${dateValue.getFullYear()}-${dateValue.getMonth()}-${dateValue.getDate()}`;
+    dateValue.setDate(dateValue.getDate() + 1);
+    const endDate = `${dateValue.getFullYear()}-${dateValue.getMonth()}-${dateValue.getDate()}`;
+
+    return { startDate, endDate };
+  };
+
+  const onClickFilteringItem = (filterName: string) => () => {
+    if (filterName === 'today') {
+      setFilterName('오늘 날짜');
+      const { startDate, endDate } = getDateString(new Date());
+
+      setReadStartNumber(0);
+      setFilterSelectTerm({
+        startDate,
+        endDate,
+      });
+    } else if (filterName === 'yesterday') {
+      setFilterName('어제 날짜');
+      const dateValue = new Date();
+      dateValue.setDate(dateValue.getDate() - 1);
+      const { startDate, endDate } = getDateString(dateValue);
+
+      setReadStartNumber(0);
+      setFilterSelectTerm({
+        startDate,
+        endDate,
+      });
+    } else if (filterName === 'selectDay') {
+      setFilterName('기간 선택');
+      setReadStartNumber(0);
+    } else {
+      setFilterName('기본 게시물');
+      setReadStartNumber(0);
+      setFilterSelectTerm(undefined);
+    }
+  };
+
+  const onClickCertainPeriodFilterBtn = () => {
+    console.log(
+      filterStartDateInputRef.current?.value,
+      filterEndDateInputRef.current?.value,
+    );
+    const startDate = filterStartDateInputRef.current?.value;
+    const endDate = filterEndDateInputRef.current?.value;
+
+    if (
+      startDate === filterSelectTerm?.startDate &&
+      endDate === filterSelectTerm?.endDate
+    )
+      return;
+
+    if (!startDate || !endDate) {
+      alert('날짜가 선택되지 않았습니다.');
+      return;
+    }
+
+    setReadStartNumber(0);
+    setFilterSelectTerm({ startDate, endDate });
+  };
+
+  return (
+    <Scrollbars>
       <Wrapper>
-        <Scrollbars ref={scrollRef}>
-          <MainContainer>
+        <MainContainer>
+          <FilterBox>
+            <FilteringOption onClick={() => setFilterBoxState((prev) => !prev)}>
+              <input type="checkbox" id="options-view-button" />
+              <div id="select-button">
+                <div className="selected-value">
+                  <span>{filterName}</span>
+                </div>
+                <div id="chevrons">
+                  <MdKeyboardArrowUp />
+                  <MdKeyboardArrowDown />
+                </div>
+              </div>
+              {filterBoxState && (
+                <div className="options">
+                  <div
+                    className="option"
+                    onClick={onClickFilteringItem('today')}
+                  >
+                    <span>오늘 날짜</span>
+                  </div>
+                  <div
+                    className="option"
+                    onClick={onClickFilteringItem('yesterday')}
+                  >
+                    <span>어제 날짜</span>
+                  </div>
+                  <div
+                    className="option"
+                    onClick={onClickFilteringItem('selectDay')}
+                  >
+                    <span>기간 선택</span>
+                  </div>
+                  <div
+                    className="option"
+                    onClick={onClickFilteringItem('default')}
+                  >
+                    <span>기본 게시물</span>
+                  </div>
+                </div>
+              )}
+            </FilteringOption>
+            {filterName === '기간 선택' && (
+              <div className="select_date">
+                <label htmlFor="start_date">시작날</label>
+                <input
+                  type="date"
+                  id="start_date"
+                  ref={filterStartDateInputRef}
+                />
+                <label htmlFor="end_date">마지막날</label>
+                <input type="date" id="end_date" ref={filterEndDateInputRef} />
+                <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
+                  확인
+                </Button>
+              </div>
+            )}
+          </FilterBox>
+          <ContentBox>
             <div>
-              <div>
-                <div>
-                  <span>방금 업데이트된 이미지</span>
-                </div>
-                <ImageContentList
-                  ImageData={nowImage}
-                  sectionName={'now'}
-                  observerRef={observerConverter(0)}
-                />
+              <div className="tag">
+                <span>
+                  {filterSelectTerm ? '필터링된 이미지' : '게시된 이미지'}
+                </span>
               </div>
-              <div>
-                <div>
-                  <span>오늘 업데이트된 이미지</span>
-                </div>
-                <ImageContentList
-                  ImageData={todayImage}
-                  sectionName={'today'}
-                  observerRef={observerConverter(1)}
-                />
-              </div>
-              <div>
-                <div>
-                  <span>이전에 업데이트된 이미지</span>
-                </div>
-                <ImageContentList
-                  ImageData={previousImage}
-                  sectionName={'previous'}
-                  observerRef={observerConverter(2)}
-                />
-              </div>
-              {(imageListLoading || getImageLoading) && (
+              <ImageContentList
+                ImageData={filterSelectTerm ? filterImage : postedImage}
+                observerRef={observerRef}
+              />
+              {(defaultImgListLoading ||
+                filterImgListLoading ||
+                imgDataLoading) && (
                 <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
               )}
             </div>
-          </MainContainer>
-        </Scrollbars>
+          </ContentBox>
+        </MainContainer>
       </Wrapper>
-    );
-  },
-);
+    </Scrollbars>
+  );
+};
+
 export default ContentSection;
