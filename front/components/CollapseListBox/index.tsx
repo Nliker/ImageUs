@@ -33,7 +33,6 @@ const CollapseListBox = ({
   return (
     <Container style={preventClickCSS}>
       {data.map((item) => {
-        console.log(currentDataId, item.id);
         return (
           <div key={item.id}>
             <div className="check_label_box">

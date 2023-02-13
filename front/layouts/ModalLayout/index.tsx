@@ -21,7 +21,6 @@ const ModalLayout = ({ children, modalName }: Props) => {
   }, [modalName]);
 
   const onClickOuterModal = (e: MouseEvent) => {
-    console.log(e.target);
     if (
       e.target instanceof HTMLElement &&
       !modalEl.current?.contains(e.target)
