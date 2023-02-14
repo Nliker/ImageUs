@@ -1,5 +1,5 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { Collapse, CreateBtnBox, Subtitle } from './styles';
@@ -7,26 +7,23 @@ import {
   deleteMemberFetcher,
   getUserListFetcher,
 } from '@utils/roomDataFetcher';
-import { DFriendData } from '@typing/db';
+import { DFriendData, DRoomData } from '@typing/db';
 import CollapseListBox from '@components/CollapseListBox';
 import ActionButton from '@styles/ActiveButton';
 import { useParams } from 'react-router';
 
-const MemberList = memo(() => {
+interface Props {
+  currentRoomInfo: DRoomData;
+}
+
+const MemberList = memo(({ currentRoomInfo }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
+  const { mutate } = useSWRConfig();
+  // console.log(currentRoomInfo);
 
   const { data: showModalState, mutate: showModalMutate } =
     useSWR('showModalState');
   const { data: logInInfo } = useSWR('/user/my');
-  const { data: userlist, mutate: userlistMutate } = useSWR<DFriendData[]>(
-    ['userlist', roomId],
-    getUserListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
   const { trigger: deleteMemberTrigger } = useSWRMutation(
     `/room/${roomId}/user`,
     deleteMemberFetcher,
@@ -40,13 +37,15 @@ const MemberList = memo(() => {
   );
 
   const collapseListBoxData = useCallback(() => {
-    if (!userlist) return [];
+    if (!currentRoomInfo) return;
+    const { userlist } = currentRoomInfo;
+
     const data = userlist.map((userData) => ({
       id: userData.id,
       data: userData.name,
     }));
     return [...data];
-  }, [userlist]);
+  }, [currentRoomInfo]);
 
   const onClickInviteMember = useCallback(() => {
     showModalMutate({
@@ -56,13 +55,10 @@ const MemberList = memo(() => {
   }, [showModalState]);
 
   const onClickDeleteMember = (memberId: number) => () => {
-    deleteMemberTrigger(memberId)
-      .then(() => {
-        userlistMutate();
-      })
-      .catch(() => {
-        alert('에러가 발생하였습니다.');
-      });
+    deleteMemberTrigger(memberId).then(() => {
+      const userId = sessionStorage.getItem('USER_ID');
+      mutate(`/user/${userId}/roomlist`);
+    });
   };
 
   return (
