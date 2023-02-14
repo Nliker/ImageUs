@@ -153,7 +153,41 @@ class RoomDao:
         }if row else None
 
         return room_user
+    
+    def get_room_deleted_user(self,room_id,user_id):
+        result=self.db.execute(text("""
+            select
+                room_id,
+                user_id
+            from rooms_user_list
+            where room_id=:room_id
+            and user_id=:user_id
+            and deleted=1
+            """),{'room_id':room_id,'user_id':user_id})
+        row=result.fetchone()
+        result.close()
 
+        room_user={
+            'room_id':row['room_id'],
+            'user_id':row['user_id']
+        }if row else None
+
+        return room_user
+    
+    def update_room_user_deleted(self,room_id,user_id,deleted):
+        result=self.db.execute(text("""
+                update rooms_user_list
+                set deleted=:deleted
+                where room_id=:room_id
+                and user_id=:user_id
+                and deleted!=:deleted
+            """),{'room_id':room_id,'user_id':user_id,'deleted':deleted})
+
+        row=result.rowcount
+        result.close()
+            
+        return row
+    
     def insert_room_user_history(self,room_id,user_id):
         result=self.db.execute(text("""
             insert into rooms_user_history(

@@ -66,10 +66,13 @@ class RoomService:
         #이미 방에 속한 사람을 삽입하면 에러나기에 미리 속하지 않은지 검증
         for user_id in userlist:
             if not (self.room_dao.get_room_user(room_id,user_id)):
-                result+=self.room_dao.insert_room_user(room_id,user_id)
-                
-                if not self.room_dao.get_room_user_history_info(room_id,user_id):
-                    self.room_dao.insert_room_user_history(room_id,user_id)
+                if self.room_dao.get_room_deleted_user(room_id,user_id):
+                    result+=self.room_dao.update_room_user_deleted(room_id,user_id,deleted=0)
+                else:
+                    result+=self.room_dao.insert_room_user(room_id,user_id)
+
+            if not self.room_dao.get_room_user_history_info(room_id,user_id):
+                self.room_dao.insert_room_user_history(room_id,user_id)
             
         return result
     
