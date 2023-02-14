@@ -94,16 +94,11 @@ const ToolBar = ({ handleSidebar, isImageRoom }: Props) => {
       navigate('/');
       return;
     }
-    leaveRoomFetcher(roomId)
-      .then(() => {
-        navigate('/');
-      })
-      .catch((err) => {
-        if (err instanceof AxiosError) {
-          alert(err.response?.data);
-        }
-        alert('오류가 발생하였습니다..');
-      });
+    leaveRoomFetcher(roomId).then(() => {
+      const userId = sessionStorage.getItem('USER_ID');
+      mutate(`/user/${userId}/roomlist`);
+      navigate('/');
+    });
   }, []);
 
   const onClickUserIcon = useCallback(
