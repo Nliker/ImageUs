@@ -1,11 +1,14 @@
 import ChannelList from '@components/ChannelList';
 import MemberList from '@components/MemberList';
+import { DRoomData } from '@typing/db';
+import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import React, {
   memo,
   MutableRefObject,
   RefObject,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -27,11 +30,23 @@ interface SidebarProps {
 }
 
 const SideBar = memo(({ show, close }: SidebarProps) => {
+  const { roomId } = useParams<{ roomId: string }>();
+  const userId = sessionStorage.getItem('USER_ID');
+
+  const { data: roomListInfo } = useSWR(
+    `/user/${userId}/roomlist`,
+    getUserRoomListFetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
   const sideBarEl = useRef<HTMLDivElement>(null);
   const backgroundEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // console.log(backgroundEl);
     backgroundEl.current?.addEventListener('click', handleCloseSidebar);
     return () => {
       backgroundEl.current?.removeEventListener('click', handleCloseSidebar);
@@ -50,6 +65,29 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
     },
     [show],
   );
+
+  const extractRoomList = useMemo(() => {
+    if (!roomListInfo) return [];
+
+    const roomListData = roomListInfo.map((data: DRoomData) => {
+      return {
+        id: data.id,
+        data: data.title,
+      };
+    });
+
+    return [...roomListData];
+  }, [roomListInfo]);
+
+  const extractCurrentUserList = useMemo(() => {
+    if (!roomListInfo) return;
+    // console.log(roomListInfo);
+
+    const currentRoomData = roomListInfo.find(
+      (data: DRoomData) => '' + data.id === roomId,
+    );
+    return { ...currentRoomData };
+  }, [roomId, roomListInfo]);
 
   return (
     <>
@@ -70,7 +108,10 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               <div className="tab_content">
                 <Scrollbars>
                   <div className="tab_content_box">
-                    <ChannelList closeSidebar={close} />
+                    <ChannelList
+                      roomlist={extractRoomList}
+                      closeSidebar={close}
+                    />
                   </div>
                 </Scrollbars>
               </div>
@@ -83,7 +124,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               <div className="tab_content">
                 <Scrollbars>
                   <div className="tab_content_box">
-                    <MemberList />
+                    <MemberList currentRoomInfo={extractCurrentUserList} />
                   </div>
                 </Scrollbars>
               </div>
