@@ -72,7 +72,10 @@ class RoomService:
                     result+=self.room_dao.insert_room_user(room_id,user_id)
 
             if not self.room_dao.get_room_user_history_info(room_id,user_id):
-                self.room_dao.insert_room_user_history(room_id,user_id)
+                if self.room_dao.get_room_user_deleted_history_info(room_id,user_id):
+                    self.room_dao.update_room_user_deleted_history(room_id,user_id)
+                else:
+                    self.room_dao.insert_room_user_history(room_id,user_id)
             
         return result
     

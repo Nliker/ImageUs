@@ -209,6 +209,7 @@ class RoomDao:
             from rooms_user_history
             where room_id=:room_id
             and user_id=:user_id
+            and deleted=0
             """),{'room_id':room_id,'user_id':user_id})
         row=result.fetchone()
         result.close()
@@ -274,6 +275,20 @@ class RoomDao:
         row=result.rowcount
         result.close()
 
+        return row
+    
+    def update_room_user_deleted_history(self,room_id,user_id):
+        result=self.db.execute(text("""
+            update rooms_user_history
+            set deleted=0
+            where user_id=:user_id
+            and room_id=:room_id
+            and deleted=1
+        """),{'room_id':room_id,'user_id':user_id})
+
+        row=result.rowcount
+        result.close()
+            
         return row
     
     def update_user_room_host_user_id(self,host_user_id,room_id):
