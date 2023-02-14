@@ -526,10 +526,11 @@ def room_router(api,services):
             if not room_service.get_room_info(room_id):
                 return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
                                      api_error.room_existance_error()['status_code'])
-            #방장이 아니라면
-            if current_user_id!= room_service.get_room_info(room_id)['host_user_id']:
+            #방장이 아니거나 자기 자신을 강퇴할경우
+            if current_user_id!= room_service.get_room_info(room_id)['host_user_id'] or current_user_id==delete_room_user_id:
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
+                
             
             if not user_service.get_user_info(delete_room_user_id):
                 return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
