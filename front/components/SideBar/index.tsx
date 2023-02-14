@@ -27,7 +27,6 @@ interface SidebarProps {
 }
 
 const SideBar = memo(({ show, close }: SidebarProps) => {
-  const { roomId } = useParams<{ roomId: string }>();
   const sideBarEl = useRef<HTMLDivElement>(null);
   const backgroundEl = useRef<HTMLDivElement>(null);
 
@@ -84,7 +83,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               <div className="tab_content">
                 <Scrollbars>
                   <div className="tab_content_box">
-                    <MemberList roomId={roomId} />
+                    <MemberList />
                   </div>
                 </Scrollbars>
               </div>
