@@ -1,16 +1,22 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { Collapse, CreateBtnBox, Subtitle } from './styles';
-import { getUserListFetcher } from '@utils/roomDataFetcher';
+import {
+  deleteMemberFetcher,
+  getUserListFetcher,
+} from '@utils/roomDataFetcher';
 import { DFriendData } from '@typing/db';
 import CollapseListBox from '@components/CollapseListBox';
 import ActionButton from '@styles/ActiveButton';
+import { useParams } from 'react-router';
 
-const MemberList = memo(({ roomId }: { roomId?: string }) => {
+const MemberList = memo(() => {
+  const { roomId } = useParams<{ roomId: string }>();
+
   const { data: showModalState, mutate: showModalMutate } =
     useSWR('showModalState');
-
   const { data: logInInfo } = useSWR('/user/my');
   const { data: userlist, mutate: userlistMutate } = useSWR<DFriendData[]>(
     ['userlist', roomId],
@@ -21,6 +27,11 @@ const MemberList = memo(({ roomId }: { roomId?: string }) => {
       revalidateOnReconnect: false,
     },
   );
+  const { trigger: deleteMemberTrigger } = useSWRMutation(
+    `/room/${roomId}/user`,
+    deleteMemberFetcher,
+  );
+
   const [memberCollapse, setMemberCollapse] = useState<boolean>(true);
 
   const toggleMemberCollapse = useCallback(
@@ -44,6 +55,16 @@ const MemberList = memo(({ roomId }: { roomId?: string }) => {
     });
   }, [showModalState]);
 
+  const onClickDeleteMember = (memberId: number) => () => {
+    deleteMemberTrigger(memberId)
+      .then(() => {
+        userlistMutate();
+      })
+      .catch(() => {
+        alert('에러가 발생하였습니다.');
+      });
+  };
+
   return (
     <div>
       <Subtitle onClick={toggleMemberCollapse}>
@@ -58,6 +79,7 @@ const MemberList = memo(({ roomId }: { roomId?: string }) => {
             data={collapseListBoxData()}
             currentDataId={logInInfo.user_info.id}
             nameKey={'member'}
+            onClickDeleteMember={onClickDeleteMember}
             readOnly
           />
           <CreateBtnBox>
