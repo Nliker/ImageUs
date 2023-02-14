@@ -76,7 +76,7 @@ export const Content = styled.div`
           .list_info > p {
             margin: 0;
 
-            &:first-child {
+            &:first-of-type {
               margin-bottom: 0.5rem;
             }
           }
