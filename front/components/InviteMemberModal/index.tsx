@@ -18,38 +18,35 @@ type AppendCheckFriendData = DFriendData & { check: boolean };
 
 const InviteMemberModal = () => {
   const { roomId } = useParams<{ roomId: string }>();
+  const { mutate } = useSWRConfig();
+
   const { data: showModalState, mutate: modalMutate } =
     useSWR('showModalState');
-
   const { data: userFriendList } = useSWR('friendlist', getUserFriendList, {
-    revalidateIfStale: false,
     revalidateOnFocus: false,
-    revalidateOnReconnect: false,
   });
-  const { data: roomFreindList, mutate: userlistMutate } = useSWR(
-    ['userlist', roomId],
+  const { data: roomMemberList, mutate: roomMemberMutate } = useSWR(
+    `/room/${roomId}/userlist`,
     getUserListFetcher,
     {
-      revalidateIfStale: false,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
     },
   );
   const { trigger: inviteFriendsTrigger } = useSWRMutation(
     `/room/${roomId}/user`,
     inviteFriendFetcher,
   );
-  const { mutate } = useSWRConfig();
 
   const [notInvitedFriends, setNotInvitedFriends] = useState<
     AppendCheckFriendData[]
   >([]);
 
   useEffect(() => {
-    if (!userFriendList || !roomFreindList) return;
+    if (!userFriendList || !roomMemberList) return;
 
+    console.log(userFriendList, roomMemberList);
     const newList = userFriendList.filter((userInfo: DFriendData) => {
-      for (const roomUserInfo of roomFreindList) {
+      for (const roomUserInfo of roomMemberList) {
         if (roomUserInfo.id === userInfo.id) return false;
       }
       return true;
@@ -60,7 +57,7 @@ const InviteMemberModal = () => {
     });
 
     setNotInvitedFriends([...appendCheckList]);
-  }, [userFriendList, roomFreindList]);
+  }, [userFriendList, roomMemberList]);
 
   const getSelectFriends = useCallback(() => {
     const selectMemberName = notInvitedFriends
@@ -87,16 +84,12 @@ const InviteMemberModal = () => {
     if (selectDataId.length === 0) {
       alert('선택된 친구가 없습니다.');
     } else {
-      inviteFriendsTrigger(selectDataId)
-        .then(() => {
-          modalMutate({ ...showModalState, invite_member: false });
-          mutate(['userlist', roomId]);
-        })
-        .catch((err) => {
-          if (err instanceof AxiosError) {
-            alert('오류가 발생했습니다..');
-          }
-        });
+      inviteFriendsTrigger(selectDataId).then(() => {
+        const userId = sessionStorage.getItem('USER_ID');
+
+        modalMutate({ ...showModalState, invite_member: false });
+        mutate(`/user/${userId}/roomlist`);
+      });
     }
   }, [notInvitedFriends]);
 
