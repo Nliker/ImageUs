@@ -124,21 +124,24 @@ const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
 
 const getUserRoomListFetcher = async (url: string) => {
   try {
-    const userId = sessionStorage.getItem('USER_ID');
     const token = sessionStorage.getItem('TOKEN');
 
-    const response = await axios.get(`/user/${userId}/${url}`, {
+    const response = await axios.get(url, {
       headers: {
         Authorization: `${token}`,
       },
     });
-    const roomList = response.data.roomlist.map((roomData: DRoomData) => {
-      return {
-        id: roomData.id,
-        title: roomData.title,
-      };
-    });
-    return roomList;
+
+    // const roomList = response.data.roomlist.map((roomData: DRoomData) => {
+    //   return {
+    //     id: roomData.id,
+    //     title: roomData.title,
+    //   };
+    // });
+
+    const { roomlist } = response.data;
+
+    return roomlist;
   } catch (err) {
     if (err instanceof AxiosError) {
       alert('오류가 발생했습니다..');
@@ -226,12 +229,12 @@ const postNewFriend = async (
 
 export {
   getUserFriendList,
-  deleteUserFriend,
   getUserRoomListFetcher,
   getUserImageList,
   getUserImageLen,
   getImageData,
-  postUserInfoFetcher,
-  deleteUserImage,
   postNewFriend,
+  postUserInfoFetcher,
+  deleteUserFriend,
+  deleteUserImage,
 };
