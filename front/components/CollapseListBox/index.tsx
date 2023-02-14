@@ -1,13 +1,15 @@
+import { Button } from '@styles/Button';
 import autosize from 'autosize';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Container, DataCheckInput, DataLabel } from './styles';
 
 interface Props {
-  data: { id: number; data: string }[];
+  data?: { id: number; data: string }[];
   currentDataId?: number | string;
   nameKey: string;
   readOnly?: boolean;
   dataClickCallBack?: (roomId: number) => void;
+  onClickDeleteMember?: (memberId: number) => () => void;
 }
 
 const CollapseListBox = ({
@@ -16,6 +18,7 @@ const CollapseListBox = ({
   currentDataId,
   readOnly,
   dataClickCallBack,
+  onClickDeleteMember,
 }: Props) => {
   const preventClickCSS = {
     pointerEvents: readOnly
@@ -31,27 +34,34 @@ const CollapseListBox = ({
   );
 
   return (
-    <Container style={preventClickCSS}>
-      {data.map((item) => {
-        return (
-          <div key={item.id}>
-            <div className="check_label_box">
-              <DataCheckInput
-                type="radio"
-                id={`${item.id}`}
-                name={`radio-group-${nameKey}`}
-                defaultChecked={'' + currentDataId === '' + item.id}
-              />
-              <DataLabel
-                htmlFor={`${item.id}`}
-                onClick={onClickDataLabel(item.id)}
-              >
-                {item.data}
-              </DataLabel>
+    <Container>
+      {data ? (
+        data.map((item) => {
+          return (
+            <div key={item.id}>
+              <div className="check_label_box" style={preventClickCSS}>
+                <DataCheckInput
+                  type="radio"
+                  id={`${item.id}`}
+                  name={`radio-group-${nameKey}`}
+                  defaultChecked={'' + currentDataId === '' + item.id}
+                />
+                <DataLabel
+                  htmlFor={`${item.id}`}
+                  onClick={onClickDataLabel(item.id)}
+                >
+                  {item.data}
+                </DataLabel>
+              </div>
+              {nameKey === 'member' && onClickDeleteMember && (
+                <Button onClick={onClickDeleteMember(item.id)}>X</Button>
+              )}
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+      ) : (
+        <div>로딩중...</div>
+      )}
     </Container>
   );
 };
