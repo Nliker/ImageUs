@@ -1,13 +1,13 @@
 export interface DRoomData {
   id: number;
   title: string;
-  host_user_id?: string;
-  userlist?: Array<object>;
+  host_user_id: string;
+  userlist: DFriendData[];
 }
 
 export interface DFriendData {
-  email?: string;
   id: number;
+  email?: string;
   name: string;
   profile?: string;
 }
