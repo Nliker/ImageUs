@@ -116,13 +116,13 @@ const getImageData = async (
   }
 };
 
-const getUserListFetcher = async (arg: Array<string | undefined>) => {
+const getUserListFetcher = async (url: string) => {
   const token = sessionStorage.getItem('TOKEN');
-  const [url, roomId] = arg;
-  if (!roomId) return null;
+  // const [url, roomId] = arg;
+  // if (!roomId) return null;
 
   try {
-    const response = await axios.get(`/room/${roomId}/${url}`, {
+    const response = await axios.get(url, {
       headers: {
         Authorization: token,
       },
@@ -154,8 +154,10 @@ const inviteFriendFetcher = async (
       },
     );
     console.log(response.data);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      alert('오류가 발생했습니다..');
+    }
   }
 };
 
@@ -261,6 +263,35 @@ const createRoomFetcher = async (
   }
 };
 
+const deleteMemberFetcher = async (
+  url: string,
+  { arg: memberId }: { arg: number },
+) => {
+  try {
+    const token = sessionStorage.getItem('TOKEN');
+
+    await axios.delete(url, {
+      headers: { Authorization: token },
+      data: {
+        delete_room_user_id: memberId,
+      },
+    });
+
+    alert('강퇴하였습니다.');
+
+    return true;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 403) {
+        alert('방장이 아닙니다.');
+      } else {
+        alert('오류가 발생했습니다..');
+      }
+    }
+    return false;
+  }
+};
+
 export {
   getDefaultImgFetcher,
   getFilterImgFetcher,
@@ -272,4 +303,5 @@ export {
   deleteImageFetcher,
   leaveRoomFetcher,
   createRoomFetcher,
+  deleteMemberFetcher,
 };
