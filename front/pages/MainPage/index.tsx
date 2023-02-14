@@ -22,9 +22,10 @@ import {
 } from './styles';
 
 const MainPage = () => {
+  const userId = sessionStorage.getItem('USER_ID');
   const { data: logInInfo } = useSWR('/user/my');
   const { data: roomlist, isValidating: roomListValidating } = useSWR(
-    'roomlist',
+    `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
     {
       revalidateIfStale: false,
@@ -61,7 +62,7 @@ const MainPage = () => {
                       {!roomListValidating &&
                         roomlist?.map((roomData: DRoomData) => (
                           <Link key={roomData.id} to={`/booth/${roomData.id}`}>
-                            <li key={roomData.id}>{roomData.title}</li>
+                            <li>{roomData.title}</li>
                           </Link>
                         ))}
                     </ul>
