@@ -10,22 +10,24 @@ import { useParams } from 'react-router';
 import ActionButton from '@styles/ActiveButton';
 
 interface Props {
+  roomlist: { id: number; data: string }[];
   closeSidebar: () => void;
 }
 
-const ChannelList = memo(({ closeSidebar }: Props) => {
+const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
+  // const { data: roomlist, mutate: mutateRoomList } = useSWR(
+  //   'roomlist',
+  //   getUserRoomListFetcher,
+  //   {
+  //     revalidateIfStale: false,
+  //     revalidateOnFocus: false,
+  //     revalidateOnReconnect: false,
+  //   },
+  // );
   const { roomId } = useParams<{ roomId: string }>();
-  const { data: roomlist, mutate: mutateRoomList } = useSWR(
-    'roomlist',
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
-  const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
   const navigate = useNavigate();
+
+  const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
   const { data: showModalState, mutate: showModalMutate } =
     useSWR('showModalState');
 
@@ -39,14 +41,13 @@ const ChannelList = memo(({ closeSidebar }: Props) => {
     [],
   );
 
-  const collapseListBoxData = useCallback(() => {
-    if (!roomlist) return [];
-    const data = roomlist.map((room: DRoomData) => ({
-      id: room.id,
-      data: room.title,
-    }));
-    return [...data];
-  }, [roomlist]);
+  // const collapseListBoxData = useCallback(() => {
+  //   const data = roomlist.map((room: DRoomData) => ({
+  //     id: room.id,
+  //     data: room.title,
+  //   }));
+  //   return [...data];
+  // }, [roomlist]);
 
   const onClickCreateRoomBtn = useCallback(() => {
     showModalMutate({
@@ -66,7 +67,7 @@ const ChannelList = memo(({ closeSidebar }: Props) => {
       {channelCollapse && (
         <>
           <CollapseListBox
-            data={collapseListBoxData()}
+            data={roomlist}
             dataClickCallBack={onClickRoom}
             currentDataId={roomId}
             nameKey={'channel'}
