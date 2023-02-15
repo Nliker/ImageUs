@@ -413,10 +413,15 @@ def user_router(api,services,config,es):
             if not user_service.is_email_exists(credential['email']):
                 return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
                                      api_error.email_existance_login_error()['status_code'])
+                                     
+            user_credential=user_service.get_user_id_and_password(credential['email'])
+            
+            if not user_service.get_user_info(user_credential['id']):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
             
             authorized=user_service.login(credential)
             if authorized:
-                user_credential=user_service.get_user_id_and_password(credential['email'])
                 access_token=user_service.generate_access_token(user_credential['id'])
                 return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
             
