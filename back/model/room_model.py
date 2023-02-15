@@ -314,3 +314,24 @@ class RoomDao:
         result.close()
 
         return row
+    
+    def get_room_user_deleted_history_info(self,room_id,user_id):
+        result=self.db.execute(text("""
+            select *
+            from rooms_user_history
+            where room_id=:room_id
+            and user_id=:user_id
+            and deleted=1
+            """),{'room_id':room_id,'user_id':user_id})
+        row=result.fetchone()
+        result.close()
+        
+        user_read_history={
+            'user_id':row['user_id'],
+            'room_id':row['room_id'],
+            'last_unread_row':row['last_unread_row'],
+            'read_start_row':row['read_start_row'],
+            'marker_row':row['marker_row']
+        } if row else None
+
+        return user_read_history
