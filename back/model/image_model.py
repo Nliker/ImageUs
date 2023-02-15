@@ -190,6 +190,7 @@ class ImageDao:
         return room_image_info_list
     
     def get_room_imagelist_by_date(self,room_id,dates,pages):
+        
         result=self.db.execute(text("""
             select
                 i_r.image_id as id,
@@ -205,8 +206,8 @@ class ImageDao:
             left join users as u
             on (i.user_id=u.id)
             where i_r.room_id=:room_id
-            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')>=:start_date
-            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')<=:end_date
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')>=DATE_FORMAT(:start_date,'%Y-%m-%d')
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')<=DATE_FORMAT(:end_date,'%Y-%m-%d')
             order by i_r.created_at
             limit :start,:limit
             """),{
