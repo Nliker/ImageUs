@@ -32,11 +32,11 @@ import { IconContext } from 'react-icons/lib';
 import Scrollbars from 'react-custom-scrollbars';
 
 const MyPage = () => {
-  const userId = sessionStorage.getItem('USER_ID');
   const { pathname } = useLocation();
+  const userId = sessionStorage.getItem('USER_ID');
 
   const { data: roomlist, mutate: mutateRoomList } = useSWR(
-    'roomlist',
+    `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
     {
       revalidateIfStale: false,
