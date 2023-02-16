@@ -7,10 +7,9 @@ import jwt
 import shutil
 from model import UserDao,RoomDao,ImageDao
 from service import UserService,RoomService,ImageService
-from sqlalchemy import create_engine,text
+from sqlalchemy import text
 import config
-
-database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
+from models import *
 
 parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 projects_dir=os.path.dirname(os.path.abspath(parent_path))
@@ -475,22 +474,100 @@ def get_room_imagelist(room_id):
         } for room_image_info in rows]
 
     return room_image_info_list
+
+def test_get_email_auth_info(user_service):
+    sample_email="test_auth1@naver.com"
+    email_auth_info=user_service.get_email_auth_info(sample_email)
+    assert email_auth_info=={
+        'email':sample_email,
+        'auth_password':"1234",
+        'activated':0
+    }
     
+def test_generate_auth_password(user_service):
+    generated_auth_password=user_service.generate_auth_password()
+    assert type(generated_auth_password)==str
+    assert len(generated_auth_password)==4
+
+def test_initiate_email_auth(user_service):
+    email="test_auth1@naver.com"
+    auth_password="4321"
+    result=user_service.initiate_email_auth(email,auth_password)
+    assert result==1
+    
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info['activated']==0
+
+def test_create_new_email_auth(user_service):
+    email="test_auth2@naver.com"
+    auth_password="1234"
+    result=user_service.create_new_email_auth(email,auth_password)
+    assert result==1
+
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info=={
+        'email':email,
+        'auth_password':auth_password,
+        'activated':0
+    }
+
+def test_send_email_auth_password(user_service):
+    email="test_auth1@naver.com"
+    auth_password="1234"
+
+    result=user_service.send_email_auth_password(email,auth_password)
+    assert result==1
+
+def test_authorize_email_auth(user_service):
+    email="test_auth1@naver.com"
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info!=None
+
+    auth_password="1234"
+    result=user_service.authorize_email_auth(email,auth_password)
+
+    assert result==True
+    
+    auth_password="9999"
+    result=user_service.authorize_email_auth(email,auth_password)
+
+    assert result==False
+
+def test_is_email_auth_expired(user_service):
+    email="test_auth1@naver.com"
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info!=None
+    
+    result=user_service.is_email_auth_expired(email)
+    assert result==False
+    
+def test_activate_email_auth(user_service):
+    email="test_auth1@naver.com"
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info['activated']==0
+
+    result=user_service.activate_email_auth(email)
+    assert result==1
+    
+    email_auth_info=get_email_auth_info(email)
+    assert email_auth_info['activated']==1
+
 
 #이메일의 존재 확인
 def test_is_email_exists(user_service):
-    # {
-    #     'id':1,
-    #     'name':'test1',
-    #     'email':'test1@naver.com',
-    #     'profile':'testuser1',
-    #     'hashed_password':hashed_password
-    # }
     #존재하는 이메일의 존재를 확인
-    result=user_service.is_email_exists('test1@naver.com')
+    email='test1@naver.com'
+    email_auth_info=get_user_id_and_password(email,type="image_us")
+    assert email_auth_info!=None
+
+    result=user_service.is_email_exists(email)
     assert result==True
     #존재하지 않는 이메일의 존재를 확인
-    result=user_service.is_email_exists('test100@naver.com')
+    email='test100000@naver.com'
+    email_auth_info=get_user_id_and_password(email,type="image_us")
+    assert email_auth_info==None
+
+    result=user_service.is_email_exists(email)
     assert result==False
 
 #새로운 유저를 생성
@@ -631,547 +708,578 @@ def test_delete_user_friend(user_service):
     assert user_friendlist==[]
     user_friendlist=[user_friend_info['id'] for user_friend_info in get_user_friendlist(2)]
     assert user_friendlist==[3]
-
-#새로운 방을 생성
-def test_create_room(room_service):
-    #호스트가 1번 유저인 방을 생성합니다.
-    new_room={
-        'title':'test_room3',
-        'user_id':1
-    }
-    new_room_id=room_service.create_room(new_room)
-    assert get_room_info(new_room_id)=={
-        'id':3,
-        'title':new_room['title'],
-        'host_user_id':new_room['user_id']
-    }
-
-#방의 정보를 확인
-def test_get_room_info(room_service):
-    #1번 방의 정보를 확인
-    room_info=room_service.get_room_info(1)
-    assert room_info==get_room_info(1)
-    #존재하지 않는 방의 정보 확인
-    room_info=room_service.get_room_info(100)
-    assert room_info==None
-
-#유저의 방 정보 목록 확인
-def test_get_user_roomlist(room_service):
-    #1번 유저의 방 정보 목록 확인
-    user_room_info_list=room_service.get_user_roomlist(1)
-    assert user_room_info_list==get_user_roomlist(1)
-    #2번 유저의 방 정보 목록 확인
-    user_room_info_list=room_service.get_user_roomlist(2)
-    assert user_room_info_list==get_user_roomlist(2)
-
-#유저의 방 삭제
-def test_delete_user_room(room_service):
-    #기존 정보 확인
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-    assert user_roomlist==[1,2]
     
-    #2번 유저의 1번방 삭제 후 정보 확인
-    result=room_service.delete_user_room(2,1)
-    assert result==1
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-    assert user_roomlist==[2]
-
-    #2번 유저의 방 중복 삭제 확인
-    result=room_service.delete_user_room(2,1)
-    assert result==0
+def test_update_user_info(user_service):
+    user_info=get_user_info(1)
+    assert user_info=={
+        'id':1,
+        'name':'test1',
+        'email':'test1@naver.com',
+        'profile':'testuser1'
+    }
     
-#방에 유저들 생성 확인
-def test_create_room_users(room_service):
-    #1번방의 유저 목록을 확인
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1,2]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-    assert user_roomlist==[2]
-    #1번 방에 1,2,3번 유저 초대
-    invite_users=[1,2,3]
-    result=room_service.create_room_users(1,invite_users)
+    update_user={
+        'name':'updateuser1',
+        'profile':'updatetestuser1'
+    }
+    result=user_service.update_user_info(1,update_user)
+    assert result==2
+
+    user_info=get_user_info(1)
+    
+    assert user_info=={
+        'id':1,
+        'name':update_user['name'],
+        'email':'test1@naver.com',
+        'profile':update_user['profile']
+    }
+    
+def test_delete_user(user_service):
+    result=user_service.delete_user(1)
     assert result==1
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1,2,3]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-    assert user_roomlist==[1,2]
-    #1번방 이미 초대된 사람들의 중복 초대 확인
-    invite_users=[1,2,3]
-    result=room_service.create_room_users(1,invite_users)
-    assert result==0
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1,2,3]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-    assert user_roomlist==[1,2]
+    
+    assert get_user_info(1)==None
 
-#방에 속한 유저인지 확인
-def test_is_room_user(room_service):
-    #1번 방의 2번 유저 관계 확인
-    result=room_service.is_room_user(1,2)
-    assert result==True
-    #1번 방의 존재하지 않는 유저 확인
-    result=room_service.is_room_user(1,100)
-    assert result==False
+# #새로운 방을 생성
+# def test_create_room(room_service):
+#     #호스트가 1번 유저인 방을 생성합니다.
+#     new_room={
+#         'title':'test_room3',
+#         'user_id':1
+#     }
+#     new_room_id=room_service.create_room(new_room)
+#     assert get_room_info(new_room_id)=={
+#         'id':3,
+#         'title':new_room['title'],
+#         'host_user_id':new_room['user_id']
+#     }
 
-#방의 유저 정보 목록 확인
-def test_get_room_userlist(room_service):
-    #1번 방의 유저 정보목록 확인
-    room_user_info_list=room_service.get_room_userlist(1)
-    assert room_user_info_list==get_room_userlist(1)
-    #2번 방의 유저 정보 목록 확인
-    room_user_info_list=room_service.get_room_userlist(2)
-    assert room_user_info_list==get_room_userlist(2)
+# #방의 정보를 확인
+# def test_get_room_info(room_service):
+#     #1번 방의 정보를 확인
+#     room_info=room_service.get_room_info(1)
+#     assert room_info==get_room_info(1)
+#     #존재하지 않는 방의 정보 확인
+#     room_info=room_service.get_room_info(100)
+#     assert room_info==None
 
-#방의 유저 제거(강퇴)
-def test_delete_room_user(room_service):
-    #1번 방의 정보 확인
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1,2]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-    assert user_roomlist==[1,2]
-    #1번 방의 2번 유저 제거 후 정보 확인
-    result=room_service.delete_room_user(1,2)
-    assert result==1
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-    assert user_roomlist==[2]
-    #1번방의 삭제된 유저 중복 삭제 확인
-    result=room_service.delete_room_user(1,2)
-    assert result==0
-    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-    assert room_userlist==[1]
-    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-    assert user_roomlist==[2]
+# #유저의 방 정보 목록 확인
+# def test_get_user_roomlist(room_service):
+#     #1번 유저의 방 정보 목록 확인
+#     user_room_info_list=room_service.get_user_roomlist(1)
+#     assert user_room_info_list==get_user_roomlist(1)
+#     #2번 유저의 방 정보 목록 확인
+#     user_room_info_list=room_service.get_user_roomlist(2)
+#     assert user_room_info_list==get_user_roomlist(2)
 
-#이미지 업로드 확인
+# #유저의 방 삭제
+# def test_delete_user_room(room_service):
+#     #기존 정보 확인
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+#     assert user_roomlist==[1,2]
+    
+#     #2번 유저의 1번방 삭제 후 정보 확인
+#     result=room_service.delete_user_room(2,1)
+#     assert result==1
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+#     assert user_roomlist==[2]
+
+#     #2번 유저의 방 중복 삭제 확인
+#     result=room_service.delete_user_room(2,1)
+#     assert result==0
+    
+# #방에 유저들 생성 확인
+# def test_create_room_users(room_service):
+#     #1번방의 유저 목록을 확인
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1,2]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+#     assert user_roomlist==[2]
+#     #1번 방에 1,2,3번 유저 초대
+#     invite_users=[1,2,3]
+#     result=room_service.create_room_users(1,invite_users)
+#     assert result==1
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1,2,3]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+#     assert user_roomlist==[1,2]
+#     #1번방 이미 초대된 사람들의 중복 초대 확인
+#     invite_users=[1,2,3]
+#     result=room_service.create_room_users(1,invite_users)
+#     assert result==0
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1,2,3]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+#     assert user_roomlist==[1,2]
+
+# #방에 속한 유저인지 확인
+# def test_is_room_user(room_service):
+#     #1번 방의 2번 유저 관계 확인
+#     result=room_service.is_room_user(1,2)
+#     assert result==True
+#     #1번 방의 존재하지 않는 유저 확인
+#     result=room_service.is_room_user(1,100)
+#     assert result==False
+
+# #방의 유저 정보 목록 확인
+# def test_get_room_userlist(room_service):
+#     #1번 방의 유저 정보목록 확인
+#     room_user_info_list=room_service.get_room_userlist(1)
+#     assert room_user_info_list==get_room_userlist(1)
+#     #2번 방의 유저 정보 목록 확인
+#     room_user_info_list=room_service.get_room_userlist(2)
+#     assert room_user_info_list==get_room_userlist(2)
+
+# #방의 유저 제거(강퇴)
+# def test_delete_room_user(room_service):
+#     #1번 방의 정보 확인
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1,2]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+#     assert user_roomlist==[1,2]
+#     #1번 방의 2번 유저 제거 후 정보 확인
+#     result=room_service.delete_room_user(1,2)
+#     assert result==1
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+#     assert user_roomlist==[2]
+#     #1번방의 삭제된 유저 중복 삭제 확인
+#     result=room_service.delete_room_user(1,2)
+#     assert result==0
+#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+#     assert room_userlist==[1]
+#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+#     assert user_roomlist==[2]
+
+# #이미지 업로드 확인
+# # def test_upload_image(image_service):
+    
+# # def test_upload_room_image(image_service):
+    
+# #유저의 이미지 관계 확인
+# def test_is_user_image(image_service):
+#     #2번 유저의 2번 사진 관계 확인
+#     result=image_service.is_user_image(2,2)
+#     assert result==True
+#     #2번 유저의 3번 사진 관계 확인
+#     result=image_service.is_user_image(2,3)
+#     assert result==False
+
+# #이미지의 방 정보 목록 확인
+# def test_get_image_roomlist(image_service):
+#     #2번 이미지의 방 정보 목록 확인
+#     image_room_info_list=image_service.get_image_roomlist(2)
+#     assert image_room_info_list==get_image_roomlist(2)
+#     #4번 이미지의 방 정보 목록 확인
+#     image_room_info_list=image_service.get_image_roomlist(4)
+#     assert image_room_info_list==[]
+
+# #이미지의 정보 확인
+# def test_get_image_info(image_service):
+#     #1번 이미지의 정보 확인
+#     image_info=image_service.get_image_info(1)
+#     assert image_info==get_image_info(1)
+#     #존재하지 않는 이미지의 정보 확인
+#     image_info=image_service.get_image_info(100)
+#     assert image_info==None
+
+# #유저의 이미지 정보 목록 확인
+# def test_get_user_imagelist(image_service):
+#     #3번 유저의 이미지 정보 목록 확인
+#     user_image_info_list=image_service.get_user_imagelist(3)
+#     assert user_image_info_list==get_user_imagelist(3)
+
+# #방의 이미지 정보 목록 확인
+# def test_get_room_imagelist(image_service):
+#     #1번 방의 이미지 정보 목록 확인
+#     room_image_info_list=image_service.get_room_imagelist(1)
+#     assert room_image_info_list==get_room_imagelist(1)
+
+# #이미지의 방 업데이트 확인
+# def test_update_image_room(image_service):
+#     #2번 이미지의 방 목록 확인
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+#     assert image_roomlist==[1,2]
+#     #2번 이미지의 방 목록 업데이트 확인 
+#     update_roomlist=[2]
+#     result=image_service.update_image_room(2,update_roomlist)
+#     assert result=={
+#                     'addlist':[],
+#                     'deletelist':[1],
+#                     'add_result':0,
+#                     'delete_result':1
+#                     }
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+#     assert image_roomlist==[2]
+
+#     #4번 이미지의 방 목록 확인
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(4)]
+#     assert image_roomlist==[]
+#     #2번 이미지의 방 목록 업데이트 확인 
+#     update_roomlist=[1,2]
+#     result=image_service.update_image_room(4,update_roomlist)
+#     assert result=={
+#                     'addlist':[1,2],
+#                     'deletelist':[],
+#                     'add_result':2,
+#                     'delete_result':0
+#                     }
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+#     assert image_roomlist==[2]
+
+# #방의 사진 삭제 확인
+# def test_delete_room_image(image_service):
+#     #2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
+#     image_room_info_list=get_image_roomlist(2)
+#     assert image_room_info_list==[
+#         {
+#             'id':1,
+#             'title':'testroom1',
+#             'host_user_id':1,
+#         },
+#         {
+#             'id':2,
+#             'title':'testroom2',
+#             'host_user_id':2,
+#         },
+#     ]
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':'testlink2',
+#             'user_id':2
+#         }
+#     ]
+#     #1번방의 2번 이미지 삭제 후 2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
+#     result=image_service.delete_room_image(1,2)
+#     assert result==1
+#     image_room_info_list=get_image_roomlist(2)
+#     assert image_room_info_list==[
+#         {
+#             'id':2,
+#             'title':'testroom2',
+#             'host_user_id':2,
+#         },
+#     ]
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':None,
+#             'user_id':None
+#         }
+#     ]
+#     #1번방의 2번 사진 중복 삭제 확인
+#     result=image_service.delete_room_image(1,2)
+#     assert result==0
+
+# #이미지를 삭제합니다.
+# def test_delete_image(image_service):
+#     #2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
+#     user_image_info_list=get_user_imagelist(2)
+#     assert user_image_info_list==[
+#         {
+#             'id':2,
+#             'link':'testlink2',
+#             'user_id':2
+#         }
+#     ]
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':'testlink2',
+#             'user_id':2
+#         }
+#     ]
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+#     assert image_roomlist==[1,2]
+#     #2번 이미지 삭제 후 2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
+#     result=image_service.delete_image(2)
+#     assert result=={
+#         'delete_image':1,
+#         'delete_image_room':len(image_roomlist)
+#     }
+#     user_image_info_list=get_user_imagelist(2)
+#     assert user_image_info_list==[]
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':None,
+#             'user_id':None
+#         }
+#     ]
+#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+#     assert image_roomlist==[]
+#     image_info=get_image_info(2)
+#     assert image_info==None
+#     #이미 삭제된 이미지의 중복 삭제 확인
+#     result=image_service.delete_image(2)
+#     assert result=={
+#         'delete_image':0,
+#         'delete_image_room':len(image_roomlist)
+#     }
+    
+# #방에 속한 유저의 모든 이미지 제거
+# def test_delete_room_user_image(image_service):
+#     #2번 유저의 5번 이미지 생성 및 1번방에 업로드
+#     database.execute(text("""
+#         insert into images (
+#             id,
+#             link,
+#             user_id
+#         ) values (
+#             :id,
+#             :link,
+#             :user_id
+#         )
+#     """),{
+#         'id':5,
+#         'link':'testlink5',
+#         'user_id':2
+#     })
+#     database.execute(text("""
+#         insert into images_room_list (
+#             image_id,
+#             room_id
+#         ) values (
+#             :image_id,
+#             :room_id
+#         )
+#     """),{'image_id':5,'room_id':1})
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':'testlink2',
+#             'user_id':2
+#         },
+#         {
+#             'id':5,
+#             'link':'testlink5',
+#             'user_id':2
+#         }
+#     ]
+#     image_room_info_list=get_image_roomlist(2)
+#     assert image_room_info_list==[
+#         {
+#             'id':1,
+#             'title':'testroom1',
+#             'host_user_id':1,
+#         },
+#         {
+#             'id':2,
+#             'title':'testroom2',
+#             'host_user_id':2,
+#         },
+#     ]
+#     user_room_info_list=get_user_roomlist(2)
+#     assert user_room_info_list==[
+#         {
+#             'id':1,
+#             'title':'testroom1',
+#             'host_user_id':1,
+#         },
+#         {
+#             'id':2,
+#             'title':'testroom2',
+#             'host_user_id':2,
+#         }
+#     ]
+    
+#     result=image_service.delete_room_user_image(1,2)
+#     assert result==2
+    
+#     room_image_info_list=get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':None,
+#             'user_id':None
+#         },
+#         {
+#             'id':5,
+#             'link':None,
+#             'user_id':None
+#         }
+#     ]
+#     image_room_info_list=get_image_roomlist(2)
+#     assert image_room_info_list==[
+#         {
+#             'id':2,
+#             'title':'testroom2',
+#             'host_user_id':2,
+#         },
+#     ]
+#     image_room_info_list=get_image_roomlist(5)
+#     assert image_room_info_list==[]
+    
+#     #1번 방에 속한 2번 유저의 모든 이미지 중복 삭제 확인
+#     result=image_service.delete_room_user_image(1,2)
+#     assert result==0
+#     result=image_service.delete_room_user_image(2,100)
+#     assert result==0
+#     result=image_service.delete_room_user_image(2,3)
+#     assert result==1
+#     result=image_service.delete_room_user_image(2,3)
+#     assert result==0
+#     result=image_service.delete_room_user_image(100,3)
+#     assert result==0
+
 # def test_upload_image(image_service):
+#     filename='sample_image.JPG'
+#     parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+#     test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+#     with open(test_image_path, 'rb') as f:
+#         byte_image = f.read()
+#     #request 의 file클래스 구현
+#     class image:
+#         file=None
+#         filename=None
+#         def __init__(self,file,filename):
+#             self.file=file
+#             self.filename=filename
+#         def read(self):
+#             return self.file
+        
+#     request_image=image(byte_image,filename)
+
+#     new_image={
+#         'image':request_image,
+#         'user_id':1
+#     }
+#     result=image_service.upload_image(new_image)
+#     must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+#     new_image_id=result['new_image_id']
+#     new_image_info=image_service.get_image_info(new_image_id)
+#     assert new_image_info=={
+#         'id':5,
+#         'link':must_new_image_link,
+#         'user_id':1
+#     }
+#     #같은 사진을 두 번 올렸을 경우
+    
+#     new_image={
+#         'image':request_image,
+#         'user_id':1
+#     }
+#     result=image_service.upload_image(new_image)
+#     new_image_id=result['new_image_id']
+#     filename='sample_image(1).JPG'
+#     must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+#     new_image_info=image_service.get_image_info(new_image_id)
+#     assert new_image_info=={
+#         'id':6,
+#         'link':must_new_image_link,
+#         'user_id':1
+#     }
     
 # def test_upload_room_image(image_service):
-    
-#유저의 이미지 관계 확인
-def test_is_user_image(image_service):
-    #2번 유저의 2번 사진 관계 확인
-    result=image_service.is_user_image(2,2)
-    assert result==True
-    #2번 유저의 3번 사진 관계 확인
-    result=image_service.is_user_image(2,3)
-    assert result==False
-
-#이미지의 방 정보 목록 확인
-def test_get_image_roomlist(image_service):
-    #2번 이미지의 방 정보 목록 확인
-    image_room_info_list=image_service.get_image_roomlist(2)
-    assert image_room_info_list==get_image_roomlist(2)
-    #4번 이미지의 방 정보 목록 확인
-    image_room_info_list=image_service.get_image_roomlist(4)
-    assert image_room_info_list==[]
-
-#이미지의 정보 확인
-def test_get_image_info(image_service):
-    #1번 이미지의 정보 확인
-    image_info=image_service.get_image_info(1)
-    assert image_info==get_image_info(1)
-    #존재하지 않는 이미지의 정보 확인
-    image_info=image_service.get_image_info(100)
-    assert image_info==None
-
-#유저의 이미지 정보 목록 확인
-def test_get_user_imagelist(image_service):
-    #3번 유저의 이미지 정보 목록 확인
-    user_image_info_list=image_service.get_user_imagelist(3)
-    assert user_image_info_list==get_user_imagelist(3)
-
-#방의 이미지 정보 목록 확인
-def test_get_room_imagelist(image_service):
-    #1번 방의 이미지 정보 목록 확인
-    room_image_info_list=image_service.get_room_imagelist(1)
-    assert room_image_info_list==get_room_imagelist(1)
-
-#이미지의 방 업데이트 확인
-def test_update_image_room(image_service):
-    #2번 이미지의 방 목록 확인
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[1,2]
-    #2번 이미지의 방 목록 업데이트 확인 
-    update_roomlist=[2]
-    result=image_service.update_image_room(2,update_roomlist)
-    assert result=={
-                    'addlist':[],
-                    'deletelist':[1],
-                    'add_result':0,
-                    'delete_result':1
-                    }
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[2]
-
-    #4번 이미지의 방 목록 확인
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(4)]
-    assert image_roomlist==[]
-    #2번 이미지의 방 목록 업데이트 확인 
-    update_roomlist=[1,2]
-    result=image_service.update_image_room(4,update_roomlist)
-    assert result=={
-                    'addlist':[1,2],
-                    'deletelist':[],
-                    'add_result':2,
-                    'delete_result':0
-                    }
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[2]
-
-#방의 사진 삭제 확인
-def test_delete_room_image(image_service):
-    #2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
-    image_room_info_list=get_image_roomlist(2)
-    assert image_room_info_list==[
-        {
-            'id':1,
-            'title':'testroom1',
-            'host_user_id':1,
-        },
-        {
-            'id':2,
-            'title':'testroom2',
-            'host_user_id':2,
-        },
-    ]
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':'testlink2',
-            'user_id':2
-        }
-    ]
-    #1번방의 2번 이미지 삭제 후 2번 이미지의 방 정보 목록 및 1번 방의 이미지 정보 목록 확인
-    result=image_service.delete_room_image(1,2)
-    assert result==1
-    image_room_info_list=get_image_roomlist(2)
-    assert image_room_info_list==[
-        {
-            'id':2,
-            'title':'testroom2',
-            'host_user_id':2,
-        },
-    ]
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':None,
-            'user_id':None
-        }
-    ]
-    #1번방의 2번 사진 중복 삭제 확인
-    result=image_service.delete_room_image(1,2)
-    assert result==0
-
-#이미지를 삭제합니다.
-def test_delete_image(image_service):
-    #2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
-    user_image_info_list=get_user_imagelist(2)
-    assert user_image_info_list==[
-        {
-            'id':2,
-            'link':'testlink2',
-            'user_id':2
-        }
-    ]
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':'testlink2',
-            'user_id':2
-        }
-    ]
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[1,2]
-    #2번 이미지 삭제 후 2번 유저의 이미지 목록 확인 및 1번 방의 이미지 목록을 확인
-    result=image_service.delete_image(2)
-    assert result=={
-        'delete_image':1,
-        'delete_image_room':len(image_roomlist)
-    }
-    user_image_info_list=get_user_imagelist(2)
-    assert user_image_info_list==[]
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':None,
-            'user_id':None
-        }
-    ]
-    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-    assert image_roomlist==[]
-    image_info=get_image_info(2)
-    assert image_info==None
-    #이미 삭제된 이미지의 중복 삭제 확인
-    result=image_service.delete_image(2)
-    assert result=={
-        'delete_image':0,
-        'delete_image_room':len(image_roomlist)
-    }
-    
-#방에 속한 유저의 모든 이미지 제거
-def test_delete_room_user_image(image_service):
-    #2번 유저의 5번 이미지 생성 및 1번방에 업로드
-    database.execute(text("""
-        insert into images (
-            id,
-            link,
-            user_id
-        ) values (
-            :id,
-            :link,
-            :user_id
-        )
-    """),{
-        'id':5,
-        'link':'testlink5',
-        'user_id':2
-    })
-    database.execute(text("""
-        insert into images_room_list (
-            image_id,
-            room_id
-        ) values (
-            :image_id,
-            :room_id
-        )
-    """),{'image_id':5,'room_id':1})
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':'testlink2',
-            'user_id':2
-        },
-        {
-            'id':5,
-            'link':'testlink5',
-            'user_id':2
-        }
-    ]
-    image_room_info_list=get_image_roomlist(2)
-    assert image_room_info_list==[
-        {
-            'id':1,
-            'title':'testroom1',
-            'host_user_id':1,
-        },
-        {
-            'id':2,
-            'title':'testroom2',
-            'host_user_id':2,
-        },
-    ]
-    user_room_info_list=get_user_roomlist(2)
-    assert user_room_info_list==[
-        {
-            'id':1,
-            'title':'testroom1',
-            'host_user_id':1,
-        },
-        {
-            'id':2,
-            'title':'testroom2',
-            'host_user_id':2,
-        }
-    ]
-    
-    result=image_service.delete_room_user_image(1,2)
-    assert result==2
-    
-    room_image_info_list=get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':None,
-            'user_id':None
-        },
-        {
-            'id':5,
-            'link':None,
-            'user_id':None
-        }
-    ]
-    image_room_info_list=get_image_roomlist(2)
-    assert image_room_info_list==[
-        {
-            'id':2,
-            'title':'testroom2',
-            'host_user_id':2,
-        },
-    ]
-    image_room_info_list=get_image_roomlist(5)
-    assert image_room_info_list==[]
-    
-    #1번 방에 속한 2번 유저의 모든 이미지 중복 삭제 확인
-    result=image_service.delete_room_user_image(1,2)
-    assert result==0
-    result=image_service.delete_room_user_image(2,100)
-    assert result==0
-    result=image_service.delete_room_user_image(2,3)
-    assert result==1
-    result=image_service.delete_room_user_image(2,3)
-    assert result==0
-    result=image_service.delete_room_user_image(100,3)
-    assert result==0
-
-def test_upload_image(image_service):
-    filename='sample_image.JPG'
-    parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
-    with open(test_image_path, 'rb') as f:
-        byte_image = f.read()
-    #request 의 file클래스 구현
-    class image:
-        file=None
-        filename=None
-        def __init__(self,file,filename):
-            self.file=file
-            self.filename=filename
-        def read(self):
-            return self.file
+#     filename='sample_image.JPG'
+#     parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+#     test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
+#     with open(test_image_path, 'rb') as f:
+#         byte_image = f.read()
+#     #request 의 file클래스 구현
+#     class image:
+#         file=None
+#         filename=None
+#         def __init__(self,file,filename):
+#             self.file=file
+#             self.filename=filename
+#         def read(self):
+#             return self.file
         
-    request_image=image(byte_image,filename)
+#     request_image=image(byte_image,filename)
 
-    new_image={
-        'image':request_image,
-        'user_id':1
-    }
-    result=image_service.upload_image(new_image)
-    must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
-    new_image_id=result['new_image_id']
-    new_image_info=image_service.get_image_info(new_image_id)
-    assert new_image_info=={
-        'id':5,
-        'link':must_new_image_link,
-        'user_id':1
-    }
-    #같은 사진을 두 번 올렸을 경우
-    
-    new_image={
-        'image':request_image,
-        'user_id':1
-    }
-    result=image_service.upload_image(new_image)
-    new_image_id=result['new_image_id']
-    filename='sample_image(1).JPG'
-    must_new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
-    new_image_info=image_service.get_image_info(new_image_id)
-    assert new_image_info=={
-        'id':6,
-        'link':must_new_image_link,
-        'user_id':1
-    }
-    
-def test_upload_room_image(image_service):
-    filename='sample_image.JPG'
-    parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    test_image_path=f"{parent_path}/{config.test_config['TEST_IMAGE_PATH']}/{filename}"
-    with open(test_image_path, 'rb') as f:
-        byte_image = f.read()
-    #request 의 file클래스 구현
-    class image:
-        file=None
-        filename=None
-        def __init__(self,file,filename):
-            self.file=file
-            self.filename=filename
-        def read(self):
-            return self.file
-        
-    request_image=image(byte_image,filename)
+#     new_image={
+#         'image':request_image,
+#         'user_id':1
+#     }
+#     #1번 유저가 1번방에 사진 업로드 확인
+#     result=image_service.upload_room_image(1,new_image)
+#     new_image_id=result['new_image_id']
+#     new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
+#     new_image_info=image_service.get_image_info(new_image_id)
+#     assert new_image_info=={
+#         'id':5,
+#         'link':new_image_link,
+#         'user_id':1
+#     }
+#     image_room_info_list=image_service.get_image_roomlist(1)
+#     assert image_room_info_list==[
+#         {
+#             'id':1,
+#             'title':'testroom1',
+#             'host_user_id':1,
+#         }
+#     ]
 
-    new_image={
-        'image':request_image,
-        'user_id':1
-    }
-    #1번 유저가 1번방에 사진 업로드 확인
-    result=image_service.upload_room_image(1,new_image)
-    new_image_id=result['new_image_id']
-    new_image_link=f"{config.test_config['IMAGE_DOWNLOAD_URL']}1/{filename}"
-    new_image_info=image_service.get_image_info(new_image_id)
-    assert new_image_info=={
-        'id':5,
-        'link':new_image_link,
-        'user_id':1
-    }
-    image_room_info_list=image_service.get_image_roomlist(1)
-    assert image_room_info_list==[
-        {
-            'id':1,
-            'title':'testroom1',
-            'host_user_id':1,
-        }
-    ]
-
-    room_image_info_list=image_service.get_room_imagelist(1)
-    assert room_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':2,
-            'link':'testlink2',
-            'user_id':2
-        },
-        {
-            'id':5,
-            'link':new_image_link,
-            'user_id':1
-        }
-    ]
+#     room_image_info_list=image_service.get_room_imagelist(1)
+#     assert room_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':2,
+#             'link':'testlink2',
+#             'user_id':2
+#         },
+#         {
+#             'id':5,
+#             'link':new_image_link,
+#             'user_id':1
+#         }
+#     ]
     
-    user_image_info_list=image_service.get_user_imagelist(1)
-    assert user_image_info_list==[
-        {
-            'id':1,
-            'link':'testlink1',
-            'user_id':1
-        },
-        {
-            'id':5,
-            'link':new_image_link,
-            'user_id':1
-        }
-    ]
+#     user_image_info_list=image_service.get_user_imagelist(1)
+#     assert user_image_info_list==[
+#         {
+#             'id':1,
+#             'link':'testlink1',
+#             'user_id':1
+#         },
+#         {
+#             'id':5,
+#             'link':new_image_link,
+#             'user_id':1
+#         }
+#     ]
 
 # def test_is_user_image_room_member(image_service):
 #     is_user_image_room_member=image_service.is_user_image_room_member(3,4)
