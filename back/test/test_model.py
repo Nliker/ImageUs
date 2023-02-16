@@ -931,7 +931,7 @@ def test_insert_room_user_history(room_dao):
 
 #방에서 유저의 읽기 정보를 확인
 def test_get_room_user_history_info(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=room_dao.get_room_user_history_info(1,1)
@@ -939,7 +939,7 @@ def test_get_room_user_history_info(room_dao):
     
 
 def test_update_room_user_history_start(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=get_room_user_history_info(1,1)
@@ -963,7 +963,7 @@ def test_update_room_user_history_start(room_dao):
     }
     
 def test_update_room_user_history_last_unread_row(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=get_room_user_history_info(1,1)
@@ -1002,7 +1002,7 @@ def test_delete_user_rooms(room_dao):
     assert user_room_info_list==[]
 
 def test_delete_user_room_history(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=get_room_user_history_info(1,1)
@@ -1021,7 +1021,7 @@ def test_delete_user_room_history(room_dao):
     assert room_user_history_info==None
     
 def test_update_room_user_deleted_history(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=get_room_user_history_info(1,1)
@@ -1084,7 +1084,7 @@ def test_delete_room(room_dao):
     assert room_info==None
 
 def test_get_room_user_deleted_history_info(room_dao):
-    result=room_dao.insert_room_user_history(1,1)
+    result=insert_room_user_history(1,1)
     assert result==1
     
     room_user_history_info=get_room_user_history_info(1,1)
