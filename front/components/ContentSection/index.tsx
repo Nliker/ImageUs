@@ -36,6 +36,7 @@ import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { Button } from '@styles/Button';
+import Spinner from '@styles/Spinner';
 
 interface Props {
   roomId?: string;
@@ -225,33 +226,33 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
   }, [realTimeImageList]);
 
   const getDateString = (dateValue: Date) => {
-    const startDate = `${dateValue.getFullYear()}-${dateValue.getMonth()}-${dateValue.getDate()}`;
-    dateValue.setDate(dateValue.getDate() + 1);
-    const endDate = `${dateValue.getFullYear()}-${dateValue.getMonth()}-${dateValue.getDate()}`;
+    const selectDate = `${dateValue.getFullYear()}-${
+      dateValue.getMonth() + 1 >= 13 ? 0 : dateValue.getMonth() + 1
+    }-${dateValue.getDate()}`;
 
-    return { startDate, endDate };
+    return { selectDate };
   };
 
   const onClickFilteringItem = (filterName: string) => () => {
     if (filterName === 'today') {
       setFilterName('오늘 날짜');
-      const { startDate, endDate } = getDateString(new Date());
+      const { selectDate } = getDateString(new Date());
 
       setReadStartNumber(0);
       setFilterSelectTerm({
-        startDate,
-        endDate,
+        startDate: selectDate,
+        endDate: selectDate,
       });
     } else if (filterName === 'yesterday') {
       setFilterName('어제 날짜');
       const dateValue = new Date();
       dateValue.setDate(dateValue.getDate() - 1);
-      const { startDate, endDate } = getDateString(dateValue);
+      const { selectDate } = getDateString(dateValue);
 
       setReadStartNumber(0);
       setFilterSelectTerm({
-        startDate,
-        endDate,
+        startDate: selectDate,
+        endDate: selectDate,
       });
     } else if (filterName === 'selectDay') {
       setFilterName('기간 선택');
@@ -285,6 +286,8 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     setReadStartNumber(0);
     setFilterSelectTerm({ startDate, endDate });
   };
+
+  console.log(filterSelectTerm?.startDate);
 
   return (
     <Scrollbars>
@@ -361,7 +364,8 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
               {(defaultImgListLoading ||
                 filterImgListLoading ||
                 imgDataLoading) && (
-                <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
+                // <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
+                <Spinner />
               )}
             </div>
           </ContentBox>
