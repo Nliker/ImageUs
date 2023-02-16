@@ -15,7 +15,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   top: 0;
   box-sizing: border-box;
 
-  width: 300px;
+  width: 350px;
   height: 100%;
   z-index: 100;
 
@@ -24,7 +24,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   user-select: none;
 
   transition: transform 0.5s;
-  transform: translateX(-300px);
+  transform: translateX(-350px);
 
   ${({ show }) =>
     show &&
