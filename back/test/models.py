@@ -438,3 +438,18 @@ def get_room_imagelist_by_date(room_id,dates,pages):
         
     return room_image_info_list
 
+def insert_room_user_history(room_id,user_id):
+    result=database.execute(text("""
+            insert into rooms_user_history(
+                user_id,
+                room_id
+            ) values (
+                :user_id,
+                :room_id
+            )
+            """),{'user_id':user_id,'room_id':room_id})
+    row=result.rowcount
+    result.close()
+        
+    return row
+
