@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 export const Wrapper = styled.div``;
 
 export const Container = styled.div`
@@ -34,12 +35,14 @@ export const CloseBtn = styled.div`
 `;
 
 export const ModalContainer = styled.div`
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  min-height: 100vh;
+
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 1001;
@@ -60,23 +63,28 @@ export const Modal = styled.div`
   max-width: calc(100vw - 40px);
   min-width: 348px;
   min-height: 391px;
-  max-height: 403px;
   border-radius: 12px;
   background-color: white;
   overflow: hidden;
   user-select: none;
+
   .content_box {
     box-sizing: border-box;
 
     width: 100%;
     height: 360px;
-    padding: 20px;
 
     overflow: auto;
   }
+
   .result_box {
     display: flex;
   }
+
+  .upload_btn button {
+    width: 100%;
+  }
+
   @media screen and (max-width: 688px) {
     .content_box {
       overflow: auto;
@@ -109,7 +117,7 @@ export const ModalHeader = styled.div`
   align-items: center;
   height: 100%;
   user-select: none;
-  .left_btn,
+  /* .left_btn,
   .right_btn {
     display: flex;
     justify-content: center;
@@ -123,7 +131,7 @@ export const ModalHeader = styled.div`
       float: right;
       margin-left: auto;
     }
-  }
+  } */
 `;
 
 export const ModalTitle = styled.div`
@@ -137,7 +145,6 @@ export const ModalTitle = styled.div`
   h1 {
     width: 100%;
     margin: 0;
-    // font-size: 16px;
     text-align: center;
   }
 `;
@@ -148,28 +155,37 @@ export const ModalImageBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  padding: 20px 10px;
+  height: 100%;
+
+  box-sizing: border-box;
 `;
 
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   // 이미지가 load 되고 난 뒤에 값들을 넣어준다.
-  ${({ image }) => {
-    // console.log(image?.height, image, image?.width);
-    return `
-    background-image: url(${image?.src});
-    width: ${image && ((360 / image.height) * image.width).toFixed(3)}px;
-    `;
-  }};
-  height: 360px;
-  background-position: center center;
+  width: 100%;
+  height: 100%;
+
+  background-image: ${(props) => `url(${props.image?.src})`};
+  background-size: contain;
+  background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
-  overflow: hidden;
-  transform: none;
+
+  .default_image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+    gap: 1.5rem;
+  }
 `;
 
 export const ImageCover = styled.div`
   bottom: 0;
-  cursor: grab;
+  /* cursor: grab; */
   height: 100%;
   left: 0;
   position: absolute;
