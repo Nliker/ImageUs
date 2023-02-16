@@ -10,7 +10,7 @@ from sqlalchemy import create_engine,text
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
-image_args=['id','user_id','link']
+image_args=['id','user_id','link','user_name']
 
 def extract_arguments_from_data(data,args):
     if isinstance(data,dict):
@@ -469,17 +469,20 @@ def get_image_roomlist(image_id):
     return image_room_info_list
 
 def get_room_imagelist(room_id,pages):
-    rows=database.execute(text("""
+    result=database.execute(text("""
             select
                 i_r.image_id as id,
                 i.link,
                 i.user_id,
-                i.created_at
+                u.name,
+                i_r.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
             and i_r.deleted=0
             and i.deleted=0)
+            left join users as u
+            on (i.user_id=u.id)
             where i_r.room_id=:room_id
             order by i_r.created_at
             limit :start,:limit
@@ -487,12 +490,15 @@ def get_room_imagelist(room_id,pages):
                     'room_id':room_id,
                     'limit':pages['limit'],
                     'start':pages['start']
-                }).fetchall()
+                })
+    rows=result.fetchall()
+    result.close()
 
     room_image_info_list=[{
             'id':room_image_info['id'],
             'link':room_image_info['link'],
             'user_id':room_image_info['user_id'],
+            'user_name':room_image_info['name'],
             'created_at':room_image_info['created_at']
         } for room_image_info in rows]
 
@@ -625,8 +631,71 @@ def delete_user_room_history(user_id):
 
     return row
 
+def get_room_user_deleted_history_info(room_id,user_id):
+    result=database.execute(text("""
+            select *
+            from rooms_user_history
+            where room_id=:room_id
+            and user_id=:user_id
+            and deleted=1
+            """),{'room_id':room_id,'user_id':user_id})
+    row=result.fetchone()
+    result.close()
+        
+    user_read_history={
+            'user_id':row['user_id'],
+            'room_id':row['room_id'],
+            'last_unread_row':row['last_unread_row'],
+            'read_start_row':row['read_start_row'],
+            'marker_row':row['marker_row']
+    } if row else None
+
+    return user_read_history
+
+def get_room_imagelist_by_date(room_id,dates,pages):
+    result=database.execute(text("""
+            select
+                i_r.image_id as id,
+                i.link,
+                i.user_id,
+                u.name,
+                i_r.created_at
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0)
+            left join users as u
+            on (i.user_id=u.id)
+            where i_r.room_id=:room_id
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')>=DATE_FORMAT(:start_date,'%Y-%m-%d')
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')<=DATE_FORMAT(:end_date,'%Y-%m-%d')
+            order by i_r.created_at
+            limit :start,:limit
+            """),{
+                    'room_id':room_id,
+                    'start_date':dates['start_date'],
+                    'end_date':dates['end_date'],
+                    'limit':pages['limit'],
+                    'start':pages['start']
+                })
+    
+    rows=result.fetchall()
+    result.close()
+
+    room_image_info_list=[{
+            'id':room_image_info['id'],
+            'link':room_image_info['link'],
+            'user_id':room_image_info['user_id'],
+            'user_name':room_image_info['name'],
+            'created_at':room_image_info['created_at']
+    } for room_image_info in rows]
+        
+    return room_image_info_list
+
 def test_setup():
     assert True
+
 
 #새로운 유저 가입 검증
 def test_insert_user(user_dao):
@@ -1049,34 +1118,10 @@ def test_get_user_roomlist(room_dao):
 def test_get_room_userlist(room_dao):
     #1번방의 유저 정보 목록 확인
     room_user_info_list=room_dao.get_room_userlist(1)
-    assert room_user_info_list==[
-        {
-            'id':1,
-            'name':'test1',
-            'email':'test1@naver.com',
-            'profile':'testuser1'
-        },{
-            'id':2,
-            'name':'test2',
-            'email':'test2@naver.com',
-            'profile':'testuser2',
-        }
-    ]
+    assert room_user_info_list==get_room_userlist(1)
     #2번방의 유저 정보 목록 확인
     room_user_info_list=room_dao.get_room_userlist(2)
-    assert room_user_info_list==[
-        {
-            'id':2,
-            'name':'test2',
-            'email':'test2@naver.com',
-            'profile':'testuser2'
-        },{
-            'id':3,
-            'name':'test3',
-            'email':'test3@naver.com',
-            'profile':'testuser3',
-        }
-    ]
+    assert room_user_info_list==get_room_userlist(2)
 
 #방에 유저 삽입 확인
 def test_insert_room_user(room_dao):
@@ -1454,460 +1499,549 @@ def test_delete_room(room_dao):
     room_info=room_dao.get_room_info(1)
     assert room_info==None
 
-# #이미지 삽입 확인
-# def test_insert_image(image_dao):
-#     datetime_now=datetime.now()
-#     new_image={
-#         'link':'testlink5',
-#         'user_id':1,
-#     }
-#     new_image_id=image_dao.insert_image(new_image)
-#     image_info=get_image_info(new_image_id)
-#     assert extract_arguments_from_data(image_info,image_args)=={
-#         'id':new_image_id,
-#         'link':new_image['link'],
-#         'user_id':new_image['user_id']
-#     }
-
-# #유저의 이미지 정보 목록 확인
-# def test_get_user_imagelist(image_dao):
-#     #1유저의 이미지 정보 목록 확인
-#     user_image_info_list=image_dao.get_user_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(user_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#     ]
-#     #3번 유저의 이미지 정보 목록 확인
-#     user_image_info_list=image_dao.get_user_imagelist(3,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(user_image_info_list,image_args)==[
-#         {
-#             'id':3,
-#             'link':'testlink3',
-#             'user_id':3
-#         },
-#         {
-#             'id':4,
-#             'link':'testlink4',
-#             'user_id':3
-#         }
-#     ]
-
-# #이미지 정보 확인
-# def test_get_image_info(image_dao):
-#     #1번 이미지 정보 확인
-#     image_info=image_dao.get_image_info(1)
-#     assert extract_arguments_from_data(image_info,image_args)=={
-#         'id':1,
-#         'link':'testlink1',
-#         'user_id':1
-#     }
-#     #4번 이미지 정보 확인
-#     image_info=image_dao.get_image_info(4)
-#     assert extract_arguments_from_data(image_info,image_args)=={
-#         'id':4,
-#         'link':'testlink4',
-#         'user_id':3
-#     }
-#     #존재하지 않는 이미지 정보 확인
-#     image_info=image_dao.get_image_info(100)
-#     assert image_info==None
-
-# #이미지 삭제 확인
-# def test_delete_image(image_dao):
-#     #3번 유저의 이미지 정보 목록 확인
-#     user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(user_image_info_list,image_args)==[
-#         {
-#             'id':3,
-#             'link':'testlink3',
-#             'user_id':3
-#         },
-#         {
-#             'id':4,
-#             'link':'testlink4',
-#             'user_id':3
-#         }
-#     ]
-#     #1번 이미지 삭제 및 유저의 이미지 리스트 확인
-#     result=image_dao.delete_image(3)
-#     assert result==1
-#     user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(user_image_info_list,image_args)==[
-#         {
-#             'id':4,
-#             'link':'testlink4',
-#             'user_id':3
-#         }
-#     ]
-#     #이미 삭제된 이미지 정보 확인
-#     image_info=image_dao.get_image_info(3)
-#     assert image_info==None
-#     #이미 삭제한 1번 이미지를 중복 삭제 및 삭제된 사진의 방 목록 확인
-#     result=image_dao.delete_image(3)
-#     assert result==0
-
-# #사진의 방 정보 목록 확인
-# def test_get_image_roomlist(image_dao):
-#     #1번 이미지의 방 정보 목록 확인
-#     image_room_info_list=image_dao.get_image_roomlist(1)
-#     assert image_room_info_list==[
-#         {
-#             'id':1,
-#             'title':'testroom1',
-#             'host_user_id':1
-#         }
-#     ]
-#     #2번 이미지의 방 정보 목록 확인
-#     image_room_info_list=image_dao.get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':1,
-#             'title':'testroom1',
-#             'host_user_id':1
-#         },
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     #4번 이미지의 방 정보 목록 확인
-#     image_room_info_list=image_dao.get_image_roomlist(4)
-#     assert image_room_info_list==[]
-
-# #방에 이미지 삽입 확인
-# def test_insert_room_image(image_dao):
-#     #1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
-#     room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(3)
-#     assert image_room_info_list==[
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     #1번방에 3번 이미지를 추가 후 1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
-#     result=image_dao.insert_room_image(1,3)
-#     assert result==1
-#     room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         },
-#         {
-#             'id':3,
-#             'link':'testlink3',
-#             'user_id':3
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(3)
-#     assert image_room_info_list==[
-#         {
-#             'id':1,
-#             'title':'testroom1',
-#             'host_user_id':1
-#         },
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     #방에 이미 삽입된 사진 중복 삽입 확인
-#     result=image_dao.insert_room_image(1,3)
-#     assert result==0
-#     room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1,{'start':0,'limit':10})]
-#     assert room_imagelist==[1,2,3]
-#     image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
-#     assert image_roomlist==[1,2]
-
-# #방의 이미지 삭제 확인
-# def test_delete_room_image(image_dao):
-#     #1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
-#     room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':1,
-#             'title':'testroom1',
-#             'host_user_id':1
-#         },
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     #1번 방에서 2번 이미지 삭제 후 1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
-#     result=image_dao.delete_room_image(1,2)
-#     assert result==1
-#     room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':None,
-#             'user_id':None
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     #방에서 이미 삭제한 이미지 중복 삭제 확인
-#     result=image_dao.delete_room_image(1,2)
-#     assert result==0
-#     room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':None,
-#             'user_id':None
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-
-# #방의 이미지 정보 목록 확인
-# def test_get_room_imagelist(image_dao):
-#     #1번방의 이미지 정보 정보 확인
-#     room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         }
-#     ]
-#     room_image_info_list=image_dao.get_room_imagelist(2,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         },
-#         {
-#             'id':3,
-#             'link':'testlink3',
-#             'user_id':3
-#         }
-#     ]
-
-# #방의 특정 유저의 이미지 모두 삭제 확인
-# def test_delete_room_user_image(image_dao):
-#     #1번 방의 이미지 목록과 2번 사진의 방 목록 확인
-#     room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':'testlink2',
-#             'user_id':2
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':1,
-#             'title':'testroom1',
-#             'host_user_id':1
-#         },
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-
-#     #1번방의 2번 유저 사진 삭제 확인
-#     result=image_dao.delete_room_user_image(1,2)
-#     assert result==1
-#     room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
-#     assert extract_arguments_from_data(room_image_info_list,image_args)==[
-#         {
-#             'id':1,
-#             'link':'testlink1',
-#             'user_id':1
-#         },
-#         {
-#             'id':2,
-#             'link':None,
-#             'user_id':None
-#         }
-#     ]
-#     image_room_info_list=get_image_roomlist(2)
-#     assert image_room_info_list==[
-#         {
-#             'id':2,
-#             'title':'testroom2',
-#             'host_user_id':2
-#         }
-#     ]
-#     result=image_dao.delete_room_user_image(1,2)
-#     assert result==0
+def test_get_room_user_deleted_history_info(room_dao):
+    result=room_dao.insert_room_user_history(1,1)
+    assert result==1
     
-# #이미지가 속한 방을 삭제
-# def test_delete_image_room(image_dao):
-#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-#     assert image_roomlist==[1,2]
-#     result=image_dao.delete_image_room(2)
-#     image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
-#     assert image_roomlist==[]
+    room_user_history_info=get_room_user_history_info(1,1)
+    assert room_user_history_info=={
+        'user_id':1,
+        'room_id':1,
+        'last_unread_row':0,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+    
+    result=delete_user_room_history(1)
+    assert result==1
+    room_user_history_info=get_room_user_history_info(1,1)
+
+    assert room_user_history_info==None
+    
+    result=room_dao.get_room_user_deleted_history_info(1,1)
+    assert result==get_room_user_deleted_history_info(1,1)
+
+#이미지 삽입 확인
+def test_insert_image(image_dao):
+    new_image={
+        'link':'testlink5',
+        'user_id':1,
+    }
+    new_image_id=image_dao.insert_image(new_image)
+    image_info=get_image_info(new_image_id)
+    assert extract_arguments_from_data(image_info,image_args)=={
+        'id':new_image_id,
+        'link':new_image['link'],
+        'user_id':new_image['user_id']
+    }
+
+#유저의 이미지 정보 목록 확인
+def test_get_user_imagelist(image_dao):
+    #1유저의 이미지 정보 목록 확인
+    user_image_info_list=image_dao.get_user_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1
+        },
+    ]
+    #3번 유저의 이미지 정보 목록 확인
+    user_image_info_list=image_dao.get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        },
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+
+#이미지 정보 확인
+def test_get_image_info(image_dao):
+    #1번 이미지 정보 확인
+    image_info=image_dao.get_image_info(1)
+    assert extract_arguments_from_data(image_info,image_args)=={
+        'id':1,
+        'link':'testlink1',
+        'user_id':1
+    }
+    #4번 이미지 정보 확인
+    image_info=image_dao.get_image_info(4)
+    assert extract_arguments_from_data(image_info,image_args)=={
+        'id':4,
+        'link':'testlink4',
+        'user_id':3
+    }
+    #존재하지 않는 이미지 정보 확인
+    image_info=image_dao.get_image_info(100)
+    assert image_info==None
+
+#이미지 삭제 확인
+def test_delete_image(image_dao):
+    #3번 유저의 이미지 정보 목록 확인
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        },
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+    #1번 이미지 삭제 및 유저의 이미지 리스트 확인
+    result=image_dao.delete_image(3)
+    assert result==1
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+    #이미 삭제된 이미지 정보 확인
+    image_info=image_dao.get_image_info(3)
+    assert image_info==None
+    #이미 삭제한 1번 이미지를 중복 삭제 및 삭제된 사진의 방 목록 확인
+    result=image_dao.delete_image(3)
+    assert result==0
+
+#사진의 방 정보 목록 확인
+def test_get_image_roomlist(image_dao):
+    #1번 이미지의 방 정보 목록 확인
+    image_room_info_list=image_dao.get_image_roomlist(1)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        }
+    ]
+    #2번 이미지의 방 정보 목록 확인
+    image_room_info_list=image_dao.get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #4번 이미지의 방 정보 목록 확인
+    image_room_info_list=image_dao.get_image_roomlist(4)
+    assert image_room_info_list==[]
+
+#방에 이미지 삽입 확인
+def test_insert_room_image(image_dao):
+    #1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2,
+            'user_name':'test2'
+        }
+    ]
+    image_room_info_list=get_image_roomlist(3)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #1번방에 3번 이미지를 추가 후 1번방의 이미지 정보 목록과 3번 이미지의 방 정보 목록 확인
+    result=image_dao.insert_room_image(1,3)
+    assert result==1
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2,
+            'user_name':'test2'
+        },
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3,
+            'user_name':'test3'
+        }
+    ]
+    image_room_info_list=get_image_roomlist(3)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #방에 이미 삽입된 사진 중복 삽입 확인
+    result=image_dao.insert_room_image(1,3)
+    assert result==0
+    room_imagelist=[image_info['id'] for image_info in get_room_imagelist(1,{'start':0,'limit':10})]
+    assert room_imagelist==[1,2,3]
+    image_roomlist=[room_info['id'] for room_info in get_image_roomlist(3)]
+    assert image_roomlist==[1,2]
+
+#방의 이미지 삭제 확인
+def test_delete_room_image(image_dao):
+    #1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2,
+            'user_name':'test2'
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #1번 방에서 2번 이미지 삭제 후 1번방의 이미지 정보 목록과 2번 이미지의 방 정보 목록 확인
+    result=image_dao.delete_room_image(1,2)
+    assert result==1
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None,
+            'user_name':None
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    #방에서 이미 삭제한 이미지 중복 삭제 확인
+    result=image_dao.delete_room_image(1,2)
+    assert result==0
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None,
+            'user_name':None
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+
+#방의 이미지 정보 목록 확인
+def test_get_room_imagelist(image_dao):
+    #1번방의 이미지 정보 정보 확인
+    room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
+    assert room_image_info_list==get_room_imagelist(1,{'start':0,'limit':10})
+    room_image_info_list=image_dao.get_room_imagelist(2,{'start':0,'limit':10})
+    assert room_image_info_list==get_room_imagelist(2,{'start':0,'limit':10})
+        
+    
+def test_get_room_imagelist_by_date(image_dao):
+    start_date=datetime.strftime(datetime.now(),"%Y-%m-%d")
+    dates={
+        'start_date':start_date,
+        'end_date':start_date
+    }
+    pages={'start':0,'limit':10}
+    room_image_info_list_by_date=image_dao.get_room_imagelist_by_date(1,dates,pages)
+
+    assert room_image_info_list_by_date==get_room_imagelist_by_date(1,dates,pages) 
+
+    
+
+#방의 특정 유저의 이미지 모두 삭제 확인
+def test_delete_room_user_image(image_dao):
+    #1번 방의 이미지 목록과 2번 사진의 방 목록 확인
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2,
+            'user_name':'test2'
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':1,
+            'title':'testroom1',
+            'host_user_id':1
+        },
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+
+    #1번방의 2번 유저 사진 삭제 확인
+    result=image_dao.delete_room_user_image(1,2)
+    assert result==1
+    room_image_info_list=image_dao.get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':None,
+            'user_id':None,
+            'user_name':None
+        }
+    ]
+    image_room_info_list=get_image_roomlist(2)
+    assert image_room_info_list==[
+        {
+            'id':2,
+            'title':'testroom2',
+            'host_user_id':2
+        }
+    ]
+    result=image_dao.delete_room_user_image(1,2)
+    assert result==0
+    
+#이미지가 속한 방을 삭제
+def test_delete_image_room(image_dao):
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[1,2]
+    #2번 이미지가 속한 방들을 삭제
+    result=image_dao.delete_image_room(2)
+    assert result==2
+
+    image_roomlist=[image_room_info['id'] for image_room_info in get_image_roomlist(2)]
+    assert image_roomlist==[]
 
 
-# def test_image_room_userlist(image_dao):
-#     image_room_userlist=get_image_room_userlist(1)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':1,
-#             'user_id':1
-#         },
-#         {
-#             'room_id':1,
-#             'user_id':2
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(2)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':1,
-#             'user_id':1
-#         },
-#         {
-#             'room_id':1,
-#             'user_id':2
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':2
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':3
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(3)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':2,
-#             'user_id':2
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':3
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(4)
-#     assert image_room_userlist==[]
+def test_image_room_userlist(image_dao):
+    image_room_userlist=get_image_room_userlist(1)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':1,
+            'user_id':2
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(2)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':1,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(3)
+    assert image_room_userlist==[
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(4)
+    assert image_room_userlist==[]
     
-#     row=database.execute(text("""
-#         update rooms_user_list
-#         set deleted=1
-#         where room_id=1
-#         and user_id=2
-#         """)).rowcount
-#     assert row==1
+    row=database.execute(text("""
+        update rooms_user_list
+        set deleted=1
+        where room_id=1
+        and user_id=2
+        """)).rowcount
+    assert row==1
     
     
-#     image_room_userlist=get_image_room_userlist(1)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':1,
-#             'user_id':1
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(2)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':1,
-#             'user_id':1
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':2
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':3
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(3)
-#     assert image_room_userlist==[
-#         {
-#             'room_id':2,
-#             'user_id':2
-#         },
-#         {
-#             'room_id':2,
-#             'user_id':3
-#         }
-#     ]
-#     image_room_userlist=get_image_room_userlist(4)
-#     assert image_room_userlist==[]
+    image_room_userlist=get_image_room_userlist(1)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(2)
+    assert image_room_userlist==[
+        {
+            'room_id':1,
+            'user_id':1
+        },
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(3)
+    assert image_room_userlist==[
+        {
+            'room_id':2,
+            'user_id':2
+        },
+        {
+            'room_id':2,
+            'user_id':3
+        }
+    ]
+    image_room_userlist=get_image_room_userlist(4)
+    assert image_room_userlist==[]
+
+def test_get_room_imagelist_len(image_dao):
+    room_image_info_list=get_room_imagelist(1,{'start':0,'limit':10})
+    assert extract_arguments_from_data(room_image_info_list,image_args)==[
+        {
+            'id':1,
+            'link':'testlink1',
+            'user_id':1,
+            'user_name':'test1'
+        },
+        {
+            'id':2,
+            'link':'testlink2',
+            'user_id':2,
+            'user_name':'test2'
+        }
+    ]
+
+    result=image_dao.get_room_imagelist_len(1)
+    assert result==2
+def test_get_user_imagelist_len(image_dao):
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        },
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+
+    result=image_dao.get_user_imagelist_len(3)
+    assert result==2
     
+def test_delete_user_imagelist(image_dao):
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[
+        {
+            'id':3,
+            'link':'testlink3',
+            'user_id':3
+        },
+        {
+            'id':4,
+            'link':'testlink4',
+            'user_id':3
+        }
+    ]
+
+    result=image_dao.delete_user_imagelist(3)
+    assert result==2
+    
+    user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
+    assert extract_arguments_from_data(user_image_info_list,image_args)==[]
+
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
