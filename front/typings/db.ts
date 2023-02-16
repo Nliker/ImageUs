@@ -1,7 +1,7 @@
 export interface DRoomData {
   id: number;
   title: string;
-  host_user_id: string;
+  host_user_id: number;
   userlist: DFriendData[];
 }
 
