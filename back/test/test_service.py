@@ -50,10 +50,16 @@ def setup_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate email_auth
     """))
     print("초기화 완료")
     print("샘플 기입")
@@ -61,6 +67,10 @@ def setup_function():
         "test_password".encode('utf-8'),
         bcrypt.gensalt()
     )
+    new_email_auths=[{
+        'email':"test_auth1@naver.com",
+        'auth_password':"1234"
+    }]
     new_users=[{
         'id':1,
         'name':'test1',
@@ -147,6 +157,15 @@ def setup_function():
         'room_id':2
     }]
     database.execute(text("""
+        insert into email_auth(
+            email,
+            auth_password
+        ) values (
+            :email,
+            :auth_password
+        )
+    """),new_email_auths)
+    database.execute(text("""
         insert into users (
             id,
             name,
@@ -229,10 +248,16 @@ def teardown_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate email_auth
     """))
     print("초기화 완료")
     print("이미지 폴더 초기화")
