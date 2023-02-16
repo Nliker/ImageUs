@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { keyframes } from '@emotion/react';
+import { keyframes, css } from '@emotion/react';
 
 const sliceAnimate = keyframes`
     0% {
@@ -84,6 +84,19 @@ export const Container = styled.div`
   background: white;
   padding: 10px 45px;
 
+  .check_box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & > button {
+      width: 50px;
+      height: 25px;
+      padding: 0px;
+      font-size: 15px;
+    }
+  }
+
   & .check_label_box {
     display: inline-flex;
     align-items: center;
@@ -91,10 +104,29 @@ export const Container = styled.div`
     height: 35px;
 
     cursor: pointer;
+
+    .mark_box {
+      display: flex;
+      position: absolute;
+      left: 0px;
+      gap: 5px;
+
+      span {
+        border-radius: 5px;
+      }
+
+      .room_manager_mark {
+        background-color: antiquewhite;
+      }
+
+      .onself_mark {
+        background-color: lavender;
+      }
+    }
   }
 `;
 
-export const DataCheckInput = styled.input`
+export const DataCheckInput = styled.input<{ boxName: string }>`
   display: grid;
   align-items: center;
   position: relative;
@@ -102,7 +134,7 @@ export const DataCheckInput = styled.input`
   height: 15px;
   width: 15px;
   border: 0;
-  margin: 0 15px 0 0;
+  margin: 0 6px 0 0;
 
   background: #fff;
   outline: none;
@@ -117,17 +149,22 @@ export const DataCheckInput = styled.input`
     animation: ${check02Animate} 0.4s ease forwards;
   }
 
-  &:checked + label {
+  &:checked ~ label {
     font-weight: bolder;
   }
 
-  &:checked + label::before {
-    animation: ${sliceAnimate} 0.4s ease forwards;
-    //   background: gray;
-    // width: 0px;
+  &:checked ~ label::before {
+    animation: ${(props) =>
+      props.boxName === 'member'
+        ? ''
+        : css`
+            ${sliceAnimate} 0.4s ease forwards
+          `};
+    width: ${(props) => (props.boxName === 'member' ? '0' : '')};
+    /* animation: ${sliceAnimate} 0.4s ease forwards; */
   }
 
-  &:checked + label::after {
+  &:checked ~ label::after {
     animation: ${fireworkAnimate} 0.5s ease forwards 0.1s;
   }
 
@@ -158,8 +195,10 @@ export const DataLabel = styled.label`
   position: relative;
   display: grid;
   align-items: center;
+  grid-auto-flow: column;
 
   width: fit-content;
+  /* margin-left: 15px; */
 
   color: #414856;
   cursor: pointer;
@@ -168,7 +207,7 @@ export const DataLabel = styled.label`
   &::before {
     height: 2px;
     width: 8px;
-    left: -27px;
+    left: -18px;
     border-radius: 2px;
 
     background: #4f29f0;
