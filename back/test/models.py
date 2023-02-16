@@ -3,6 +3,25 @@ from sqlalchemy import create_engine,text
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
+def get_user_id_and_password(email,type):
+    result=database.execute(text("""
+            select
+                id,
+                hashed_password
+            from users
+            where email=:email
+            and type=:type
+            """),{'email':email,'type':type})
+    row=result.fetchone()
+    result.close()
+
+    user_id_and_password={
+            'id':row['id'],
+            'hashed_password':row['hashed_password']
+        } if row else None
+        
+    return user_id_and_password
+
 def get_user_info(user_id):
     row=database.execute(text("""
             select
