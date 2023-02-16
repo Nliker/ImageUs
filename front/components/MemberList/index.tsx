@@ -11,6 +11,8 @@ import { DFriendData, DRoomData } from '@typing/db';
 import CollapseListBox from '@components/CollapseListBox';
 import ActionButton from '@styles/ActiveButton';
 import { useParams } from 'react-router';
+import { SyncLoader } from 'react-spinners';
+import Spinner from '@styles/Spinner';
 
 interface Props {
   currentRoomInfo: DRoomData;
@@ -19,7 +21,6 @@ interface Props {
 const MemberList = memo(({ currentRoomInfo }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
   const { mutate } = useSWRConfig();
-  // console.log(currentRoomInfo);
 
   const { data: showModalState, mutate: showModalMutate } =
     useSWR('showModalState');
@@ -37,7 +38,6 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
   );
 
   const collapseListBoxData = useCallback(() => {
-    if (!currentRoomInfo) return;
     const { userlist } = currentRoomInfo;
 
     const data = userlist.map((userData) => ({
@@ -61,6 +61,8 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
     });
   };
 
+  if (!currentRoomInfo) return <Spinner />;
+
   return (
     <div>
       <Subtitle onClick={toggleMemberCollapse}>
@@ -73,8 +75,11 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
         <>
           <CollapseListBox
             data={collapseListBoxData()}
-            currentDataId={logInInfo.user_info.id}
-            nameKey={'member'}
+            currentLoginId={logInInfo.user_info.id}
+            boxInfo={{
+              boxName: 'member',
+              hostId: currentRoomInfo.host_user_id,
+            }}
             onClickDeleteMember={onClickDeleteMember}
             readOnly
           />

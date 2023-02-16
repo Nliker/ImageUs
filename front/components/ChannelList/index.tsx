@@ -8,22 +8,14 @@ import { useNavigate } from 'react-router';
 import CollapseListBox from '@components/CollapseListBox';
 import { useParams } from 'react-router';
 import ActionButton from '@styles/ActiveButton';
+import Spinner from '@styles/Spinner';
 
 interface Props {
-  roomlist: { id: number; data: string }[];
+  roomlist?: { id: number; data: string }[];
   closeSidebar: () => void;
 }
 
 const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
-  // const { data: roomlist, mutate: mutateRoomList } = useSWR(
-  //   'roomlist',
-  //   getUserRoomListFetcher,
-  //   {
-  //     revalidateIfStale: false,
-  //     revalidateOnFocus: false,
-  //     revalidateOnReconnect: false,
-  //   },
-  // );
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
 
@@ -32,7 +24,7 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
     useSWR('showModalState');
 
   const onClickRoom = useCallback((roomId: number) => {
-    // closeSidebar();
+    closeSidebar();
     navigate(`/booth/${roomId}`);
   }, []);
 
@@ -41,20 +33,14 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
     [],
   );
 
-  // const collapseListBoxData = useCallback(() => {
-  //   const data = roomlist.map((room: DRoomData) => ({
-  //     id: room.id,
-  //     data: room.title,
-  //   }));
-  //   return [...data];
-  // }, [roomlist]);
-
   const onClickCreateRoomBtn = useCallback(() => {
     showModalMutate({
       ...showModalState,
       create_room: true,
     });
   }, [showModalState]);
+
+  if (!roomlist) return <Spinner />;
 
   return (
     <Container>
@@ -69,8 +55,8 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
           <CollapseListBox
             data={roomlist}
             dataClickCallBack={onClickRoom}
-            currentDataId={roomId}
-            nameKey={'channel'}
+            currentLoginId={roomId}
+            boxInfo={{ boxName: 'channel' }}
           />
           <CreateBtnBox>
             <ActionButton onClickBtn={onClickCreateRoomBtn} btnTitle={'+'} />
