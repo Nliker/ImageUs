@@ -60,7 +60,11 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
           <AlertBox />
         </ModalWrapper>
       )}
-      {showModalState?.upload && <UploadModal />}
+      {showModalState?.upload && (
+        <ModalLayout modalName={'upload'}>
+          <UploadModal />
+        </ModalLayout>
+      )}
       {showModalState?.create_room && (
         <ModalLayout modalName={'create_room'}>
           <CreateRoomModal />
