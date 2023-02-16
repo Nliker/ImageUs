@@ -67,7 +67,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
   );
 
   const extractRoomList = useMemo(() => {
-    if (!roomListInfo) return [];
+    if (!roomListInfo) return;
 
     const roomListData = roomListInfo.map((data: DRoomData) => {
       return {
@@ -81,7 +81,6 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
 
   const extractCurrentUserList = useMemo(() => {
     if (!roomListInfo) return;
-    // console.log(roomListInfo);
 
     const currentRoomData = roomListInfo.find(
       (data: DRoomData) => '' + data.id === roomId,
