@@ -468,10 +468,10 @@ def user_router(api,services,config,es):
             else:
                 new_user={
                     **oauth_user_info,
-                    'profile':f"{Oauth_class.oauth_type} 유저 입니다."
+                    'profile':f"{coperation} 유저 입니다."
                 }
                 print(new_user)
-                new_user_id=user_service.create_new_user(new_user,type=Oauth_class.oauth_type)
+                new_user_id=user_service.create_new_user(new_user,type=coperation)
     
                 access_token=user_service.generate_access_token(new_user_id)
                 
