@@ -41,6 +41,18 @@ class ParserModule:
                                 location='args',
                                 help='end date',
                                 required=False)
+
+        if 'code' in args:
+            parser.add_argument('code',type=str,
+                                location='args',
+                                help='oauth_login_code',
+                                required=False)
+        
+        if 'coperation' in args:
+            parser.add_argument('coperation',type=str,
+                                location='args',
+                                help='oauth_login_coperation',
+                                required=False)
         
         return parser
     

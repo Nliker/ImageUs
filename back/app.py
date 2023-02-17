@@ -3,7 +3,7 @@ from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import UserDao,ImageDao,RoomDao
 from service import UserService,ImageService,RoomService
-from view import user_router,image_router,room_router
+from view import user_router,image_router,room_router,oauth_router
 from flask_restx import Api,Resource
 from elasticsearch import Elasticsearch
 import os
@@ -67,6 +67,7 @@ def create_app(test_config=None):
     services.image_service=ImageService(image_dao,app.config)
     services.room_service=RoomService(room_dao,app.config)
 
+    oauth_router(api,services,app.config)
     user_router(api,services,app.config,es)
     room_router(api,services)
     image_router(api,services)
