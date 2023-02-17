@@ -1,15 +1,15 @@
-from flask import request,jsonify,make_response,redirect,url_for
-import requests
+from flask import request,jsonify,make_response,redirect
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
-
+import requests
 from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
+
 class Oauth:
         default_headers={
             "Content-Type": "application/x-www-form-urlencoded",
@@ -26,41 +26,38 @@ class Oauth:
             "profile_url":"https://openapi.naver.com/v1/nid/me"
         }}
 
-        def __init__(self,oauth_type,rest_api_key,oauth_redirect_url,secret_key):
-            self.oauth_type=oauth_type
-            self.rest_api_key=rest_api_key
-            self.redirect_url=oauth_redirect_url
-            self.secret_key=secret_key
+        def __init__(self):
+            pass
             
-        def get_access_token(self,code):
+        def get_access_token(self,coperation,code,rest_api_key,secret_key,redirect_url):
+            print(code)
             return requests.post(
-            url=self.corperation.get(self.oauth_type)['auth_url'],
+            url=self.corperation.get(coperation)['auth_url'],
             headers=self.default_headers
             ,
             data={
                     "grant_type": "authorization_code",
-                    "client_id": self.rest_api_key,
-                    "client_secret": self.secret_key,
-                    "redirect_uri": self.redirect_url,
+                    "client_id": rest_api_key,
+                    "client_secret": secret_key,
+                    "redirect_uri": redirect_url,
                     "code": code
                 },
             ).json()
             
-        def get_user_info(self,access_token):
+        def get_user_info(self,coperation,access_token):
             return requests.get(
-            url=self.corperation.get(self.oauth_type)['profile_url'],
+            url=self.corperation.get(coperation)['profile_url'],
             headers={
             **self.default_headers,
             "Authorization":f"Bearer {access_token}"
             },
             data={}
         ).json()
-
-
 def user_router(api,services,config,es):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
+    oauth=Oauth()
 
     api.add_namespace(user_namespace,'')
     api_error=ApiError(user_namespace)
@@ -428,56 +425,42 @@ def user_router(api,services,config,es):
             else:
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
-
-
-    @api.route("/oauth-login")
-    class oauth_login(Resource):
-        def get(self):
-            oauth_type=request.args['type']
-            global Oauth_class
-            if oauth_type=="kakao":
-                print("kakao")
-                Oauth_class=Oauth(oauth_type="kakao",rest_api_key=config['KAKAO_REST_API_KEY'],oauth_redirect_url=config['OAUTH_REDIRECT_URI'],secret_key=config["KAKAO_SECRET_KEY"])
-                oauth_login_url = f"https://kauth.{Oauth_class.oauth_type}.com/oauth/authorize?client_id={Oauth_class.rest_api_key}&redirect_uri={Oauth_class.redirect_url}&response_type=code"
-
-            if oauth_type=="naver":
-                print("naver")
-                Oauth_class=Oauth(oauth_type="naver",rest_api_key=config['NAVER_REST_API_KEY'],oauth_redirect_url=config['OAUTH_REDIRECT_URI'],secret_key=config["NAVER_SECRET_KEY"])
-                oauth_login_url = f"https://nid.{Oauth_class.oauth_type}.com/oauth2.0/authorize?client_id={Oauth_class.rest_api_key}&redirect_uri={Oauth_class.redirect_url}&response_type=code"
-
-            return redirect(oauth_login_url)
   
+    oauth_login_callback_parser=api_parser_module.get_parser(['code','coperation'])
     @user_namespace.route("/oauth-login/callback")
+    @user_namespace.expect(oauth_login_callback_parser,validate=False)
     class oauth_signup(Resource):
         def get(self):
             code=request.args['code']
+            coperation=request.args['coperation']
 
-            token=Oauth_class.get_access_token(code)
+            if coperation=="kakao":
+                token=oauth.get_access_token(coperation,code,config['KAKAO_REST_API_KEY'],config['KAKAO_SECRET_KEY'],config['KAKAO_REDIRECT_URI'])
+                print(token)
+                access_token=token['access_token']
 
-            access_token=token['access_token']
-
-            res=Oauth_class.get_user_info(access_token)
-        
-            if Oauth_class.oauth_type=="kakao":
+                res=oauth.get_user_info(coperation,access_token)
                 kakao_account_info=res['kakao_account']
                 oauth_user_info={
                     'name':kakao_account_info['profile']['nickname'],
                     'email':kakao_account_info['email'],
                     'password':str(res['id'])
                 }
-        
-            if Oauth_class.oauth_type=="naver":
+            if coperation=="naver":
+                token=oauth.get_access_token(coperation,code,config['NAVER_REST_API_KEY'],config['NAVER_SECRET_KEY'],config['NAVER_REDIRECT_URI'])
+                print(token)
+                access_token=token['access_token']
+
+                res=oauth.get_user_info(coperation,access_token)
                 naver_account_info=res['response']
                 oauth_user_info={
                     'name':naver_account_info['name'],
                     'email':naver_account_info['email'],
                     'password':naver_account_info['id']
                 }
-            print(oauth_user_info)
-            print(user_service.is_email_exists(oauth_user_info['email'],type=Oauth_class.oauth_type))
 
-            if user_service.is_email_exists(oauth_user_info['email'],type=Oauth_class.oauth_type):
-                user_info=user_service.get_user_id_and_password(email=oauth_user_info['email'],type=Oauth_class.oauth_type)
+            if user_service.is_email_exists(oauth_user_info['email'],type=coperation):
+                user_info=user_service.get_user_id_and_password(email=oauth_user_info['email'],type=coperation)
                     
                 access_token=user_service.generate_access_token(user_info['id'])
 
