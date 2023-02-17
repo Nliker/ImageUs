@@ -124,5 +124,6 @@ def oauth_router(api,services,config):
                 new_user_id=user_service.create_new_user(new_user,type=coperation)
     
                 access_token=user_service.generate_access_token(new_user_id)
-                
-                return make_response(jsonify({'access_token':access_token,'user_id':new_user_id}))
+                res=make_response(jsonify({'access_token':access_token,'user_id':new_user_id}))
+                res.headers["Access-Control-Allow-Origin"]="*"
+                return res
