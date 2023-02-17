@@ -77,7 +77,7 @@ def oauth_router(api,services,config):
             return redirect(oauth_login_url)
     
     oauth_login_callback_parser=api_parser_module.get_parser(['code','coperation'])
-    @oauth_namespace.route("/oauth-login/callback")
+    @oauth_namespace.route("/callback")
     @oauth_namespace.expect(oauth_login_callback_parser,validate=False)
     class oauth_signup(Resource):
         def get(self):
