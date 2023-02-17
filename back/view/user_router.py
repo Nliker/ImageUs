@@ -430,7 +430,7 @@ def user_router(api,services,config,es):
                                      api_error.credential_error()['status_code'])
 
 
-    @user_namespace.route("/oauth-login")
+    @api.route("/oauth-login")
     class oauth_login(Resource):
         def get(self):
             oauth_type=request.args['type']
