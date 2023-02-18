@@ -41,6 +41,63 @@ export const OuterContainer = styled.div`
     border: 1px solid #dadce0;
     border-radius: 8px;
   }
+
+  .social_sign-in_box {
+    margin-top: 13px;
+
+    .social_icon_box {
+      display: flex;
+      justify-content: center;
+
+      padding: 12px 0;
+      gap: 2.5rem;
+
+      .social_button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 44px;
+        height: 44px;
+        border: 0;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 20%);
+        cursor: pointer;
+
+        &.kakao {
+          background-color: #fae500;
+        }
+
+        &.naver {
+          color: white;
+          background-color: #15c654;
+        }
+      }
+    }
+
+    .social_sign-in_title {
+      position: relative;
+
+      padding: 0 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 16px;
+      letter-spacing: -0.3px;
+      color: #b8b8b8;
+      z-index: 11;
+      background-color: #fff;
+    }
+
+    .social_sign-in_line {
+      position: relative;
+      bottom: -12px;
+      display: block;
+      margin: 0;
+      width: 100%;
+      height: 1px;
+      background-color: #b8b8b8;
+      border: none;
+    }
+  }
 `;
 
 export const InnerContainer = styled.div`
