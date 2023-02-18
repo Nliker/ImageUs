@@ -88,6 +88,10 @@ const config: Configuration = {
         target: 'http://118.42.101.135:5001',
         changeOrigin: true,
       },
+      '/oauth-login/*': {
+        target: 'http://118.42.101.135:5000',
+        changeOrigin: true,
+      },
       '/user/*': {
         target: 'http://118.42.101.135:5000',
         changeOrigin: true,
@@ -101,23 +105,6 @@ const config: Configuration = {
         changeOrigin: true,
       },
     },
-
-    // '/user': {
-    //   target: 'http://118.42.101.135:5000',
-    //   changeOrigin: true,
-    // },
-    // '/room': {
-    //   target: 'http://118.42.101.135:5000',
-    //   changeOrigin: true,
-    // },
-    // '/image': {
-    //   target: 'http://118.42.101.135:5000',
-    //   changeOrigin: true,
-    // },
-    // '/image-download': {
-    //   target: 'http://118.42.101.135:5001',
-    //   changeOrigin: true,
-    // },
   },
 };
 
