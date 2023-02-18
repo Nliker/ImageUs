@@ -110,7 +110,7 @@ const getImageData = async (
     return [...imgDataList];
   } catch (err) {
     if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
+      console.log('이미지 로딩에 실패했습니다.');
     }
     return [];
   }
