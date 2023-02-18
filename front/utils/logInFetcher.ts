@@ -30,34 +30,7 @@ const logInCheckFetcher = async (url: string) => {
     }
     return { logInState: false };
   }
-  // return axios
-  //   .get(url, {
-  //     headers: {
-  //       Authorization: `${sessionStorage.getItem('TOKEN')}`,
-  //     },
-  //   })
-  //   .then(() => {
-  //     console.log('토큰 정상');
-  //     // const { user_info } = res.data;
-  //     // sessionStorage.setItem('NAME', user_info.name);
-  //     // sessionStorage.setItem('EMAIL', user_info.email);
-  //     // sessionStorage.setItem('PROFILE', user_info.profile);
-  //     return true;
-  //   })
-  //   .catch(() => {
-  //     console.log('유효하지 않은 접근입니다.');
-  //     return false;
-  //   });
 };
-
-/*
-
-  <logInRequestFetcher>
-
-  key 값: '/user/login' => 로그인 페이지에서 아이디, 패스워드를 입력받고 토큰을 받는다.
-  기능 => 토큰과 유저아이디를 세션 스토리지에 저장하고 로그인 성공여부를 반환한다.
-
-*/
 
 const logInRequestFetcher = async (
   url: string,
@@ -79,14 +52,28 @@ const logInRequestFetcher = async (
     return false;
   }
 };
-// 임시 로그인 Fetcher
-// const logInFetcher = () => {
-//     // const hasToken = sessionStorage.getItem('token');
-//     // if (hasToken) {
-//     //     return true;
-//     // }
-//     // return false;
-//     return true;
-// };
 
-export { logInCheckFetcher, logInRequestFetcher };
+const socialLoginFetcher = async ([url, coperation, code]: [
+  string,
+  string,
+  string,
+]) => {
+  try {
+    const response = await axios.get(
+      `${url}?coperation=${coperation}&code=${code}`,
+    );
+
+    const { access_token, user_id } = response.data;
+    sessionStorage.setItem('TOKEN', access_token);
+    sessionStorage.setItem('USER_ID', user_id);
+
+    return true;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      console.error(err);
+    }
+    return false;
+  }
+};
+
+export { logInCheckFetcher, logInRequestFetcher, socialLoginFetcher };
