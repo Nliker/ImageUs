@@ -24,15 +24,22 @@ import {
 const MainPage = () => {
   const userId = sessionStorage.getItem('USER_ID');
   const { data: logInInfo } = useSWR('/user/my');
-  const { data: roomlist, isValidating: roomListValidating } = useSWR(
-    `/user/${userId}/roomlist`,
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const {
+    data: roomlist,
+    mutate: mutateRoomlist,
+    isLoading: roomlistIsLoading,
+  } = useSWR(`/user/${userId}/roomlist`, getUserRoomListFetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateOnMount: false,
+  });
+
+  useEffect(() => {
+    console.log('확인', logInInfo);
+    if (!logInInfo.logInState) return;
+    mutateRoomlist();
+  }, [logInInfo]);
 
   console.log('메인페이지 로그인:', logInInfo);
 
@@ -59,12 +66,17 @@ const MainPage = () => {
                 <div className="content_box">
                   <Scrollbars>
                     <ul className="room_list">
-                      {!roomListValidating &&
+                      {!roomlist ? (
+                        <div>로딩중...</div>
+                      ) : roomlist.length === 0 ? (
+                        <div>등록된 방이 없습니다.</div>
+                      ) : (
                         roomlist?.map((roomData: DRoomData) => (
                           <Link key={roomData.id} to={`/booth/${roomData.id}`}>
                             <li>{roomData.title}</li>
                           </Link>
-                        ))}
+                        ))
+                      )}
                     </ul>
                   </Scrollbars>
                 </div>
