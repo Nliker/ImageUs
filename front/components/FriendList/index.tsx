@@ -28,40 +28,39 @@ const FriendList = () => {
 
   return (
     <Wrapper>
-      <div>
-        <table>
-          <colgroup></colgroup>
-          <thead>
-            <tr>
-              <th scope="col">이름</th>
-              <th scope="col">이메일</th>
-              <th scope="col">관계</th>
-              {/* <th scope="col">조회</th> */}
-              <th scope="col">목록에서 삭제</th>
-            </tr>
-          </thead>
-          <tbody>
-            {friendListData &&
-              friendListData.map((data: DFriendData) => (
-                <tr key={data.id}>
-                  <td>{data.name}</td>
-                  <td>{data.email}</td>
-                  <td>{data.profile}</td>
-                  <td>
-                    <div>
-                      <Button
-                        type="button"
-                        onClick={handleDeleteFriend(data.id)}
-                      >
-                        삭제
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <colgroup>
+          <col span={1} style={{ width: '15%' }} />
+          <col span={1} style={{ width: '30%' }} />
+          <col span={1} style={{ width: '40%' }} />
+          <col span={1} style={{ width: '15%' }} />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">이름</th>
+            <th scope="col">이메일</th>
+            <th scope="col">관계</th>
+            <th scope="col">목록 삭제</th>
+          </tr>
+        </thead>
+        <tbody>
+          {friendListData &&
+            friendListData.map((data: DFriendData) => (
+              <tr key={data.id}>
+                <td>{data.name}</td>
+                <td>{data.email}</td>
+                <td>{data.profile}</td>
+                <td>
+                  <div className="delete_btn">
+                    <Button type="button" onClick={handleDeleteFriend(data.id)}>
+                      삭제
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </Wrapper>
   );
 };

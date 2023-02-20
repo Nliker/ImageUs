@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  overflow: hidden;
-
   table tr th,
   table tbody td {
     text-align: center;
@@ -10,5 +8,12 @@ export const Wrapper = styled.div`
 
   table tbody tr {
     height: 100px;
+  }
+
+  @media screen and (max-width: 850px) {
+    .delete_btn button {
+      width: 53px;
+      font-size: 0.65rem;
+    }
   }
 `;
