@@ -74,8 +74,16 @@ export const ProfileInfo = styled.div`
   justify-content: space-around;
   flex-basis: 50%;
 
+  gap: 1rem;
+
   ul {
     display: flex;
     gap: 1rem;
+  }
+
+  @media screen and (max-width: 600px) {
+    ul {
+      flex-direction: column;
+    }
   }
 `;
