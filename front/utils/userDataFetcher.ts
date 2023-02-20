@@ -221,7 +221,7 @@ const postNewFriend = async (
   } catch (err) {
     if (err instanceof AxiosError) {
       console.log(err);
-      alert('오류가 발생했습니다..');
+      alert(err.response?.data.message);
     }
     return;
   }
