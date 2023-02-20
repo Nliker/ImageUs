@@ -1,13 +1,11 @@
 import styled from '@emotion/styled';
 
-// export const ProfileModal = styled.div``;
-
-// export const LogOutButton = styled.button``;
-
 export const Wrappper = styled.div`
+  min-width: 370px;
   height: calc(100% - 40px);
   font-size: 0.85rem;
-  overflow: auto;
+
+  overflow: hidden;
 `;
 
 export const ContentWrappper = styled.div`
@@ -24,11 +22,44 @@ export const ContentWrappper = styled.div`
 `;
 
 export const MainIntroduction = styled.section`
-  padding: 6rem 0;
+  .main_background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-  & > h1 {
+    width: 100%;
+    height: 100%;
+    gap: 5rem;
+
+    color: white;
+    background-color: rgb(0 0 0);
+
+    img {
+      position: absolute;
+      right: 0;
+
+      height: 70%;
+    }
+
+    .btn_group {
+      display: flex;
+      position: relative;
+
+      z-index: 1;
+      gap: 5rem;
+    }
+  }
+
+  .main_page_article {
+    position: relative;
+    z-index: 1;
+  }
+
+  .main_page_intro {
     text-align: center;
 
+    margin: 0;
     font-size: 2.75rem;
 
     .brand_logo {
