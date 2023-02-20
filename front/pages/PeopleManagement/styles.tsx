@@ -22,6 +22,9 @@ export const Wrapper = styled.div`
   }
 
   .content_wrapper {
+    position: relative;
+    right: 3px;
+
     padding-bottom: 40px;
   }
 `;
@@ -41,6 +44,9 @@ export const ContentBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  width: fit-content;
+  margin: auto;
 
   table {
     width: 100%;
@@ -68,8 +74,10 @@ export const ContentBox = styled.div`
 export const TabBox = styled.div`
   position: relative;
   top: 18px;
-  right: 130px;
-  z-index: 1;
+
+  width: 100%;
+  padding-left: 50px;
+  box-sizing: border-box;
 
   ul {
     display: inline-flex;
@@ -103,14 +111,16 @@ export const TabBox = styled.div`
 
 export const TabContent = styled.div`
   position: relative;
-  z-index: 10;
 
-  min-width: 561px;
-  max-width: 800px;
-  height: 400px;
-  margin: auto;
+  width: calc(100vw - 20px);
+  min-width: 560px;
+  border-top: 1px solid #a39485;
 
   background-color: white;
-  border-radius: 15px;
-  box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
+
+  @media screen and (min-width: 850px) {
+    max-width: 800px;
+    border-radius: 15px;
+    box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
+  }
 `;
