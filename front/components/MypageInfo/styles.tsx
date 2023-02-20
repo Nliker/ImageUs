@@ -37,5 +37,11 @@ export const InfoTable = styled.table`
     th {
       border-right: 1px solid #a39485;
     }
+
+    @media screen and (max-width: 600px) {
+      .btn_group button {
+        font-size: 0.65rem;
+      }
+    }
   }
 `;
