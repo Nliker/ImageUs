@@ -740,117 +740,232 @@ def test_delete_user(user_service):
     
     assert get_user_info(1)==None
 
-# #새로운 방을 생성
-# def test_create_room(room_service):
-#     #호스트가 1번 유저인 방을 생성합니다.
-#     new_room={
-#         'title':'test_room3',
-#         'user_id':1
-#     }
-#     new_room_id=room_service.create_room(new_room)
-#     assert get_room_info(new_room_id)=={
-#         'id':3,
-#         'title':new_room['title'],
-#         'host_user_id':new_room['user_id']
-#     }
+#새로운 방을 생성
+def test_create_room(room_service):
+    #호스트가 1번 유저인 방을 생성합니다.
+    new_room={
+        'title':'test_room3',
+        'user_id':1
+    }
+    new_room_id=room_service.create_room(new_room)
+    assert get_room_info(new_room_id)=={
+        'id':3,
+        'title':new_room['title'],
+        'host_user_id':new_room['user_id']
+    }
 
-# #방의 정보를 확인
-# def test_get_room_info(room_service):
-#     #1번 방의 정보를 확인
-#     room_info=room_service.get_room_info(1)
-#     assert room_info==get_room_info(1)
-#     #존재하지 않는 방의 정보 확인
-#     room_info=room_service.get_room_info(100)
-#     assert room_info==None
+#방의 정보를 확인
+def test_get_room_info(room_service):
+    #1번 방의 정보를 확인
+    room_info=room_service.get_room_info(1)
+    assert room_info==get_room_info(1)
+    #존재하지 않는 방의 정보 확인
+    room_info=room_service.get_room_info(100)
+    assert room_info==None
 
-# #유저의 방 정보 목록 확인
-# def test_get_user_roomlist(room_service):
-#     #1번 유저의 방 정보 목록 확인
-#     user_room_info_list=room_service.get_user_roomlist(1)
-#     assert user_room_info_list==get_user_roomlist(1)
-#     #2번 유저의 방 정보 목록 확인
-#     user_room_info_list=room_service.get_user_roomlist(2)
-#     assert user_room_info_list==get_user_roomlist(2)
+#유저의 방 정보 목록 확인
+def test_get_user_roomlist(room_service):
+    #1번 유저의 방 정보 목록 확인
+    user_room_info_list=room_service.get_user_roomlist(1)
+    assert user_room_info_list==get_user_roomlist(1)
+    #2번 유저의 방 정보 목록 확인
+    user_room_info_list=room_service.get_user_roomlist(2)
+    assert user_room_info_list==get_user_roomlist(2)
 
-# #유저의 방 삭제
-# def test_delete_user_room(room_service):
-#     #기존 정보 확인
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-#     assert user_roomlist==[1,2]
+#유저의 방 삭제
+def test_delete_user_room(room_service):
+    #기존 정보 확인
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1,2]
     
-#     #2번 유저의 1번방 삭제 후 정보 확인
-#     result=room_service.delete_user_room(2,1)
-#     assert result==1
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-#     assert user_roomlist==[2]
+    #2번 유저의 1번방 삭제 후 정보 확인
+    result=room_service.delete_user_room(2,1)
+    assert result==1
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[2]
 
-#     #2번 유저의 방 중복 삭제 확인
-#     result=room_service.delete_user_room(2,1)
-#     assert result==0
+    #2번 유저의 방 중복 삭제 확인
+    result=room_service.delete_user_room(2,1)
+    assert result==0
     
-# #방에 유저들 생성 확인
-# def test_create_room_users(room_service):
-#     #1번방의 유저 목록을 확인
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1,2]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-#     assert user_roomlist==[2]
-#     #1번 방에 1,2,3번 유저 초대
-#     invite_users=[1,2,3]
-#     result=room_service.create_room_users(1,invite_users)
-#     assert result==1
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1,2,3]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-#     assert user_roomlist==[1,2]
-#     #1번방 이미 초대된 사람들의 중복 초대 확인
-#     invite_users=[1,2,3]
-#     result=room_service.create_room_users(1,invite_users)
-#     assert result==0
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1,2,3]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
-#     assert user_roomlist==[1,2]
+#방에 유저들 생성 확인
+def test_create_room_users(room_service):
+    #1번방의 유저 목록을 확인
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+    assert user_roomlist==[2]
+    #1번 방에 1,2,3번 유저 초대
+    invite_users=[1,2,3]
+    result=room_service.create_room_users(1,invite_users)
+    assert result==1
+    #새로 초대된 3번유저의 room_user_histroy 생성 확인
+    assert get_room_user_history_info(1,3)=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':0,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2,3]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+    assert user_roomlist==[1,2]
+    #1번방 이미 초대된 사람들의 중복 초대 확인
+    invite_users=[1,2,3]
+    result=room_service.create_room_users(1,invite_users)
+    assert result==0
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2,3]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(3)]
+    assert user_roomlist==[1,2]
 
-# #방에 속한 유저인지 확인
-# def test_is_room_user(room_service):
-#     #1번 방의 2번 유저 관계 확인
-#     result=room_service.is_room_user(1,2)
-#     assert result==True
-#     #1번 방의 존재하지 않는 유저 확인
-#     result=room_service.is_room_user(1,100)
-#     assert result==False
+#방에 속한 유저인지 확인
+def test_is_room_user(room_service):
+    #1번 방의 2번 유저 관계 확인
+    result=room_service.is_room_user(1,2)
+    assert result==True
+    #1번 방의 존재하지 않는 유저 확인
+    result=room_service.is_room_user(1,100)
+    assert result==False
 
-# #방의 유저 정보 목록 확인
-# def test_get_room_userlist(room_service):
-#     #1번 방의 유저 정보목록 확인
-#     room_user_info_list=room_service.get_room_userlist(1)
-#     assert room_user_info_list==get_room_userlist(1)
-#     #2번 방의 유저 정보 목록 확인
-#     room_user_info_list=room_service.get_room_userlist(2)
-#     assert room_user_info_list==get_room_userlist(2)
+#방의 유저 정보 목록 확인
+def test_get_room_userlist(room_service):
+    #1번 방의 유저 정보목록 확인
+    room_user_info_list=room_service.get_room_userlist(1)
+    assert room_user_info_list==get_room_userlist(1)
+    #2번 방의 유저 정보 목록 확인
+    room_user_info_list=room_service.get_room_userlist(2)
+    assert room_user_info_list==get_room_userlist(2)
 
-# #방의 유저 제거(강퇴)
-# def test_delete_room_user(room_service):
-#     #1번 방의 정보 확인
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1,2]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-#     assert user_roomlist==[1,2]
-#     #1번 방의 2번 유저 제거 후 정보 확인
-#     result=room_service.delete_room_user(1,2)
-#     assert result==1
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-#     assert user_roomlist==[2]
-#     #1번방의 삭제된 유저 중복 삭제 확인
-#     result=room_service.delete_room_user(1,2)
-#     assert result==0
-#     room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
-#     assert room_userlist==[1]
-#     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
-#     assert user_roomlist==[2]
+#방의 유저 제거(강퇴)
+def test_delete_room_user(room_service):
+    #1번 방의 정보 확인
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1,2]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1,2]
+    #1번 방의 2번 유저 제거 후 정보 확인
+    result=room_service.delete_room_user(1,2)
+    assert result==1
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[2]
+    #1번방의 삭제된 유저 중복 삭제 확인
+    result=room_service.delete_room_user(1,2)
+    assert result==0
+    room_userlist=[room_user_info['id'] for room_user_info in get_room_userlist(1)]
+    assert room_userlist==[1]
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[2]
+
+#방의 유저의 읽기 기록 가져오기 확인
+def test_get_room_user_history_info(room_service):
+    result=insert_room_user_history(1,2)
+
+    assert result==1
+    
+    room_user_history_info=room_service.get_room_user_history_info(1,2)
+
+    assert get_room_user_history_info(1,2)==room_user_history_info
+
+#방의 유저의 읽기 기록 업데이트 확인
+def test_update_room_user_history_start(room_service):
+    result= insert_room_user_history(1,3)
+    assert result==1
+
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':0,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+    
+    result=room_service.update_room_user_history_start(1,3,10)
+    assert result==1
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':10,
+        'read_start_row':9,
+        'marker_row':10
+    }
+
+#방의 유저의 읽기 기록 업데이트 확인
+def test_update_room_user_history_last_unread_row(room_service):
+    result= insert_room_user_history(1,3)
+    assert result==1
+
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':0,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+    result=room_service.update_room_user_history_last_unread_row(1,3,15)
+    assert result==1
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':15,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+
+def test_delete_user_roomlist(room_service):
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1,2]
+
+    result=room_service.delete_user_roomlist(2)
+    assert result==2
+
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[]
+    
+#유저의 방의 읽기 기록 삭제 확인
+def test_delete_user_room_history(room_service):
+    result=insert_room_user_history(1,3)
+    assert result==1
+    
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info=={
+        'user_id':3,
+        'room_id':1,
+        'last_unread_row':0,
+        'read_start_row':-1,
+        'marker_row':0
+    }
+
+    result=room_service.delete_user_room_history(3)
+    assert result==1
+    room_user_history_info=get_room_user_history_info(1,3)
+    assert room_user_history_info==None
+
+#방의 방장을 변경 확인
+def test_change_room_host_user_id(room_service):
+    room_info=get_room_info(1)
+    assert room_info=={
+        'id':1,
+        'title':'testroom1',
+        'host_user_id':1
+    }
+    
+def test_delete_room(room_service):
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1,2] 
+
+    result=room_service.delete_room(2)
+    assert result==1
+    
+    user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]
+    assert user_roomlist==[1]
 
 # #이미지 업로드 확인
 # # def test_upload_image(image_service):
