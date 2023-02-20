@@ -1,7 +1,6 @@
 import requests
 import jwt
-from datetime import timezone,timedelta,datetime
-import pytz
+from datetime import timezone,timedelta
 
 class ImageService:
     def __init__(self,image_dao,config):

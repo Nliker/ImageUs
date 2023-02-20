@@ -1,7 +1,37 @@
+import sys,os
+sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 import config
 from sqlalchemy import create_engine,text
+from datetime import timezone,timedelta
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
+
+image_args=['id','user_id','link','user_name']
+
+def insert_datetime_timezone(datetime_no_timezone):
+    custom_timezone=timezone(timedelta(hours=config.test_config['MYSQL_TIMEZONE']))
+    datetime_with_timezone=datetime_no_timezone.replace(tzinfo=custom_timezone).strftime('%Y-%m-%d %H:%M:%S %Z')
+    return datetime_with_timezone
+
+def extract_arguments_from_data(data,args):
+    if isinstance(data,dict):
+        result={}
+        for key in args:
+            if key in data:
+                result[key]=data[key]
+
+        return result
+
+    if isinstance(data,list):
+        result=[]
+        for dic in data:
+            temp_dic={}
+            for key in args:
+                if key in dic:
+                    temp_dic[key]=dic[key]
+            result.append(temp_dic)
+            
+        return result
 
 def get_user_id_and_password(email,type):
     result=database.execute(text("""
