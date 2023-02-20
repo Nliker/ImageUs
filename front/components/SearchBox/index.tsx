@@ -14,7 +14,7 @@ import React, {
   useState,
 } from 'react';
 import { useLinkClickHandler } from 'react-router-dom';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 import { IconContext } from 'react-icons/lib';
@@ -26,6 +26,7 @@ const SearchBox = () => {
   const [searchData, setSearchData] = useState<DFriendData>();
   const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
 
+  const { mutate } = useSWRConfig();
   const { data: prevSearchDataList } = useSWR(
     `/user/search?email=${queryParams}`,
     searchFetcher,
@@ -77,7 +78,7 @@ const SearchBox = () => {
 
   const onClickAddFriend = useCallback(
     (friendId?: number) => () => {
-      registerFriendTrigger(friendId);
+      mutate('friendlist', registerFriendTrigger(friendId));
     },
     [searchData],
   );
