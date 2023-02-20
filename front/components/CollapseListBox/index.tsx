@@ -76,8 +76,8 @@ const CollapseListBox = ({
               </DataLabel>
             </div>
             {boxInfo.boxName === 'member' &&
+              boxInfo.hostId === currentLoginId &&
               boxInfo?.hostId !== item.id &&
-              currentLoginId !== item.id &&
               onClickDeleteMember && (
                 <Button
                   className="error"
