@@ -346,7 +346,7 @@ def user_router(api,services,config,es):
     #     'access_token':<str>
     # }
     post_login_model=api_model.get_model("post_login_model",['email','password'])
-    post_login_response_model=api_model.get_model("post_login_response_model",['access_token'])
+    post_login_response_model=api_model.get_model("post_login_response_model",['user_id','access_token','access_token_expire_time','refresh_token','refresh_token_expire_time'])
     @user_namespace.route("/login")
     class login(Resource):
         @user_namespace.expect(post_login_model,validate=False)
@@ -357,6 +357,9 @@ def user_router(api,services,config,es):
         @user_namespace.response(api_error.credential_error()['status_code'],
                                  '비밀번호가 일치하지 않습니다.',
                                  api_error.credential_error_model())
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
         def post(self):
             '''
             로그인을 합니다.
@@ -381,6 +384,54 @@ def user_router(api,services,config,es):
             else:
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
+
+    post_refresh_model=api_model.get_model("post_refresh_model",['refresh_token'])
+    post_refresh_response_model=api_model.get_model("post_refresh_response_model",['user_id','refresh_token','refresh_token_expire_time'])
+    @user_namespace.route("/<int:user_id>/refresh")
+    class refresh(Resource):
+        @user_namespace.expect(post_refresh_model,validate=False)
+        @user_namespace.response(200,'접근 토큰을 반환합니다.',post_refresh_response_model)
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
+        @user_namespace.response(api_error.user_token_auth_existance_error()['status_code'],
+                                 '리프레시 토큰을 발급한 내역이 없습니다.',
+                                 api_error.user_token_auth_existance_error_model())
+        @user_namespace.response(api_error.user_token_auth_decode_error()['status_code'],
+                                 '리프레시토큰의 인증이 유효하지 않습니다.',
+                                 api_error.user_token_auth_decode_error_model())
+        @user_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        def post(self,user_id):
+            '''
+            리프레시 토큰을 통해 접근 토큰을 발급합니다.
+            '''
+
+            refresh_token=request.json['refresh_token']
+            if not user_service.get_user_info(user_id):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
+            
+            if not user_service.get_user_token_auth(user_id):
+                return make_response(jsonify({'message':api_error.user_token_auth_existance_error()['message']}),
+                                     api_error.user_token_auth_existance_error()['status_code'])
+
+            result=user_service.decode_from_refresh_token(refresh_token,user_id)
+
+            if result==False:
+                return make_response(jsonify({'message':api_error.user_token_auth_decode_error()['message']}),
+                                     api_error.user_token_auth_decode_error()['status_code'])
+                
+                
+            result=user_service.generate_access_token(user_id)
+
+            return make_response(jsonify({'user_id':user_id,**result}),200)
+            
+            
+                
+                
+            
 
     #input
     #output
