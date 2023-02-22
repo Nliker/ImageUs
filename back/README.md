@@ -124,10 +124,18 @@ CREATE TABLE `rooms_user_history` (
   `marker_row` int NOT NULL default 0,
   `deleted` boolean not null DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`room_id`,`user_id`)
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
 
+9.users_refresh_token_auth
+CREATE TABLE `users_token_auth` (
+  `user_id` int NOT NULL,
+  `refresh_token_secret_key` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted` boolean not null DEFAULT 0,
+  PRIMARY KEY (`user_id`)
+)
 <!-- 아래는 추후 완성 기능 -->
 <!-- 7. albums
 CREATE TABLE `albums` (
