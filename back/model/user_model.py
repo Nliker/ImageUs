@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 class UserDao:
     def __init__(self,database):
         self.db=database
-        
+    
     def insert_user(self,new_user):
         result=self.db.execute(text("""
             insert into users(
@@ -294,6 +294,68 @@ class UserDao:
            where id=:delete_user_id
            and deleted=0
         """),{'delete_user_id':delete_user_id})
+        row=result.rowcount
+        result.close()
+        
+        return row
+    
+    def insert_user_token_auth(self,user_id,refresh_token_secret_key):
+        result=self.db.execute(text("""
+            insert into users_token_auth(
+                user_id,
+                refresh_token_secret_key
+            ) values(
+                :user_id,
+                :refresh_token_secret_key
+            )
+            """),{'user_id':user_id,'refresh_token_secret_key':refresh_token_secret_key})
+        row=result.rowcount
+        result.close()
+        
+        return row
+    
+    def get_user_token_auth(self,user_id):
+        result=self.db.execute(text("""
+            select *
+            from users_token_auth
+            where user_id=:user_id
+            """
+        ),{'user_id':user_id})
+
+        row=result.fetchone()
+        result.close()
+        
+        user_token_auth_info={
+            'user_id':row['user_id'],
+            'refresh_token_secret_key':row['refresh_token_secret_key'],
+            'created_at':row['created_at'],
+            'updated_at':row['updated_at'],
+            'deleted':row['deleted']
+        } if row else None
+
+        return user_token_auth_info
+
+        
+    
+    def update_user_token_auth(self,user_id,updates):
+        set_query=[]
+        
+        for key,value in updates.items():
+            if type(value)==int:
+                set_query.append(f"{key}={updates[key]}")
+            elif type(value)==str:
+                set_query.append(f"{key}='{updates[key]}'")
+        
+        set_query=','.join(set_query)
+      
+        query="""
+            update users_token_auth
+            set
+                %s
+            where user_id=%d
+        """ % (set_query,user_id)
+
+        result=self.db.execute(query)
         row=result.rowcount
         result.close()
         
