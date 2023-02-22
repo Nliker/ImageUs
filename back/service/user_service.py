@@ -5,7 +5,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
-
+import string
+import random
 
 class UserService:
     def __init__(self,user_dao,config):
@@ -165,16 +166,54 @@ class UserService:
 
         return authorized
     
-    def generate_access_token(self,user_id):
-        jwt_expire_time= timedelta(seconds=self.config['JWT_EXPIRE_TIME'])
-        payload={
-            'user_id':user_id,
-            'exp':datetime.utcnow()+jwt_expire_time,
-            'iat':datetime.utcnow()
-        }
-        access_token=jwt.encode(payload,self.config['JWT_SECRET_KEY'],'HS256')
+    def generate_token(self,user_id):
+        user_token_auth_info=self.user_dao.get_user_token_auth(user_id)
+            
+        refresh_token_len=self.config['JWT_REFRESH_TOKEN_NUM']
+        
+        refresh_token_secret_key=(''.join(random.choice(string.ascii_letters + string.digits) for _ in range(refresh_token_len)))
 
-        return access_token
+        if user_token_auth_info ==None:
+            result=self.user_dao.insert_user_token_auth(user_id,refresh_token_secret_key)
+
+        elif user_token_auth_info['deleted']==1:
+            result=self.user_dao.update_user_token_auth(user_id,{'deleted':0,'refresh_token_secret_key':refresh_token_secret_key})
+
+        else:
+            result=self.user_dao.update_user_token_auth(user_id,{'refresh_token_secret_key':refresh_token_secret_key})
+
+        print(result)
+        
+        jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
+        jwt_refresh_token_expire_time= timedelta(seconds=self.config['JWT_REFRESH_TOKEN_EXPIRE_TIME'])
+
+        time_now=datetime.now()
+
+        access_token_expire=time_now+jwt_access_token_expire_time
+        refresh_token_expire=time_now+jwt_refresh_token_expire_time
+        
+        
+        access_token_payload={
+            'user_id':user_id,
+            'exp':access_token_expire,
+            'iat':time_now
+        }
+        
+        refresh_token_payload={
+            'user_id':user_id,
+            'exp':refresh_token_expire,
+            'iat':time_now
+        }
+        
+        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],'HS256')
+        refresh_token=jwt.encode(refresh_token_payload,refresh_token_secret_key,'HS256')
+        
+        return {
+            'access_token':access_token,
+            'access_token_expire_time':access_token_expire.strftime('%Y-%m-%d %H:%M:%S'),
+            'refresh_token':refresh_token,
+            'refresh_token_expire_time':refresh_token_expire.strftime('%Y-%m-%d %H:%M:%S')
+        }
     
     def get_user_id_and_password(self,email,type="image_us"):
         user_credential=self.user_dao.get_user_id_and_password(email,type)
@@ -222,4 +261,5 @@ class UserService:
         result=self.user_dao.delete_user(delete_user_id)
         print(result)
         return result
-                    
+    
+      
