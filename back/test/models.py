@@ -3,10 +3,14 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 import config
 from sqlalchemy import create_engine,text
 from datetime import timezone,timedelta
+import jwt
 
 database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
 image_args=['id','user_id','link','user_name']
+
+def generate_access_token(user_id):
+    return jwt.encode({'user_id':user_id},config.test_config['JWT_SECRET_KEY'],'HS256')
 
 def insert_datetime_timezone(datetime_no_timezone):
     custom_timezone=timezone(timedelta(hours=config.test_config['MYSQL_TIMEZONE']))
