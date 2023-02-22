@@ -166,6 +166,41 @@ class UserService:
 
         return authorized
     
+    def get_user_token_auth(self,user_id):
+        user_token_auth=self.user_dao.get_user_token_auth(user_id)
+        if user_token_auth and user_token_auth['deleted']==1:
+            return None
+        else:
+            return user_token_auth
+            
+    def decode_from_refresh_token(self,refresh_token,user_id):
+        user_token_auth=self.user_dao.get_user_token_auth(user_id)
+        refresh_token_secret_key=user_token_auth['refresh_token_secret_key']
+        try:
+            payload=jwt.decode(refresh_token,refresh_token_secret_key,'HS256')
+            return True
+        except:
+            return False
+        
+    def generate_access_token(self,user_id):
+        jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
+        time_now=datetime.now()
+        access_token_expire=time_now+jwt_access_token_expire_time
+
+        access_token_payload={
+            'user_id':user_id,
+            'exp':access_token_expire,
+            'iat':time_now
+        }
+        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],'HS256')
+
+        return {
+            'access_token':access_token,
+            'access_token_expire_time':access_token_expire.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    
+
+    
     def generate_token(self,user_id):
         user_token_auth_info=self.user_dao.get_user_token_auth(user_id)
             
