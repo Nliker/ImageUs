@@ -171,6 +171,17 @@ class ApiModel:
                 description="int_imagelist_len",
                 required=False
     )
+    access_token_expire_time=fields.String(
+            default="2023-02-10 10:00:00",
+            description='str_access_token_expire_time',
+            required=False
+    )
+    refresh_token_expire_time=fields.String(
+            default="2023-02-24 10:00:00",
+            description='str_refresh_token_expire_time',
+            required=False
+    )
+    
     
     search_user_info={
                     'id':fields.Integer,
@@ -203,6 +214,12 @@ class ApiModel:
         required=False
     )
     
+    user_id=fields.Integer(
+        default=1,
+        description='int_user_id',
+        required=False
+    )
+    
     marker=fields.Integer(
         default=2,
         description='int_marker',
@@ -221,6 +238,12 @@ class ApiModel:
                 description="int_user_read_room_history_row",
                 required=False
             )
+    
+    refresh_token=fields.String(
+            default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            description='str_refresh_token',
+            required=False
+    )
     
     
     def __init__(self,api):
@@ -458,9 +481,22 @@ class ApiModel:
                 ],
                 required=False
             )
+            
         if 'marker' in args:
             payload['marker']=self.marker
-    
+        
+        if 'refresh_token' in args:
+            payload['refresh_token']=self.refresh_token
+
+        if 'access_token_expire_time' in args:
+            payload['access_token_expire_time']=self.access_token_expire_time
+            
+        if 'refresh_token_expire_time' in args:
+            payload['refresh_token_expire_time']=self.refresh_token_expire_time
+        
+        if 'user_id' in args:
+            payload['user_id']=self.user_id
+        
         api_model=self.api.model(modelname,payload)
         
         return api_model
@@ -530,7 +566,16 @@ class ApiError:
         'user_email_auth_activate_error':{
             'message':"먼저 이메일 인증을 진행해 주세요",
             'status_code':401
+        },
+        'user_token_auth_decode_error':{
+            'message':"리프레시토큰 인증이 유효하지 않습니다.",
+            'status_code':401
+        },
+        'user_token_auth_existance_error':{
+            'message':"리프레시 토큰 발급 내역이 존재하지 않습니다",
+            'status_code':401
         }
+        
         
     }
     
@@ -634,3 +679,19 @@ class ApiError:
 
     def user_email_auth_activate_error_model(self):
         return self.api.model('user_email_auth_activate_error_model',{'message':fields.String(self.errors['user_email_auth_activate_error']['message'])})
+    
+    
+    def user_token_auth_existance_error(self):
+        return self.errors['user_token_auth_existance_error']
+
+    def user_token_auth_existance_error_model(self):
+        return self.api.model('user_token_auth_existance_error_model',{'message':fields.String(self.errors['user_token_auth_existance_error']['message'])})
+        
+        
+    def user_token_auth_decode_error(self):
+        return self.errors['user_token_auth_decode_error']
+
+    def user_token_auth_decode_error_model(self):
+        return self.api.model('user_token_auth_decode_error_model',{'message':fields.String(self.errors['user_token_auth_decode_error']['message'])})
+    
+    
