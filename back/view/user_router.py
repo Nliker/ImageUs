@@ -375,8 +375,8 @@ def user_router(api,services,config,es):
             
             authorized=user_service.login(credential)
             if authorized:
-                access_token=user_service.generate_access_token(user_credential['id'])
-                return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
+                tokens=user_service.generate_token(user_credential['id'])
+                return make_response(jsonify({'user_id':user_credential['id'],**tokens}))
             
             else:
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
