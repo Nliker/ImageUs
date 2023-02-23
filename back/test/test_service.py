@@ -61,6 +61,9 @@ def setup_function():
     database.execute(text("""
         truncate email_auth
     """))
+    database.execute(text("""
+        truncate users_token_auth
+    """))
     print("초기화 완료")
     print("샘플 기입")
     hashed_password=bcrypt.hashpw(
@@ -156,6 +159,19 @@ def setup_function():
         'image_id':3,
         'room_id':2
     }]
+    new_user_token_auth=[{
+        'user_id':1,
+        'refresh_token_secret_key':'test_key',
+    }]
+    database.execute(text("""
+        insert into users_token_auth (
+            user_id,
+            refresh_token_secret_key
+        ) values (
+            :user_id,
+            :refresh_token_secret_key
+        )
+        """),new_user_token_auth)
     database.execute(text("""
         insert into email_auth(
             email,
@@ -258,6 +274,9 @@ def teardown_function():
     """))
     database.execute(text("""
         truncate email_auth
+    """))
+    database.execute(text("""
+        truncate users_token_auth
     """))
     print("초기화 완료")
     print("이미지 폴더 초기화")
@@ -415,16 +434,67 @@ def test_login(user_service):
     }
     authorized=user_service.login(credential)
     assert authorized==None
+
+#유저의 토큰 인증 정보를 불러옵니다.
+def test_get_user_token_auth(user_service):
+    user_id=1
+    stock_user_token_auth=get_user_token_auth(user_id)
+    assert stock_user_token_auth!=None
     
-#토큰 생성 확인
+    user_token_auth=user_service.get_user_token_auth(user_id)
+    assert stock_user_token_auth==user_token_auth
+
+#유저의 리프레시 토큰 해석을 검증합니다.
+def test_decode_from_refresh_token(user_service):
+    user_id=1
+    stock_user_token_auth=get_user_token_auth(user_id)
+    assert stock_user_token_auth!=None
+
+    refresh_token=generate_refresh_token(user_id,stock_user_token_auth['refresh_token_secret_key'])
+    result=user_service.decode_from_refresh_token(refresh_token,user_id)
+    
+    assert result==True
+
+    refresh_token=generate_refresh_token(user_id,'fake_key')
+    result=user_service.decode_from_refresh_token(refresh_token,user_id)
+
+    assert result==False
+
+#액세스 토큰 생성 확인
 def test_generate_access_token(user_service):
     user_id=1
     #토큰을 생성하고 토큰의 정보를 확인합니다.
-    access_token=user_service.generate_access_token(user_id)
-    assert type(access_token)==type('asd')
-    payload=jwt.decode(access_token,config.test_config['JWT_SECRET_KEY'],'HS256')
+    result=user_service.generate_access_token(user_id)
+    assert 'access_token' in result
+    assert 'access_token_expire_time' in result
+
+    payload=jwt.decode(result['access_token'],config.test_config['JWT_SECRET_KEY'],'HS256')
+
     assert ('user_id' in payload) and ('exp' in payload) and ('iat' in payload)
     assert payload['user_id']==1
+    
+#액세스 토큰과 리프레시 토큰 생성 확인
+def test_generate_token(user_service):
+    user_id=1
+    result=user_service.generate_token(user_id)
+    assert 'access_token' in result
+    assert 'access_token_expire_time' in result
+    assert 'refresh_token' in result
+    assert 'refresh_token_expire_time' in result
+    
+    user_token_auth=get_user_token_auth(user_id)
+
+    assert user_token_auth!=None
+
+    access_token_payload=jwt.decode(result['access_token'],config.test_config['JWT_SECRET_KEY'],'HS256')
+    refresh_token_payload=jwt.decode(result['refresh_token'],user_token_auth['refresh_token_secret_key'],'HS256')
+
+    assert ('user_id' in access_token_payload) and ('exp' in access_token_payload) and ('iat' in access_token_payload)
+    assert ('user_id' in refresh_token_payload) and ('exp' in refresh_token_payload) and ('iat' in refresh_token_payload)
+
+
+
+    
 
 #유저의 민감 정보 확인
 def test_get_user_id_and_password(user_service):
