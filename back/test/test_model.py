@@ -49,7 +49,10 @@ def setup_function():
     database.execute(text("""
         truncate email_auth
     """))
-
+    database.execute(text("""
+        truncate users_token_auth
+    """))
+    
     print("초기화 완료")
     print("샘플 기입")
 
@@ -147,6 +150,11 @@ def setup_function():
         'room_id':2
     }]
     
+    new_user_token_auth=[{
+        'user_id':1,
+        'refresh_token_secret_key':'test_key',
+    }]
+    
     database.execute(text("""
         insert into email_auth(
             email,
@@ -221,6 +229,16 @@ def setup_function():
             :room_id
         )
     """),new_images_room_list)
+
+    database.execute(text("""
+        insert into users_token_auth (
+            user_id,
+            refresh_token_secret_key
+        ) values (
+            :user_id,
+            :refresh_token_secret_key
+        )
+        """),new_user_token_auth)
     
     print("샘플 기입 완료")
     print("======================")
@@ -251,6 +269,9 @@ def teardown_function():
     """))
     database.execute(text("""
         truncate email_auth
+    """))
+    database.execute(text("""
+        truncate users_token_auth
     """))
     print("초기화 완료")
     print("======================")
@@ -1604,6 +1625,44 @@ def test_delete_user_imagelist(image_dao):
     user_image_info_list=get_user_imagelist(3,{'start':0,'limit':10})
     assert extract_arguments_from_data(user_image_info_list,image_args)==[]
 
+def test_insert_user_token_auth(user_dao):
+    new_user_token_auth={
+        'user_id':2,
+        'refresh_token_secret_key':"test_key"
+    }
+    result=user_dao.insert_user_token_auth(new_user_token_auth['user_id'],new_user_token_auth['refresh_token_secret_key'])
+    assert result==1
+    user_token_auth=get_user_token_auth(new_user_token_auth['user_id'])
+    for key,value in new_user_token_auth.items():
+        assert user_token_auth[key]==new_user_token_auth[key]
+
+def test_get_user_token_auth(user_dao):
+    user_id=1
+    stock_user_token_auth=get_user_token_auth(user_id)
+    assert stock_user_token_auth!=None
+    
+    user_token_auth=user_dao.get_user_token_auth(user_id)
+    assert stock_user_token_auth==user_token_auth
+    
+
+def test_update_user_token_auth(user_dao):
+    user_id=1
+
+    stock_user_token_auth=get_user_token_auth(user_id)
+    assert stock_user_token_auth!=None
+
+    updater={
+        'refresh_token_secret_key':'updated_key'
+    }
+    result=user_dao.update_user_token_auth(user_id,updater)
+    assert result==1
+
+    updated_user_token_auth=get_user_token_auth(user_id)
+    for key,value in updater.items():
+        assert updated_user_token_auth[key]==updater[key]
+        
+    
+    
 '''
     유저 1,2,3 (친구 1-2,친구 2-1,3,친구 3-2)
     룸 1(유저 1,2, 이미지 1,2),2(유저 2,3 이미지 2,3)
