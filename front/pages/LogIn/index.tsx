@@ -7,6 +7,7 @@ import {
   InputBox,
   InputDiv,
   PasswordInputContainer,
+  SocialLoginBox,
   SubmitBox,
 } from './styled';
 import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
@@ -15,6 +16,9 @@ import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
+import { IconContext } from 'react-icons/lib';
+import { RiKakaoTalkFill } from 'react-icons/ri';
+import { SiNaver } from 'react-icons/si';
 
 const LogIn = () => {
   const { data: logInSuccess, trigger } = useSWRMutation(
@@ -102,56 +106,84 @@ const LogIn = () => {
   }, [logInSuccess]);
 
   return (
-    <div>
-      <UserInfoInputBox pageName={'로그인'}>
-        <form onSubmit={onSubmitLoginInfo}>
-          <EmailInputContainer>
-            <InputBox>
-              <label htmlFor="email-input">이메일 주소를 입력하세요.</label>
-              <InputDiv>
-                <input
-                  type="text"
-                  id="email-input"
-                  ref={emailRef}
-                  value={emailValue}
-                  onChange={onChangeEmailInput}
-                  placeholder="이메일을 입력하세요."
-                />
-              </InputDiv>
-              <ErrorMessage>
-                <span>{emailErrorMessage}</span>
-              </ErrorMessage>
-            </InputBox>
-          </EmailInputContainer>
-          <PasswordInputContainer>
-            <InputBox>
-              <label htmlFor="password-input">비밀번호를 입력하세요.</label>
-              <InputDiv>
-                <input
-                  type="password"
-                  id="password-input"
-                  ref={passwordRef}
-                  value={passwordValue}
-                  onChange={onChangePasswordInput}
-                  placeholder="비밀번호를 입력하세요."
-                />
-              </InputDiv>
-              <ErrorMessage>
-                <span>{pwErrorMessage}</span>
-              </ErrorMessage>
-            </InputBox>
-          </PasswordInputContainer>
-          <SubmitBox>
-            <NavLink to={'/signup'}>
-              <Button type="button" className="warning">
-                계정 만들기
-              </Button>
-            </NavLink>
-            <Button type="submit">확인</Button>
-          </SubmitBox>
-        </form>
-      </UserInfoInputBox>
-    </div>
+    <UserInfoInputBox pageName={'로그인'}>
+      <form onSubmit={onSubmitLoginInfo}>
+        <EmailInputContainer>
+          <InputBox>
+            <label htmlFor="email-input">이메일 주소를 입력하세요.</label>
+            <InputDiv>
+              <input
+                type="text"
+                id="email-input"
+                ref={emailRef}
+                value={emailValue}
+                onChange={onChangeEmailInput}
+                placeholder="이메일을 입력하세요."
+              />
+            </InputDiv>
+            <ErrorMessage>
+              <span>{emailErrorMessage}</span>
+            </ErrorMessage>
+          </InputBox>
+        </EmailInputContainer>
+        <PasswordInputContainer>
+          <InputBox>
+            <label htmlFor="password-input">비밀번호를 입력하세요.</label>
+            <InputDiv>
+              <input
+                type="password"
+                id="password-input"
+                ref={passwordRef}
+                value={passwordValue}
+                onChange={onChangePasswordInput}
+                placeholder="비밀번호를 입력하세요."
+              />
+            </InputDiv>
+            <ErrorMessage>
+              <span>{pwErrorMessage}</span>
+            </ErrorMessage>
+          </InputBox>
+        </PasswordInputContainer>
+        <SubmitBox>
+          <NavLink to={'/signup'} className="signup_link">
+            계정 만들기
+          </NavLink>
+          <Button type="submit">확인</Button>
+        </SubmitBox>
+      </form>
+      <SocialLoginBox>
+        <hr className="social_sign-in_line" />
+        <span className="social_sign-in_title">간편 로그인</span>
+        <div className="social_icon_box">
+          <a
+            href={`/oauth-login?coperation=kakao`}
+            className="kakao_icon social_icon_a"
+          >
+            <IconContext.Provider
+              value={{
+                size: '60%',
+                style: { display: 'inline-block' },
+              }}
+            >
+              <RiKakaoTalkFill />
+            </IconContext.Provider>
+          </a>
+          <a
+            href="/oauth-login?coperation=naver"
+            className="naver_icon social_icon_a"
+          >
+            <IconContext.Provider
+              value={{
+                size: '60%',
+                style: { display: 'inline-block' },
+              }}
+            >
+              <SiNaver />
+            </IconContext.Provider>
+          </a>
+        </div>
+      </SocialLoginBox>
+    </UserInfoInputBox>
   );
 };
 
