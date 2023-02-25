@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const Wrappper = styled.div`
   min-width: 370px;
-  height: calc(100% - 40px);
+  height: 100%;
   font-size: 0.85rem;
 
   overflow: hidden;
@@ -33,7 +33,7 @@ export const MainIntroduction = styled.section`
     gap: 5rem;
 
     color: white;
-    background-color: rgb(0 0 0);
+    background-color: #080609;
 
     img {
       position: absolute;
