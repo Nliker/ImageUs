@@ -4,8 +4,7 @@ export const WrapperBox = styled.section`
   display: flex;
   flex-direction: column;
 
-  height: calc(100% - 40px);
-  /* padding-bottom: 30px; */
+  height: 100%;
   box-sizing: border-box;
 
   overflow-x: hidden;
@@ -14,6 +13,7 @@ export const WrapperBox = styled.section`
 export const ContentBox = styled.main`
   box-sizing: border-box;
 
+  min-width: 400px;
   padding: 0 2rem;
 
   overflow: hidden;
