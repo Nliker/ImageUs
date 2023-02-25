@@ -16,36 +16,38 @@ const UserInfoInputBox = ({ children, pageName }: InputBoxProps) => {
       <OuterContainer>
         <h1>{pageName}</h1>
         <InnerContainer>{children}</InnerContainer>
-        <div className="social_sign-in_box">
+        {/* <div className="social_sign-in_box">
           <hr className="social_sign-in_line" />
           <span className="social_sign-in_title">간편 로그인</span>
           <div className="social_icon_box">
-            <button type="button" className="social_button kakao">
-              <a href={`/oauth-login?coperation=kakao`}>
-                <IconContext.Provider
-                  value={{
-                    size: '80%',
-                    style: { display: 'inline-block' },
-                  }}
-                >
-                  <RiKakaoTalkFill />
-                </IconContext.Provider>
-              </a>
-            </button>
-            <button type="button" className="social_button naver">
-              <a href="/oauth-login?coperation=naver">
-                <IconContext.Provider
-                  value={{
-                    size: '80%',
-                    style: { display: 'inline-block' },
-                  }}
-                >
-                  <SiNaver />
-                </IconContext.Provider>
-              </a>
-            </button>
+            <a
+              href={`/oauth-login?coperation=kakao`}
+              className="kakao_icon social_icon_a"
+            >
+              <IconContext.Provider
+                value={{
+                  size: '60%',
+                  style: { display: 'inline-block' },
+                }}
+              >
+                <RiKakaoTalkFill />
+              </IconContext.Provider>
+            </a>
+            <a
+              href="/oauth-login?coperation=naver"
+              className="naver_icon social_icon_a"
+            >
+              <IconContext.Provider
+                value={{
+                  size: '60%',
+                  style: { display: 'inline-block' },
+                }}
+              >
+                <SiNaver />
+              </IconContext.Provider>
+            </a>
           </div>
-        </div>
+        </div> */}
       </OuterContainer>
     </Wrapper>
   );
