@@ -121,7 +121,7 @@ export const UserBox = styled.div`
   flex-direction: column;
 
   height: auto;
-  right: -17px;
+  right: -10px;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
@@ -138,12 +138,12 @@ export const UserBox = styled.div`
       width: 0;
       height: 0;
       top: 100%;
-      right: 1.5em;
+      right: 0.9em;
       border: 0.75rem solid transparent;
       border-bottom: none;
 
       border-top-color: #fff;
-      filter: drop-shadow(0 0.325rem 0.0625rem rgba(0, 0, 0, 0.1));
+      filter: drop-shadow(0 0.2rem 0.0625rem rgba(0, 0, 0, 0.1));
     }
   }
 
@@ -169,17 +169,9 @@ export const UserBox = styled.div`
 `;
 
 export const UserInfo = styled.div`
-  min-width: 14rem;
-
   p {
     margin: 0;
-    span {
-      font-weight: bold;
-    }
-  }
-
-  img {
-    width: 50px;
+    white-space: nowrap;
   }
 
   .info_words {
@@ -198,4 +190,8 @@ export const LogoutBtn = styled.div`
   text-align: center;
 
   margin-top: 20px;
+
+  button {
+    font-size: 80%;
+  }
 `;
