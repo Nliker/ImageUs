@@ -2,9 +2,12 @@ import styled from '@emotion/styled';
 
 export const ContentBox = styled.div`
   position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   border-radius: 12px;
+
+  overflow: hidden;
 
   a {
     text-decoration: none;
@@ -29,8 +32,12 @@ export const ImageCard = styled.div`
 
 export const InfoContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  flex: 1;
+
+  font-size: 80%;
   text-align: center;
+
   background-color: whitesmoke;
 `;
 
@@ -62,6 +69,11 @@ export const HoverBox = styled.div`
 
 export const ImageInfo = styled.div`
   width: 100%;
+  padding: 10px 0;
+
+  & div:first-of-type {
+    margin-bottom: 5px;
+  }
 `;
 
 export const EditBtn = styled.div`
