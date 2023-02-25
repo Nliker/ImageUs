@@ -4,6 +4,7 @@ import { Button } from '@styles/Button';
 import axios, { AxiosError } from 'axios';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Navigate, redirect, useNavigate } from 'react-router-dom';
 import {
@@ -299,113 +300,109 @@ const SignUp = () => {
   );
 
   return (
-    <div>
-      <UserInfoInputBox pageName={'회원가입'}>
-        <InputContainer>
-          <NameBox>
-            <div className="input_box">
-              <Input
-                type="text"
-                name="name-input"
-                value={name}
-                onChange={nameHandler}
-                placeholder="이름을 입력하세요."
-              />
-            </div>
-            <ErrorText>
-              <span style={correctMessageStyle(errorInfo.name.hasError)}>
-                {errorInfo.name.errorMessage}
-              </span>
-            </ErrorText>
-          </NameBox>
-          <EmailBox>
-            <div className="input_box">
-              <Input
-                type="text"
-                name="email-input"
-                value={email}
-                onChange={emailHandler}
-                placeholder="이메일을 입력하세요."
-              />
-            </div>
-            {errorInfo.email.emailAuth &&
-              (isRequestingAuth ? (
-                <RequestAuthBox className="input_box">
-                  <Input
-                    type="password"
-                    name="email-auth"
-                    value={emailAuth}
-                    onChange={emailAuthHandler}
-                    placeholder="인증번호"
-                  />
-                  <button type="button" onClick={checkEmailAuth}>
-                    확인
-                  </button>
-                  <button type="button" onClick={cancelEmailAuth}>
-                    취소
-                  </button>
-                  <div>
-                    <span>남은 시간: {count}</span>
-                  </div>
-                </RequestAuthBox>
-              ) : (
-                <div className="email_err_message">
-                  <button onClick={requestEmailAuthNum}>인증 요청</button>
+    <UserInfoInputBox pageName={'회원가입'}>
+      <InputContainer>
+        <NameBox>
+          <div className="input_box">
+            <Input
+              type="text"
+              name="name-input"
+              value={name}
+              onChange={nameHandler}
+              placeholder="이름을 입력하세요."
+            />
+          </div>
+          <ErrorText>
+            <span style={correctMessageStyle(errorInfo.name.hasError)}>
+              {errorInfo.name.errorMessage}
+            </span>
+          </ErrorText>
+        </NameBox>
+        <EmailBox>
+          <div className="input_box">
+            <Input
+              type="text"
+              name="email-input"
+              value={email}
+              onChange={emailHandler}
+              placeholder="이메일을 입력하세요."
+            />
+          </div>
+          {errorInfo.email.emailAuth &&
+            (isRequestingAuth ? (
+              <RequestAuthBox className="input_box">
+                <Input
+                  type="password"
+                  name="email-auth"
+                  value={emailAuth}
+                  onChange={emailAuthHandler}
+                  placeholder="인증번호"
+                />
+                <button type="button" onClick={checkEmailAuth}>
+                  확인
+                </button>
+                <button type="button" onClick={cancelEmailAuth}>
+                  취소
+                </button>
+                <div>
+                  <span>남은 시간: {count}</span>
                 </div>
-              ))}
+              </RequestAuthBox>
+            ) : (
+              <div className="email_err_message">
+                <button onClick={requestEmailAuthNum}>인증 요청</button>
+              </div>
+            ))}
+          <ErrorText>
+            <span style={correctMessageStyle(errorInfo.email.hasError)}>
+              {errorInfo.email.errorMessage}
+            </span>
+          </ErrorText>
+        </EmailBox>
+        <PasswordBox>
+          <div className="wrap_password_input">
+            <div className="input_box">
+              <Input
+                type={checked ? 'text' : 'password'}
+                name="password-input"
+                value={password}
+                onChange={passwordHandler}
+                placeholder="비밀번호를 입력하세요."
+              />
+              <Input
+                type={checked ? 'text' : 'password'}
+                name="password-check"
+                value={passwordCheck}
+                onChange={passwordCheckHandler}
+                placeholder="한 번 더 입력하세요."
+              />
+            </div>
             <ErrorText>
-              <span style={correctMessageStyle(errorInfo.email.hasError)}>
-                {errorInfo.email.errorMessage}
+              <span style={correctMessageStyle(errorInfo.password.hasError)}>
+                {errorInfo.password.errorMessage}
               </span>
             </ErrorText>
-          </EmailBox>
-          <PasswordBox>
-            <div className="wrap_password_input">
-              <div className="input_box">
-                <Input
-                  type={checked ? 'text' : 'password'}
-                  name="password-input"
-                  value={password}
-                  onChange={passwordHandler}
-                  placeholder="비밀번호를 입력하세요."
-                />
-                <Input
-                  type={checked ? 'text' : 'password'}
-                  name="password-check"
-                  value={passwordCheck}
-                  onChange={passwordCheckHandler}
-                  placeholder="한 번 더 입력하세요."
-                />
-              </div>
-              <ErrorText>
-                <span style={correctMessageStyle(errorInfo.password.hasError)}>
-                  {errorInfo.password.errorMessage}
-                </span>
-              </ErrorText>
-            </div>
-            <PasswordShowCheckBox onClick={checkHandler}>
-              <input
-                type="checkbox"
-                name="show-password"
-                checked={checked}
-                readOnly
-              />
-              비밀번호 표시
-            </PasswordShowCheckBox>
-          </PasswordBox>
-          <SubmitBox>
-            <Link to={'/login'}>
-              <Button type="button" className="warning">
-                로그인 화면으로 이동
-              </Button>
-            </Link>
-            <Button type="button" onClick={handleSubmit}>
-              제출
-            </Button>
-          </SubmitBox>
-        </InputContainer>
-      </UserInfoInputBox>
-    </div>
+          </div>
+          <PasswordShowCheckBox onClick={checkHandler}>
+            <input
+              type="checkbox"
+              name="show-password"
+              checked={checked}
+              readOnly
+            />
+            비밀번호 표시
+          </PasswordShowCheckBox>
+        </PasswordBox>
+        <SubmitBox>
+          <NavLink to={'/login'} className="login_link">
+            로그인 화면으로 이동
+          </NavLink>
+          <Button type="button" onClick={handleSubmit}>
+            제출
+          </Button>
+        </SubmitBox>
+      </InputContainer>
+    </UserInfoInputBox>
   );
 };
 
