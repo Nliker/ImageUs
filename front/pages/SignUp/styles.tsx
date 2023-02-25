@@ -92,9 +92,12 @@ export const PasswordBox = styled.div`
   }
 `;
 export const PasswordShowCheckBox = styled.div`
-  display: flex;
+  width: fit-content;
+  text-align: left;
 
   font-size: 17px;
+
+  cursor: pointer;
 
   input {
     width: auto;
@@ -104,9 +107,21 @@ export const PasswordShowCheckBox = styled.div`
 
 export const SubmitBox = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
 
   margin-top: 20px;
+
+  .login_link {
+    line-height: 1.38;
+    letter-spacing: -0.3px;
+    font-weight: 400;
+
+    color: #616568;
+    border-bottom: 1px solid #858a8d;
+    text-decoration: none;
+    cursor: pointer;
+  }
 `;
 
 export const ErrorText = styled.div`
