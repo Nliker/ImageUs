@@ -36,9 +36,13 @@ export const OuterContainer = styled.div<{
 
 export const InnerContainer = styled.div`
   width: 100%;
-  height: calc(100% - 55px);
+  height: 100%;
 
   background-color: rgb(255, 255, 255);
+
+  @media screen and (min-width: 1024px) {
+    /* height: calc(100% - 66px); */
+  }
 `;
 
 export const ModalWrapper = styled.div`
