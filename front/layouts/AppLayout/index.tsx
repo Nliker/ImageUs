@@ -1,8 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { useMediaQuery } from 'react-responsive';
-import TopNavBar from '@components/TopNavBar';
-import BottomNavBar from '@components/BottomNavBar';
+import NavigationBar from '@components/NavigationBar';
 import UploadModal from '@components/UploadModal';
 import CreateRoomModal from '@components/CreateRoomModal';
 import InviteMemberModal from '@components/InviteMemberModal';
@@ -26,6 +25,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: showModalState } = useSWR('showModalState');
+  const { data: userInfo } = useSWR('/user/my');
 
   const [showSideBar, setshowSideBar] = useState<boolean>(false);
   const isMobile = useMediaQuery({ maxWidth: 1023 });
@@ -41,11 +41,17 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   return (
     <Wrapper>
       <OuterContainer showModal={showModalState}>
-        {isMobile ? <BottomNavBar /> : <TopNavBar />}
-        <InnerContainer>
-          {isMobile && (
+        {userInfo.logInState && <NavigationBar />}
+        {/* {isMobile ? <BottomNavBar /> : <TopNavBar />} */}
+        {/* <ToolBar handleSidebar={toggleSidebar} isImageRoom={isImageRoom} /> */}
+        <InnerContainer
+          style={
+            userInfo.logInState ? { height: 'calc(100% - 66px)' } : undefined
+          }
+        >
+          {/* {isMobile && (
             <ToolBar handleSidebar={toggleSidebar} isImageRoom={isImageRoom} />
-          )}
+          )} */}
           {isImageRoom && <SideBar show={showSideBar} close={closeSidebar} />}
           {children}
         </InnerContainer>
