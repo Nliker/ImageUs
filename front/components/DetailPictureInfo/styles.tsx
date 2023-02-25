@@ -1,43 +1,50 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<{
+  modalSize: {
+    modalWidth: string;
+    modalHeight: string;
+  };
+}>`
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 
-  height: 100%;
+  width: ${(props) => props.modalSize.modalWidth}px;
+  height: ${(props) => props.modalSize.modalHeight}px;
   border-radius: 12px;
   box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%);
 
+  overflow: hidden;
   background-color: white;
 
   .head_info {
-    position: absolute;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    top: 20px;
 
-    padding: 0 30px;
+    padding: 15px 30px;
     width: 100%;
 
+    font-size: 80%;
     box-sizing: border-box;
     text-align: center;
+    white-space: nowrap;
 
     & > span {
       color: black;
     }
 
     .writer {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: bolder;
     }
 
     .name_info {
       display: flex;
+      align-items: center;
 
-      gap: 10px;
-      height: 100%;
+      gap: 2rem;
     }
 
     .date_info {
@@ -47,17 +54,28 @@ export const Wrapper = styled.div`
       height: 100%;
     }
   }
+
+  @media screen and (max-width: 600px) {
+    width: 300px;
+    height: 400px;
+
+    .head_info {
+      .writer {
+        font-size: 1.2rem;
+      }
+      .name_info {
+        gap: 0.2rem;
+      }
+    }
+  }
 `;
 
 export const ImageSection = styled.div`
-  position: relative;
   display: flex;
-  align-items: center;
-  flex-basis: 50%;
+  justify-content: center;
 
-  img {
-    width: 100%;
-  }
+  width: 100%;
+  height: 70%;
 `;
 
 export const InfoSection = styled.div`
