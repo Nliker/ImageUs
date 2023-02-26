@@ -18,7 +18,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   ContentBox,
-  FilterBox,
+  ActiveContentBox,
   FilteringOption,
   ImageCard,
   ImageInfo,
@@ -34,9 +34,16 @@ import ImageContentList from '@components/ImageContentList';
 import { SyncLoader } from 'react-spinners';
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
-import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
+import {
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+  MdOutlineSpaceDashboard,
+} from 'react-icons/md';
 import { Button } from '@styles/Button';
 import Spinner from '@styles/Spinner';
+import { TbDoorExit } from 'react-icons/tb';
+import { IconContext } from 'react-icons/lib';
+import { SidebarContext } from '@layouts/AppLayout';
 
 interface Props {
   roomId?: string;
@@ -293,7 +300,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     <Scrollbars>
       <Wrapper>
         <MainContainer>
-          <FilterBox>
+          <ActiveContentBox>
             <FilteringOption onClick={() => setFilterBoxState((prev) => !prev)}>
               <input type="checkbox" id="options-view-button" />
               <div id="select-button">
@@ -349,7 +356,38 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
                 </Button>
               </div>
             )}
-          </FilterBox>
+            <div className="active_icon_box">
+              <SidebarContext.Consumer>
+                {({ setSidebarState }) => (
+                  <div
+                    className="sidebar_icon"
+                    onClick={() => {
+                      setSidebarState((prev) => !prev);
+                    }}
+                  >
+                    <IconContext.Provider
+                      value={{
+                        size: '30px',
+                        style: { display: 'inline-block' },
+                      }}
+                    >
+                      <MdOutlineSpaceDashboard />
+                    </IconContext.Provider>
+                  </div>
+                )}
+              </SidebarContext.Consumer>
+              <div>
+                <IconContext.Provider
+                  value={{
+                    size: '30px',
+                    style: { display: 'inline-block' },
+                  }}
+                >
+                  <TbDoorExit />
+                </IconContext.Provider>
+              </div>
+            </div>
+          </ActiveContentBox>
           <ContentBox>
             <div>
               <div className="tag">
@@ -363,10 +401,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
               />
               {(defaultImgListLoading ||
                 filterImgListLoading ||
-                imgDataLoading) && (
-                // <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />
-                <Spinner />
-              )}
+                imgDataLoading) && <Spinner />}
             </div>
           </ContentBox>
         </MainContainer>
