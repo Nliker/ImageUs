@@ -1,4 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import useSWR from 'swr';
 import { useMediaQuery } from 'react-responsive';
 import NavigationBar from '@components/NavigationBar';
@@ -23,37 +29,38 @@ interface AppLayoutProps {
   isImageRoom?: boolean;
 }
 
+interface ISidebarContext {
+  setSidebarState: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const SidebarContext = createContext<ISidebarContext>({
+  setSidebarState: () => {},
+});
+
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: showModalState } = useSWR('showModalState');
   const { data: userInfo } = useSWR('/user/my');
 
-  const [showSideBar, setshowSideBar] = useState<boolean>(false);
-  const isMobile = useMediaQuery({ maxWidth: 1023 });
-
-  const toggleSidebar = useCallback(() => {
-    setshowSideBar((prev) => !prev);
-  }, [showSideBar]);
+  const [sidebarState, setSidebarState] = useState<boolean>(false);
+  const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
 
   const closeSidebar = useCallback(() => {
-    setshowSideBar(false);
-  }, [showSideBar]);
+    setSidebarState(false);
+  }, [sidebarState]);
 
   return (
     <Wrapper>
       <OuterContainer showModal={showModalState}>
         {userInfo.logInState && <NavigationBar />}
-        {/* {isMobile ? <BottomNavBar /> : <TopNavBar />} */}
-        {/* <ToolBar handleSidebar={toggleSidebar} isImageRoom={isImageRoom} /> */}
         <InnerContainer
           style={
             userInfo.logInState ? { height: 'calc(100% - 66px)' } : undefined
           }
         >
-          {/* {isMobile && (
-            <ToolBar handleSidebar={toggleSidebar} isImageRoom={isImageRoom} />
-          )} */}
-          {isImageRoom && <SideBar show={showSideBar} close={closeSidebar} />}
-          {children}
+          {isImageRoom && <SideBar show={sidebarState} close={closeSidebar} />}
+          <SidebarContext.Provider value={value}>
+            {children}
+          </SidebarContext.Provider>
         </InnerContainer>
       </OuterContainer>
       {showModalState?.detailPicture && (
