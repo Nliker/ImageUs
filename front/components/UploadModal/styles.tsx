@@ -35,9 +35,6 @@ export const CloseBtn = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
