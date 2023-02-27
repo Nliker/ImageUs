@@ -7,9 +7,8 @@ from sqlalchemy import create_engine,text
 import config
 import shutil
 import bcrypt
+from models import *
 from io import BytesIO
-
-database=create_engine(config.test_config['DB_URL'],encoding='utf-8',max_overflow=0)
 
 parent_path=os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 projects_dir=os.path.dirname(os.path.abspath(parent_path))
@@ -45,6 +44,9 @@ def setup_function():
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate users_token_auth
     """))
     print("초기화 완료")
     print("샘플 기입")
@@ -137,6 +139,19 @@ def setup_function():
         'image_id':3,
         'room_id':2
     }]
+    new_user_token_auth=[{
+        'user_id':1,
+        'refresh_token_secret_key':'test_key',
+    }]
+    database.execute(text("""
+        insert into users_token_auth (
+            user_id,
+            refresh_token_secret_key
+        ) values (
+            :user_id,
+            :refresh_token_secret_key
+        )
+        """),new_user_token_auth)
     database.execute(text("""
         insert into users (
             id,
@@ -225,12 +240,32 @@ def teardown_function():
     database.execute(text("""
         truncate images_room_list
     """))
+    database.execute(text("""
+        truncate users_token_auth
+    """))
     print("초기화 완료")
     print("이미지 폴더 초기화")
     if os.path.isdir(f"{image_dir}"):
         shutil.rmtree(f"{image_dir}")
     print("이미지 폴더 초기화 완료")
     print("======================")
+#검색 확인
+def test_get_search(api):
+    search_keyword="test_odjqwopjd"
+    resp=api.get(f"/user/search?email={search_keyword=}")
+    
+    assert resp.status_code==200
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert 'result' in resp_json
+    assert type(resp_json['result'])==list
+    
+    resp=api.get(f"/user/search")
+    
+    assert resp.status_code==400
+    
+    
+
 
 #새로운 유저 생성 
 def test_sign_up(api):
