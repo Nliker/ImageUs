@@ -19,7 +19,7 @@
 
       function getAutoComplete() {
               const query = $('.search-box').val();
-              fetch(`http://localhost:5001/user/search?email=${encodeURIComponent(query.trim())}`)
+              fetch(`http://127.0.0.1:5000/user/search/mysql?email=${encodeURIComponent(query.trim())}`)
                 .then((resp) => resp.json())
                 .then((data) => 
                   {

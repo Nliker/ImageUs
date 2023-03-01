@@ -360,3 +360,28 @@ class UserDao:
         result.close()
         
         return row
+
+    def get_users_by_keyword(self,keyword):
+        keyword="%"+keyword+"%"
+        query="""
+            select id,email,name
+            from users
+            where email like "%s"
+            limit 20
+        """ % (keyword)
+        print(query)
+        result=self.db.execute(query)
+        
+        rows=result.fetchall()
+        result.close()
+
+        user_info_by_keyword=[
+            {
+                'id':row['id'],
+                'name':row['name'],
+                'email':row['email'],
+            } for row in rows
+        ]
+
+        print(len(user_info_by_keyword))
+        return user_info_by_keyword
