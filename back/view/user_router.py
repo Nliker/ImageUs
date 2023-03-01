@@ -7,7 +7,7 @@ from auth import login_required,g
 from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
-
+import time
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
 def user_router(api,services,config,es):
@@ -84,14 +84,31 @@ def user_router(api,services,config,es):
                                 }
                             ]
                         }
+                start = time.time()
                 resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
+                end = time.time()
+                print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
                 search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name']} for result in resp['hits']['hits']]
+                end = time.time()
+                
                 return make_response(jsonify({'result':search_result}),200)
             else:
                 return make_response(jsonify({'result':[]}),200)
 
-
+    @user_namespace.route("/search/mysql")
+    class user_search_mysql(Resource):
+        def get(self):
+            if 'email' not in request.args:
+                print(api_error.user_search_no_arg_error()['message'])
+                return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
+                                     api_error.user_search_no_arg_error()['status_code'])
+            keyword=request.args['email']
+            start = time.time()
+            search_result=user_service.get_users_by_keyword(keyword)
+            end = time.time()
+            print(f"mysql:{end - start:.5f} sec")
+            return make_response(jsonify({'result':search_result}),200)
     
     #input
     #query ->email='tjwjdgus83@naver.com'

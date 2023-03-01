@@ -1,3 +1,5 @@
+import os
+
 import bcrypt
 from datetime import datetime, timedelta
 import jwt
@@ -69,7 +71,7 @@ class UserService:
         smtp.login(sender,password)
 
         msg = MIMEMultipart('alternative')
-        with open('./templates/email_auth.html', 'r') as f:
+        with open(os.path.dirname(os.getcwd())+'/templates/email_auth.html', 'r') as f:
            html = f.read()
         try:
             text=f"Hi,This is message for your email authentification of sign-up from ImageUs"
@@ -270,6 +272,10 @@ class UserService:
     def delete_user(self,delete_user_id):
         result=self.user_dao.delete_user(delete_user_id)
         print(result)
+        return result
+    
+    def get_users_by_keyword(self,keyword):
+        result=self.user_dao.get_users_by_keyword(keyword)
         return result
     
       
