@@ -1,6 +1,5 @@
-import os
-
 import bcrypt
+import os
 from datetime import datetime, timedelta
 import jwt
 import smtplib
@@ -71,7 +70,11 @@ class UserService:
         smtp.login(sender,password)
 
         msg = MIMEMultipart('alternative')
-        with open(os.path.dirname(os.getcwd())+'/templates/email_auth.html', 'r') as f:
+        current_dir=os.getcwd()
+        if self.config['MODE']=='test':
+            current_dir=os.pardir
+        
+        with open(current_dir+'/templates/email_auth.html', 'r') as f:
            html = f.read()
         try:
             text=f"Hi,This is message for your email authentification of sign-up from ImageUs"
