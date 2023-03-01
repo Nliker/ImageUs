@@ -67,25 +67,37 @@ def user_router(api,services,config,es):
                 ]
                 print(terms)
                 
-                payload={   
-                            "_source":  ["email","name"],
-                            "size":config['ELASTIC_MAX_SIZE'],
-                            "query": {
+                # payload={   
+                #             "_source":  ["email","name"],
+                #             "size":config['ELASTIC_MAX_SIZE'],
+                #             "query": {
+                #                 "bool": {
+                #                     "must":terms
+                #                 }
+                #             },
+                #             "sort":[
+                #                 {
+                #                     "email.keyword":"asc",
+                #                     "_score":{
+                #                         "order":"desc"
+                #                     }
+                #                 }
+                #             ]
+                #         }
+                start = time.time()
+                resp=es.search(index=config['ELASTIC_INDEX'],source=["email","name"],query={
                                 "bool": {
                                     "must":terms
                                 }
                             },
-                            "sort":[
+                              size=config['ELASTIC_MAX_SIZE'],sort= [
                                 {
                                     "email.keyword":"asc",
                                     "_score":{
                                         "order":"desc"
                                     }
                                 }
-                            ]
-                        }
-                start = time.time()
-                resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
+                            ])
                 end = time.time()
                 print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
