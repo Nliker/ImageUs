@@ -41,6 +41,7 @@ CREATE TABLE `users` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `type` varchar(255) NOT NULL DEFAULT 'image_us',
   PRIMARY KEY (`id`)
+) 
 
 
 2. users_friend_list
@@ -64,7 +65,7 @@ CREATE TABLE `images` (
   `public` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) 
+)
 
 4. rooms
 CREATE TABLE `rooms` (
@@ -75,7 +76,7 @@ CREATE TABLE `rooms` (
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-)
+) 
 
 5. rooms_user_list
 CREATE TABLE `rooms_user_list` (
@@ -86,7 +87,7 @@ CREATE TABLE `rooms_user_list` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`room_id`,`user_id`),
   KEY `user_id` (`user_id`)
-) 
+)
 
 
 6. images_room_list
@@ -120,7 +121,7 @@ CREATE TABLE `rooms_user_history` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`room_id`,`user_id`)
-)
+) 
 
 9.users_refresh_token_auth
 CREATE TABLE `users_token_auth` (
@@ -130,26 +131,4 @@ CREATE TABLE `users_token_auth` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`)
-
-<!-- 아래는 추후 완성 기능 -->
-<!-- 7. albums
-CREATE TABLE `albums` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(300) NOT NULL,
-  `user_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `albums_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 )
-
-8. albums_image_list
-CREATE TABLE `albums` (
-  `album_id` int NOT NULL,
-  `image_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`album_id`,`image_id`),
-  CONSTRAINT `albums_album_id_fkey` FOREIGN KEY (`album_id`) REFERENCES `albums` (`id`),
-  CONSTRAINT `albums_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`)
-) -->

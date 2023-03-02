@@ -56,14 +56,15 @@ def oauth_router(api,services,config):
     user_service=services.user_service
     
     oauth=Oauth()
-    
-    api_error=ApiError(oauth_namespace)
-    api_model=ApiModel(oauth_namespace)
+
     api_parser_module=ParserModule()
     
     @oauth_namespace.route("")
     class oauth_login(Resource):
         def get(self):
+            '''
+            소셜로그인 페이지로 이동합니다.
+            '''
             coperation=request.args['coperation']
             
             if coperation=="kakao":
@@ -81,6 +82,9 @@ def oauth_router(api,services,config):
     @oauth_namespace.expect(oauth_login_callback_parser,validate=False)
     class oauth_signup(Resource):
         def get(self):
+            '''
+            코드값과 함께 유저의 가입 및 로그인 처리를 진행합니다.
+            '''
             code=request.args['code']
             coperation=request.args['coperation']
 

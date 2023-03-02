@@ -47,6 +47,9 @@ def create_app(test_config=None):
     @api.route("/search")
     class search_user(Resource):
         def get(self):
+            '''
+            간단한 검색창으로 검색을 테스트합니다.
+            '''
             headers = {'Content-Type': 'text/html'}
             return make_response(render_template('index.html'),200,
                                               headers)
