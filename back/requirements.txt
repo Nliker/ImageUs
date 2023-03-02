@@ -45,7 +45,7 @@ MarkupSafe==2.1.1
 matplotlib==3.6.3
 msgpack==1.0.4
 mypy-extensions==0.4.3
-mysql-connector-python==8.0.30
+mysql-connector-python==8.0.29
 numpy==1.24.1
 observable==1.0.3
 pathspec==0.10.1
