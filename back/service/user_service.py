@@ -219,9 +219,9 @@ class UserService:
             'exp':refresh_token_expire,
             'iat':time_now
         }
-        
-        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],'HS256')
-        refresh_token=jwt.encode(refresh_token_payload,refresh_token_secret_key,'HS256')
+        print(self.config['JWT_SECRET_KEY'])
+        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],algorithm='HS256')
+        refresh_token=jwt.encode(refresh_token_payload,refresh_token_secret_key,algorithm='HS256')
         
         return {
             'access_token':access_token,
