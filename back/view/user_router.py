@@ -111,6 +111,9 @@ def user_router(api,services,config,es):
     @user_namespace.route("/search/mysql")
     class user_search_mysql(Resource):
         def get(self):
+            '''
+            mysql로 검색기능을 테스트 합니다.
+            '''
             if 'email' not in request.args:
                 print(api_error.user_search_no_arg_error()['message'])
                 return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
@@ -805,6 +808,9 @@ def user_router(api,services,config,es):
                                 api_error.user_existance_error_model())
         @login_required
         def delete(self):
+            '''
+            유저를 삭제합니다.
+            '''
             delete_user_id=request.json['delete_user_id']
             current_user_id=g.user_id
             
