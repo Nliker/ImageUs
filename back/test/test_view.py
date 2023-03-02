@@ -41,10 +41,16 @@ def setup_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate email_auth
     """))
     database.execute(text("""
         truncate users_token_auth
@@ -259,10 +265,16 @@ def teardown_function():
         truncate rooms_user_list
     """))
     database.execute(text("""
+        truncate rooms_user_history
+    """))
+    database.execute(text("""
         truncate images
     """))
     database.execute(text("""
         truncate images_room_list
+    """))
+    database.execute(text("""
+        truncate email_auth
     """))
     database.execute(text("""
         truncate users_token_auth
