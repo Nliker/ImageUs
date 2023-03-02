@@ -150,95 +150,101 @@ def setup_function():
         'room_id':2
     }]
     
-    new_user_token_auth=[{
+    new_user_token_auths=[{
         'user_id':1,
         'refresh_token_secret_key':'test_key',
     }]
+    for new_email_auth in new_email_auths:
+        database.execute(text("""
+            insert into email_auth(
+                email,
+                auth_password
+            ) values (
+                :email,
+                :auth_password
+            )
+        """),{**new_email_auth})
+    for new_user in new_users:
+        database.execute(text("""
+            insert into users (
+                id,
+                name,
+                email,
+                profile,
+                hashed_password
+            ) values (
+                :id,
+                :name,
+                :email,
+                :profile,
+                :hashed_password
+            )
+        """),{**new_user})
+    for new_users_friend in new_users_friend_list:
+        database.execute(text("""
+            insert into users_friend_list (
+                user_id,
+                friend_user_id
+            ) values (
+                :user_id,
+                :friend_user_id
+            )
+        """),{**new_users_friend})
     
-    database.execute(text("""
-        insert into email_auth(
-            email,
-            auth_password
-        ) values (
-            :email,
-            :auth_password
-        )
-    """),new_email_auths)
-
-    database.execute(text("""
-        insert into users (
-            id,
-            name,
-            email,
-            profile,
-            hashed_password
-        ) values (
-            :id,
-            :name,
-            :email,
-            :profile,
-            :hashed_password
-        )
-    """),new_users)
-    database.execute(text("""
-        insert into users_friend_list (
-            user_id,
-            friend_user_id
-        ) values (
-            :user_id,
-            :friend_user_id
-        )
-    """),new_users_friend_list)
-    database.execute(text("""
-        insert into rooms (
-            id,
-            title,
-            host_user_id
-        ) values (
-            :id,
-            :title,
-            :host_user_id
-        )
-    """),new_rooms)
-    database.execute(text("""
-        insert into rooms_user_list (
-            room_id,
-            user_id
-        ) values (
-            :room_id,
-            :user_id
-        )
-    """),new_rooms_user_list)
-    database.execute(text("""
-        insert into images (
-            id,
-            link,
-            user_id
-        ) values (
-            :id,
-            :link,
-            :user_id
-        )
-    """),new_images)
-    database.execute(text("""
-        insert into images_room_list (
-            image_id,
-            room_id
-        ) values (
-            :image_id,
-            :room_id
-        )
-    """),new_images_room_list)
-
-    database.execute(text("""
-        insert into users_token_auth (
-            user_id,
-            refresh_token_secret_key
-        ) values (
-            :user_id,
-            :refresh_token_secret_key
-        )
-        """),new_user_token_auth)
+    for new_room in new_rooms:    
+        database.execute(text("""
+            insert into rooms (
+                id,
+                title,
+                host_user_id
+            ) values (
+                :id,
+                :title,
+                :host_user_id
+            )
+        """),{**new_room})
+    for new_rooms_user in new_rooms_user_list:
+        database.execute(text("""
+            insert into rooms_user_list (
+                room_id,
+                user_id
+            ) values (
+                :room_id,
+                :user_id
+            )
+        """),{**new_rooms_user})
+    for new_image in new_images:
+        database.execute(text("""
+            insert into images (
+                id,
+                link,
+                user_id
+            ) values (
+                :id,
+                :link,
+                :user_id
+            )
+        """),{**new_image})
+    for new_images_room in new_images_room_list:
+        database.execute(text("""
+            insert into images_room_list (
+                image_id,
+                room_id
+            ) values (
+                :image_id,
+                :room_id
+            )
+        """),{**new_images_room})
+    for new_user_token_auth in new_user_token_auths:
+        database.execute(text("""
+            insert into users_token_auth (
+                user_id,
+                refresh_token_secret_key
+            ) values (
+                :user_id,
+                :refresh_token_secret_key
+            )
+            """),{**new_user_token_auth})
     
     print("샘플 기입 완료")
     print("======================")
