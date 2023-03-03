@@ -2,4 +2,4 @@ config.py
 wsgi.py
 access.log
 nohup.out
-managements
+memory_history
