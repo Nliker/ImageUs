@@ -116,9 +116,9 @@ def oauth_router(api,services,config):
             if user_service.is_email_exists(oauth_user_info['email'],type=coperation):
                 user_info=user_service.get_user_id_and_password(email=oauth_user_info['email'],type=coperation)
                     
-                access_token=user_service.generate_access_token(user_info['id'])
-
-                return make_response(jsonify({'access_token':access_token,'user_id':user_info['id']}))
+                result=user_service.generate_token(user_info['id'])
+                
+                return make_response(jsonify({'user_id':user_info['id'],**result}),200)
             else:
                 new_user={
                     **oauth_user_info,
@@ -127,7 +127,7 @@ def oauth_router(api,services,config):
                 print(new_user)
                 new_user_id=user_service.create_new_user(new_user,type=coperation)
     
-                access_token=user_service.generate_access_token(new_user_id)
-                res=make_response(jsonify({'access_token':access_token,'user_id':new_user_id}))
+                result=user_service.generate_token(new_user_id)
+                res=make_response(jsonify({'user_id':new_user_id,**result}))
                 res.headers["Access-Control-Allow-Origin"]="*"
                 return res
