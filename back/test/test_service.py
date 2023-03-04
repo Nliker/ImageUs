@@ -824,12 +824,25 @@ def test_delete_user_room_history(room_service):
 
 #방의 방장을 변경 확인
 def test_change_room_host_user_id(room_service):
-    room_info=get_room_info(1)
+    room_id=1
+    room_info=get_room_info(room_id)
     assert room_info=={
         'id':1,
         'title':'testroom1',
         'host_user_id':1
     }
+    
+    user_id=2
+    result=room_service.change_room_host_user_id(user_id,room_id)
+    assert result==1
+    
+    room_info=get_room_info(room_id)
+    assert room_info=={
+        'id':1,
+        'title':'testroom1',
+        'host_user_id':2
+    }
+
     
 def test_delete_room(room_service):
     user_roomlist=[user_room_info['id'] for user_room_info in get_user_roomlist(2)]

@@ -40,7 +40,8 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `type` varchar(255) NOT NULL DEFAULT 'image_us',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
 ) 
 
 
