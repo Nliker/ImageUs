@@ -39,5 +39,3 @@ def create_app(test_config=None):
     image_router(api,services)
     
     return app
-
-app=create_app()
