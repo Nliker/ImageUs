@@ -164,7 +164,7 @@ class UserService:
         
     def generate_access_token(self,user_id):
         jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
-        time_now=datetime.now()
+        time_now=datetime.utcnow()
         access_token_expire=time_now+jwt_access_token_expire_time
 
         access_token_payload={
@@ -176,7 +176,7 @@ class UserService:
 
         return {
             'access_token':access_token,
-            'access_token_expire_time':access_token_expire.strftime('%Y-%m-%d %H:%M:%S'),
+            'access_token_expire_time':(access_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S'),
         }
     
 
@@ -202,7 +202,7 @@ class UserService:
         jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
         jwt_refresh_token_expire_time= timedelta(seconds=self.config['JWT_REFRESH_TOKEN_EXPIRE_TIME'])
 
-        time_now=datetime.now()
+        time_now=datetime.utcnow()
 
         access_token_expire=time_now+jwt_access_token_expire_time
         refresh_token_expire=time_now+jwt_refresh_token_expire_time
@@ -225,9 +225,9 @@ class UserService:
         
         return {
             'access_token':access_token,
-            'access_token_expire_time':access_token_expire.strftime('%Y-%m-%d %H:%M:%S'),
+            'access_token_expire_time':(access_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S'),
             'refresh_token':refresh_token,
-            'refresh_token_expire_time':refresh_token_expire.strftime('%Y-%m-%d %H:%M:%S')
+            'refresh_token_expire_time':(refresh_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S')
         }
     
     def get_user_id_and_password(self,email,type="image_us"):
