@@ -35,22 +35,24 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `hashed_password` varchar(255) NOT NULL,
   `profile` varchar(255) NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
   `name` varchar(255) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `type` varchar(255) NOT NULL DEFAULT 'image_us',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-)
+  KEY `email` (`email`)
+) 
+
 
 2. users_friend_list
 CREATE TABLE `users_friend_list` (
   `user_id` int NOT NULL,
   `friend_user_id` int NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`user_id`,`friend_id`)
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`,`friend_user_id`)
 )
 
 3. images
@@ -58,59 +60,54 @@ CREATE TABLE `images` (
   `id` int NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
   `user_id` int NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `public` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  INDEX `user_id` (`user_id`)
+  KEY `user_id` (`user_id`)
 )
-=>유저의 이미지 조회시 인덱스 따로 필요
 
 4. rooms
 CREATE TABLE `rooms` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(300) NOT NULL,
   `host_user_id` int NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-)
+) 
 
 5. rooms_user_list
 CREATE TABLE `rooms_user_list` (
   `room_id` int NOT NULL,
   `user_id` int NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`room_id`,`user_id`),
-  INDEX `user_id` (`user_id`)
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`room_id`,`user_id`),
+  KEY `user_id` (`user_id`)
 )
-=>방의 유저 조회(pri가 room_id하나에도 적용되기 때문에 인덱스 추가 x)
-=>유저의 방 조회시 인덱스 따로 필요
 
 
 6. images_room_list
 CREATE TABLE `images_room_list` (
   `image_id` int NOT NULL,
   `room_id` int NOT NULL,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT, 
-  CURRENT_TIMESTAMP,
-  PRIMARY KEY(`image_id`,`room_id`),
-  INDEX `room_id` (`room_id`)
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`image_id`,`room_id`),
+  KEY `room_id` (`room_id`)
 )
-=>이미지의 방 조회(pri가 image_id하나에도 적용되기 때문에 인덱스 추가 x)
-=>방에서 이미지 조회시 인덱스 따로 필요
 
 7. email_auth
 CREATE TABLE `email_auth` (
   `email` varchar(255) NOT NULL,
-  `auth_password` int NOT NULL,
-  `activated` int NOT NULL default 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `auth_password` varchar(4) NOT NULL,
+  `activated` int NOT NULL DEFAULT '0',
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`email`)
 )
 
@@ -118,53 +115,21 @@ CREATE TABLE `email_auth` (
 CREATE TABLE `rooms_user_history` (
   `room_id` int NOT NULL,
   `user_id` int NOT NULL,
-  `last_unread_row` int NOT NULL default 0,
-  `read_start_row` int NOT NULL default -1,
-  `marker_row` int NOT NULL default 0,
-  `deleted` boolean not null DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(`room_id`,`user_id`)
-)
+  `last_unread_row` int NOT NULL DEFAULT '0',
+  `read_start_row` int NOT NULL DEFAULT '-1',
+  `marker_row` int NOT NULL DEFAULT '0',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`room_id`,`user_id`)
+) 
 
-0,-1,0,len:5->0,10요청->start:0,limit:10,
-last_unread_row:5,
-read_start_row:4,
-marker_row:5-1
-
-0,-1,0,len:15->0,10요청->start:5,limit:10,
-last_unread_row:15,
-read_start_row:14,
-marker_row:0
-
-15,14,0 len:27->0,10요청->start17,:limit:10
-last_unread_row:27,
-read_start_row:26,
-marker_row:12
-
-27,26,15 len:30->0,10요청->start 20,:limit:10 10,1010
-last_unread_row:30,
-read_start_row:29,
-marker_row:27
-<!-- 아래는 추후 완성 기능 -->
-<!-- 7. albums
-CREATE TABLE `albums` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(300) NOT NULL,
+9.users_refresh_token_auth
+CREATE TABLE `users_token_auth` (
   `user_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `albums_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  `refresh_token_secret_key` varchar(255) NOT NULL,
+  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`)
 )
-
-8. albums_image_list
-CREATE TABLE `albums` (
-  `album_id` int NOT NULL,
-  `image_id` int NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`album_id`,`image_id`),
-  CONSTRAINT `albums_album_id_fkey` FOREIGN KEY (`album_id`) REFERENCES `albums` (`id`),
-  CONSTRAINT `albums_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`)
-) -->
