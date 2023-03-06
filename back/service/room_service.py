@@ -66,8 +66,16 @@ class RoomService:
         #이미 방에 속한 사람을 삽입하면 에러나기에 미리 속하지 않은지 검증
         for user_id in userlist:
             if not (self.room_dao.get_room_user(room_id,user_id)):
-                result+=self.room_dao.insert_room_user(room_id,user_id)
-                self.room_dao.insert_room_user_history(room_id,user_id)
+                if self.room_dao.get_room_deleted_user(room_id,user_id):
+                    result+=self.room_dao.update_room_user_deleted(room_id,user_id,deleted=0)
+                else:
+                    result+=self.room_dao.insert_room_user(room_id,user_id)
+
+            if not self.room_dao.get_room_user_history_info(room_id,user_id):
+                if self.room_dao.get_room_user_deleted_history_info(room_id,user_id):
+                    self.room_dao.update_room_user_deleted_history(room_id,user_id)
+                else:
+                    self.room_dao.insert_room_user_history(room_id,user_id)
             
         return result
     
@@ -100,3 +108,27 @@ class RoomService:
 
         return result
     
+    def delete_user_roomlist(self,user_id):
+        result=self.room_dao.delete_user_rooms(user_id)
+        
+        return result
+    
+    def delete_user_room_history(self,user_id):
+        result=self.room_dao.delete_user_room_history(user_id)
+        print(result)
+        return result
+    
+    def change_room_host_user_id(self,user_id,room_id):
+        result=self.room_dao.update_user_room_host_user_id(user_id,room_id)
+        
+        return result
+    
+    def delete_room(self,delete_room_id):
+        result=self.room_dao.delete_room(delete_room_id)
+
+        return result
+
+
+        
+
+        

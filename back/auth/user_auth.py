@@ -8,7 +8,9 @@ def login_required(f):
         access_token=request.headers.get('Authorization')
         if access_token is not None:
             try:
-                payload=jwt.decode(access_token,current_app.config['JWT_SECRET_KEY'],'HS256')
+                print(current_app.config['JWT_SECRET_KEY'])
+                print(access_token)
+                payload=jwt.decode(access_token,current_app.config['JWT_SECRET_KEY'],algorithms=['HS256'])
             except:
                 return '유효하지 않은 토큰입니다!',401
             if 'user_id' not in payload and type(payload['user_id']) !=type(1):

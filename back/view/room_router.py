@@ -3,7 +3,7 @@ import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 from auth import login_required,g
-
+import datetime
 from flask_restx import Resource,Namespace
 from tool import ParserModule,ApiModel,ApiError
 
@@ -149,7 +149,104 @@ def room_router(api,services):
             result=image_service.delete_room_image(room_id,delete_room_image_id)
             
             return make_response(f"{result}장 삭제 완료",200)
+    
+    
+    #input
+    #output
+    # {
+    #     'imagelist':[
+    #         {
+    #             'id':<int>,
+    #             'link':<str>,
+    #             'user_id':<int>
+    #         },
+    #         {
+    #             'id':<int>,
+    #             'link':<str>,
+    #             'user_id':<int>
+    #         }
+    #     ]
+    # }
+    get_room_imagelist_by_date_parser=api_parser_module.get_parser(['Authorization','start_date','end_date','start','limit'])
+    get_room_imagelist_by_date_response_model=api_model.get_model('get_room_imagelist_by_date_model',['imagelist'])
+    @room_namespace.route("/<int:room_id>/imagelist/bydate")
+    class room_imagelist_by_date(Resource):
+        @room_namespace.expect(get_room_imagelist_by_date_parser,validate=False)
+        @room_namespace.response(200,'이미지의 정보 목록을 불러옵니다.',get_room_imagelist_by_date_response_model)
+        @room_namespace.response(api_error.room_existance_error()['status_code'],
+                                 '방이 존재하지 않습니다.',
+                                 api_error.room_existance_error_model())
+        @room_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        @login_required
+        def get(self,room_id):
+            '''
+            id가 room_id인 room의 날짜별 이미지 정보 목록을 불러옵니다.
+            '''
+            current_user_id=g.user_id
+            if not room_service.get_room_info(room_id):
+                return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
+                                     api_error.room_existance_error()['status_code'])
             
+            if not room_service.is_room_user(room_id,current_user_id):
+                return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
+                                     api_error.authorizaion_error()['status_code'])
+            
+            if 'start' not in request.args or 'limit' not in request.args or 'start_date' not in request.args or 'end_date' not in request.args:
+                return make_response(jsonify({'message':"필수 성분이 없습니다."}),
+                                    405)
+            
+            def check_int(s):
+                if s[0] in ('-', '+'):
+                    return s[1:].isdigit()
+                return s.isdigit()
+            
+            start=request.args['start']
+            limit=request.args['limit']
+            if not check_int(start) or not check_int(limit):
+                return make_response(jsonify({'message':"형태변환 불가능!"}),
+                                     405)
+
+            start=int(start)
+            limit=int(limit)
+            if start < 0 or limit < 0 :
+                return make_response(jsonify({'message':"범위 초과!"}),
+                                    405)
+            pages={
+                    'start':start,
+                    'limit':limit
+                }
+
+            def validate_date(start_date,end_date):
+                try:
+                    start_date=datetime.datetime.strptime(start_date,"%Y-%m-%d")
+                    end_date=datetime.datetime.strptime(end_date,"%Y-%m-%d")
+                    if start_date<=end_date:
+                        return True
+                    else:
+                        return False
+                except ValueError:
+                    print(f"Incorrect data format, {start_date} and {end_date} should be YYYY-MM-DD")
+                    return False
+
+            start_date=request.args['start_date']
+            end_date=request.args['end_date']
+
+            pre_date_result=validate_date(start_date,end_date)
+            if not pre_date_result:
+                return make_response(jsonify({'message':"올바른 날짜 형십이 아닙니다!"}),
+                                     405)
+            dates={
+                'start_date':datetime.datetime.strptime(start_date,"%Y-%m-%d"),
+                'end_date':datetime.datetime.strptime(end_date,"%Y-%m-%d")
+                
+            }
+
+            imagelist=image_service.get_room_imagelist_by_date(room_id,dates,pages)
+
+            return make_response(jsonify({'imagelist':imagelist}),200)
+    
     #input
     #output
     # {
@@ -211,8 +308,8 @@ def room_router(api,services):
                 return make_response(jsonify({'message':"범위 초과!"}),
                                     405)
             pages={
-                    'start':int(start),
-                    'limit':int(limit) if int(limit) >= 0 else int(limit)*(-1)
+                    'start':start,
+                    'limit':limit
                 }
  
             room_user_history_info=room_service.get_room_user_history_info(room_id,current_user_id)
@@ -429,10 +526,11 @@ def room_router(api,services):
             if not room_service.get_room_info(room_id):
                 return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
                                      api_error.room_existance_error()['status_code'])
-            #방장이 아니라면
-            if current_user_id!= room_service.get_room_info(room_id)['host_user_id']:
+            #방장이 아니거나 자기 자신을 강퇴할경우
+            if current_user_id!= room_service.get_room_info(room_id)['host_user_id'] or current_user_id==delete_room_user_id:
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
+                
             
             if not user_service.get_user_info(delete_room_user_id):
                 return make_response(jsonify({'message':api_error.user_existance_error()['message']}),

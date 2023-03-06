@@ -1,4 +1,4 @@
-from flask import request,jsonify,make_response,redirect,url_for
+from flask import request,jsonify,make_response
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
@@ -7,10 +7,10 @@ from auth import login_required,g
 from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
-
+import time
 user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
-def user_router(app,api,services,config,es):
+def user_router(api,services,config,es):
     user_service=services.user_service
     image_service=services.image_service
     room_service=services.room_service
@@ -84,14 +84,34 @@ def user_router(app,api,services,config,es):
                                 }
                             ]
                         }
+                start = time.time()
                 resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
+                end = time.time()
+                print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
                 search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name']} for result in resp['hits']['hits']]
+                end = time.time()
+                
                 return make_response(jsonify({'result':search_result}),200)
             else:
                 return make_response(jsonify({'result':[]}),200)
 
-
+    @user_namespace.route("/search/mysql")
+    class user_search_mysql(Resource):
+        def get(self):
+            '''
+            mysql로 검색기능을 테스트 합니다.
+            '''
+            if 'email' not in request.args:
+                print(api_error.user_search_no_arg_error()['message'])
+                return make_response(jsonify({'message':api_error.user_search_no_arg_error()['message']}),
+                                     api_error.user_search_no_arg_error()['status_code'])
+            keyword=request.args['email']
+            start = time.time()
+            search_result=user_service.get_users_by_keyword(keyword)
+            end = time.time()
+            print(f"mysql:{end - start:.5f} sec")
+            return make_response(jsonify({'result':search_result}),200)
     
     #input
     #query ->email='tjwjdgus83@naver.com'
@@ -239,6 +259,14 @@ def user_router(app,api,services,config,es):
             
             new_user_id=user_service.create_new_user(new_user)
             user_info=user_service.get_user_info(new_user_id)
+
+            doc={
+                'email':user_info['email'],
+                'name':user_info['name']
+            }
+            
+            res = es.index(index=config['ELASTIC_INDEX'], doc_type="_doc", body=doc,id=user_info['id'])
+            print('es insert result:',res)
             
             return make_response(jsonify({'user_info':user_info}))
 
@@ -346,7 +374,7 @@ def user_router(app,api,services,config,es):
     #     'access_token':<str>
     # }
     post_login_model=api_model.get_model("post_login_model",['email','password'])
-    post_login_response_model=api_model.get_model("post_login_response_model",['access_token'])
+    post_login_response_model=api_model.get_model("post_login_response_model",['user_id','access_token','access_token_expire_time','refresh_token','refresh_token_expire_time'])
     @user_namespace.route("/login")
     class login(Resource):
         @user_namespace.expect(post_login_model,validate=False)
@@ -357,6 +385,9 @@ def user_router(app,api,services,config,es):
         @user_namespace.response(api_error.credential_error()['status_code'],
                                  '비밀번호가 일치하지 않습니다.',
                                  api_error.credential_error_model())
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
         def post(self):
             '''
             로그인을 합니다.
@@ -366,16 +397,69 @@ def user_router(app,api,services,config,es):
             if not user_service.is_email_exists(credential['email']):
                 return make_response(jsonify({'message':api_error.email_existance_login_error()['message']}),
                                      api_error.email_existance_login_error()['status_code'])
+                                     
+            user_credential=user_service.get_user_id_and_password(credential['email'])
+            
+            if not user_service.get_user_info(user_credential['id']):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
             
             authorized=user_service.login(credential)
             if authorized:
-                user_credential=user_service.get_user_id_and_password(credential['email'])
-                access_token=user_service.generate_access_token(user_credential['id'])
-                return make_response(jsonify({'access_token':access_token,'user_id':user_credential['id']}))
+                tokens=user_service.generate_token(user_credential['id'])
+                return make_response(jsonify({'user_id':user_credential['id'],**tokens}))
             
             else:
                 return make_response(jsonify({'message':api_error.credential_error()['message']}),
                                      api_error.credential_error()['status_code'])
+
+    post_refresh_model=api_model.get_model("post_refresh_model",['refresh_token'])
+    post_refresh_response_model=api_model.get_model("post_refresh_response_model",['user_id','refresh_token','refresh_token_expire_time'])
+    @user_namespace.route("/<int:user_id>/refresh")
+    class refresh(Resource):
+        @user_namespace.expect(post_refresh_model,validate=False)
+        @user_namespace.response(200,'접근 토큰을 반환합니다.',post_refresh_response_model)
+        @user_namespace.response(api_error.user_existance_error()['status_code'],
+                                 '해당 유저가 존재하지 않습니다.',
+                                api_error.user_existance_error_model())
+        @user_namespace.response(api_error.user_token_auth_existance_error()['status_code'],
+                                 '리프레시 토큰을 발급한 내역이 없습니다.',
+                                 api_error.user_token_auth_existance_error_model())
+        @user_namespace.response(api_error.user_token_auth_decode_error()['status_code'],
+                                 '리프레시토큰의 인증이 유효하지 않습니다.',
+                                 api_error.user_token_auth_decode_error_model())
+        @user_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        def post(self,user_id):
+            '''
+            리프레시 토큰을 통해 접근 토큰을 발급합니다.
+            '''
+
+            refresh_token=request.json['refresh_token']
+            if not user_service.get_user_info(user_id):
+                return make_response(jsonify({'message':api_error.user_existance_error()['message']}),
+                                     api_error.user_existance_error()['status_code'])
+            
+            if not user_service.get_user_token_auth(user_id):
+                return make_response(jsonify({'message':api_error.user_token_auth_existance_error()['message']}),
+                                     api_error.user_token_auth_existance_error()['status_code'])
+
+            result=user_service.decode_from_refresh_token(refresh_token,user_id)
+
+            if result==False:
+                return make_response(jsonify({'message':api_error.user_token_auth_decode_error()['message']}),
+                                     api_error.user_token_auth_decode_error()['status_code'])
+                
+                
+            result=user_service.generate_access_token(user_id)
+
+            return make_response(jsonify({'user_id':user_id,**result}),200)
+            
+            
+                
+                
+            
 
     #input
     #output
@@ -451,6 +535,28 @@ def user_router(app,api,services,config,es):
 
             return make_response(jsonify({'imagelist':user_imagelist}),200)
     
+    get_user_imagelist_len_parser=api_parser_module.get_parser(['Authorization'])
+    get_user_imagelist_len_response_model=api_model.get_model('get_user_imagelist_len_response_model',['imagelist_len'])
+    @user_namespace.route("/<int:user_id>/imagelist-len")
+    class user_imagelist_len(Resource):
+        @user_namespace.expect(get_user_imagelist_len_parser,validate=False)
+        @user_namespace.response(200,'유저의 이미지 정보 목록의 길이를 반환합니다.',get_user_imagelist_len_response_model)
+        @user_namespace.response(api_error.authorizaion_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.authorizaion_error_model())
+        @login_required
+        def get(self,user_id):
+            '''
+            유저의 이미지 정보 목록의 길이를 반환합니다.
+            '''
+            current_user_id=g.user_id
+            if current_user_id != user_id:
+                return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
+                                     api_error.authorizaion_error()['status_code'])
+
+            images_len=image_service.get_user_imagelist_len(current_user_id)
+            
+            return make_response(jsonify({'imagelist_len':images_len}))
     #input
     #output
     # {
@@ -572,7 +678,7 @@ def user_router(app,api,services,config,es):
             if user_service.is_user_friend(current_user_id,friend_user_id):
                 return make_response(jsonify({'message':api_error.friend_existance_error()['message']}),
                                      api_error.friend_existance_error()['status_code'])
-            
+                
             result=user_service.create_user_friend(current_user_id,friend_user_id)
 
             return make_response(f"{result}명 친구 생성 성공")
@@ -652,25 +758,40 @@ def user_router(app,api,services,config,es):
         @user_namespace.response(api_error.authorizaion_error()['status_code'],
                                  '소유물이 아니기에 권한이 없습니다',
                                 api_error.authorizaion_error_model())
+        @user_namespace.response(api_error.room_existance_error()['status_code'],
+                                 '소유물이 아니기에 권한이 없습니다',
+                                api_error.room_existance_error_model())
         @login_required
         def delete(self,user_id):
             '''
             id가 user_id인 유저의 id가 room_id인 방을 삭제 합니다.(방 나가기)
             '''
             current_user_id=g.user_id
+            delete_user_room_id=request.json['delete_user_room_id']
             
-            if current_user_id != user_id:
+            if current_user_id != user_id or not room_service.is_room_user(delete_user_room_id,current_user_id):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
             
-            delete_user_room_id=request.json['delete_user_room_id']
+
+            room_info=room_service.get_room_info(delete_user_room_id)
+            if not room_info:
+                return make_response(jsonify({'message':api_error.room_existance_error()['message']}),
+                                     api_error.room_existance_error()['status_code'])                
 
             result=room_service.delete_user_room(current_user_id,delete_user_room_id)
+            room_userlist=room_service.get_room_userlist(delete_user_room_id)
+            if result==1:
+                if len(room_userlist)>=1:
+                    if room_info['host_user_id']==current_user_id:
+                        change_result=room_service.change_room_host_user_id(room_userlist[0]['id'],delete_user_room_id)
+                else:
+                    result=room_service.delete_room(delete_user_room_id)
 
             return make_response(f"{result}개 방 삭제 성공",200)
         
     delete_user_parser=api_parser_module.get_parser(['Authorization'])   
-    delete_user_model=api_model.get_model("delete_user_room_model",['delete_user_id'])
+    delete_user_model=api_model.get_model("delete_user_model",['delete_user_id'])
     @user_namespace.route("")
     class user_delete(Resource):
         @user_namespace.expect(delete_user_parser,delete_user_model)
@@ -683,6 +804,9 @@ def user_router(app,api,services,config,es):
                                 api_error.user_existance_error_model())
         @login_required
         def delete(self):
+            '''
+            유저를 삭제합니다.
+            '''
             delete_user_id=request.json['delete_user_id']
             current_user_id=g.user_id
             
@@ -694,6 +818,8 @@ def user_router(app,api,services,config,es):
                 return make_response(jsonify({'message':api_error.authorizaion_error()['message']}),
                                      api_error.authorizaion_error()['status_code'])
                 
-            result=user_service.delete_user(delete_user_id)
+            delete_user_result=user_service.delete_user(delete_user_id)
+            delete_user_imagelist_result=image_service.delete_user_imagelist(delete_user_id)
+            delete_user_roomlist_result=room_service.delete_user_roomlist(delete_user_id)
             
             return make_response(f"회원삭제에 성공하였습니다.")

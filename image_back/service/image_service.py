@@ -48,6 +48,7 @@ class ImageService:
 
         print(output_path)
         image.save(output_path)
+        image.close()
         image_link=f"{user_id}/{output_path.split('/')[-1]}"
         return image_link
 
