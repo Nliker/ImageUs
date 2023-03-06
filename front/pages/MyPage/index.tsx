@@ -1,12 +1,25 @@
-import MypageInfo from '@components/MypageInfo';
-import MyPictures from '@components/MyPictures';
-import AppLayout from '@layouts/AppLayout';
 import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { NavLink } from 'react-router-dom';
 import { Routes, Route, useLocation } from 'react-router';
+import { BiUserCircle } from 'react-icons/bi';
+import { IconContext } from 'react-icons/lib';
+
+import { CImageData } from '@typing/client';
+import useIntersect from '@hooks/useIntersect';
+import Scrollbars from 'react-custom-scrollbars';
+import MypageInfo from '@components/MypageInfo';
+import MyPictures from '@components/MyPictures';
+import AppLayout from '@layouts/AppLayout';
+import {
+  getImageData,
+  getUserFriendList,
+  getUserImageLen,
+  getUserImageList,
+  getUserRoomListFetcher,
+} from '@utils/userDataFetcher';
 import {
   ContentBox,
   EachRoomPictureList,
@@ -16,26 +29,12 @@ import {
   SubMenu,
   WrapperBox,
 } from './styles';
-import {
-  getImageData,
-  getUserFriendList,
-  getUserImageLen,
-  getUserImageList,
-  getUserRoomListFetcher,
-} from '@utils/userDataFetcher';
-import { DImageData } from '@typing/db';
-import { userImageLoadNumber } from '@hooks/swrStore';
-import { CImageData } from '@typing/client';
-import useIntersect from '@hooks/useIntersect';
-import { BiUserCircle } from 'react-icons/bi';
-import { IconContext } from 'react-icons/lib';
-import Scrollbars from 'react-custom-scrollbars';
 
 const MyPage = () => {
   const { pathname } = useLocation();
-  const userId = sessionStorage.getItem('USER_ID');
+  const userId = sessionStorage.getItem('user_id');
 
-  const { data: roomlist, mutate: mutateRoomList } = useSWR(
+  const { data: roomlist } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
     {
@@ -44,15 +43,11 @@ const MyPage = () => {
       revalidateOnReconnect: false,
     },
   );
-  const { data: friendList, mutate: mutateFriendList } = useSWR(
-    'friendlist',
-    getUserFriendList,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data: friendList } = useSWR('friendlist', getUserFriendList, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
   const { data: userImageList, mutate: mutateUserImageList } = useSWR<
     CImageData[]
   >('/user/imageDataList', {
@@ -67,7 +62,6 @@ const MyPage = () => {
       revalidateOnReconnect: false,
     },
   );
-
   const { data: loginInfo } = useSWR('/user/my');
 
   const {
@@ -80,7 +74,6 @@ const MyPage = () => {
     useSWRMutation('/user/image-download', getImageData);
 
   const [readStartNumber, setReadStartNumber] = useState(0);
-
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
@@ -89,7 +82,6 @@ const MyPage = () => {
         !imageDataLoading &&
         requestImageList?.loadDataLength === 12
       ) {
-        console.log('인터섹션 데이터 패칭 요청');
         requestImageListInfo(readStartNumber);
       }
     },
@@ -98,13 +90,11 @@ const MyPage = () => {
     },
   );
 
-  // 페이지 url이 바뀔 때 다시 마운트 시킨다.
   useEffect(() => {
     if (pathname !== '/my_page') return;
     requestImageListInfo(readStartNumber);
 
     return () => {
-      console.log('마이페이지 언마운트');
       setReadStartNumber(0);
       mutateUserImageList([]);
     };
@@ -175,7 +165,6 @@ const MyPage = () => {
                   <div>프로필</div>
                 </NavLink>
               </SubMenu>
-              {/* 여기를 Route를 활용해서 만든다. */}
               <Routes>
                 <Route
                   path="/"

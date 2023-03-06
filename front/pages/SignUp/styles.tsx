@@ -14,15 +14,14 @@ export const InputContainer = styled.div`
 `;
 
 export const Input = styled.input`
-  box-sizing: border-box;
-
   height: 56px;
   margin: 1px 1px 0 1px;
   padding: 13px 15px;
+  box-sizing: border-box;
 
+  border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  border: 1px solid #ccc;
   box-shadow: 0 0 3px #eee;
   color: #202124;
 `;
@@ -54,7 +53,6 @@ export const EmailBox = styled.div`
 export const RequestAuthBox = styled.div`
   display: flex;
 
-  // width: 50%;
   gap: 1rem;
 
   input {

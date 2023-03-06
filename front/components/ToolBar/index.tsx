@@ -22,9 +22,9 @@ import { logInCheckFetcher } from '@utils/logInFetcher';
 import { Link } from 'react-router-dom';
 import { Node } from 'typescript';
 import { useParams } from 'react-router';
-import { leaveRoomFetcher } from '@utils/roomDataFetcher';
 import { AxiosError } from 'axios';
 import { Button } from '@styles/Button';
+import { leaveRoomFetcher } from '@utils/userDataFetcher';
 
 interface Props {
   handleSidebar?: (e: any) => void;
@@ -94,11 +94,6 @@ const ToolBar = ({ handleSidebar, isImageRoom }: Props) => {
       navigate('/');
       return;
     }
-    leaveRoomFetcher(roomId).then(() => {
-      const userId = sessionStorage.getItem('USER_ID');
-      mutate(`/user/${userId}/roomlist`);
-      navigate('/');
-    });
   }, []);
 
   const onClickUserIcon = useCallback(
@@ -151,40 +146,43 @@ const ToolBar = ({ handleSidebar, isImageRoom }: Props) => {
               )}
             </LeftIcon>
           )}
-          <RightIcons className="toolbar_icon">
-            <div>
-              <span
-                onClick={onClickUserIcon}
-                onMouseEnter={onMouseEnterUserIcon}
-                onMouseLeave={onMouseLeaveUserIcon}
-              >
-                <BiUserCircle />
-              </span>
-            </div>
-            {(clickUserIcon || hoverUserIcon) && (
-              <UserBox ref={userInfoEl}>
-                <UserInfo>
-                  <div className={'info_words'}>
-                    <p>
-                      <strong>{logInInfo.user_info.name}</strong> 님 어서오세요!
-                    </p>
-                    <p>
-                      <strong>email:</strong> {logInInfo.user_info.email}
-                    </p>
-                  </div>
-                </UserInfo>
-                <LogoutBtn>
-                  <Button
-                    className="error"
-                    type="button"
-                    onClick={onClickLogOut}
-                  >
-                    로그아웃
-                  </Button>
-                </LogoutBtn>
-              </UserBox>
-            )}
-          </RightIcons>
+          {isMobile && (
+            <RightIcons className="toolbar_icon">
+              <div>
+                <span
+                  onClick={onClickUserIcon}
+                  onMouseEnter={onMouseEnterUserIcon}
+                  onMouseLeave={onMouseLeaveUserIcon}
+                >
+                  <BiUserCircle />
+                </span>
+              </div>
+              {(clickUserIcon || hoverUserIcon) && (
+                <UserBox ref={userInfoEl}>
+                  <UserInfo>
+                    <div className={'info_words'}>
+                      <p>
+                        <strong>{logInInfo.user_info.name}</strong> 님
+                        어서오세요!
+                      </p>
+                      <p>
+                        <strong>email:</strong> {logInInfo.user_info.email}
+                      </p>
+                    </div>
+                  </UserInfo>
+                  <LogoutBtn>
+                    <Button
+                      className="error"
+                      type="button"
+                      onClick={onClickLogOut}
+                    >
+                      로그아웃
+                    </Button>
+                  </LogoutBtn>
+                </UserBox>
+              )}
+            </RightIcons>
+          )}
         </>
       ) : (
         <LogInBtnBox>

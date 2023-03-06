@@ -1,12 +1,11 @@
+import React, { useEffect, useCallback, useMemo, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios, { AxiosError } from 'axios';
+
 import UserInfoInputBox from '@components/UserInfoInputBox';
 import useInput from '@hooks/useInput';
 import { Button } from '@styles/Button';
-import axios, { AxiosError } from 'axios';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { Navigate, redirect, useNavigate } from 'react-router-dom';
 import {
   ErrorText,
   InputContainer,
@@ -26,6 +25,8 @@ interface ErrorInfo {
 }
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [checked, setChecked] = useState<boolean>(false);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
     name: { hasError: true, errorMessage: '이름을 입력해주세요.' },
@@ -47,11 +48,6 @@ const SignUp = () => {
   );
   const [count, setCount] = useState(60);
   const [timeLimitId, setTimeLimitId] = useState<NodeJS.Timeout | null>();
-  const navigate = useNavigate();
-
-  const checkHandler = useCallback(() => {
-    return setChecked((prev) => !prev);
-  }, []);
 
   useEffect(() => {
     if (!name) {
@@ -152,7 +148,6 @@ const SignUp = () => {
   }, [timeLimitId, count]);
 
   const countTimeLimit = () => {
-    console.log(timeLimitId);
     if (timeLimitId) return;
     const Id = setInterval(() => {
       setCount((prev) => prev - 1);
@@ -160,7 +155,7 @@ const SignUp = () => {
     setTimeLimitId(Id);
   };
 
-  const requestEmailAuthNum = useCallback(async () => {
+  const requestEmailAuthNum = async () => {
     try {
       await axios.get(`/user/auth?email=${email}`);
       countTimeLimit();
@@ -188,9 +183,9 @@ const SignUp = () => {
         }
       }
     }
-  }, [email, timeLimitId]);
+  };
 
-  const checkEmailAuth = useCallback(async () => {
+  const checkEmailAuth = async () => {
     try {
       if (!emailAuth) {
         setErrorInfo((prev) => ({
@@ -224,7 +219,6 @@ const SignUp = () => {
     } catch (err) {
       if (err instanceof AxiosError) {
         const { message } = err.response?.data;
-        // console.log(err.response);
         if (err.response?.status === 401) {
           setErrorInfo((prev) => ({
             ...prev,
@@ -238,9 +232,9 @@ const SignUp = () => {
         }
       }
     }
-  }, [emailAuth]);
+  };
 
-  const cancelEmailAuth = useCallback(() => {
+  const cancelEmailAuth = () => {
     if (timeLimitId) clearInterval(timeLimitId);
     setTimeLimitId(null);
     setCount(60);
@@ -254,7 +248,7 @@ const SignUp = () => {
         emailAuth: true,
       },
     }));
-  }, [isRequestingAuth, timeLimitId, emailAuth, count]);
+  };
 
   const checkErrorValue = () => {
     for (const key in errorInfo) {
@@ -263,41 +257,34 @@ const SignUp = () => {
     return false;
   };
 
-  const handleSubmit = useCallback(
-    async (e: { preventDefault: () => void }) => {
-      e.preventDefault();
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
 
-      const hasError = checkErrorValue();
-      if (hasError) {
-        alert('양식을 다시 확인해 주세요.');
-        return;
-      }
+    const hasError = checkErrorValue();
+    if (hasError) {
+      alert('양식을 다시 확인해 주세요.');
+      return;
+    }
 
-      await axios
-        .post('user/sign-up', {
-          name,
-          email,
-          password,
-          profile: 'test1',
-        })
-        .then((res) => {
-          console.log(res);
-          alert('회원가입되었습니다.');
-          navigate('/login');
-        })
-        .catch((err) => {
-          console.log(err.response.data.message);
-        });
-    },
-    [checkErrorValue, errorInfo],
-  );
+    await axios
+      .post('user/sign-up', {
+        name,
+        email,
+        password,
+        profile: 'test1',
+      })
+      .then((res) => {
+        alert('회원가입되었습니다.');
+        navigate('/login');
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+  };
 
-  const correctMessageStyle = useMemo(
-    () => (hasError: boolean) => {
-      if (!hasError) return { color: 'dodgerblue' };
-    },
-    [errorInfo],
-  );
+  const correctMessageStyle = (hasError: boolean) => {
+    if (!hasError) return { color: 'dodgerblue' };
+  };
 
   return (
     <UserInfoInputBox pageName={'회원가입'}>
@@ -383,7 +370,7 @@ const SignUp = () => {
               </span>
             </ErrorText>
           </div>
-          <PasswordShowCheckBox onClick={checkHandler}>
+          <PasswordShowCheckBox onClick={() => setChecked((prev) => !prev)}>
             <input
               type="checkbox"
               name="show-password"

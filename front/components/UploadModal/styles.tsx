@@ -1,6 +1,4 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-export const Wrapper = styled.div``;
 
 export const Container = styled.div`
   height: 100%;
@@ -13,22 +11,27 @@ export const Background = styled.div`
   bottom: 0;
   left: 0;
   top: 0;
+
   background-color: rgba(0, 0, 0, 0.65);
 `;
 
 export const CloseBtn = styled.div`
   position: absolute;
   display: flex;
-  z-index: 1002;
   top: 10px;
   right: 10px;
+  z-index: 1002;
+
   padding: 8px;
+
   & > div {
     display: flex;
   }
+
   svg {
     width: 25px;
     height: 25px;
+
     color: white;
     cursor: pointer;
   }
@@ -39,15 +42,15 @@ export const ModalContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  z-index: 1001;
 
   overflow-x: hidden;
   overflow-y: hidden;
-  z-index: 1001;
 `;
 
 export const ModalBox = styled.div`
   display: flex;
-  margin: 20px;
+
   h1,
   h2 {
     font-size: 16px;
@@ -61,6 +64,7 @@ export const Modal = styled.div`
   min-width: 348px;
   min-height: 391px;
   border-radius: 12px;
+
   background-color: white;
   overflow: hidden;
   user-select: none;
@@ -96,10 +100,11 @@ export const ModalHeaderWrapper = styled.div`
   position: relative;
   display: inline-block;
   align-items: center;
-  border-bottom: 1px solid rgb(219, 219, 219);
+  box-sizing: border-box;
+
   width: 100%;
   height: 43px;
-  box-sizing: border-box;
+  border-bottom: 1px solid rgb(219, 219, 219);
 `;
 
 export const HeaderContainer = styled.div`
@@ -112,23 +117,9 @@ export const ModalHeader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
   height: 100%;
   user-select: none;
-  /* .left_btn,
-  .right_btn {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    flex-basis: 48px;
-    height: 100%;
-    &.left_btn {
-      float: left;
-    }
-    &.right_btn {
-      float: right;
-      margin-left: auto;
-    }
-  } */
 `;
 
 export const ModalTitle = styled.div`
@@ -136,9 +127,10 @@ export const ModalTitle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
   width: calc(100% - 120px);
-  height: 100%;
   height: 43px;
+
   h1 {
     width: 100%;
     margin: 0;
@@ -160,7 +152,6 @@ export const ModalImageBox = styled.div`
 `;
 
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
-  // 이미지가 load 되고 난 뒤에 값들을 넣어준다.
   width: 100%;
   height: 100%;
 
@@ -181,26 +172,28 @@ export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
 `;
 
 export const ImageCover = styled.div`
-  bottom: 0;
-  /* cursor: grab; */
-  height: 100%;
-  left: 0;
   position: absolute;
+  bottom: 0;
+  left: 0;
   right: 0;
   top: 0;
-  touch-action: none;
-  -webkit-user-select: none;
-  width: 100%;
   z-index: 2;
+
+  height: 100%;
+  width: 100%;
+  -webkit-user-select: none;
+  touch-action: none;
 `;
 
 export const ChannelListBox = styled.div`
   width: 100%;
   height: 100%;
+
   ul {
     margin: 0;
     padding: 0;
   }
+
   ul li {
     cursor: pointer;
     list-style: none;
@@ -222,9 +215,11 @@ export const ListBox = styled.div`
   justify-content: center;
 
   width: calc(100% / 2);
+
   & > div {
     width: 100%;
   }
+
   h2 {
     text-align: center;
   }

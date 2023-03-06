@@ -25,8 +25,8 @@ export const Wrapper = styled.div<{
 
     padding: 15px 30px;
     width: 100%;
-
     font-size: 80%;
+
     box-sizing: border-box;
     text-align: center;
     white-space: nowrap;

@@ -1,31 +1,27 @@
 import styled from '@emotion/styled';
 
-export const InputDiv = styled.div``;
-
-export const EmailInputContainer = styled.div``;
-export const PasswordInputContainer = styled.div`
-  // margin-top: 20px;
-`;
-
 export const InputBox = styled.div`
   input {
     width: 100%;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    box-shadow: 0 0 3px #eee;
-    border-radius: 4px;
-    color: #202124;
-    font-size: 17px;
     height: 56px;
     margin: 1px 1px 0 1px;
     padding: 13px 15px;
+    box-sizing: border-box;
+
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 0 3px #eee;
+
+    color: #202124;
+    font-size: 17px;
   }
+
   label {
     display: block;
     text-align: left;
+
     &:not(.pwcheck-label) {
       padding-bottom: 10px;
-      // color: #d93025;
     }
   }
 `;
@@ -34,13 +30,17 @@ export const ErrorMessage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 2rem;
+
   color: orangered;
 `;
 
 export const CheckBox = styled.div`
   display: block;
+
   margin-top: 20px;
+
   input {
     transform: scale(1.5);
   }
@@ -54,12 +54,11 @@ export const SubmitBox = styled.div`
   margin-top: 40px;
 
   .signup_link {
+    font-weight: 400;
     line-height: 1.38;
     letter-spacing: -0.3px;
-    font-weight: 400;
-
-    color: #616568;
     border-bottom: 1px solid #858a8d;
+    color: #616568;
     text-decoration: none;
     cursor: pointer;
   }
@@ -98,14 +97,15 @@ export const SocialLoginBox = styled.div`
 
   .social_sign-in_title {
     position: relative;
+    z-index: 11;
 
     padding: 0 8px;
     margin-bottom: 16px;
+
     font-size: 14px;
     line-height: 16px;
     letter-spacing: -0.3px;
     color: #b8b8b8;
-    z-index: 11;
     background-color: #fff;
   }
 
@@ -113,9 +113,11 @@ export const SocialLoginBox = styled.div`
     position: relative;
     bottom: -12px;
     display: block;
-    margin: 0;
+
     width: 100%;
     height: 1px;
+    margin: 0;
+
     background-color: #b8b8b8;
     border: none;
   }

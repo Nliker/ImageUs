@@ -1,14 +1,9 @@
-import ImageContentBox from '@components/ImageContentBox';
-import { CImageData } from '@typing/client';
 import React, { memo } from 'react';
 import { IconContext } from 'react-icons/lib';
-import {
-  MdImageNotSupported,
-  MdOutlineHideImage,
-  MdOutlineImageNotSupported,
-} from 'react-icons/md';
 import { FcRemoveImage } from 'react-icons/fc';
-import { CiImageOff } from 'react-icons/ci';
+
+import ImageContentBox from '@components/ImageContentBox';
+import { CImageData } from '@typing/client';
 import { ImageLayout, NotImageData } from './styles';
 
 interface Props {
@@ -39,7 +34,10 @@ const ImageContentList = ({ ImageData, observerRef, sectionName }: Props) => {
       ) : (
         <NotImageData>
           <IconContext.Provider
-            value={{ size: '30%', style: { display: 'inline-block' } }}
+            value={{
+              size: '30%',
+              style: { display: 'inline-block', maxWidth: '250px' },
+            }}
           >
             <FcRemoveImage />
           </IconContext.Provider>

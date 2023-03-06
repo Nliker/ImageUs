@@ -1,10 +1,11 @@
-import useInput from '@hooks/useInput';
-import { Button } from '@styles/Button';
-import { logInCheckFetcher } from '@utils/logInFetcher';
-import { postUserInfoFetcher } from '@utils/userDataFetcher';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+
+import useInput from '@hooks/useInput';
+import { logInCheckFetcher } from '@utils/logInFetcher';
+import { postUserInfoFetcher } from '@utils/userDataFetcher';
+import { Button } from '@styles/Button';
 import { InfoSection, InfoTable } from './styles';
 
 const MypageInfo = () => {
@@ -25,7 +26,6 @@ const MypageInfo = () => {
   const [introductionInput, setIntroductionInput, handleIntroInput] =
     useInput('');
   const [nameInput, setNameInput, handleNameInput] = useInput('');
-  // const { userInfo } = useMemo(getUserInfo, []);
 
   const changeIntroBox = useCallback(() => {
     setProfileState((prev) => {
@@ -74,56 +74,10 @@ const MypageInfo = () => {
             </td>
           </tr>
           <tr>
-            <th>소개글</th>
-            {!profileState.intro ? (
-              <>
-                <td>
-                  <div>{userInfo?.user_info.profile}</div>
-                </td>
-                <td className="btn_group">
-                  <Button type="button" onClick={changeIntroBox}>
-                    소개글 변경
-                  </Button>
-                </td>
-              </>
-            ) : (
-              <>
-                <td>
-                  <div>
-                    <label htmlFor="intro_label">
-                      소개글 수정
-                      <div>
-                        <input
-                          type="text"
-                          id="intro_label"
-                          onChange={handleIntroInput}
-                          value={introductionInput}
-                          placeholder="소개글 입력"
-                        />
-                      </div>
-                    </label>
-                  </div>
-                </td>
-                <td className="btn_group">
-                  <Button type="button" onClick={onClickPostIntro('profile')}>
-                    완료
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      setProfileState((prev) => {
-                        return {
-                          ...prev,
-                          intro: false,
-                        };
-                      })
-                    }
-                  >
-                    취소
-                  </Button>
-                </td>
-              </>
-            )}
+            <th>가입 유형</th>
+            <td>
+              <div>{userInfo?.user_info.profile}</div>
+            </td>
           </tr>
           <tr>
             <th>이름</th>

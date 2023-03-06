@@ -1,21 +1,16 @@
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
+import { useLocation, useParams } from 'react-router';
+
 import { CImageData } from '@typing/client';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import { Button } from '@styles/Button';
 import {
-  AertContainer,
   ContentBox,
-  EditBtn,
-  EditImageMenu,
   HoverBox,
   ImageCard,
   ImageInfo,
   InfoContainer,
 } from './styles';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
-import { deleteImageFetcher } from '@utils/roomDataFetcher';
-import { useParams } from 'react-router';
-import { Button } from '@styles/Button';
 
 interface Props {
   data: CImageData;
@@ -25,20 +20,12 @@ interface Props {
   sectionName?: string;
 }
 
-const ImageContentBox = ({
-  data,
-  index,
-  thisArr,
-  observerRef,
-  sectionName,
-}: Props) => {
-  const { data: showModalState, mutate: mutateModalState } =
-    useSWR('showModalState');
-  // const { data: deleteImageTriggerVar } = useSWR('deleteImage');
-  const { mutate: mutateDeleteImageInfo } = useSWR('deleteImageInfo');
-  const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
+const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
+  const currentPath = useLocation().pathname;
   const { roomId } = useParams<{ roomId: string }>();
+  const { mutate } = useSWRConfig();
 
+  const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
     `/image/${roomId}`,
   );
@@ -57,23 +44,19 @@ const ImageContentBox = ({
     useSWR('userImageDelete');
 
   const [isHover, setIsHover] = useState(false);
-  const imageDeleteEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!roomImageList || roomImageDeleting || deleteRoomImageId !== data.id)
       return;
-    console.log('이미지 아이디: ', deleteRoomImageId);
     const filteredList = roomImageList.filter(
       (image: CImageData) => image.id !== data.id,
     );
-    console.log(filteredList);
     fetchRoomImage([...filteredList], false);
   }, [deleteRoomImageId]);
 
   useEffect(() => {
     if (!userImageList || userImageDeleting || deleteUserImageId !== data.id)
       return;
-    console.log('이미지 아이디: ', deleteUserImageId);
     const filteredList = userImageList.filter(
       (image: CImageData) => image.id !== data.id,
     );
@@ -82,17 +65,25 @@ const ImageContentBox = ({
 
   const onClickShowAlertBox = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    mutateModalState({ ...showModalState, alert: true });
-    mutateDeleteImageInfo({ id: data.id });
+
+    const alertArgKey =
+      currentPath === '/my_page' ? '/image' : `/room/${roomId}/image`;
+
+    mutate('modalState', {
+      currentModalState: 'alert',
+      data: {
+        content: '정말 삭제하시겠습니까?',
+        mutateKey: alertArgKey,
+        imageId: data.id,
+      },
+    });
   };
 
   const onClickPictureInfo = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    mutateModalState({ ...showModalState, detailPicture: true });
+    mutate('modalState', { currentModalState: 'detailPicture' });
     mutateDetailImageInfo({ index, data });
   };
-
-  // console.log('말단', thisArr, index);
 
   return (
     <>
@@ -121,7 +112,7 @@ const ImageContentBox = ({
               <Button type="button" onClick={onClickPictureInfo}>
                 자세히 보기
               </Button>
-              {data.user_id + '' === sessionStorage.getItem('USER_ID') && (
+              {data.user_id + '' === sessionStorage.getItem('user_id') && (
                 <Button
                   type="button"
                   className="error"

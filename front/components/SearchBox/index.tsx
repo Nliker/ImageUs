@@ -1,32 +1,21 @@
-import useInput from '@hooks/useInput';
-import { Button } from '@styles/Button';
-import { DFriendData } from '@typing/db';
-import searchFetcher from '@utils/searchFetcher';
-import axios from 'axios';
-import { VscSearchStop } from 'react-icons/vsc';
-import React, {
-  FocusEvent,
-  FocusEventHandler,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useLinkClickHandler } from 'react-router-dom';
+import React, { FormEvent, useCallback, useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
+
+import { VscSearchStop } from 'react-icons/vsc';
 import { IconContext } from 'react-icons/lib';
+
+import { DFriendData } from '@typing/db';
+import useInput from '@hooks/useInput';
+import searchFetcher from '@utils/searchFetcher';
 import { postNewFriend } from '@utils/userDataFetcher';
+import { Button } from '@styles/Button';
+import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 
 const SearchBox = () => {
-  const [queryParams, setQueryParams] = useState('');
-  const [focusSearchBox, setFocusSearchBox] = useState(false);
-  const [searchData, setSearchData] = useState<DFriendData>();
-  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
-
   const { mutate } = useSWRConfig();
+  const [queryParams, setQueryParams] = useState('');
+
   const { data: prevSearchDataList } = useSWR(
     `/user/search?email=${queryParams}`,
     searchFetcher,
@@ -42,9 +31,12 @@ const SearchBox = () => {
     postNewFriend,
   );
 
+  const [focusSearchBox, setFocusSearchBox] = useState(false);
+  const [searchData, setSearchData] = useState<DFriendData>();
+  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
+
   useEffect(() => {
     const debounce = setTimeout(() => {
-      console.log('디바운싱 부분');
       setQueryParams(tmpInputData);
     }, 300);
     return () => clearTimeout(debounce);
@@ -62,13 +54,13 @@ const SearchBox = () => {
   );
 
   const onClickPreviewItem = useCallback(
-    (searchEmail: string | undefined) => () => {
-      if (searchEmail) {
-        setTmpInputData(searchEmail);
+    (searchEmailData: DFriendData | undefined) => () => {
+      if (searchEmailData?.id) {
+        setTmpInputData(searchEmailData.email ?? '');
         setFocusSearchBox(false);
 
         const clickItemData = prevSearchDataList?.find(
-          (data) => data.email === searchEmail,
+          (data) => data.id === searchEmailData.id,
         );
         setSearchData(clickItemData);
       }
@@ -113,7 +105,7 @@ const SearchBox = () => {
                   <li
                     key={data.id}
                     className={'preview_li'}
-                    onMouseDown={onClickPreviewItem(data.email)}
+                    onMouseDown={onClickPreviewItem(data)}
                   >
                     <div className="search_result_space">
                       <span>email: {data.email}</span>

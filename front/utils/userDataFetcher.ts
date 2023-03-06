@@ -1,11 +1,17 @@
-import { CImageData } from '@typing/client';
-import { DImageData, DRoomData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
+import { CImageData } from '@typing/client';
+import { DImageData } from '@typing/db';
+import { getToken } from './getToken';
 
 const getUserFriendList = async (url: string) => {
   try {
-    const userId = sessionStorage.getItem('USER_ID');
-    const token = sessionStorage.getItem('TOKEN');
+    const userId = sessionStorage.getItem('user_id');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const response = await axios.get(`/user/${userId}/${url}`, {
       headers: {
         Authorization: token,
@@ -25,8 +31,13 @@ const getUserImageList = async (
   url: string,
   { arg: start }: { arg: number },
 ) => {
-  const userId = sessionStorage.getItem('USER_ID');
-  const token = sessionStorage.getItem('TOKEN');
+  const userId = sessionStorage.getItem('user_id');
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error();
+  }
+
   const limit = 12;
   try {
     const response = await axios.get(
@@ -51,7 +62,12 @@ const getUserImageList = async (
 
 const getUserImageLen = async (url: string) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const response = await axios.get(url, {
       headers: {
         Authorization: token,
@@ -74,11 +90,17 @@ const getImageData = async (
   { arg: newImageList }: { arg: DImageData[] },
 ) => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const imageDataList: CImageData[] = await Promise.all(
       newImageList.map(async (imageData) => {
         const res = await axios.get(`/image-download/${imageData.link}`, {
           headers: {
-            Authorization: `${sessionStorage.getItem('TOKEN')}`,
+            Authorization: token,
           },
           responseType: 'blob',
         });
@@ -104,19 +126,25 @@ const getImageData = async (
 
 const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
   try {
-    const userId = sessionStorage.getItem('USER_ID');
-    const response = await axios.delete(`/user/${userId}/friend`, {
+    const userId = sessionStorage.getItem('user_id');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.delete(`/user/${userId}/friend`, {
       data: {
         delete_friend_user_id: arg,
       },
       headers: {
-        Authorization: `${sessionStorage.getItem('TOKEN')}`,
+        Authorization: token,
       },
     });
-    console.log(response.data);
+    alert('친구 목록에서 삭제하였습니다.');
   } catch (err) {
     if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
+      alert('친구 목록에서 삭제하지 못하였습니다..');
     }
     return false;
   }
@@ -124,7 +152,11 @@ const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
 
 const getUserRoomListFetcher = async (url: string) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
 
     const response = await axios.get(url, {
       headers: {
@@ -155,7 +187,12 @@ const postUserInfoFetcher = async (
   { arg }: { arg: { name?: string; profile?: string } },
 ) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const postData: { name?: string; profile?: string } = {};
 
     if (arg.name) postData.name = arg.name;
@@ -174,11 +211,18 @@ const postUserInfoFetcher = async (
   }
 };
 
-const deleteUserImage = async (imageId: number) => {
+const deleteUserImage = async (
+  url: string,
+  { arg: imageId }: { arg: number },
+) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
 
-    const response = await axios.delete('/image', {
+    if (!token) {
+      throw new Error();
+    }
+
+    const response = await axios.delete(url, {
       headers: { Authorization: token },
       data: { delete_image_id: imageId },
     });
@@ -199,8 +243,12 @@ const postNewFriend = async (
   { arg: friendId }: { arg: number },
 ) => {
   try {
-    const userId = sessionStorage.getItem('USER_ID');
-    const token = sessionStorage.getItem('TOKEN');
+    const userId = sessionStorage.getItem('user_id');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
 
     const response = await axios.post(
       `/user/${userId}/friend`,
@@ -227,6 +275,36 @@ const postNewFriend = async (
   }
 };
 
+const leaveRoomFetcher = async (
+  url: string,
+  { arg: roomId }: { arg: string },
+) => {
+  try {
+    if (!roomId) throw new Error('올바른 요청이 아닙니다.');
+    const token = await getToken();
+    const userId = sessionStorage.getItem('user_id');
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.delete(`/user/${userId}/room`, {
+      headers: { Authorization: token },
+      data: { delete_user_room_id: roomId },
+    });
+
+    alert('성공적으로 나갔습니다.');
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 403) {
+        alert(err.response.data);
+      } else {
+        alert('오류가 발생했습니다..');
+      }
+    }
+  }
+};
+
 export {
   getUserFriendList,
   getUserRoomListFetcher,
@@ -237,4 +315,5 @@ export {
   postUserInfoFetcher,
   deleteUserFriend,
   deleteUserImage,
+  leaveRoomFetcher,
 };

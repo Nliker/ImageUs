@@ -25,13 +25,17 @@ export const Wrapper = styled.div<{ isImageRoom?: boolean }>`
   }
 
   &::before {
-    background-color: rgb(219, 219, 219);
+    background-color: #f1f3f5;
     bottom: -1px;
     content: '';
     height: 1px;
     left: 0;
     position: absolute;
     right: 0;
+  }
+
+  @media screen and (min-width: 1024px) {
+    justify-content: end;
   }
 `;
 
@@ -56,6 +60,11 @@ export const LeftIcon = styled.div`
   position: relative;
 
   gap: 2rem;
+
+  @media screen and (min-width: 1024px) {
+    width: 100%;
+    justify-content: space-between;
+  }
 `;
 
 export const UserBox = styled.div`

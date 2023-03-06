@@ -9,9 +9,11 @@ export const Wrapper = styled.div`
     margin: 0;
     padding: 0;
   }
+
   li {
     list-style: none;
   }
+
   a {
     color: black;
     text-decoration: none;
@@ -35,6 +37,7 @@ export const Header = styled.header`
     height: 105px;
     box-sizing: border-box;
   }
+
   h1 {
     margin-left: 2em;
   }
