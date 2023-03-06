@@ -1,9 +1,13 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  height: 100%;
-
+  width: 450px;
+  height: 80%;
   border-radius: 6px;
+
+  @media screen and (min-width: 768px) {
+    width: 600px;
+  }
 `;
 
 export const Container = styled.div`
@@ -17,9 +21,9 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.div`
-  text-align: center;
   font-size: 18px;
   padding: 5px 0;
+  text-align: center;
 
   span {
     display: inline-block;
@@ -29,6 +33,7 @@ export const Title = styled.div`
 export const Content = styled.div`
   width: 100%;
   padding-bottom: 20px;
+
   box-sizing: border-box;
   overflow: auto;
 
@@ -55,7 +60,6 @@ export const Content = styled.div`
           display: table-row;
 
           vertical-align: middle;
-
           list-style: none;
           cursor: pointer;
 

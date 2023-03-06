@@ -1,10 +1,5 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.section`
-  /* height: 100%; */
-  padding: 0 20px;
-`;
-
 export const MainContainer = styled.main`
   position: relative;
 
@@ -17,22 +12,23 @@ export const MainContainer = styled.main`
     padding: 0 20px 0 23px;
     margin: 0 20px 20px 0;
     border-radius: 3px 0 0 3px;
-    color: white;
     line-height: 2rem;
 
+    color: white;
     background: #5b7cfa;
     text-decoration: none;
   }
 
   .tag::before {
     position: absolute;
-    width: 6px;
     top: 13px;
     left: 10px;
 
+    width: 6px;
     height: 6px;
-    background: #fff;
     border-radius: 10px;
+
+    background: #fff;
     box-shadow: inset 0 1px rgb(0 0 0 / 25%);
     content: '';
   }
@@ -50,28 +46,36 @@ export const MainContainer = styled.main`
   }
 `;
 
-export const FilterBox = styled.div`
+export const ActiveContentBox = styled.div`
   position: relative;
 
-  .select_date {
-    display: inline-flex;
-    align-items: center;
-
-    gap: 0.5rem;
+  .active_icon_box {
     position: absolute;
-    right: 15px;
-    top: 70px;
+    top: 20px;
+    left: 50px;
+    display: flex;
+
+    gap: 1rem;
+
+    .sidebar_icon {
+      cursor: pointer;
+    }
+
+    .leave_icon {
+      cursor: pointer;
+    }
   }
 `;
 
 export const FilteringOption = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: -65px;
+  right: 0px;
 
   width: 180px;
   height: 20px;
   padding: 12px 14px;
+
   background-color: #fff;
   border: 1px solid #e2eded;
   border-color: #eaf1f1 #e4eded #dbe7e7 #e4eded;
@@ -84,12 +88,13 @@ export const FilteringOption = styled.div`
     right: 0;
     bottom: 0;
     left: 0;
+    z-index: 3;
 
     width: 100%;
     height: 100%;
     margin: 0;
     opacity: 0;
-    z-index: 3;
+
     cursor: pointer;
   }
 
@@ -111,11 +116,11 @@ export const FilteringOption = styled.div`
     top: 45px;
     right: 0;
     left: 0;
+    z-index: 10;
 
     width: 209px;
-    background-color: #fff;
     border-radius: 4px;
-    z-index: 10;
+    background-color: #fff;
     box-shadow: 0 0.125rem 0.05rem rgb(0 0 0 / 30%),
       0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
     text-align: center;
@@ -136,20 +141,27 @@ export const ContentBox = styled.div`
 
   width: 100%;
   padding-bottom: 40px;
+
+  .content_box_pos {
+    position: relative;
+
+    width: 85%;
+    margin: auto;
+  }
 `;
 
 export const ImageCard = styled.div`
-  overflow: hidden;
-  padding-bottom: 100%;
   position: relative;
+
+  padding-bottom: 100%;
+  overflow: hidden;
 `;
 
 export const ImageInfo = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+
   text-align: center;
   background-color: whitesmoke;
 `;
-
-export const InfoItem = styled.div``;

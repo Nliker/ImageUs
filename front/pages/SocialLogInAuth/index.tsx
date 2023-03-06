@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useEffect } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router';
-import useSWR, { useSWRConfig } from 'swr';
+
 import { socialLoginFetcher } from '@utils/logInFetcher';
 
 const SocialLogInAuth = () => {

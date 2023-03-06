@@ -15,10 +15,10 @@ export const Wrapper = styled.div`
   box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%);
 
   & > p {
-    text-align: center;
-
     margin: 0;
     font-size: 18px;
+
+    text-align: center;
   }
 
   .btn_group {

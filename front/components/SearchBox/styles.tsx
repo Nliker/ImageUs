@@ -26,8 +26,10 @@ export const Wrapper = styled.div`
 
     background: #fff;
     box-shadow: 0px 0px 5px 0px rgb(0 0 0 / 19%);
+
     .search_btn {
       padding-left: 10px;
+
       button {
         width: 60px;
         font-size: 0.5rem;
@@ -42,7 +44,6 @@ export const Wrapper = styled.div`
     label {
       position: absolute;
       display: block;
-
       z-index: 100;
 
       font-size: 12px;
@@ -100,10 +101,10 @@ export const PreviewBox = styled.div`
 `;
 
 export const SearchResult = styled.div`
-  flex: 1 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 0 auto;
 
   width: 100%;
   margin-top: 30px;

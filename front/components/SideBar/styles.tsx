@@ -7,17 +7,18 @@ export const Background = styled.div`
   bottom: 0;
   left: 0;
   top: 0;
+
   background-color: rgba(0, 0, 0, 0.65);
 `;
 
 export const Wrapper = styled.div<{ show: boolean }>`
   position: absolute;
   top: 0;
-  box-sizing: border-box;
 
   width: 350px;
   height: 100%;
   z-index: 100;
+  box-sizing: border-box;
 
   background-color: transparent;
   box-shadow: rgb(0 0 0 / 8%) 2px 0px 2px;
@@ -44,10 +45,12 @@ export const ContentWrapper = styled.div`
 
 export const ContentTabs = styled.ul`
   position: relative;
+
   padding: 0;
   margin: 0;
-  list-style: none;
   height: 100%;
+
+  list-style: none;
   overflow: hidden;
 `;
 
@@ -81,6 +84,7 @@ export const Tab = styled.li`
     bottom: 0;
     left: 0;
     right: 0;
+
     padding: 0;
 
     box-sizing: border-box;
@@ -89,8 +93,8 @@ export const Tab = styled.li`
   }
 
   & .tab_content > .tab_content_box {
-    height: 100%;
     box-sizing: border-box;
+    height: 100%;
     padding: 10px;
 
     transform: translateX(-100%);

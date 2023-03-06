@@ -4,9 +4,12 @@ export const Wrapper = styled.nav`
   display: block;
   position: fixed;
   bottom: 0;
-  width: 100%;
   z-index: 100;
+
+  width: 100%;
+  min-width: 330px;
   font-size: 0.75rem;
+
   h1 {
     margin: 0;
   }
@@ -20,9 +23,10 @@ export const BottomContainer = styled.div`
   position: relative;
   display: flex;
 
-  height: 66px;
   width: 100%;
+  height: 66px;
   box-shadow: 0 -2px 4px 0 rgb(33 37 41 / 8%);
+
   background-color: #fff;
 
   a {
@@ -48,6 +52,8 @@ export const BottomContainer = styled.div`
       .user_icon_s {
         display: inline-block;
         height: 100%;
+
+        cursor: pointer;
       }
     }
   }
@@ -61,8 +67,8 @@ export const MobileNavList = styled.ul`
   display: flex;
   justify-content: space-around;
   align-items: center;
-
   flex: 10;
+
   height: 100%;
   margin: 0;
   padding: 0;
@@ -84,22 +90,26 @@ export const MobileNavItem = styled.li`
   position: relative;
   display: flex;
   align-items: center;
+
   height: 100%;
+  padding: 0.5rem 1rem;
+
   list-style: none;
   box-sizing: border-box;
-  padding: 0.5rem 1rem;
 
   svg {
     display: block;
-    margin: 0 auto 3px;
+
     width: 25px;
     height: auto;
+    margin: 0 auto 3px;
   }
 
   h1 {
     a {
       display: flex;
       gap: 0.5rem;
+
       svg {
         margin: 0 auto;
       }
@@ -119,6 +129,7 @@ export const UserBox = styled.div`
   position: absolute;
   top: -153px;
   flex-direction: column;
+  z-index: 1000;
 
   height: auto;
   right: -10px;
@@ -127,18 +138,17 @@ export const UserBox = styled.div`
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
     0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
 
-  z-index: 1000;
   background-color: white;
 
   @media screen and (max-width: 1023px) {
     &::after {
       content: '';
       position: absolute;
+      top: 100%;
+      right: 0.9em;
 
       width: 0;
       height: 0;
-      top: 100%;
-      right: 0.9em;
       border: 0.75rem solid transparent;
       border-bottom: none;
 
@@ -154,11 +164,11 @@ export const UserBox = styled.div`
     &::before {
       content: '';
       position: absolute;
+      right: 1.5em;
+      bottom: 100%;
 
       width: 0;
       height: 0;
-      bottom: 100%;
-      right: 1.5em;
       border: 0.75rem solid transparent;
       border-top: none;
 

@@ -1,27 +1,10 @@
-import React, {
-  createContext,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { useMediaQuery } from 'react-responsive';
+
 import NavigationBar from '@components/NavigationBar';
-import UploadModal from '@components/UploadModal';
-import CreateRoomModal from '@components/CreateRoomModal';
-import InviteMemberModal from '@components/InviteMemberModal';
-import AlertBox from '@components/AlertBox';
-import DetailPictureInfo from '@components/DetailPictureInfo';
-import ModalLayout from '@layouts/ModalLayout';
-import {
-  OuterContainer,
-  InnerContainer,
-  ModalWrapper,
-  Wrapper,
-} from './styles';
-import ToolBar from '@components/ToolBar';
 import SideBar from '@components/SideBar';
+import Modal from '@components/Modal';
+import { OuterContainer, InnerContainer, Wrapper } from './styles';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -38,9 +21,10 @@ export const SidebarContext = createContext<ISidebarContext>({
 });
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
-  const { data: showModalState } = useSWR('showModalState');
   const { data: userInfo } = useSWR('/user/my');
+  const { data: modalStateData } = useSWR('modalState');
 
+  const currentModalState = modalStateData?.currentModalState;
   const [sidebarState, setSidebarState] = useState<boolean>(false);
   const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
 
@@ -50,7 +34,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
 
   return (
     <Wrapper>
-      <OuterContainer showModal={showModalState}>
+      <OuterContainer showModal={currentModalState}>
         {userInfo.logInState && <NavigationBar />}
         <InnerContainer
           style={
@@ -63,31 +47,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
           </SidebarContext.Provider>
         </InnerContainer>
       </OuterContainer>
-      {showModalState?.detailPicture && (
-        <ModalLayout modalName={'detailPicture'}>
-          <DetailPictureInfo />
-        </ModalLayout>
-      )}
-      {showModalState?.alert && (
-        <ModalWrapper>
-          <AlertBox />
-        </ModalWrapper>
-      )}
-      {showModalState?.upload && (
-        <ModalLayout modalName={'upload'}>
-          <UploadModal />
-        </ModalLayout>
-      )}
-      {showModalState?.create_room && (
-        <ModalLayout modalName={'create_room'}>
-          <CreateRoomModal />
-        </ModalLayout>
-      )}
-      {showModalState?.invite_member && (
-        <ModalLayout modalName={'invite_member'}>
-          <InviteMemberModal />
-        </ModalLayout>
-      )}
+      <Modal modalName={currentModalState} />
     </Wrapper>
   );
 };

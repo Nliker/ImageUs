@@ -1,18 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { useParams } from 'react-router';
+
+import Scrollbars from 'react-custom-scrollbars';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
-import { Container, Content, Title, Wrapper } from './styles';
+
 import { getUserFriendList } from '@utils/userDataFetcher';
 import { DFriendData } from '@typing/db';
-import useSWRMutation from 'swr/mutation';
 import {
   getUserListFetcher,
   inviteFriendFetcher,
 } from '@utils/roomDataFetcher';
-import { useParams } from 'react-router';
-import { AxiosError } from 'axios';
 import { Button } from '@styles/Button';
-import Scrollbars from 'react-custom-scrollbars';
+import { Container, Content, Title, Wrapper } from './styles';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
@@ -20,12 +21,10 @@ const InviteMemberModal = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { mutate } = useSWRConfig();
 
-  const { data: showModalState, mutate: modalMutate } =
-    useSWR('showModalState');
   const { data: userFriendList } = useSWR('friendlist', getUserFriendList, {
     revalidateOnFocus: false,
   });
-  const { data: roomMemberList, mutate: roomMemberMutate } = useSWR(
+  const { data: roomMemberList } = useSWR(
     `/room/${roomId}/userlist`,
     getUserListFetcher,
     {
@@ -37,14 +36,13 @@ const InviteMemberModal = () => {
     inviteFriendFetcher,
   );
 
-  const [notInvitedFriends, setNotInvitedFriends] = useState<
+  const [checkFriendState, setCheckFriendState] = useState<
     AppendCheckFriendData[]
   >([]);
 
   useEffect(() => {
     if (!userFriendList || !roomMemberList) return;
 
-    console.log(userFriendList, roomMemberList);
     const newList = userFriendList.filter((userInfo: DFriendData) => {
       for (const roomUserInfo of roomMemberList) {
         if (roomUserInfo.id === userInfo.id) return false;
@@ -56,28 +54,21 @@ const InviteMemberModal = () => {
       return { ...data, check: false };
     });
 
-    setNotInvitedFriends([...appendCheckList]);
+    setCheckFriendState([...appendCheckList]);
   }, [userFriendList, roomMemberList]);
 
-  const getSelectFriends = useCallback(() => {
-    const selectMemberName = notInvitedFriends
-      .filter((data) => data.check)
-      .map((data) => data.name);
-    return selectMemberName.join(' ');
-  }, [notInvitedFriends]);
-
   const onClickFriendList = (dataId: number) => () => {
-    const newData = notInvitedFriends.map((data) => {
+    const newData = checkFriendState.map((data) => {
       if (data.id === dataId) {
         return { ...data, check: !data.check };
       }
       return { ...data };
     });
-    setNotInvitedFriends([...newData]);
+    setCheckFriendState([...newData]);
   };
 
   const onClickInviteFriends = useCallback(() => {
-    const selectDataId = notInvitedFriends
+    const selectDataId = checkFriendState
       .filter((data) => data.check)
       .map((data) => data.id);
 
@@ -85,13 +76,17 @@ const InviteMemberModal = () => {
       alert('선택된 친구가 없습니다.');
     } else {
       inviteFriendsTrigger(selectDataId).then(() => {
-        const userId = sessionStorage.getItem('USER_ID');
-
-        modalMutate({ ...showModalState, invite_member: false });
+        const userId = sessionStorage.getItem('user_id');
         mutate(`/user/${userId}/roomlist`);
+        mutate('modalState', { currentModalState: '' });
       });
     }
-  }, [notInvitedFriends]);
+  }, [checkFriendState]);
+
+  const checkFriendList = useMemo(
+    () => checkFriendState.filter((data) => data.check),
+    [checkFriendState],
+  );
 
   return (
     <Wrapper>
@@ -107,8 +102,8 @@ const InviteMemberModal = () => {
                   <h2>초대할 친구 목록</h2>
                 </div>
                 <ul className="not_selected_ul">
-                  {notInvitedFriends &&
-                    notInvitedFriends.map((data: AppendCheckFriendData) => (
+                  {checkFriendState.length !== 0 ? (
+                    checkFriendState.map((data: AppendCheckFriendData) => (
                       <li key={data.id} onClick={onClickFriendList(data.id)}>
                         <div className="list_layout">
                           <div className="list_check_icon">
@@ -124,19 +119,25 @@ const InviteMemberModal = () => {
                           </div>
                         </div>
                       </li>
-                    ))}
+                    ))
+                  ) : (
+                    <p>등록할 친구가 없습니다.</p>
+                  )}
                 </ul>
               </div>
               <div className="content_selected_box">
                 <div className="content_subname">
                   <h2>선택한 친구들</h2>
                 </div>
-                <ul className="selected_member_ul">
-                  {notInvitedFriends &&
-                    notInvitedFriends
-                      .filter((data) => data.check)
-                      .map((data) => <li key={data.id}>{data.name}</li>)}
-                </ul>
+                {checkFriendList.length !== 0 ? (
+                  <ul className="selected_member_ul">
+                    {checkFriendList.map((data) => (
+                      <li key={data.id}>{data.name}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>선택한 친구가 없습니다.</p>
+                )}
               </div>
               <div className="content_btn">
                 <Button type="button" onClick={onClickInviteFriends}>

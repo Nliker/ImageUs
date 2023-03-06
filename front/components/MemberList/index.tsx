@@ -1,18 +1,15 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { useParams } from 'react-router';
+
 import { IoMdArrowDropright } from 'react-icons/io';
-import { Collapse, CreateBtnBox, Subtitle } from './styles';
-import {
-  deleteMemberFetcher,
-  getUserListFetcher,
-} from '@utils/roomDataFetcher';
-import { DFriendData, DRoomData } from '@typing/db';
+import { deleteMemberFetcher } from '@utils/roomDataFetcher';
+import { DRoomData } from '@typing/db';
 import CollapseListBox from '@components/CollapseListBox';
 import ActionButton from '@styles/ActiveButton';
-import { useParams } from 'react-router';
-import { SyncLoader } from 'react-spinners';
 import Spinner from '@styles/Spinner';
+import { Collapse, CreateBtnBox, Subtitle } from './styles';
 
 interface Props {
   currentRoomInfo: DRoomData;
@@ -22,8 +19,6 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
   const { mutate } = useSWRConfig();
 
-  const { data: showModalState, mutate: showModalMutate } =
-    useSWR('showModalState');
   const { data: logInInfo } = useSWR('/user/my');
   const { trigger: deleteMemberTrigger } = useSWRMutation(
     `/room/${roomId}/user`,
@@ -47,16 +42,9 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
     return [...data];
   }, [currentRoomInfo]);
 
-  const onClickInviteMember = useCallback(() => {
-    showModalMutate({
-      ...showModalState,
-      invite_member: true,
-    });
-  }, [showModalState]);
-
   const onClickDeleteMember = (memberId: number) => () => {
     deleteMemberTrigger(memberId).then(() => {
-      const userId = sessionStorage.getItem('USER_ID');
+      const userId = sessionStorage.getItem('user_id');
       mutate(`/user/${userId}/roomlist`);
     });
   };
@@ -84,7 +72,12 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
             readOnly
           />
           <CreateBtnBox>
-            <ActionButton onClickBtn={onClickInviteMember} btnTitle={'+'} />
+            <ActionButton
+              onClickBtn={() => {
+                mutate('modalState', { currentModalState: 'inviteMember' });
+              }}
+              btnTitle={'+'}
+            />
           </CreateBtnBox>
         </>
       )}

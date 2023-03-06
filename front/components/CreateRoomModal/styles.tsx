@@ -1,9 +1,13 @@
 import styled from '@emotion/styled';
 
 export const ModalBoxContainer = styled.div`
-  height: 100%;
-
+  width: 450px;
+  height: 80%;
   border-radius: 6px;
+
+  @media screen and (min-width: 768px) {
+    width: 600px;
+  }
 `;
 
 export const ModalBox = styled.div`
@@ -13,19 +17,19 @@ export const ModalBox = styled.div`
   height: 100%;
   padding: 20px 0;
   border-radius: 12px;
-  box-sizing: border-box;
 
+  box-sizing: border-box;
   background-color: white;
 `;
 
 export const Title = styled.div`
   flex: 1;
-  text-align: center;
 
   height: 30%;
-
-  font-size: 18px;
   margin: 5px 0;
+  font-size: 18px;
+
+  text-align: center;
 
   span {
     display: inline-block;
@@ -33,10 +37,10 @@ export const Title = styled.div`
 `;
 
 export const CloseBtn = styled.div`
-  position: relative;
-  display: inline-block;
-  right: 5px;
   float: right;
+  display: inline-block;
+  position: relative;
+  right: 5px;
 
   cursor: pointer;
 
@@ -76,13 +80,16 @@ export const Content = styled.div`
 `;
 
 export const RoomName = styled.div`
-  flex: 1;
   display: flex;
+  justify-content: center;
   align-items: center;
 
-  max-width: 50%;
+  width: 100%;
+  height: 40px;
   margin: auto;
+
   text-align: center;
+  box-shadow: 0 0 2px 0px rgb(0 0 0 / 40%);
 
   & > label {
     margin-right: 20px;
@@ -96,9 +103,10 @@ export const MemeberList = styled.div`
     display: flex;
     flex-direction: column;
 
-    max-width: 50%;
+    /* max-width: 50%; */
     margin: auto;
-    padding: 1.5rem 0;
+    /* padding: 1.5rem 0; */
+    padding: 1.5rem;
 
     overflow-y: auto;
 
@@ -118,11 +126,13 @@ export const MemeberList = styled.div`
 
 export const ActionBtn = styled.div`
   display: flex;
-  justify-content: end;
+  justify-content: center;
   align-items: center;
 
   height: 60px;
   padding: 0 20px;
+
+  box-shadow: 0px -1px 2px -1px rgb(0 0 0 / 40%);
 `;
 
 export const ResultRoomName = styled.div`
@@ -151,5 +161,6 @@ export const ResultActionBtn = styled.div`
   width: 100%;
   height: 60px;
   padding: 0 20px;
+
   box-sizing: border-box;
 `;

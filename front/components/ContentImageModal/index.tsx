@@ -1,26 +1,13 @@
-import ModalLayout from '@layouts/ModalLayout';
 import React from 'react';
 import useSWR from 'swr';
+import ModalLayout from '@layouts/ModalLayout';
 import { ModalBox, ModalBoxContainer } from './styles';
 
-interface Props {
-  onCloseModal: (e: any) => void;
-}
-
-interface ImageInfoProps {
-  id: number;
-  url: string;
-  name: string;
-}
-
 const ContentImageModal = () => {
-  const { data: imageInfo, mutate: imageInfoMutate } = useSWR('imageInfo');
-  const { data: imageModalState, mutate: imageModalMutate } =
-    useSWR('imageModalState');
+  const { data: imageModalState } = useSWR('imageModalState');
 
-  // console.log(imageModalState);
   return (
-    <ModalLayout modalName="detailPicture">
+    <ModalLayout>
       <ModalBoxContainer>
         <ModalBox>
           <ul>

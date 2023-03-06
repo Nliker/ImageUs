@@ -1,67 +1,65 @@
-import React, {
-  ChangeEvent,
-  CSSProperties,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  getDefaultImgFetcher,
-  getFilterImgFetcher,
-  getImageData,
-  getMarkerFetcher,
-  getUnreadImageList,
-} from '@utils/roomDataFetcher';
-import useSWR, { useSWRConfig } from 'swr';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
+import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import {
-  ContentBox,
-  ActiveContentBox,
-  FilteringOption,
-  ImageCard,
-  ImageInfo,
-  InfoItem,
-  MainContainer,
-  Wrapper,
-} from './styles';
-import { imageLoadNumber } from '@hooks/swrStore';
-import { AxiosError, AxiosResponse } from 'axios';
-import useIntersect from '@hooks/useIntersect';
+
 import Scrollbars from 'react-custom-scrollbars';
-import ImageContentList from '@components/ImageContentList';
-import { SyncLoader } from 'react-spinners';
-import { CImageData } from '@typing/client';
-import { DImageData } from '@typing/db';
+import { TbDoorExit } from 'react-icons/tb';
+import { IconContext } from 'react-icons/lib';
 import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdOutlineSpaceDashboard,
 } from 'react-icons/md';
+
+import useIntersect from '@hooks/useIntersect';
+import ImageContentList from '@components/ImageContentList';
+import { CImageData } from '@typing/client';
+import {
+  getDefaultImgFetcher,
+  getFilterImgFetcher,
+  getImageData,
+  getUnreadImageList,
+} from '@utils/roomDataFetcher';
+
 import { Button } from '@styles/Button';
 import Spinner from '@styles/Spinner';
-import { TbDoorExit } from 'react-icons/tb';
-import { IconContext } from 'react-icons/lib';
 import { SidebarContext } from '@layouts/AppLayout';
-
-interface Props {
-  roomId?: string;
-}
+import {
+  ContentBox,
+  ActiveContentBox,
+  FilteringOption,
+  MainContainer,
+} from './styles';
 
 interface SelectTerm {
   startDate?: string;
   endDate?: string;
 }
 
-const spinnerCSS: CSSProperties = {
-  display: 'block',
-  margin: '1rem auto',
-  textAlign: 'center',
-};
-
 const ContentSection = ({ roomId }: { roomId?: string }) => {
-  const [readStartNumber, setReadStartNumber] = useState(0);
+  const { data: realTimeImageList } = useSWR(
+    `/room/${roomId}/unread-imagelist`,
+    getUnreadImageList,
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 100000,
+    },
+  );
+  const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
+    `/image/${roomId}`,
+    {
+      fallbackData: [],
+    },
+  );
+  const { data: filterImage, mutate: mutateFilterImage } = useSWR<CImageData[]>(
+    `/image/${roomId}/filter`,
+    {
+      fallbackData: [],
+    },
+  );
 
   const {
     data: defaultImageList,
@@ -75,34 +73,10 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     isMutating: filterImgListLoading,
   } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
 
-  const { data: realTimeImageList, isLoading: realTimeImgLoading } = useSWR(
-    `/room/${roomId}/unread-imagelist`,
-    getUnreadImageList,
-    {
-      revalidateOnFocus: false,
-      revalidateOnMount: false,
-      revalidateOnReconnect: false,
-      refreshInterval: 10000,
-    },
-  );
-
   const { trigger: imgDataListTrigger, isMutating: imgDataLoading } =
     useSWRMutation('/room/imageData', getImageData);
 
-  const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
-    `/image/${roomId}`,
-    {
-      fallbackData: [],
-    },
-  );
-
-  const { data: filterImage, mutate: mutateFilterImage } = useSWR<CImageData[]>(
-    `/image/${roomId}/filter`,
-    {
-      fallbackData: [],
-    },
-  );
-
+  const [readStartNumber, setReadStartNumber] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
   const [filterName, setFilterName] = useState('기본 게시물');
   const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>();
@@ -112,14 +86,12 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-
       if (
         !filterSelectTerm &&
         !defaultImgListLoading &&
         !imgDataLoading &&
         defaultImageList?.loadDataLength === 12
       ) {
-        console.log('일반 이미지 인터섹션 데이터 패칭 요청');
         defaultImgListTrigger({
           start: readStartNumber,
         });
@@ -131,7 +103,6 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
         !imgDataLoading &&
         filterImageList?.loadDataLength === 12
       ) {
-        console.log('필터 이미지 인터섹션 데이터 패칭 요청');
         filterImgListTrigger({
           start: readStartNumber,
           start_date: filterSelectTerm.startDate,
@@ -148,16 +119,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     return <div>로딩중...</div>;
   }
 
-  /*
-
-   방에 처음 들어가서 마운트 됐을 때
-   구분없이 전체 이미지를 보여준다.
-
-  */
-
   useEffect(() => {
-    console.log('컨텐트 섹션 룸아이디', roomId, filterSelectTerm);
-
     if (!filterSelectTerm) {
       defaultImgListTrigger({
         start: readStartNumber,
@@ -216,7 +178,6 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     );
   }, [filterImageList]);
 
-  // 실시간 데이터 업데이트
   useEffect(() => {
     if (!realTimeImageList) return;
 
@@ -272,10 +233,6 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
   };
 
   const onClickCertainPeriodFilterBtn = () => {
-    console.log(
-      filterStartDateInputRef.current?.value,
-      filterEndDateInputRef.current?.value,
-    );
     const startDate = filterStartDateInputRef.current?.value;
     const endDate = filterEndDateInputRef.current?.value;
 
@@ -294,68 +251,22 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     setFilterSelectTerm({ startDate, endDate });
   };
 
-  console.log(filterSelectTerm?.startDate);
+  const onClickLeaveRoom = () => {
+    const userId = sessionStorage.getItem('user_id');
+    mutate('modalState', {
+      currentModalState: 'alert',
+      data: {
+        content: '방에서 나가시겠습니까?',
+        mutateKey: `/user/${userId}/room`,
+      },
+    });
+  };
 
   return (
     <Scrollbars>
-      <Wrapper>
+      <section>
         <MainContainer>
           <ActiveContentBox>
-            <FilteringOption onClick={() => setFilterBoxState((prev) => !prev)}>
-              <input type="checkbox" id="options-view-button" />
-              <div id="select-button">
-                <div className="selected-value">
-                  <span>{filterName}</span>
-                </div>
-                <div id="chevrons">
-                  <MdKeyboardArrowUp />
-                  <MdKeyboardArrowDown />
-                </div>
-              </div>
-              {filterBoxState && (
-                <div className="options">
-                  <div
-                    className="option"
-                    onClick={onClickFilteringItem('today')}
-                  >
-                    <span>오늘 날짜</span>
-                  </div>
-                  <div
-                    className="option"
-                    onClick={onClickFilteringItem('yesterday')}
-                  >
-                    <span>어제 날짜</span>
-                  </div>
-                  <div
-                    className="option"
-                    onClick={onClickFilteringItem('selectDay')}
-                  >
-                    <span>기간 선택</span>
-                  </div>
-                  <div
-                    className="option"
-                    onClick={onClickFilteringItem('default')}
-                  >
-                    <span>기본 게시물</span>
-                  </div>
-                </div>
-              )}
-            </FilteringOption>
-            {filterName === '기간 선택' && (
-              <div className="select_date">
-                <label htmlFor="start_date">시작날</label>
-                <input
-                  type="date"
-                  id="start_date"
-                  ref={filterStartDateInputRef}
-                />
-                <label htmlFor="end_date">마지막날</label>
-                <input type="date" id="end_date" ref={filterEndDateInputRef} />
-                <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
-                  확인
-                </Button>
-              </div>
-            )}
             <div className="active_icon_box">
               <SidebarContext.Consumer>
                 {({ setSidebarState }) => (
@@ -376,7 +287,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
                   </div>
                 )}
               </SidebarContext.Consumer>
-              <div>
+              <div className="leave_icon" onClick={onClickLeaveRoom}>
                 <IconContext.Provider
                   value={{
                     size: '30px',
@@ -388,8 +299,70 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
               </div>
             </div>
           </ActiveContentBox>
+
           <ContentBox>
-            <div>
+            <div className="content_box_pos">
+              <FilteringOption
+                onClick={() => setFilterBoxState((prev) => !prev)}
+              >
+                <input type="checkbox" id="options-view-button" />
+                <div id="select-button">
+                  <div className="selected-value">
+                    <span>{filterName}</span>
+                  </div>
+                  <div id="chevrons">
+                    <MdKeyboardArrowUp />
+                    <MdKeyboardArrowDown />
+                  </div>
+                </div>
+                {filterBoxState && (
+                  <div className="options">
+                    <div
+                      className="option"
+                      onClick={onClickFilteringItem('today')}
+                    >
+                      <span>오늘 날짜</span>
+                    </div>
+                    <div
+                      className="option"
+                      onClick={onClickFilteringItem('yesterday')}
+                    >
+                      <span>어제 날짜</span>
+                    </div>
+                    <div
+                      className="option"
+                      onClick={onClickFilteringItem('selectDay')}
+                    >
+                      <span>기간 선택</span>
+                    </div>
+                    <div
+                      className="option"
+                      onClick={onClickFilteringItem('default')}
+                    >
+                      <span>기본 게시물</span>
+                    </div>
+                  </div>
+                )}
+              </FilteringOption>
+              {filterName === '기간 선택' && (
+                <div className="select_date">
+                  <label htmlFor="start_date">시작날</label>
+                  <input
+                    type="date"
+                    id="start_date"
+                    ref={filterStartDateInputRef}
+                  />
+                  <label htmlFor="end_date">마지막날</label>
+                  <input
+                    type="date"
+                    id="end_date"
+                    ref={filterEndDateInputRef}
+                  />
+                  <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
+                    확인
+                  </Button>
+                </div>
+              )}
               <div className="tag">
                 <span>
                   {filterSelectTerm ? '필터링된 이미지' : '게시된 이미지'}
@@ -405,7 +378,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
             </div>
           </ContentBox>
         </MainContainer>
-      </Wrapper>
+      </section>
     </Scrollbars>
   );
 };

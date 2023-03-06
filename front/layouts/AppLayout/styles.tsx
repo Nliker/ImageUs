@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
+  min-width: 500px;
   height: 100%;
 
   overflow: hidden;
@@ -8,27 +9,13 @@ export const Wrapper = styled.div`
 `;
 
 export const OuterContainer = styled.div<{
-  showModal:
-    | undefined
-    | {
-        upload: boolean;
-        image: boolean;
-        create_room: boolean;
-        alert: boolean;
-        detailPicture: boolean;
-        invite_member: boolean;
-      };
+  showModal: string | undefined;
 }>`
   height: 100%;
   width: 100%;
 
   ${({ showModal }) =>
-    (showModal?.upload ||
-      showModal?.image ||
-      showModal?.create_room ||
-      showModal?.alert ||
-      showModal?.detailPicture ||
-      showModal?.invite_member) &&
+    showModal &&
     `
     position: fixed;
   `}
@@ -39,17 +26,12 @@ export const InnerContainer = styled.div`
   height: 100%;
 
   background-color: rgb(255, 255, 255);
-
-  @media screen and (min-width: 1024px) {
-    /* height: calc(100% - 66px); */
-  }
 `;
 
 export const ModalWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
   position: fixed;
   top: 0;
   left: 0;
