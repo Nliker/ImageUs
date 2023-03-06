@@ -67,37 +67,25 @@ def user_router(api,services,config,es):
                 ]
                 print(terms)
                 
-                # payload={   
-                #             "_source":  ["email","name"],
-                #             "size":config['ELASTIC_MAX_SIZE'],
-                #             "query": {
-                #                 "bool": {
-                #                     "must":terms
-                #                 }
-                #             },
-                #             "sort":[
-                #                 {
-                #                     "email.keyword":"asc",
-                #                     "_score":{
-                #                         "order":"desc"
-                #                     }
-                #                 }
-                #             ]
-                #         }
-                start = time.time()
-                resp=es.search(index=config['ELASTIC_INDEX'],source=["email","name"],query={
+                payload={   
+                            "_source":  ["email","name"],
+                            "size":config['ELASTIC_MAX_SIZE'],
+                            "query": {
                                 "bool": {
                                     "must":terms
                                 }
                             },
-                              size=config['ELASTIC_MAX_SIZE'],sort= [
+                            "sort":[
                                 {
                                     "email.keyword":"asc",
                                     "_score":{
                                         "order":"desc"
                                     }
                                 }
-                            ])
+                            ]
+                        }
+                start = time.time()
+                resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
                 end = time.time()
                 print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
@@ -271,6 +259,14 @@ def user_router(api,services,config,es):
             
             new_user_id=user_service.create_new_user(new_user)
             user_info=user_service.get_user_info(new_user_id)
+
+            doc={
+                'email':user_info['email'],
+                'name':user_info['name']
+            }
+            
+            res = es.index(index=config['ELASTIC_INDEX'], doc_type="_doc", body=doc,id=user_info['id'])
+            print('es insert result:',res)
             
             return make_response(jsonify({'user_info':user_info}))
 
