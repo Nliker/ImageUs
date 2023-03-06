@@ -6,9 +6,10 @@ import { useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { deleteMemberFetcher } from '@utils/roomDataFetcher';
 import { DRoomData } from '@typing/db';
-import CollapseListBox from '@components/CollapseListBox';
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
+
+import CollapseListBox from '../CollapseListBox';
 import { Collapse, CreateBtnBox, Subtitle } from './styles';
 
 interface Props {

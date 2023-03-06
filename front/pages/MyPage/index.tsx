@@ -6,12 +6,10 @@ import { NavLink } from 'react-router-dom';
 import { Routes, Route, useLocation } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
+import Scrollbars from 'react-custom-scrollbars';
 
 import { CImageData } from '@typing/client';
 import useIntersect from '@hooks/useIntersect';
-import Scrollbars from 'react-custom-scrollbars';
-import MypageInfo from '@components/MypageInfo';
-import MyPictures from '@components/MyPictures';
 import AppLayout from '@layouts/AppLayout';
 import {
   getImageData,
@@ -20,6 +18,9 @@ import {
   getUserImageList,
   getUserRoomListFetcher,
 } from '@utils/userDataFetcher';
+
+import MyProfile from './Components/MyProfile';
+import MyPictures from './Components/MyPictures';
 import {
   ContentBox,
   EachRoomPictureList,
@@ -175,7 +176,7 @@ const MyPage = () => {
                     />
                   }
                 />
-                <Route path="my_profile" element={<MypageInfo />} />
+                <Route path="my_profile" element={<MyProfile />} />
               </Routes>
             </EachRoomPictureList>
           </ContentBox>

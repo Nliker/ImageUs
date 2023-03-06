@@ -8,7 +8,7 @@ import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
 import { InfoSection, InfoTable } from './styles';
 
-const MypageInfo = () => {
+const MyProfile = () => {
   const { data: userInfo } = useSWR('/user/my', logInCheckFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
@@ -146,4 +146,4 @@ const MypageInfo = () => {
   );
 };
 
-export default MypageInfo;
+export default MyProfile;

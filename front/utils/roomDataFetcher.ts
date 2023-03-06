@@ -1,6 +1,6 @@
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
-import axios, { Axios, AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { getToken } from './getToken';
 
 interface AxiosCustomRequestConfig extends AxiosRequestConfig {
@@ -126,7 +126,6 @@ const getImageData = async (
 
         const response = await axiosObj.request(requestConfig);
 
-
         const created_at =
           imageInfo.created_at !== null
             ? imageInfo.created_at.split(' ')[0]
@@ -137,7 +136,6 @@ const getImageData = async (
         return { ...imageInfo, link: url, created_at };
       }),
     );
-
 
     imgDataStateList.forEach((data) => {
       if (data.status === 'fulfilled') {

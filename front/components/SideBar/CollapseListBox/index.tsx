@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { Button } from '@styles/Button';
 import { Container, DataCheckInput, DataLabel } from './styles';
 

@@ -2,9 +2,10 @@ import React, { memo, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 import { mutate } from 'swr';
-import CollapseListBox from '@components/CollapseListBox';
+
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
+import CollapseListBox from '../CollapseListBox';
 import { Collapse, CreateBtnBox, Subtitle } from './styles';
 
 interface Props {

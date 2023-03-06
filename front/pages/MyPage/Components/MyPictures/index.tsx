@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-import ImageContentList from '@components/ImageContentList';
+import ImageContentList from '@pages/ImageRoom/Components/ImageContentList';
 import { CImageData } from '@typing/client';
 import { Wrapper } from './styles';
 
