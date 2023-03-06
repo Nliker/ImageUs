@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useLocation, useParams } from 'react-router';
 
@@ -20,7 +20,7 @@ interface Props {
   sectionName?: string;
 }
 
-const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
+const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const currentPath = useLocation().pathname;
   const { roomId } = useParams<{ roomId: string }>();
   const { mutate } = useSWRConfig();
@@ -129,4 +129,4 @@ const ImageContentBox = ({ data, index, thisArr, observerRef }: Props) => {
   );
 };
 
-export default memo(ImageContentBox);
+export default memo(ImageContent);

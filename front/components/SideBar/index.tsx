@@ -4,10 +4,10 @@ import { useParams } from 'react-router';
 
 import Scrollbars from 'react-custom-scrollbars';
 
-import ChannelList from '@components/ChannelList';
-import MemberList from '@components/MemberList';
 import { DRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import ChannelList from './ChannelList';
+import MemberList from './MemberList';
 import {
   Background,
   ContentTabs,

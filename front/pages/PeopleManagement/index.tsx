@@ -2,9 +2,9 @@ import React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import { NavLink, Route, Routes } from 'react-router-dom';
 
-import FriendList from '@components/FriendList';
-import SearchBox from '@components/SearchBox';
 import AppLayout from '@layouts/AppLayout';
+import FriendList from './Components/FriendList';
+import SearchBox from './Components/SearchBox';
 import { ContentBox, Header, TabBox, TabContent, Wrapper } from './styles';
 
 const PeopleManagement = () => {

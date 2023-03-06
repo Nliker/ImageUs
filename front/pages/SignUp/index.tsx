@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 
-import UserInfoInputBox from '@components/UserInfoInputBox';
+import UserFormBox from '@components/UserFormBox';
 import useInput from '@hooks/useInput';
 import { Button } from '@styles/Button';
 import {
@@ -287,7 +287,7 @@ const SignUp = () => {
   };
 
   return (
-    <UserInfoInputBox pageName={'회원가입'}>
+    <UserFormBox pageName={'회원가입'}>
       <InputContainer>
         <NameBox>
           <div className="input_box">
@@ -389,7 +389,7 @@ const SignUp = () => {
           </Button>
         </SubmitBox>
       </InputContainer>
-    </UserInfoInputBox>
+    </UserFormBox>
   );
 };
 

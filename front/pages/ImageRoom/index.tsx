@@ -6,7 +6,7 @@ import { IconContext } from 'react-icons/lib';
 import { SlCloudUpload } from 'react-icons/sl';
 
 import AppLayout from '@layouts/AppLayout';
-import ContentSection from '@components/ContentSection';
+import ContentSection from './Components/ContentSection';
 import { ContentSectionWrapper } from './styles';
 
 const ImageRoom = () => {
