@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 
 export const InfoSection = styled.section`
-  max-width: 800px;
   margin: auto;
+  max-width: 800px;
   margin-top: 40px;
 `;
 
@@ -29,6 +29,7 @@ export const InfoTable = styled.table`
       height: 5rem;
       .btn_group {
         display: flex;
+
         gap: 1rem;
         justify-content: center;
       }

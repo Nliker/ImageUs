@@ -5,8 +5,8 @@ export const ContentSectionWrapper = styled.div`
 
   .upload_icon {
     position: fixed;
-    top: 75%;
-    right: 12px;
+    top: 65%;
+    right: 50px;
     text-align: center;
 
     width: 40px;

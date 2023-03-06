@@ -1,6 +1,5 @@
+import React, { memo, useCallback } from 'react';
 import { Button } from '@styles/Button';
-import autosize from 'autosize';
-import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Container, DataCheckInput, DataLabel } from './styles';
 
 interface Props {
@@ -26,15 +25,12 @@ const CollapseListBox = ({
       : ('auto' as React.CSSProperties['pointerEvents']),
   };
 
-  const onClickDataLabel = useCallback(
-    (id: number) => () => {
-      if (dataClickCallBack) dataClickCallBack(id);
-    },
-    [data],
-  );
+  const onClickDataLabel = (id: number) => () => {
+    if (dataClickCallBack) dataClickCallBack(id);
+  };
 
   const labelMarginCSS = {
-    marginLeft: '60px',
+    marginLeft: '70px',
   };
 
   return (

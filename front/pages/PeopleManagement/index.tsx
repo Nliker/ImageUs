@@ -1,12 +1,11 @@
-import FriendList from '@components/FriendList';
-import SearchBox from '@components/SearchBox';
-import AppLayout from '@layouts/AppLayout';
 import React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import { NavLink, Route, Routes } from 'react-router-dom';
-import { ContentBox, Header, TabBox, TabContent, Wrapper } from './styles';
 
-// 전체 친구들 목록을 보여주고 각 친구들 추가와 삭제
+import FriendList from '@components/FriendList';
+import SearchBox from '@components/SearchBox';
+import AppLayout from '@layouts/AppLayout';
+import { ContentBox, Header, TabBox, TabContent, Wrapper } from './styles';
 
 const PeopleManagement = () => {
   return (

@@ -42,6 +42,7 @@ const check01Animate = keyframes`
     transform: rotate(45deg);
     }
 `;
+
 const check02Animate = keyframes`
     0% {
     width: 4px;
@@ -64,6 +65,7 @@ const check02Animate = keyframes`
     transform: rotate(-45deg);
     }
 `;
+
 const fireworkAnimate = keyframes`
   0% {
     opacity: 1;
@@ -81,8 +83,8 @@ const fireworkAnimate = keyframes`
 export const Container = styled.div`
   position: relative;
 
-  background: white;
   padding: 10px 45px;
+  background: white;
 
   .check_box {
     display: flex;
@@ -109,6 +111,7 @@ export const Container = styled.div`
       display: flex;
       position: absolute;
       left: 0px;
+
       gap: 5px;
 
       span {
@@ -198,7 +201,6 @@ export const DataLabel = styled.label`
   grid-auto-flow: column;
 
   width: fit-content;
-  /* margin-left: 15px; */
 
   color: #414856;
   cursor: pointer;

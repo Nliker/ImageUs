@@ -1,9 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
+
+import { useMediaQuery } from 'react-responsive';
+import { BiUserCircle } from 'react-icons/bi';
+import { IconContext } from 'react-icons/lib';
 import { CgUserList } from 'react-icons/cg';
-import { SlCloudUpload } from 'react-icons/sl';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
+
+import { Button } from '@styles/Button';
 import {
   BottomContainer,
   LogoutBtn,
@@ -13,23 +19,16 @@ import {
   UserInfo,
   Wrapper,
 } from './styles';
-import useSWR, { useSWRConfig } from 'swr';
-import { useMediaQuery } from 'react-responsive';
-import { BiUserCircle } from 'react-icons/bi';
-import { Button } from '@styles/Button';
-import { IconContext } from 'react-icons/lib';
 
 const NavigationBar = () => {
-  const { roomId } = useParams<{ roomId: string | undefined }>();
-  const { data, mutate: showModalMutate } = useSWR('showModalState');
+  const { mutate } = useSWRConfig();
+  const navigate = useNavigate();
+
   const { data: loginInfo } = useSWR('/user/my');
 
   const [clickUserIcon, setClickUserIcon] = useState<boolean>(false);
   const [hoverUserIcon, setHoverUserIcon] = useState<boolean>(false);
   const userInfoEl = useRef<HTMLDivElement>(null);
-
-  const { mutate } = useSWRConfig();
-  const navigate = useNavigate();
 
   useEffect(() => {
     window.addEventListener('click', userIconBoxHandler);
@@ -90,7 +89,7 @@ const NavigationBar = () => {
               <h1>
                 <NavLink to={'/main_page'}>
                   <HiOutlineHome />
-                  Cloudy
+                  ImageUs
                 </NavLink>
               </h1>
             </MobileNavItem>
@@ -108,7 +107,7 @@ const NavigationBar = () => {
               <h1>
                 <NavLink to={'/main_page'}>
                   <HiOutlineHome />
-                  Cloudy
+                  ImageUs
                 </NavLink>
               </h1>
             </MobileNavItem>

@@ -18,6 +18,7 @@ export const ContentBox = styled.div`
   }
   img {
     position: absolute;
+
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -25,9 +26,10 @@ export const ContentBox = styled.div`
 `;
 
 export const ImageCard = styled.div`
-  overflow: hidden;
-  padding-bottom: 100%;
   position: relative;
+
+  padding-bottom: 100%;
+  overflow: hidden;
 `;
 
 export const InfoContainer = styled.div`
@@ -78,10 +80,10 @@ export const ImageInfo = styled.div`
 
 export const EditBtn = styled.div`
   position: absolute;
+  right: 10px;
 
   width: 25px;
   height: 40px;
-  right: 10px;
 
   cursor: pointer;
 
@@ -96,14 +98,14 @@ export const EditBtn = styled.div`
 export const EditImageMenu = styled.div`
   position: absolute;
   bottom: 45px;
-
-  width: 150px;
   left: 218px;
   z-index: 100;
 
+  width: 150px;
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
     0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
   border-radius: 12px;
+
   background-color: mintcream;
 
   &::after {

@@ -1,21 +1,13 @@
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import useSWR from 'swr';
+import { useParams } from 'react-router';
+
+import Scrollbars from 'react-custom-scrollbars';
+
 import ChannelList from '@components/ChannelList';
 import MemberList from '@components/MemberList';
 import { DRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
-import React, {
-  memo,
-  MutableRefObject,
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import Scrollbars from 'react-custom-scrollbars';
-import { useParams } from 'react-router';
-import { Route, Routes } from 'react-router';
-import useSWR, { useSWRConfig } from 'swr';
 import {
   Background,
   ContentTabs,
@@ -31,7 +23,7 @@ interface SidebarProps {
 
 const SideBar = memo(({ show, close }: SidebarProps) => {
   const { roomId } = useParams<{ roomId: string }>();
-  const userId = sessionStorage.getItem('USER_ID');
+  const userId = sessionStorage.getItem('user_id');
 
   const { data: roomListInfo } = useSWR(
     `/user/${userId}/roomlist`,
@@ -55,7 +47,6 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
 
   const handleCloseSidebar = useCallback(
     (e: MouseEvent) => {
-      console.log('클로즈', backgroundEl);
       if (
         e.target instanceof HTMLElement &&
         !sideBarEl.current?.contains(e.target)

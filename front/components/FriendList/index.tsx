@@ -1,21 +1,20 @@
-import { Button } from '@styles/Button';
-import { DFriendData } from '@typing/db';
-import { deleteUserFriend, getUserFriendList } from '@utils/userDataFetcher';
 import React, { useCallback } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+
+import { DFriendData } from '@typing/db';
+import { Button } from '@styles/Button';
+import { deleteUserFriend, getUserFriendList } from '@utils/userDataFetcher';
 import { Wrapper } from './styles';
 
 const FriendList = () => {
-  const { data: friendListData, mutate: friendListMutate } = useSWR(
-    'friendlist',
-    getUserFriendList,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data: friendListData, mutate: friendListMutate } = useSWR<
+    DFriendData[]
+  >('friendlist', getUserFriendList, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
   const { trigger } = useSWRMutation('deleteFriend', deleteUserFriend);
 
   const handleDeleteFriend = useCallback(
@@ -39,13 +38,13 @@ const FriendList = () => {
           <tr>
             <th scope="col">이름</th>
             <th scope="col">이메일</th>
-            <th scope="col">관계</th>
+            <th scope="col">가입 유형</th>
             <th scope="col">목록 삭제</th>
           </tr>
         </thead>
         <tbody>
-          {friendListData &&
-            friendListData.map((data: DFriendData) => (
+          {friendListData?.length !== 0 ? (
+            friendListData?.map((data: DFriendData) => (
               <tr key={data.id}>
                 <td>{data.name}</td>
                 <td>{data.email}</td>
@@ -58,7 +57,12 @@ const FriendList = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <tr>
+              <td colSpan={4}>등록된 친구가 없습니다.</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </Wrapper>

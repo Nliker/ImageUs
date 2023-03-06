@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ImageSection, InfoSection, Wrapper } from './styles';
 import useSWR from 'swr';
+
 import { IconContext } from 'react-icons/lib';
-import { RiMapPinUserLine } from 'react-icons/ri';
 import { BiUserPin } from 'react-icons/bi';
+
+import { ImageSection, Wrapper } from './styles';
 
 const DetailPictureInfo = () => {
   const { data: imageInfo } = useSWR('detailImageInfo');
@@ -17,7 +18,6 @@ const DetailPictureInfo = () => {
       modalHeight,
     };
   }, [window.innerHeight]);
-
   const [modalSize, setModalSize] = useState(getCurrentModalSize());
 
   useEffect(() => {
@@ -50,14 +50,6 @@ const DetailPictureInfo = () => {
       const imageAspect = imageObj.width / imageObj.height;
 
       if (boxAspect <= imageAspect) {
-        // const imageWidthActual =
-        //   window.innerWidth <= 600
-        //     ? 280 * imageAspect
-        //     : parseFloat(modalSize.modalHeight) * 0.7 * imageAspect;
-        // const boxWidth =
-        //   window.innerWidth <= 600 ? 300 : parseFloat(modalSize.modalWidth);
-        // const marginLeft = -Math.round((imageWidthActual - boxWidth) / 2);
-
         return {
           width: 'auto',
           height: '100%',

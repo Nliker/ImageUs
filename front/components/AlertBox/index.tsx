@@ -1,21 +1,34 @@
-import { Button } from '@styles/Button';
-import { CImageData } from '@typing/client';
-import { deleteImageFetcher } from '@utils/roomDataFetcher';
-import { deleteUserImage } from '@utils/userDataFetcher';
-import React, { useCallback, useEffect } from 'react';
-import { useRef } from 'react';
-import { useLocation, useParams } from 'react-router';
+import React, { useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { deleteRoomImgFetcher } from '@utils/roomDataFetcher';
+import { deleteUserImage, leaveRoomFetcher } from '@utils/userDataFetcher';
+import { Button } from '@styles/Button';
 import { Wrapper } from './styles';
 
 const AlertBox = () => {
-  const currentPath = useLocation().pathname;
+  const userId = sessionStorage.getItem('user_id');
   const { roomId } = useParams<{ roomId: string }>();
-  const { data: showModalState, mutate: changeAlertState } =
-    useSWR('showModalState');
-  const { data: imageDataInfo } = useSWR('deleteImageInfo');
+  const navigate = useNavigate();
+
+  const { data: modalStateData } = useSWR('modalState');
   const alertBoxEl = useRef<HTMLDivElement>(null);
+  const currentModalState = modalStateData?.currentModalState;
+  const propsData = modalStateData?.data;
+
+  const { trigger: deleteRoomImgTrigger } = useSWRMutation(
+    `/room/${roomId}/image`,
+    deleteRoomImgFetcher,
+  );
+  const { trigger: deleteUserImgTrigger } = useSWRMutation(
+    '/image',
+    deleteUserImage,
+  );
+  const { trigger: leaveRoomTrigger } = useSWRMutation(
+    `/user/${userId}/room`,
+    leaveRoomFetcher,
+  );
 
   useEffect(() => {
     window.addEventListener('click', handleCloseAlert);
@@ -27,38 +40,46 @@ const AlertBox = () => {
   const handleCloseAlert = (e: MouseEvent) => {
     if (
       e.target instanceof HTMLElement &&
-      showModalState.alert &&
+      currentModalState === 'alert' &&
       !alertBoxEl.current?.contains(e.target)
     ) {
-      changeAlertState({ ...showModalState, alert: false });
+      mutate('modalState', { currentModalState: '' });
     }
   };
 
-  const deleteImage = async () => {
-    console.log('삭제 요청');
-
-    if (currentPath === '/my_page') {
-      mutate('userImageDelete', deleteUserImage(imageDataInfo.id));
+  const executeFetch = () => {
+    if (propsData.mutateKey === `/room/${roomId}/image`) {
+      deleteRoomImgTrigger(propsData.imageId).then((dataId) => {
+        mutate('roomImageDelete', dataId);
+      });
+    } else if (propsData.mutateKey === `/user/${userId}/room`) {
+      leaveRoomTrigger(roomId).then(() => {
+        navigate('/');
+      });
     } else {
-      mutate(
-        'roomImageDelete',
-        deleteImageFetcher([`/room/${roomId}/image`, imageDataInfo.id]),
-      );
+      deleteUserImgTrigger(propsData.imageId).then((dataId) => {
+        mutate('userImageDelete', dataId);
+      });
     }
-    changeAlertState({ ...showModalState, alert: false });
   };
 
   return (
     <Wrapper ref={alertBoxEl}>
-      <p>정말 삭제하시겠습니까?</p>
+      <p>{propsData?.content}</p>
       <div className="btn_group">
-        <Button type="button" onClick={deleteImage}>
+        <Button
+          type="button"
+          onClick={() => {
+            executeFetch();
+            mutate('modalState', { currentModalState: '' });
+          }}
+        >
           확인
         </Button>
         <Button
           type="button"
           onClick={() => {
-            changeAlertState({ ...showModalState, alert: false });
+            mutate('modalState', { currentModalState: '' });
           }}
         >
           취소

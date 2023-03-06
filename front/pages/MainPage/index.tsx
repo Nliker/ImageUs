@@ -1,49 +1,44 @@
-import ContentImageModal from '@components/ContentImageModal';
-import ContentSection from '@components/ContentSection';
-import CreateRoomModal from '@components/CreateRoomModal';
-import SideBar from '@components/SideBar';
-import ToolBar from '@components/ToolBar';
+import React, { CSSProperties, useEffect } from 'react';
+import useSWR, { mutate } from 'swr';
+
+import { Link } from 'react-router-dom';
+import Scrollbars from 'react-custom-scrollbars';
+import { NavLink } from 'react-router-dom';
+
+import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
-import { DRoomData } from '@typing/db';
-import { logInCheckFetcher } from '@utils/logInFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
-import React, { useCallback, useEffect, useState } from 'react';
-import Scrollbars from 'react-custom-scrollbars';
-import { useLocation } from 'react-router';
-import { Route, Routes, useNavigate, useParams } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import useSWR, { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
 import {
   ContentWrappper,
   MainIntroduction,
   MainRoomList,
   Wrappper,
 } from './styles';
+import ActionButton from '@styles/ActiveButton';
 
 const MainPage = () => {
-  const userId = sessionStorage.getItem('USER_ID');
+  const userId = sessionStorage.getItem('user_id');
   const { data: logInInfo } = useSWR('/user/my');
-  const {
-    data: roomlist,
-    mutate: mutateRoomlist,
-    isLoading: roomlistIsLoading,
-  } = useSWR(`/user/${userId}/roomlist`, getUserRoomListFetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    revalidateOnMount: false,
-  });
+  const { data: roomlist, mutate: mutateRoomlist } = useSWR(
+    `/user/${userId}/roomlist`,
+    getUserRoomListFetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateOnMount: false,
+    },
+  );
+
+  const createBtnStyle: CSSProperties = {
+    width: '150px',
+  };
 
   useEffect(() => {
-    console.log('확인', logInInfo);
     if (!logInInfo.logInState) return;
     mutateRoomlist();
   }, [logInInfo]);
-
-  console.log('메인페이지 로그인:', logInInfo);
 
   return (
     <AppLayout>
@@ -82,21 +77,37 @@ const MainPage = () => {
                   <h1>방에 입장하기</h1>
                 </header>
                 <div className="content_box">
-                  <Scrollbars>
-                    <ul className="room_list">
-                      {!roomlist ? (
-                        <div>로딩중...</div>
-                      ) : roomlist.length === 0 ? (
-                        <div>등록된 방이 없습니다.</div>
-                      ) : (
-                        roomlist?.map((roomData: DRoomData) => (
-                          <Link key={roomData.id} to={`/booth/${roomData.id}`}>
-                            <li>{roomData.title}</li>
-                          </Link>
-                        ))
-                      )}
-                    </ul>
-                  </Scrollbars>
+                  <div className="content_list">
+                    <Scrollbars>
+                      <ul className="room_list">
+                        {!roomlist ? (
+                          <div>로딩중...</div>
+                        ) : roomlist.length === 0 ? (
+                          <div>등록된 방이 없습니다.</div>
+                        ) : (
+                          roomlist?.map((roomData: DRoomData) => (
+                            <Link
+                              key={roomData.id}
+                              to={`/booth/${roomData.id}`}
+                            >
+                              <li>{roomData.title}</li>
+                            </Link>
+                          ))
+                        )}
+                      </ul>
+                    </Scrollbars>
+                  </div>
+                  <div className="create_room_btn">
+                    <ActionButton
+                      onClickBtn={() => {
+                        mutate('modalState', {
+                          currentModalState: 'creatRoom',
+                        });
+                      }}
+                      btnTitle={'방 생성하기'}
+                      customStyle={createBtnStyle}
+                    />
+                  </div>
                 </div>
               </MainRoomList>
             )}

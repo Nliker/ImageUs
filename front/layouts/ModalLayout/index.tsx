@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import useSWR, { mutate } from 'swr';
+
 import { CgCloseO } from 'react-icons/cg';
-import useSWR from 'swr';
 import { Background, CloseBtn, Container, Wrapper } from './styles';
 
 interface Props {
-  modalName: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-const ModalLayout = ({ children, modalName }: Props) => {
-  const { data: modalState, mutate: mutateModalState } =
-    useSWR('showModalState');
+const ModalLayout = ({ children }: Props) => {
+  const { data: modalStateData } = useSWR('modalState');
+  const currentModalState = modalStateData?.currentModalState;
   const modalEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,29 +18,41 @@ const ModalLayout = ({ children, modalName }: Props) => {
     return () => {
       window.removeEventListener('click', onClickOuterModal);
     };
-  }, [modalName]);
+  }, []);
 
   const onClickOuterModal = (e: MouseEvent) => {
     if (
       e.target instanceof HTMLElement &&
       !modalEl.current?.contains(e.target)
     ) {
-      mutateModalState({ ...modalState, [modalName]: false });
+      mutate('modalState', { currentModalState: '' });
     }
   };
 
-  const onClickCloseModal = () => {
-    mutateModalState({ ...modalState, [modalName]: false });
-  };
+  if (!currentModalState) return null;
 
   return (
     <Wrapper>
-      <Background />
-      <CloseBtn>
-        <div onClick={onClickCloseModal}>
-          <CgCloseO />
-        </div>
-      </CloseBtn>
+      <Background
+        style={
+          currentModalState === 'alert'
+            ? { backgroundColor: 'rgb(0 0 0 / 0%)' }
+            : undefined
+        }
+      />
+      {currentModalState !== 'alert' && (
+        <>
+          <CloseBtn>
+            <div
+              onClick={() => {
+                mutate('modalState', { currentModalState: '' });
+              }}
+            >
+              <CgCloseO />
+            </div>
+          </CloseBtn>
+        </>
+      )}
       <Container ref={modalEl}>{children}</Container>
     </Wrapper>
   );

@@ -1,6 +1,11 @@
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { Axios, AxiosError, AxiosRequestConfig } from 'axios';
+import { getToken } from './getToken';
+
+interface AxiosCustomRequestConfig extends AxiosRequestConfig {
+  retryCount: number;
+}
 
 const getDefaultImgFetcher = async (
   url: string,
@@ -13,7 +18,12 @@ const getDefaultImgFetcher = async (
   },
 ) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const { start } = arg;
     const loadNumber = 12;
 
@@ -43,8 +53,13 @@ const getFilterImgFetcher = async (
   { arg }: { arg: { start: number; start_date?: string; end_date?: string } },
 ) => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const { start, start_date, end_date } = arg;
-    const token = sessionStorage.getItem('TOKEN');
     const limit = 12;
 
     const response = await axios.get(
@@ -73,39 +88,62 @@ const getImageData = async (
   { arg: imageList }: { arg: DImageData[] },
 ) => {
   try {
-    if (imageList.length === 0) return [];
+    const token = await getToken();
 
+    if (!token) {
+      throw new Error();
+    }
+
+    if (imageList.length === 0) return [];
     const imgDataList: CImageData[] = [];
+
+    const MAX_RETRY_COUNT = 2;
+    const axiosObj = axios.create();
+
+    axiosObj.interceptors.response.use(undefined, (error: AxiosError) => {
+      const config = error.config as AxiosCustomRequestConfig;
+      config.retryCount = config.retryCount ?? 0;
+
+      const shouldRetry = config.retryCount < MAX_RETRY_COUNT;
+      if (shouldRetry) {
+        config.retryCount += 1;
+        config.headers = { ...config!.headers };
+
+        return axiosObj.request(config);
+      }
+
+      return Promise.reject(error);
+    });
 
     const imgDataStateList = await Promise.allSettled(
       imageList.map(async (imageInfo) => {
-        const res = await axios.get(`/image-download/${imageInfo.link}`, {
-          headers: {
-            Authorization: `${sessionStorage.getItem('TOKEN')}`,
-          },
+        const requestConfig: AxiosRequestConfig = {
+          url: `/image-download/${imageInfo.link}`,
+          method: 'GET',
+          headers: { Authorization: token },
           responseType: 'blob',
-        });
+        };
+
+        const response = await axiosObj.request(requestConfig);
+
 
         const created_at =
           imageInfo.created_at !== null
             ? imageInfo.created_at.split(' ')[0]
             : null;
         const url = window.URL.createObjectURL(
-          new Blob([res.data], { type: res.headers['content-type'] }),
+          new Blob([response.data], { type: response.headers['content-type'] }),
         );
         return { ...imageInfo, link: url, created_at };
       }),
     );
 
-    // console.log('요청리스트', imgDataStateList);
 
     imgDataStateList.forEach((data) => {
       if (data.status === 'fulfilled') {
         imgDataList.push(data.value);
       }
     });
-
-    // console.log('결과 리스트', imgDataList);
 
     return [...imgDataList];
   } catch (err) {
@@ -117,9 +155,11 @@ const getImageData = async (
 };
 
 const getUserListFetcher = async (url: string) => {
-  const token = sessionStorage.getItem('TOKEN');
-  // const [url, roomId] = arg;
-  // if (!roomId) return null;
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error();
+  }
 
   try {
     const response = await axios.get(url, {
@@ -141,8 +181,13 @@ const inviteFriendFetcher = async (
   try {
     if (invite_userlist.length === 0) return;
 
-    const token = sessionStorage.getItem('TOKEN');
-    const response = await axios.post(
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.post(
       url,
       {
         invite_userlist,
@@ -153,7 +198,6 @@ const inviteFriendFetcher = async (
         },
       },
     );
-    console.log(response.data);
   } catch (err) {
     if (err instanceof AxiosError) {
       alert('오류가 발생했습니다..');
@@ -163,12 +207,16 @@ const inviteFriendFetcher = async (
 
 const getMarkerFetcher = async (url: string) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const response = await axios.get(url, {
       headers: { Authorization: token },
     });
 
-    // console.log(response);
     const { marker } = response.data;
     return marker;
   } catch (err) {
@@ -181,7 +229,11 @@ const getMarkerFetcher = async (url: string) => {
 
 const getUnreadImageList = async (url: string) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
     const response = await axios.get(url, {
       headers: { Authorization: token },
     });
@@ -193,41 +245,28 @@ const getUnreadImageList = async (url: string) => {
   }
 };
 
-const deleteImageFetcher = async ([url, arg]: [string, number]) => {
+const deleteRoomImgFetcher = async (
+  url: string,
+  { arg: imageId }: { arg: number },
+) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
-    const response = await axios.delete(url, {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.delete(url, {
       headers: { Authorization: token },
       data: {
-        delete_room_image_id: arg,
+        delete_room_image_id: imageId,
       },
     });
-    alert(response.data);
-    return arg;
+    alert('이미지를 삭제하였습니다.');
+    return imageId;
   } catch (err) {
     if (err instanceof AxiosError) {
       if (err.response?.status === 403 || err.response?.status === 404) {
-        alert(err.response.data);
-      } else {
-        alert('오류가 발생했습니다..');
-      }
-    }
-  }
-};
-
-const leaveRoomFetcher = async (roomId: string) => {
-  try {
-    const token = sessionStorage.getItem('TOKEN');
-    const userId = sessionStorage.getItem('USER_ID');
-    await axios.delete(`/user/${userId}/room`, {
-      headers: { Authorization: token },
-      data: { delete_user_room_id: roomId },
-    });
-
-    alert('성공적으로 나갔습니다.');
-  } catch (err) {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 403) {
         alert(err.response.data);
       } else {
         alert('오류가 발생했습니다..');
@@ -241,8 +280,14 @@ const createRoomFetcher = async (
   { arg }: { arg: { selectMemberIdList: number[]; roomName: string } },
 ) => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
     const { selectMemberIdList, roomName } = arg;
-    const response = await axios.post(
+    await axios.post(
       url,
       {
         userlist: selectMemberIdList,
@@ -250,7 +295,7 @@ const createRoomFetcher = async (
       },
       {
         headers: {
-          Authorization: `${sessionStorage.getItem('TOKEN')}`,
+          Authorization: token,
           'Content-Type': 'application/json',
         },
       },
@@ -268,7 +313,11 @@ const deleteMemberFetcher = async (
   { arg: memberId }: { arg: number },
 ) => {
   try {
-    const token = sessionStorage.getItem('TOKEN');
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
 
     await axios.delete(url, {
       headers: { Authorization: token },
@@ -300,8 +349,7 @@ export {
   getImageData,
   getMarkerFetcher,
   getUnreadImageList,
-  deleteImageFetcher,
-  leaveRoomFetcher,
+  deleteRoomImgFetcher,
   createRoomFetcher,
   deleteMemberFetcher,
 };

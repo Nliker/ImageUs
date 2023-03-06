@@ -1,7 +1,7 @@
+import React, { memo } from 'react';
+
 import ImageContentList from '@components/ImageContentList';
 import { CImageData } from '@typing/client';
-import { DImageData } from '@typing/db';
-import React, { memo } from 'react';
 import { Wrapper } from './styles';
 
 interface Props {
@@ -9,7 +9,6 @@ interface Props {
   observerRef?: React.MutableRefObject<null>;
 }
 
-// Route를 활용해서 만든 컴포넌트
 const MyPictures = ({ imageList, observerRef }: Props) => {
   return !imageList ? (
     <div>로딩중..</div>

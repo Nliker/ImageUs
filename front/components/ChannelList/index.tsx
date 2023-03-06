@@ -1,14 +1,11 @@
 import React, { memo, useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
-import useSWR from 'swr';
-import { Collapse, Container, CreateBtnBox, Subtitle } from './styles';
-import { getUserRoomListFetcher } from '@utils/userDataFetcher';
-import { DRoomData } from '@typing/db';
-import { useNavigate } from 'react-router';
+import { mutate } from 'swr';
 import CollapseListBox from '@components/CollapseListBox';
-import { useParams } from 'react-router';
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
+import { Collapse, CreateBtnBox, Subtitle } from './styles';
 
 interface Props {
   roomlist?: { id: number; data: string }[];
@@ -20,8 +17,6 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
   const navigate = useNavigate();
 
   const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
-  const { data: showModalState, mutate: showModalMutate } =
-    useSWR('showModalState');
 
   const onClickRoom = useCallback((roomId: number) => {
     closeSidebar();
@@ -33,17 +28,10 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
     [],
   );
 
-  const onClickCreateRoomBtn = useCallback(() => {
-    showModalMutate({
-      ...showModalState,
-      create_room: true,
-    });
-  }, [showModalState]);
-
   if (!roomlist) return <Spinner />;
 
   return (
-    <Container>
+    <div>
       <Subtitle onClick={toggleChannelCollapse}>
         <Collapse collapse={channelCollapse}>
           <IoMdArrowDropright />
@@ -59,11 +47,16 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
             boxInfo={{ boxName: 'channel' }}
           />
           <CreateBtnBox>
-            <ActionButton onClickBtn={onClickCreateRoomBtn} btnTitle={'+'} />
+            <ActionButton
+              onClickBtn={() => {
+                mutate('modalState', { currentModalState: 'creatRoom' });
+              }}
+              btnTitle={'+'}
+            />
           </CreateBtnBox>
         </>
       )}
-    </Container>
+    </div>
   );
 });
 

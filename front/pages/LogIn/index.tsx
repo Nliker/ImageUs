@@ -1,26 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import UserInfoInputBox from '@components/UserInfoInputBox';
-import {
-  CheckBox,
-  EmailInputContainer,
-  ErrorMessage,
-  InputBox,
-  InputDiv,
-  PasswordInputContainer,
-  SocialLoginBox,
-  SubmitBox,
-} from './styled';
-import { Navigate, NavLink, redirect, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import useSWR, { mutate } from 'swr';
+import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
-import { Button } from '@styles/Button';
+import { NavLink, useNavigate } from 'react-router-dom';
+
 import { IconContext } from 'react-icons/lib';
 import { RiKakaoTalkFill } from 'react-icons/ri';
 import { SiNaver } from 'react-icons/si';
 
+import UserInfoInputBox from '@components/UserInfoInputBox';
+import { logInRequestFetcher } from '@utils/logInFetcher';
+import { Button } from '@styles/Button';
+import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
+
 const LogIn = () => {
+  const navigate = useNavigate();
+
   const { data: logInSuccess, trigger } = useSWRMutation(
     '/user/login',
     logInRequestFetcher,
@@ -36,9 +30,7 @@ const LogIn = () => {
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])",
   );
-  const navigate = useNavigate();
 
-  // console.log('login', data);
   const checkHandler = useCallback(() => {
     return setChecked((prev) => !prev);
   }, []);
@@ -67,39 +59,33 @@ const LogIn = () => {
     return true;
   }, []);
 
-  const onChangeEmailInput = useCallback((e: { target: { value: string } }) => {
+  const onChangeEmailInput = (e: { target: { value: string } }) => {
     setEmailValue(e.target.value);
     const inputValue = e.target.value;
     emailValidation(inputValue);
-  }, []);
+  };
 
-  const onChangePasswordInput = useCallback(
-    (e: { target: { value: string } }) => {
-      setPwValue(e.target.value);
-      const inputValue = e.target.value;
-      pwValidation(inputValue);
-    },
-    [],
-  );
+  const onChangePasswordInput = (e: { target: { value: string } }) => {
+    setPwValue(e.target.value);
+    const inputValue = e.target.value;
+    pwValidation(inputValue);
+  };
 
-  const onSubmitLoginInfo = useCallback(
-    async (e: { preventDefault: () => void }) => {
-      e.preventDefault();
-      const emailCheck = emailValidation(emailValue);
-      const pwCheck = pwValidation(passwordValue);
-      if (!emailCheck && !pwCheck) {
-        alert('이메일과 비밀번호를 다시 확인해주세요.');
-      } else if (!emailCheck) {
-        alert('이메일을 다시 확인해주세요.');
-      } else if (!pwCheck) {
-        alert('비밀번호를 다시 확인해주세요.');
-      } else {
-        await trigger({ email: emailValue, password: passwordValue });
-        await mutate('/user/my');
-      }
-    },
-    [emailValue, passwordValue],
-  );
+  const onSubmitLoginInfo = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    const emailCheck = emailValidation(emailValue);
+    const pwCheck = pwValidation(passwordValue);
+    if (!emailCheck && !pwCheck) {
+      alert('이메일과 비밀번호를 다시 확인해주세요.');
+    } else if (!emailCheck) {
+      alert('이메일을 다시 확인해주세요.');
+    } else if (!pwCheck) {
+      alert('비밀번호를 다시 확인해주세요.');
+    } else {
+      await trigger({ email: emailValue, password: passwordValue });
+      await mutate('/user/my');
+    }
+  };
 
   useEffect(() => {
     if (logInSuccess) navigate('/main_page');
@@ -108,10 +94,10 @@ const LogIn = () => {
   return (
     <UserInfoInputBox pageName={'로그인'}>
       <form onSubmit={onSubmitLoginInfo}>
-        <EmailInputContainer>
+        <div>
           <InputBox>
             <label htmlFor="email-input">이메일 주소를 입력하세요.</label>
-            <InputDiv>
+            <div>
               <input
                 type="text"
                 id="email-input"
@@ -120,16 +106,16 @@ const LogIn = () => {
                 onChange={onChangeEmailInput}
                 placeholder="이메일을 입력하세요."
               />
-            </InputDiv>
+            </div>
             <ErrorMessage>
               <span>{emailErrorMessage}</span>
             </ErrorMessage>
           </InputBox>
-        </EmailInputContainer>
-        <PasswordInputContainer>
+        </div>
+        <div>
           <InputBox>
             <label htmlFor="password-input">비밀번호를 입력하세요.</label>
-            <InputDiv>
+            <div>
               <input
                 type="password"
                 id="password-input"
@@ -138,12 +124,12 @@ const LogIn = () => {
                 onChange={onChangePasswordInput}
                 placeholder="비밀번호를 입력하세요."
               />
-            </InputDiv>
+            </div>
             <ErrorMessage>
               <span>{pwErrorMessage}</span>
             </ErrorMessage>
           </InputBox>
-        </PasswordInputContainer>
+        </div>
         <SubmitBox>
           <NavLink to={'/signup'} className="signup_link">
             계정 만들기
