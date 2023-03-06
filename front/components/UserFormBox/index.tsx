@@ -6,7 +6,7 @@ interface InputBoxProps {
   pageName?: string;
 }
 
-const UserInfoInputBox = ({ children, pageName }: InputBoxProps) => {
+const UserFormBox = ({ children, pageName }: InputBoxProps) => {
   return (
     <Wrapper>
       <OuterContainer>
@@ -17,4 +17,4 @@ const UserInfoInputBox = ({ children, pageName }: InputBoxProps) => {
   );
 };
 
-export default UserInfoInputBox;
+export default UserFormBox;

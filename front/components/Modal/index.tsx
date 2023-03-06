@@ -1,11 +1,11 @@
 import React from 'react';
 
-import AlertBox from '@components/AlertBox';
-import CreateRoomModal from '@components/CreateRoomModal';
-import DetailPictureInfo from '@components/DetailPictureInfo';
-import InviteMemberModal from '@components/InviteMemberModal';
-import UploadModal from '@components/UploadModal';
-import ModalLayout from '@layouts/ModalLayout';
+import AlertBox from './AlertBoxModal';
+import CreateRoomModal from './CreateRoomModal';
+import DetailPictureInfo from './DetailPictureModal';
+import InviteMemberModal from './InviteMemberModal';
+import UploadModal from './UploadModal';
+import ModalLayout from './ModalLayout';
 
 interface IModalProps {
   modalName: string;

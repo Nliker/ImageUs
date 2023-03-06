@@ -7,7 +7,7 @@ import { IconContext } from 'react-icons/lib';
 import { RiKakaoTalkFill } from 'react-icons/ri';
 import { SiNaver } from 'react-icons/si';
 
-import UserInfoInputBox from '@components/UserInfoInputBox';
+import UserFormBox from '@components/UserFormBox';
 import { logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
@@ -92,7 +92,7 @@ const LogIn = () => {
   }, [logInSuccess]);
 
   return (
-    <UserInfoInputBox pageName={'로그인'}>
+    <UserFormBox pageName={'로그인'}>
       <form onSubmit={onSubmitLoginInfo}>
         <div>
           <InputBox>
@@ -169,7 +169,7 @@ const LogIn = () => {
           </a>
         </div>
       </SocialLoginBox>
-    </UserInfoInputBox>
+    </UserFormBox>
   );
 };
 

@@ -38,10 +38,9 @@ const App = () => {
         <>
           <Route path="login" element={<LogIn />} />
           <Route path="signup" element={<SignUp />} />
+          <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
         </>
       )}
-      <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
-      {/* 추후에 404페이지 작성용 Route */}
       <Route path="*" element={<Navigate to="main_page" />} />
     </Routes>
   );

@@ -1,5 +1,4 @@
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import React, { useEffect, useRef, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -13,7 +12,6 @@ import {
 } from 'react-icons/md';
 
 import useIntersect from '@hooks/useIntersect';
-import ImageContentList from '@components/ImageContentList';
 import { CImageData } from '@typing/client';
 import {
   getDefaultImgFetcher,
@@ -21,10 +19,11 @@ import {
   getImageData,
   getUnreadImageList,
 } from '@utils/roomDataFetcher';
-
 import { Button } from '@styles/Button';
 import Spinner from '@styles/Spinner';
 import { SidebarContext } from '@layouts/AppLayout';
+
+import ImageContentList from '../ImageContentList';
 import {
   ContentBox,
   ActiveContentBox,

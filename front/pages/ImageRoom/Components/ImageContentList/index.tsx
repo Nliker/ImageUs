@@ -2,8 +2,8 @@ import React, { memo } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
-import ImageContentBox from '@components/ImageContentBox';
 import { CImageData } from '@typing/client';
+import ImageContent from '../ImageContent';
 import { ImageLayout, NotImageData } from './styles';
 
 interface Props {
@@ -18,7 +18,7 @@ const ImageContentList = ({ ImageData, observerRef, sectionName }: Props) => {
     index: number,
     thisArr: CImageData[],
   ) => (
-    <ImageContentBox
+    <ImageContent
       key={data.id}
       sectionName={sectionName}
       data={data}
