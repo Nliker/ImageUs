@@ -129,6 +129,7 @@ CREATE TABLE `rooms` (
 
 LOCK TABLES `rooms` WRITE;
 /*!40000 ALTER TABLE `rooms` DISABLE KEYS */;
+INSERT INTO `rooms` VALUES (1,'1',1,'2023-03-06 02:57:41.504710',NULL,0);
 /*!40000 ALTER TABLE `rooms` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -216,6 +217,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'test1@test.com','$2b$12$.B9gO3M6uN1U3ZMuCZwxEuwKue3WYM74gyIBneU506oopPBii.C8a','im testuser','2023-03-06 02:46:46.677223',NULL,'testname',0,'image_us'),(2,'test2@test.com','$2b$12$GpkftAmYOPFVPvuffZ3cBOduFR1WKldQME2MI0OqMUVN8XmDsbg6m','im testuser','2023-03-06 02:49:19.879277',NULL,'testname',0,'image_us'),(3,'test3@test.com','$2b$12$u6gcVxigj/5X2cziQ.Lo1uw/nkFBdEmZW/dQbW6OxqVhRf7tpykBG','im testuser','2023-03-06 02:49:47.267464',NULL,'testname',0,'image_us');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
