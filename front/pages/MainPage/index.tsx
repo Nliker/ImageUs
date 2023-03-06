@@ -9,6 +9,7 @@ import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import { BackgroundImg } from '@assets/image';
 import {
   ContentWrappper,
   MainIntroduction,
@@ -64,10 +65,7 @@ const MainPage = () => {
                         <Button>회원가입 하기</Button>
                       </NavLink>
                     </div>
-                    <img
-                      src="/styles/image/main_background_img.png"
-                      alt="사진기 이미지"
-                    />
+                    <BackgroundImg />
                   </div>
                 </MainIntroduction>
               </Scrollbars>
