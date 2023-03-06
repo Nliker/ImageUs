@@ -38,4 +38,27 @@ services:
       - imageus_image
     platform: linux/amd64
     
-    
+  elasticsearch:
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    ports:
+      - 9200:9200
+    restart: always
+    healthcheck:
+      test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 50
+
+  elasticsearch_config:
+    build:  ./elasticsearch_config
+    container_name: elastic_init_index
+    restart: "no"
+    depends_on:
+      elasticsearch: 
+        condition: service_healthy
+    extra_hosts:
+        - host.docker.internal:host-gateway 
+    entrypoint: [ "bash","init_index.sh"]     
