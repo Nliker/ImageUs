@@ -6,7 +6,6 @@ services:
     restart: always
     ports:
       - '3333:3306'
-    platform: linux/amd64
   
   imageus_back:
     build:  ./back
@@ -31,28 +30,27 @@ services:
     container_name: nginx_imageus
     restart:  always
     ports:
-      - "0.0.0.0:4000:4000"
-      - "0.0.0.0:4001:4001"
+      - "0.0.0.0:80:80"
     depends_on:
       - imageus_back
       - imageus_image
     platform: linux/amd64
-    
+  
   elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     ports:
       - 9200:9200
     restart: always
     platform: linux/amd64
     healthcheck:
       test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
-      interval: 10s
-      timeout: 10s
-      retries: 50
+      interval: 20s
+      timeout: 5s
+      retries: 100
 
   elasticsearch_config:
     build:  ./elasticsearch_config
