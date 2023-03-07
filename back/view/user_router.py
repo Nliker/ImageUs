@@ -1,4 +1,5 @@
 from flask import request,jsonify,make_response
+from flask_cors import cross_origin
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
@@ -8,7 +9,7 @@ from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 import time
-user_namespace=Namespace('backapi/user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
+user_namespace=Namespace('backapi/user',description='유저의 정보를 생성,호출,수정,삭제 합니다.',decorators=[cross_origin()] )
 
 def user_router(api,services,config,es):
     user_service=services.user_service
