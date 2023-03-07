@@ -289,7 +289,7 @@ def teardown_function():
 #검색 확인
 def test_get_user_search(api):
     search_keyword="test_odjqwopjd"
-    resp=api.get(f"/user/search?email={search_keyword=}")
+    resp=api.get(f"/user/search?email={search_keyword}")
     
     assert resp.status_code==200
     
