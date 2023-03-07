@@ -26,7 +26,7 @@ def create_app(test_config=None):
 
     print("데이터베이스 연결 성공")
 
-    @app.route("/ping",methods=["GET"])
+    @app.route("/imageapi/ping",methods=["GET"])
     def ping():
         return "pong",200
     
