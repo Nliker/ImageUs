@@ -1,4 +1,5 @@
 from flask import request,jsonify,make_response
+from flask_cors import cross_origin
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
@@ -8,7 +9,7 @@ from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 
-image_namespace=Namespace('backapi/image',description='이미지의 정보를 생성,호출,수정,삭제 합니다.')
+image_namespace=Namespace('backapi/image',description='이미지의 정보를 생성,호출,수정,삭제 합니다.',decorators=[cross_origin()])
 
 def image_router(api,services):
     image_service=services.image_service
