@@ -7,7 +7,7 @@ import datetime
 from flask_restx import Resource,Namespace
 from tool import ParserModule,ApiModel,ApiError
 
-room_namespace=Namespace('room',description='방의 정보를 생성,호출,수정,삭제 합니다.')
+room_namespace=Namespace('backapi/room',description='방의 정보를 생성,호출,수정,삭제 합니다.')
 
 def room_router(api,services):
     room_service=services.room_service

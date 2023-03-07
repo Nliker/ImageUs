@@ -1,4 +1,4 @@
-from flask import Flask,make_response,render_template,request,abort
+from flask import Flask,make_response,render_template,request,abort,send_from_directory
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import UserDao,ImageDao,RoomDao
@@ -17,8 +17,19 @@ def create_app(test_config=None):
 
     CORS(app)
     
-    api=Api(app,title='cloudy back-server api docs',doc='/api-docs')
-
+    @app.route("/backapi",methods=['GET'])
+    def index():
+        return render_template('index.html')
+    
+    @app.route("/backapi/dist/<path:path>")
+    def send_dist(path):
+        print(path)
+        return send_from_directory('statics/dist',path)
+    
+    @app.route("/backapi/images/<path:path>")
+    def send_static_images(path):
+        return send_from_directory('statics/images',path)
+    
     if test_config is None:
         app.config.from_pyfile("config.py")
     else:
@@ -42,22 +53,25 @@ def create_app(test_config=None):
             ip_range=splited_ip[0]+'.'+splited_ip[1]
             if ip not in app.config['GOOD_IP_LIST'] and ip_range not in app.config['GOOD_IP_RANGE']:
                 abort(403)
-            
-    @api.route("/search")
+    
+    api=Api(app,title='cloudy back-server api docs',doc='/backapi/api-docs')
+    
+    @api.route("/backapi/search")
     class search_user(Resource):
         def get(self):
             '''
             간단한 검색창으로 검색을 테스트합니다.
             '''
             headers = {'Content-Type': 'text/html'}
-            return make_response(render_template('index.html'),200,
+            return make_response(render_template('search.html'),200,
                                               headers)
     
-    @api.route("/ping")
+    @api.route("/backapi/ping")
     class ping(Resource):
         def get(self):
             '''back 작동 테스트를 위한 api입니다.'''
             return make_response("pong",200)
+    
     
     user_dao=UserDao(database)
     image_dao=ImageDao(database)
@@ -75,3 +89,4 @@ def create_app(test_config=None):
     image_router(api,services)
     
     return app
+

@@ -15,7 +15,7 @@ def create_app(test_config=None):
 
     CORS(app)
     
-    api = Api(app, title='API 문서', description='Swagger 문서', doc="/api-docs")
+    api = Api(app, title='API 문서', description='Swagger 문서', doc="/imageapi/api-docs")
 
     if test_config is None:
         app.config.from_pyfile("config.py")

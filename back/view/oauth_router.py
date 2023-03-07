@@ -5,7 +5,7 @@ from flask_restx import Resource,Namespace
 import requests
 from tool import ParserModule,ApiModel,ApiError
             
-oauth_namespace=Namespace('oauth-login',description='유저의 소셜로그인을 다룹니다.')
+oauth_namespace=Namespace('backapi/oauth-login',description='유저의 소셜로그인을 다룹니다.')
 
 class Oauth:
     default_headers={
