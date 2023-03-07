@@ -17,7 +17,7 @@ def create_app(test_config=None):
 
     CORS(app)
     
-    @app.route("/backapi",methods=['GET'])
+    @app.route("/",methods=['GET'])
     def index():
         return render_template('index.html')
     
@@ -37,6 +37,7 @@ def create_app(test_config=None):
         
     database=create_engine(app.config['DB_URL'],encoding='utf-8',pool_recycle=app.config['POOL_RECYCLE'],pool_size=app.config['POOL_SIZE'],max_overflow=app.config['MAX_OVERFLOW'])
     print("mysql 데이터베이스 연결 성공")
+
     es=Elasticsearch(hosts=app.config['ELASTIC_URL'])
     print("elastic 데이터베이스 연결 성공")
 
@@ -55,7 +56,7 @@ def create_app(test_config=None):
                 abort(403)
     
     api=Api(app,title='cloudy back-server api docs',doc='/backapi/api-docs')
-    
+
     @api.route("/backapi/search")
     class search_user(Resource):
         def get(self):
