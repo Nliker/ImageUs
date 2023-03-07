@@ -1,11 +1,12 @@
 from flask import request,redirect,make_response,redirect,jsonify
+from flask_cors import cross_origin
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 from flask_restx import Resource,Namespace
 import requests
 from tool import ParserModule,ApiModel,ApiError
             
-oauth_namespace=Namespace('backapi/oauth-login',description='유저의 소셜로그인을 다룹니다.')
+oauth_namespace=Namespace('backapi/oauth-login',description='유저의 소셜로그인을 다룹니다.',decorators=[cross_origin()])
 
 class Oauth:
     default_headers={

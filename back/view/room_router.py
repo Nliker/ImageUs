@@ -1,4 +1,5 @@
 from flask import request,jsonify,make_response
+from flask_cors import cross_origin
 import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
@@ -7,7 +8,7 @@ import datetime
 from flask_restx import Resource,Namespace
 from tool import ParserModule,ApiModel,ApiError
 
-room_namespace=Namespace('backapi/room',description='방의 정보를 생성,호출,수정,삭제 합니다.')
+room_namespace=Namespace('backapi/room',description='방의 정보를 생성,호출,수정,삭제 합니다.',decorators=[cross_origin()])
 
 def room_router(api,services):
     room_service=services.room_service
