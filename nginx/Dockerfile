@@ -1,5 +1,14 @@
 FROM nginx:1.21.3
 
+
+COPY ./dist /usr/share/nginx/html/dist
+
+COPY ./images /usr/share/nginx/html/images
+
+RUN rm /usr/share/nginx/html/index.html
+
+COPY index.html /usr/share/nginx/html/index.html
+
 RUN rm /etc/nginx/nginx.conf
 
 COPY nginx.conf /etc/nginx
