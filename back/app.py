@@ -1,4 +1,4 @@
-from flask import Flask,make_response,render_template,request,abort,send_from_directory
+from flask import Flask,make_response,render_template,request,abort,send_from_directory,Blueprint
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import UserDao,ImageDao,RoomDao
@@ -54,10 +54,12 @@ def create_app(test_config=None):
             ip_range=splited_ip[0]+'.'+splited_ip[1]
             if ip not in app.config['GOOD_IP_LIST'] and ip_range not in app.config['GOOD_IP_RANGE']:
                 abort(403)
+                
+    blueprint = Blueprint('backapi', __name__, url_prefix='/backapi')
+    api=Api(blueprint,title='ImageUs back_server api-docs',description='Swagger 문서', doc="/api-docs")
+    app.register_blueprint(blueprint)
     
-    api=Api(app,title='cloudy back-server api docs',doc='/backapi/api-docs')
-
-    @api.route("/backapi/search")
+    @api.route("/search")
     class search_user(Resource):
         def get(self):
             '''
@@ -67,7 +69,7 @@ def create_app(test_config=None):
             return make_response(render_template('search.html'),200,
                                               headers)
     
-    @api.route("/backapi/ping")
+    @api.route("/ping")
     class ping(Resource):
         def get(self):
             '''back 작동 테스트를 위한 api입니다.'''
