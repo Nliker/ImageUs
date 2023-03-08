@@ -17,19 +17,6 @@ def create_app(test_config=None):
 
     CORS(app)
     
-    @app.route("/",methods=['GET'])
-    def index():
-        return render_template('index.html')
-    
-    @app.route("/backapi/dist/<path:path>")
-    def send_dist(path):
-        print(path)
-        return send_from_directory('statics/dist',path)
-    
-    @app.route("/backapi/images/<path:path>")
-    def send_static_images(path):
-        return send_from_directory('statics/images',path)
-    
     if test_config is None:
         app.config.from_pyfile("config.py")
     else:
