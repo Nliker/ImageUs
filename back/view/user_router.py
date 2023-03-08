@@ -9,7 +9,7 @@ from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 import time
-user_namespace=Namespace('backapi/user',description='유저의 정보를 생성,호출,수정,삭제 합니다.',decorators=[cross_origin()] )
+user_namespace=Namespace('user',description='유저의 정보를 생성,호출,수정,삭제 합니다.')
 
 def user_router(api,services,config,es):
     user_service=services.user_service

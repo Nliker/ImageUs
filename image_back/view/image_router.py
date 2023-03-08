@@ -6,7 +6,7 @@ from flask_restx import Resource,Namespace,reqparse
 from werkzeug.datastructures import CombinedMultiDict
 from validator import UploadForm
 
-namespace=Namespace('imageapi',description='이미지를 다운 및 업로드합니다.')
+namespace=Namespace('',description='이미지를 다운 및 업로드합니다.')
 
 def image_router(image_api,services):
     image_service=services.image_service
