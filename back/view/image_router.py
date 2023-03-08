@@ -9,7 +9,7 @@ from flask_restx import Resource,Namespace
 
 from tool import ParserModule,ApiModel,ApiError
 
-image_namespace=Namespace('backapi/image',description='이미지의 정보를 생성,호출,수정,삭제 합니다.',decorators=[cross_origin()])
+image_namespace=Namespace('image',description='이미지의 정보를 생성,호출,수정,삭제 합니다.')
 
 def image_router(api,services):
     image_service=services.image_service
