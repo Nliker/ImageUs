@@ -76,6 +76,4 @@ services:
     depends_on:
       elasticsearch: 
         condition: service_healthy
-    extra_hosts:
-        - host.docker.internal:host-gateway 
     entrypoint: [ "bash","init_index.sh"]    
