@@ -1,4 +1,4 @@
-curl --location --request PUT 'http://host.docker.internal:9200/image_us' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "settings": {
@@ -25,7 +25,7 @@ curl --location --request PUT 'http://host.docker.internal:9200/image_us' \
     }
 }'
 
-curl --location --request PUT 'http://host.docker.internal:9200/image_us/_mapping' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_mapping' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "properties": {
@@ -45,7 +45,7 @@ curl --location --request PUT 'http://host.docker.internal:9200/image_us/_mappin
     }
 }'
 
-curl --location --request PUT 'http://host.docker.internal:9200/image_us/_doc/1' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/1' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test1@test.com",
@@ -53,7 +53,7 @@ curl --location --request PUT 'http://host.docker.internal:9200/image_us/_doc/1'
   "name":"test1"
 }'
 
-curl --location --request PUT 'http://host.docker.internal:9200/image_us/_doc/2' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/2' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test2@test.com",
@@ -61,7 +61,7 @@ curl --location --request PUT 'http://host.docker.internal:9200/image_us/_doc/2'
   "name":"test2"
 }'
 
-curl --location --request PUT 'http://host.docker.internal:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test3@test.com",
