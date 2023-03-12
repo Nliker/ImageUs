@@ -69,7 +69,7 @@ def user_router(api,services,config,es):
                 print(terms)
                 
                 payload={   
-                            "_source":  ["email","name"],
+                            "_source":  ["email","user_type"],
                             "size":config['ELASTIC_MAX_SIZE'],
                             "query": {
                                 "bool": {
@@ -90,7 +90,7 @@ def user_router(api,services,config,es):
                 end = time.time()
                 print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
-                search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name']} for result in resp['hits']['hits']]
+                search_result=[{'id':result['_id'],'email':result['_source']['email'],'user_type':result['_source']['user_type']} for result in resp['hits']['hits']]
                 end = time.time()
                 
                 return make_response(jsonify({'result':search_result}),200)
@@ -263,6 +263,7 @@ def user_router(api,services,config,es):
 
             doc={
                 'email':user_info['email'],
+                'user_type':user_info['user_type'],
                 'name':user_info['name']
             }
             
