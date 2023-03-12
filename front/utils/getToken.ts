@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 export const getToken = async () => {
   try {
@@ -11,7 +11,9 @@ export const getToken = async () => {
       'refresh_token_expire_time',
     );
 
-    if (!accessTokenExpireTime || !refreshTokenExpireTime) return null;
+    if (!accessTokenExpireTime || !refreshTokenExpireTime) {
+      throw new Error();
+    }
 
     const accessTokenExpireTimeDate = new Date(accessTokenExpireTime);
     const accessTokenDiffTime =
@@ -22,10 +24,10 @@ export const getToken = async () => {
       refreshTokenExpireTimeDate.getTime() - currentTimeDate.getTime();
 
     if (accessTokenDiffTime >= 30000) {
-      return sessionStorage.getItem('access_token');
+      return { token: sessionStorage.getItem('access_token'), message: '' };
     } else if (refreshTokenDiffTime >= 30000) {
       const userId = sessionStorage.getItem('user_id');
-      const response = await axios.post(`/user/${userId}/refresh`, {
+      const response = await axios.post(`/backapi/user/${userId}/refresh`, {
         refresh_token: sessionStorage.getItem('refresh_token'),
       });
       const { access_token, access_token_expire_time, user_id } = response.data;
@@ -36,15 +38,15 @@ export const getToken = async () => {
       );
       sessionStorage.setItem('user_id', user_id);
 
-      return access_token;
+      return { token: access_token, message: '' };
     } else {
-      return null;
+      sessionStorage.clear();
+      return {
+        token: null,
+        message: '장시간 요청이 없어서 로그아웃되었습니다..',
+      };
     }
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('로그인 정보를 받아오지 못했습니다..');
-    }
-    console.error(err);
-    return null;
+    return { token: null, message: '로그인 갱신에 실패했습니다..' };
   }
 };
