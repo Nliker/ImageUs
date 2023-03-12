@@ -3,14 +3,14 @@ import useSWR, { useSWRConfig } from 'swr';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router';
 
-import { socialLoginFetcher } from '@utils/logInFetcher';
+import { logInCheckFetcher, socialLoginFetcher } from '@utils/logInFetcher';
 
 const SocialLogInAuth = () => {
   const navigate = useNavigate();
   const { mutate } = useSWRConfig();
   const { coperation, code } = queryString.parse(window.location.search);
 
-  const { data: socialLoginSuccess } = useSWR(
+  const { data: socialLoginRequest } = useSWR(
     ['/oauth-login/callback', coperation, code],
     socialLoginFetcher,
     {
@@ -21,13 +21,16 @@ const SocialLogInAuth = () => {
   );
 
   useEffect(() => {
-    if (socialLoginSuccess === undefined) return;
-    if (socialLoginSuccess === false) {
-      alert('로그인에 실패했습니다.');
+    if (!socialLoginRequest) return;
+
+    if (socialLoginRequest.result === 'success') {
+      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
+        navigate('/', { replace: true });
+      });
+    } else {
+      navigate('/login');
     }
-    mutate('/user/my');
-    navigate('/');
-  }, [socialLoginSuccess]);
+  }, [socialLoginRequest]);
 
   return <div>로그인 요청 처리중..</div>;
 };
