@@ -1,6 +1,6 @@
 import React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 
 import AppLayout from '@layouts/AppLayout';
 import FriendList from './Components/FriendList';
@@ -49,6 +49,10 @@ const PeopleManagement = () => {
                 <Routes>
                   <Route path="/" element={<FriendList />} />
                   <Route path="/search" element={<SearchBox />} />
+                  <Route
+                    path="*"
+                    element={<Navigate to="/people_management" />}
+                  />
                 </Routes>
               </TabContent>
             </ContentBox>
