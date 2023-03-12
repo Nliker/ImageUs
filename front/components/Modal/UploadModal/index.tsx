@@ -1,5 +1,5 @@
-import React, { useCallback, DragEvent, useState, useEffect } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import React, { DragEvent, useState, useEffect } from 'react';
+import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { useParams } from 'react-router';
