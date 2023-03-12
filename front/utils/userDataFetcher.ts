@@ -1,18 +1,17 @@
 import axios, { AxiosError } from 'axios';
-import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
 import { getToken } from './getToken';
 
 const getUserFriendList = async (url: string) => {
   try {
     const userId = sessionStorage.getItem('user_id');
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
     }
 
-    const response = await axios.get(`/user/${userId}/${url}`, {
+    const response = await axios.get('/backapi' + `/user/${userId}/${url}`, {
       headers: {
         Authorization: token,
       },
@@ -20,9 +19,7 @@ const getUserFriendList = async (url: string) => {
     const { friendlist } = await response.data;
     return friendlist;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
-    }
+    console.error(err);
     return false;
   }
 };
@@ -32,7 +29,7 @@ const getUserImageList = async (
   { arg: start }: { arg: number },
 ) => {
   const userId = sessionStorage.getItem('user_id');
-  const token = await getToken();
+  const { token } = await getToken();
 
   if (!token) {
     throw new Error();
@@ -41,7 +38,7 @@ const getUserImageList = async (
   const limit = 12;
   try {
     const response = await axios.get(
-      `/user/${userId}/imagelist?start=${start}&limit=${limit}`,
+      '/backapi' + `/user/${userId}/imagelist?start=${start}&limit=${limit}`,
       {
         headers: {
           Authorization: token,
@@ -53,22 +50,20 @@ const getUserImageList = async (
     const filteredImageList = imagelist.filter((data: DImageData) => data.link);
     return { imagelist: filteredImageList, loadDataLength: imagelist.length };
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
-    }
+    alert('이미지정보를 받아오지 못했습니다..');
     return;
   }
 };
 
 const getUserImageLen = async (url: string) => {
   try {
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
     }
 
-    const response = await axios.get(url, {
+    const response = await axios.get('/backapi' + url, {
       headers: {
         Authorization: token,
       },
@@ -78,48 +73,7 @@ const getUserImageLen = async (url: string) => {
 
     return { imagelist_len };
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
-    }
-    return;
-  }
-};
-
-const getImageData = async (
-  url: string,
-  { arg: newImageList }: { arg: DImageData[] },
-) => {
-  try {
-    const token = await getToken();
-
-    if (!token) {
-      throw new Error();
-    }
-
-    const imageDataList: CImageData[] = await Promise.all(
-      newImageList.map(async (imageData) => {
-        const res = await axios.get(`/image-download/${imageData.link}`, {
-          headers: {
-            Authorization: token,
-          },
-          responseType: 'blob',
-        });
-
-        const url = window.URL.createObjectURL(
-          new Blob([res.data], { type: res.headers['content-type'] }),
-        );
-        const created_at =
-          imageData.created_at?.split(' ')[0] ?? '삭제된 이미지';
-        return { ...imageData, id: imageData.id, created_at, link: url };
-      }),
-    );
-
-    return [...imageDataList];
-  } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
-    }
-    console.log(err);
+    console.error(err);
     return;
   }
 };
@@ -127,13 +81,13 @@ const getImageData = async (
 const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
   try {
     const userId = sessionStorage.getItem('user_id');
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
     }
 
-    await axios.delete(`/user/${userId}/friend`, {
+    await axios.delete('/backapi' + `/user/${userId}/friend`, {
       data: {
         delete_friend_user_id: arg,
       },
@@ -143,8 +97,10 @@ const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
     });
     alert('친구 목록에서 삭제하였습니다.');
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('친구 목록에서 삭제하지 못하였습니다..');
+    if (err instanceof AxiosError && err.response?.status === 404) {
+      alert(err.response.data.message);
+    } else {
+      alert('요청을 실패하였습니다..');
     }
     return false;
   }
@@ -152,32 +108,23 @@ const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
 
 const getUserRoomListFetcher = async (url: string) => {
   try {
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
     }
 
-    const response = await axios.get(url, {
+    const response = await axios.get('/backapi' + url, {
       headers: {
         Authorization: `${token}`,
       },
     });
 
-    // const roomList = response.data.roomlist.map((roomData: DRoomData) => {
-    //   return {
-    //     id: roomData.id,
-    //     title: roomData.title,
-    //   };
-    // });
-
     const { roomlist } = response.data;
 
     return roomlist;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert('오류가 발생했습니다..');
-    }
+    console.error('에러', err);
     return null;
   }
 };
@@ -187,7 +134,7 @@ const postUserInfoFetcher = async (
   { arg }: { arg: { name?: string; profile?: string } },
 ) => {
   try {
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
@@ -198,42 +145,12 @@ const postUserInfoFetcher = async (
     if (arg.name) postData.name = arg.name;
     if (arg.profile) postData.profile = arg.profile;
 
-    await axios.post(url, postData, {
+    await axios.post('/backapi' + url, postData, {
       headers: { Authorization: token },
     });
     alert('변경되었습니다.');
   } catch (err) {
-    if (err instanceof AxiosError) {
-      console.log(err);
-      alert('오류가 발생했습니다..');
-    }
-    return;
-  }
-};
-
-const deleteUserImage = async (
-  url: string,
-  { arg: imageId }: { arg: number },
-) => {
-  try {
-    const token = await getToken();
-
-    if (!token) {
-      throw new Error();
-    }
-
-    const response = await axios.delete(url, {
-      headers: { Authorization: token },
-      data: { delete_image_id: imageId },
-    });
-
-    alert(response.data);
-    return imageId;
-  } catch (err) {
-    if (err instanceof AxiosError) {
-      console.log(err);
-      alert('오류가 발생했습니다..');
-    }
+    alert('요청을 실패하였습니다..');
     return;
   }
 };
@@ -244,14 +161,14 @@ const postNewFriend = async (
 ) => {
   try {
     const userId = sessionStorage.getItem('user_id');
-    const token = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
       throw new Error();
     }
 
     const response = await axios.post(
-      `/user/${userId}/friend`,
+      '/backapi' + `/user/${userId}/friend`,
       {
         friend_user_id: friendId,
       },
@@ -267,9 +184,13 @@ const postNewFriend = async (
       alert('성공적으로 추가하였습니다');
     }
   } catch (err) {
-    if (err instanceof AxiosError) {
-      console.log(err);
+    if (
+      err instanceof AxiosError &&
+      (err.response?.status === 402 || err.response?.status === 404)
+    ) {
       alert(err.response?.data.message);
+    } else {
+      alert('요청을 실패했습니다..');
     }
     return;
   }
@@ -281,27 +202,22 @@ const leaveRoomFetcher = async (
 ) => {
   try {
     if (!roomId) throw new Error('올바른 요청이 아닙니다.');
-    const token = await getToken();
+    const { token } = await getToken();
     const userId = sessionStorage.getItem('user_id');
 
     if (!token) {
       throw new Error();
     }
 
-    await axios.delete(`/user/${userId}/room`, {
+    await axios.delete('/backapi' + `/user/${userId}/room`, {
       headers: { Authorization: token },
       data: { delete_user_room_id: roomId },
     });
 
     alert('성공적으로 나갔습니다.');
   } catch (err) {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 403) {
-        alert(err.response.data);
-      } else {
-        alert('오류가 발생했습니다..');
-      }
-    }
+    alert('요청을 실패했습니다..');
+    return;
   }
 };
 
@@ -310,10 +226,8 @@ export {
   getUserRoomListFetcher,
   getUserImageList,
   getUserImageLen,
-  getImageData,
   postNewFriend,
   postUserInfoFetcher,
   deleteUserFriend,
-  deleteUserImage,
   leaveRoomFetcher,
 };
