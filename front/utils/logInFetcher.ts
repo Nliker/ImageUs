@@ -3,24 +3,21 @@ import { getToken } from './getToken';
 
 const logInCheckFetcher = async (url: string) => {
   try {
-    const token = await getToken();
+    const { token } = await getToken();
     if (!token) {
       throw new Error();
     }
 
-    const response = await axios.get(url, {
+    const response = await axios.get('/backapi' + url, {
       headers: {
         Authorization: token,
       },
     });
     const { user_info } = response.data;
 
-    return { logInState: true, user_info };
+    return { logInState: 'LoggedIn', userInfo: user_info };
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert(err.response?.data.message);
-    }
-    return { logInState: false };
+    return { logInState: 'LoggedOut' };
   }
 };
 
@@ -29,7 +26,7 @@ const logInRequestFetcher = async (
   { arg }: { arg: { email: string; password: string } },
 ) => {
   try {
-    const response = await axios.post(url, {
+    const response = await axios.post('/backapi' + url, {
       email: arg.email,
       password: arg.password,
     });
@@ -47,8 +44,13 @@ const logInRequestFetcher = async (
 
     return true;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      alert(err.response?.data.message);
+    if (
+      err instanceof AxiosError &&
+      (err.response?.status === 404 || err.response?.status === 401)
+    ) {
+      alert(err.response.data.message);
+    } else {
+      alert('로그인 요청에 실패했습니다..');
     }
     return false;
   }
@@ -61,7 +63,7 @@ const socialLoginFetcher = async ([url, coperation, code]: [
 ]) => {
   try {
     const response = await axios.get(
-      `${url}?coperation=${coperation}&code=${code}`,
+      '/backapi' + `${url}?coperation=${coperation}&code=${code}`,
     );
 
     const { access_token, user_id } = response.data;
@@ -77,12 +79,10 @@ const socialLoginFetcher = async ([url, coperation, code]: [
     );
     sessionStorage.setItem('user_id', user_id);
 
-    return true;
+    return { result: 'success' };
   } catch (err) {
-    if (err instanceof AxiosError) {
-      console.error(err.message);
-    }
-    return false;
+    alert('로그인 요청에 실패했습니다..');
+    return { result: 'fail' };
   }
 };
 
