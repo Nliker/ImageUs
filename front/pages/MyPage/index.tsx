@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route, useLocation } from 'react-router';
+import { Routes, Route, useLocation, Navigate } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import Scrollbars from 'react-custom-scrollbars';
@@ -12,7 +12,6 @@ import { CImageData } from '@typing/client';
 import useIntersect from '@hooks/useIntersect';
 import AppLayout from '@layouts/AppLayout';
 import {
-  getImageData,
   getUserFriendList,
   getUserImageLen,
   getUserImageList,
@@ -30,12 +29,13 @@ import {
   SubMenu,
   WrapperBox,
 } from './styles';
+import { getImageData } from '@utils/imageFetcher';
 
 const MyPage = () => {
   const { pathname } = useLocation();
   const userId = sessionStorage.getItem('user_id');
 
-  const { data: roomlist } = useSWR(
+  const { data: roomlist, error } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
     {
@@ -63,7 +63,7 @@ const MyPage = () => {
       revalidateOnReconnect: false,
     },
   );
-  const { data: loginInfo } = useSWR('/user/my');
+  const { data: userInfo } = useSWR('/user/my');
 
   const {
     data: requestImageList,
@@ -125,7 +125,7 @@ const MyPage = () => {
               </ProfileImage>
               <ProfileInfo>
                 <div>
-                  <h2>{loginInfo.user_info.name}</h2>
+                  <h2>{userInfo?.userInfo?.name ?? 'USER'}</h2>
                 </div>
                 <ul>
                   <li>
@@ -177,6 +177,7 @@ const MyPage = () => {
                   }
                 />
                 <Route path="my_profile" element={<MyProfile />} />
+                <Route path="*" element={<Navigate to="/my_page" />} />
               </Routes>
             </EachRoomPictureList>
           </ContentBox>
