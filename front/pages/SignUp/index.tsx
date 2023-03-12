@@ -157,7 +157,7 @@ const SignUp = () => {
 
   const requestEmailAuthNum = async () => {
     try {
-      await axios.get(`/user/auth?email=${email}`);
+      await axios.get(`/backapi/user/auth?email=${email}`);
       countTimeLimit();
       setRequestingAuth(true);
       setErrorInfo((prev) => ({
@@ -177,8 +177,7 @@ const SignUp = () => {
             email: { hasError: true, errorMessage: message, emailAuth: false },
           }));
         } else {
-          console.error(err);
-          alert('오류가 발생했습니다..');
+          alert('인증문자를 발송하지못하였습니다..');
           location.reload();
         }
       }
@@ -197,7 +196,7 @@ const SignUp = () => {
           },
         }));
       } else {
-        await axios.post(`/user/auth?email=${email}`, {
+        await axios.post(`/backapi/user/auth?email=${email}`, {
           auth_password: emailAuth,
         });
         if (timeLimitId) {
@@ -226,8 +225,7 @@ const SignUp = () => {
           }));
         } else {
           if (timeLimitId) clearInterval(timeLimitId);
-          console.error(err);
-          alert('오류가 발생했습니다..');
+          alert('인증에 실패하였습니다..');
           location.reload();
         }
       }
@@ -267,18 +265,18 @@ const SignUp = () => {
     }
 
     await axios
-      .post('user/sign-up', {
+      .post('/backapi/user/sign-up', {
         name,
         email,
         password,
         profile: 'test1',
       })
-      .then((res) => {
+      .then(() => {
         alert('회원가입되었습니다.');
         navigate('/login');
       })
-      .catch((err) => {
-        console.log(err.response.data.message);
+      .catch(() => {
+        alert('회원가입 요청을 처리할 수 없습니다..');
       });
   };
 
