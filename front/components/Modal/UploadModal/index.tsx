@@ -117,7 +117,6 @@ const UploadModal = () => {
       for (let i = 0; i < e.target.files.length; i++) {
         if (acceptableType.includes(e.target.files[i].type)) {
           formData.append('image', e.target.files[i]);
-          console.log(e.target.files[i]);
           setUploadFileName(e.target.files[i].name);
         } else {
           alert('jpg, png, pdf, gif, jpeg, heif 형식만 업로드 가능합니다.');
