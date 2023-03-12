@@ -5,6 +5,7 @@ import NavigationBar from '@components/NavigationBar';
 import SideBar from '@components/SideBar';
 import Modal from '@components/Modal';
 import { OuterContainer, InnerContainer, Wrapper } from './styles';
+import Spinner from '@styles/Spinner';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -32,13 +33,17 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
     setSidebarState(false);
   }, [sidebarState]);
 
+  if (!userInfo || userInfo.logInState === 'LoggingOut') return <Spinner />;
+
   return (
     <Wrapper>
       <OuterContainer showModal={currentModalState}>
-        {userInfo.logInState && <NavigationBar />}
+        {userInfo?.logInState === 'LoggedIn' && <NavigationBar />}
         <InnerContainer
           style={
-            userInfo.logInState ? { height: 'calc(100% - 66px)' } : undefined
+            userInfo?.logInState === 'LoggedIn'
+              ? { height: 'calc(100% - 66px)' }
+              : undefined
           }
         >
           {isImageRoom && <SideBar show={sidebarState} close={closeSidebar} />}
