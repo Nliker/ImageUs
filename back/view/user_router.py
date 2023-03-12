@@ -69,7 +69,7 @@ def user_router(api,services,config,es):
                 print(terms)
                 
                 payload={   
-                            "_source":  ["email","user_type"],
+                            "_source":  ["email","name","user_type"],
                             "size":config['ELASTIC_MAX_SIZE'],
                             "query": {
                                 "bool": {
