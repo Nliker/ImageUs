@@ -53,7 +53,8 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/1' \
 --data-raw '{
   "email": "test1@test.com",
   "id": 1,
-  "name":"test1"
+  "name":"test1",
+  "user_type":"image_us"
 }'
 
 curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/2' \
@@ -61,7 +62,8 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/2' \
 --data-raw '{
   "email": "test2@test.com",
   "id": 2,
-  "name":"test2"
+  "name":"test2",
+  "user_type":"image_us"
 }'
 
 curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
@@ -69,5 +71,6 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
 --data-raw '{
   "email": "test3@test.com",
   "id": 3,
-  "name":"test3"
+  "name":"test3",
+  "user_type":"image_us"
 }'
