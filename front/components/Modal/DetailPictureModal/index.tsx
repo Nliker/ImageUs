@@ -5,6 +5,7 @@ import { IconContext } from 'react-icons/lib';
 import { BiUserPin } from 'react-icons/bi';
 
 import { ImageSection, Wrapper } from './styles';
+import { AiOutlineDownload } from 'react-icons/ai';
 
 const DetailPictureInfo = () => {
   const { data: imageInfo } = useSWR('detailImageInfo');
@@ -84,6 +85,18 @@ const DetailPictureInfo = () => {
           <span className="writer">{imageInfo.data.user_name}</span>
         </div>
         <div className="date_info">
+          <div className="down_btn">
+            <a href={imageInfo?.data.link} download={imageInfo?.data.fileName}>
+              <IconContext.Provider
+                value={{
+                  size: '100%',
+                  style: { display: 'inline-block', color: 'black' },
+                }}
+              >
+                <AiOutlineDownload />
+              </IconContext.Provider>
+            </a>
+          </div>
           <span>일시: {imageInfo.data.created_at}</span>
         </div>
       </div>
