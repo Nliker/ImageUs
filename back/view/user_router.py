@@ -89,7 +89,7 @@ def user_router(api,services,config,es):
                 resp=es.search(index=config['ELASTIC_INDEX'],body=payload)
                 end = time.time()
                 print(f"elasticsearch:{end - start:.5f} sec")
-                print(resp)
+                print(resp,flush=True)
                 search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name'],'user_type':result['_source']['user_type']} for result in resp['hits']['hits']]
                 end = time.time()
                 
