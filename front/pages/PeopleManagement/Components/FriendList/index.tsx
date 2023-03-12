@@ -48,7 +48,7 @@ const FriendList = () => {
               <tr key={data.id}>
                 <td>{data.name}</td>
                 <td>{data.email}</td>
-                <td>{data.profile}</td>
+                <td>{data.user_type}</td>
                 <td>
                   <div className="delete_btn">
                     <Button type="button" onClick={handleDeleteFriend(data.id)}>
