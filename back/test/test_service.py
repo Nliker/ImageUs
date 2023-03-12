@@ -409,7 +409,8 @@ def test_create_new_user(user_service):
         'id':new_user_id,
         'name':new_user['name'],
         'email':new_user['email'],
-        'profile':new_user['profile']
+        'profile':new_user['profile'],
+        'user_type':'image_us'
     }
 
 #유저의 정보 확인
@@ -589,7 +590,8 @@ def test_update_user_info(user_service):
         'id':1,
         'name':'test1',
         'email':'test1@naver.com',
-        'profile':'testuser1'
+        'profile':'testuser1',
+        'user_type':'image_us'
     }
     
     update_user={
@@ -605,7 +607,8 @@ def test_update_user_info(user_service):
         'id':1,
         'name':update_user['name'],
         'email':'test1@naver.com',
-        'profile':update_user['profile']
+        'profile':update_user['profile'],
+        'user_type':'image_us'
     }
     
 def test_delete_user(user_service):
