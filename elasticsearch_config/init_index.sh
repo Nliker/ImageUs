@@ -41,6 +41,9 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_mapping' \
         },
         "name": {
                     "type": "keyword"
+        },
+        "user_type": {
+                    "type": "keyword"
         }
     }
 }'
