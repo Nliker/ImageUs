@@ -186,7 +186,8 @@ class ApiModel:
     search_user_info={
                     'id':fields.Integer,
                     'email':fields.String,
-                    'name':fields.String
+                    'name':fields.String,
+                    'user_type':fields.String
     }
     
     user_info={
@@ -332,7 +333,8 @@ class ApiModel:
                     'id':1,
                     'name':'testuser1',
                     'email':'test1user@test.com',
-                    'profile':'testuser1'
+                    'profile':'testuser1',
+                    'user_type':'image_us'
                 },
                 required=False
             )
@@ -363,12 +365,14 @@ class ApiModel:
                     'id':1,
                     'name':'testuser1',
                     'email':'test1user@test.com',
-                    'profile':'testuser1'
+                    'profile':'testuser1',
+                    'user_type':'image_us'
                 },{
                     'id':2,
                     'name':'testuser2',
                     'email':'testuser2@test.com',
-                    'profile':'testuser2'
+                    'profile':'testuser2',
+                    'user_type':'kakao'
                 }],
                 required=False
             )
@@ -466,17 +470,20 @@ class ApiModel:
                     {
                         'id':3,
                         'name':'testuser3',
-                        'email':'testuser3@test.com'
+                        'email':'testuser3@test.com',
+                        'user_type':'image_us'
                     },
                     {
                         'id':5,
                         'name':'testuser5',
-                        'email':'testuser5@test.com'
+                        'email':'testuser5@test.com',
+                        'user_type':'kakao'
                     },
                     {
                         'id':6,
                         'name':'testuser6',
-                        'email':'testuser6@test.com'
+                        'email':'testuser6@test.com',
+                        'user_type':'naver'
                     }
                 ],
                 required=False
