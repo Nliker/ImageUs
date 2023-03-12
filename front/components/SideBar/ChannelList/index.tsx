@@ -21,7 +21,7 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
 
   const onClickRoom = useCallback((roomId: number) => {
     closeSidebar();
-    navigate(`/booth/${roomId}`);
+    navigate(`/room/${roomId}`);
   }, []);
 
   const toggleChannelCollapse = useCallback(
