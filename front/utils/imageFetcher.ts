@@ -58,45 +58,6 @@ const deleteUserImage = async (
   }
 };
 
-// const getImageData = async (
-//   url: string,
-//   { arg: newImageList }: { arg: DImageData[] },
-// ) => {
-//   try {
-//     const { token } = await getToken();
-
-//     if (!token) {
-//       throw new Error();
-//     }
-
-//     const imageDataList: CImageData[] = await Promise.all(
-//       newImageList.map(async (imageData) => {
-//         const res = await axios.get(
-//           '/imageapi' + `/image-download/${imageData.link}`,
-//           {
-//             headers: {
-//               Authorization: token,
-//             },
-//             responseType: 'blob',
-//           },
-//         );
-
-//         const url = window.URL.createObjectURL(
-//           new Blob([res.data], { type: res.headers['content-type'] }),
-//         );
-//         const created_at =
-//           imageData.created_at?.split(' ')[0] ?? '삭제된 이미지';
-//         return { ...imageData, id: imageData.id, created_at, link: url };
-//       }),
-//     );
-
-//     return [...imageDataList];
-//   } catch (err) {
-//     alert('이미지를 받아오지 못하였습니다..');
-//     return;
-//   }
-// };
-
 const getImageData = async (
   url: string,
   { arg: imageList }: { arg: DImageData[] },
@@ -147,7 +108,10 @@ const getImageData = async (
         const url = window.URL.createObjectURL(
           new Blob([response.data], { type: response.headers['content-type'] }),
         );
-        return { ...imageInfo, link: url, created_at };
+        const fileName = imageInfo.link
+          ? imageInfo.link.split('/')[1]
+          : 'Image';
+        return { ...imageInfo, link: url, fileName, created_at };
       }),
     );
 
