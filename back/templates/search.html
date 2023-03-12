@@ -19,7 +19,7 @@
 
       function getAutoComplete() {
               const query = $('.search-box').val();
-              fetch(`http://127.0.0.1:4000/user/search?email=${encodeURIComponent(query.trim())}`)
+              fetch(`http://imageus_back/user/search?email=${encodeURIComponent(query.trim())}`)
                 .then((resp) => resp.json())
                 .then((data) => 
                   {
