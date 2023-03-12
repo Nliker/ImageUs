@@ -3,17 +3,13 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import useInput from '@hooks/useInput';
-import { logInCheckFetcher } from '@utils/logInFetcher';
 import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
 import { InfoSection, InfoTable } from './styles';
+import { logInCheckFetcher } from '@utils/logInFetcher';
 
 const MyProfile = () => {
-  const { data: userInfo } = useSWR('/user/my', logInCheckFetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
   const { trigger: postUserInfoTrigger } = useSWRMutation(
     '/user/my',
     postUserInfoFetcher,
@@ -23,18 +19,7 @@ const MyProfile = () => {
     intro: false,
     name: false,
   });
-  const [introductionInput, setIntroductionInput, handleIntroInput] =
-    useInput('');
   const [nameInput, setNameInput, handleNameInput] = useInput('');
-
-  const changeIntroBox = useCallback(() => {
-    setProfileState((prev) => {
-      return {
-        ...prev,
-        intro: true,
-      };
-    });
-  }, [profileState]);
 
   const changeNameBox = useCallback(() => {
     setProfileState((prev) => {
@@ -45,18 +30,16 @@ const MyProfile = () => {
     });
   }, [profileState]);
 
-  const onClickPostIntro = useCallback(
-    (postTitle: string) => () => {
-      if (postTitle === 'profile') {
-        postUserInfoTrigger({ [postTitle]: introductionInput });
-      } else if (postTitle === 'name') {
-        postUserInfoTrigger({ [postTitle]: nameInput });
-      } else {
-        alert('잘못된 요청입니다.');
-      }
-    },
-    [introductionInput, nameInput],
-  );
+  const onClickPostIntro = (postTitle: string) => () => {
+    if (postTitle === 'name') {
+      postUserInfoTrigger({ [postTitle]: nameInput }).then(() => {
+        setProfileState((prev) => ({ ...prev, name: false }));
+        updateUserInfo(logInCheckFetcher('/user/my'));
+      });
+    } else {
+      alert('잘못된 요청입니다.');
+    }
+  };
 
   return (
     <InfoSection>
@@ -70,13 +53,13 @@ const MyProfile = () => {
           <tr>
             <th>이메일</th>
             <td colSpan={2}>
-              <strong>{userInfo?.user_info.email}</strong>
+              <strong>{userInfo?.userInfo.email}</strong>
             </td>
           </tr>
           <tr>
             <th>가입 유형</th>
             <td>
-              <div>{userInfo?.user_info.profile}</div>
+              <div>{userInfo?.userInfo.profile}</div>
             </td>
           </tr>
           <tr>
@@ -84,7 +67,7 @@ const MyProfile = () => {
             {!profileState.name ? (
               <>
                 <td>
-                  <div>{userInfo?.user_info.name}</div>
+                  <div>{userInfo?.userInfo.name}</div>
                 </td>
                 <td className="btn_group">
                   <Button type="button" onClick={changeNameBox}>
@@ -136,9 +119,9 @@ const MyProfile = () => {
             <td>
               <strong>********</strong>
             </td>
-            <td className="btn_group">
+            {/* <td className="btn_group">
               <Button type="button">비밀번호 변경</Button>
-            </td>
+            </td> */}
           </tr>
         </tbody>
       </InfoTable>
