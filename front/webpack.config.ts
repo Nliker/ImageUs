@@ -82,24 +82,12 @@ const config: Configuration = {
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
     proxy: {
-      '/image-download/*': {
-        target: 'http://118.42.101.135:5001',
+      '/imageapi/*': {
+        target: 'https://codakcodak.site',
         changeOrigin: true,
       },
-      '/oauth-login/*': {
-        target: 'http://118.42.101.135:5000',
-        changeOrigin: true,
-      },
-      '/user/*': {
-        target: 'http://118.42.101.135:5000',
-        changeOrigin: true,
-      },
-      '/room/*': {
-        target: 'http://118.42.101.135:5000',
-        changeOrigin: true,
-      },
-      '/image/*': {
-        target: 'http://118.42.101.135:5000',
+      '/backapi/*': {
+        target: 'https://codakcodak.site',
         changeOrigin: true,
       },
     },
