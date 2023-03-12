@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useMediaQuery } from 'react-responsive';
@@ -21,10 +21,9 @@ import {
 } from './styles';
 
 const NavigationBar = () => {
-  const { mutate } = useSWRConfig();
   const navigate = useNavigate();
 
-  const { data: loginInfo } = useSWR('/user/my');
+  const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
 
   const [clickUserIcon, setClickUserIcon] = useState<boolean>(false);
   const [hoverUserIcon, setHoverUserIcon] = useState<boolean>(false);
@@ -68,11 +67,12 @@ const NavigationBar = () => {
     setHoverUserIcon(false);
   }, [hoverUserIcon, clickUserIcon]);
 
-  const onClickLogOut = useCallback(() => {
+  const onClickLogOut = async () => {
     sessionStorage.clear();
-    mutate('/user/my');
-    navigate('/');
-  }, []);
+    upadateUserState({ logInState: 'LoggingOut' }).then(async () => {
+      navigate('/');
+    });
+  };
 
   return (
     <Wrapper>
@@ -87,7 +87,7 @@ const NavigationBar = () => {
             </MobileNavItem>
             <MobileNavItem>
               <h1>
-                <NavLink to={'/main_page'}>
+                <NavLink to={'/'}>
                   <HiOutlineHome />
                   ImageUs
                 </NavLink>
@@ -105,7 +105,7 @@ const NavigationBar = () => {
           <MobileNavList>
             <MobileNavItem>
               <h1>
-                <NavLink to={'/main_page'}>
+                <NavLink to={'/'}>
                   <HiOutlineHome />
                   ImageUs
                 </NavLink>
@@ -113,13 +113,11 @@ const NavigationBar = () => {
             </MobileNavItem>
             <MobileNavItem>
               <NavLink to={'/my_page'} className="navigate_link">
-                {/* <MdOutlineManageAccounts /> */}
                 마이 페이지
               </NavLink>
             </MobileNavItem>
             <MobileNavItem>
               <NavLink to={'/people_management'} className="navigate_link">
-                {/* <CgUserList /> */}
                 친구목록
               </NavLink>
             </MobileNavItem>
@@ -149,10 +147,12 @@ const NavigationBar = () => {
                 <UserInfo>
                   <div className={'info_words'}>
                     <p>
-                      <strong>{loginInfo.user_info.name}</strong> 님 어서오세요!
+                      <strong>{userInfo.userInfo?.name ?? 'loading..'}</strong>{' '}
+                      님 어서오세요!
                     </p>
                     <p>
-                      <strong>email:</strong> {loginInfo.user_info.email}
+                      <strong>email:</strong>{' '}
+                      {userInfo.userInfo?.email ?? '로딩중입니다..'}
                     </p>
                   </div>
                 </UserInfo>
