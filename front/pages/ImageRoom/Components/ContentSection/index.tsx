@@ -16,7 +16,6 @@ import { CImageData } from '@typing/client';
 import {
   getDefaultImgFetcher,
   getFilterImgFetcher,
-  getImageData,
   getUnreadImageList,
 } from '@utils/roomDataFetcher';
 import { Button } from '@styles/Button';
@@ -30,6 +29,7 @@ import {
   FilteringOption,
   MainContainer,
 } from './styles';
+import { getImageData } from '@utils/imageFetcher';
 
 interface SelectTerm {
   startDate?: string;
@@ -44,7 +44,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
       revalidateOnFocus: false,
       revalidateOnMount: false,
       revalidateOnReconnect: false,
-      refreshInterval: 100000,
+      refreshInterval: 300000,
     },
   );
   const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
@@ -345,18 +345,14 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
               </FilteringOption>
               {filterName === '기간 선택' && (
                 <div className="select_date">
-                  <label htmlFor="start_date">시작날</label>
-                  <input
-                    type="date"
-                    id="start_date"
-                    ref={filterStartDateInputRef}
-                  />
-                  <label htmlFor="end_date">마지막날</label>
-                  <input
-                    type="date"
-                    id="end_date"
-                    ref={filterEndDateInputRef}
-                  />
+                  <div className="select_date_c">
+                    <label>시작날</label>
+                    <input type="date" ref={filterStartDateInputRef} />
+                  </div>
+                  <div className="select_date_c">
+                    <label>마지막날</label>
+                    <input type="date" ref={filterEndDateInputRef} />
+                  </div>
                   <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
                     확인
                   </Button>
