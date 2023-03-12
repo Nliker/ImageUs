@@ -368,6 +368,7 @@ def test_post_user_sign_up(api):
     assert resp.status_code==200
 
     resp_json=json.loads(resp.data.decode('utf-8'))
+    
     assert resp_json=={
         'user_info':
         {
@@ -375,6 +376,7 @@ def test_post_user_sign_up(api):
             'name':new_user['name'],
             'email':new_user['email'],
             'profile':new_user['profile'],
+            'user_type':'image_us'
         }
     }
 
@@ -584,6 +586,7 @@ def test_get_user_friendlist(api):
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         }
     ]
         }
@@ -602,12 +605,14 @@ def test_get_user_friendlist(api):
             'name':'test1',
             'email':'test1@naver.com',
             'profile':'testuser1',
+            'user_type':'image_us'
         },
         {
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
             'profile':'testuser3',
+            'user_type':'image_us'
         }
     ]}
     #로그인한 유저와 조회하려는 유저가 다른 경우 확인
