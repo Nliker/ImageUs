@@ -52,6 +52,17 @@ export const Wrapper = styled.div<{
       align-items: center;
 
       height: 100%;
+      gap: 1rem;
+
+      .down_btn {
+        width: 30px;
+        height: 30px;
+
+        & > a {
+          display: inline-block;
+          height: 100%;
+        }
+      }
     }
   }
 
