@@ -90,7 +90,7 @@ def user_router(api,services,config,es):
                 end = time.time()
                 print(f"elasticsearch:{end - start:.5f} sec")
                 print(resp)
-                search_result=[{'id':result['_id'],'email':result['_source']['email'],'user_type':result['_source']['user_type']} for result in resp['hits']['hits']]
+                search_result=[{'id':result['_id'],'email':result['_source']['email'],'name':result['_source']['name'],'user_type':result['_source']['user_type']} for result in resp['hits']['hits']]
                 end = time.time()
                 
                 return make_response(jsonify({'result':search_result}),200)
