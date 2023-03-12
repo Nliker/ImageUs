@@ -4,7 +4,7 @@ import sys,os
 sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 from flask_restx import Resource,Namespace
 import requests
-from tool import ParserModule,ApiModel,ApiError
+from tool import ParserModule
             
 oauth_namespace=Namespace('oauth-login',description='유저의 소셜로그인을 다룹니다.')
 
@@ -52,7 +52,7 @@ class Oauth:
         data={}
         ).json()
 
-def oauth_router(api,services,config):
+def oauth_router(api,services,config,es):
     api.add_namespace(oauth_namespace,'')
     user_service=services.user_service
     
@@ -127,7 +127,16 @@ def oauth_router(api,services,config):
                 }
                 print(new_user)
                 new_user_id=user_service.create_new_user(new_user,type=coperation)
-    
+
+                doc={
+                    'email':new_user['email'],
+                    'user_type':coperation,
+                    'name':new_user['name']
+                }
+            
+                es_res = es.index(index=config['ELASTIC_INDEX'], doc_type="_doc", body=doc,id=user_info['new_user_id'])
+                print('es insert result:',es_res)
+                
                 result=user_service.generate_token(new_user_id)
                 res=make_response(jsonify({'user_id':new_user_id,**result}))
                 res.headers["Access-Control-Allow-Origin"]="*"
