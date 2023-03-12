@@ -20,7 +20,7 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
   const { mutate } = useSWRConfig();
 
-  const { data: logInInfo } = useSWR('/user/my');
+  const { data: userInfo } = useSWR('/user/my');
   const { trigger: deleteMemberTrigger } = useSWRMutation(
     `/room/${roomId}/user`,
     deleteMemberFetcher,
@@ -64,7 +64,7 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
         <>
           <CollapseListBox
             data={collapseListBoxData()}
-            currentLoginId={logInInfo.user_info.id}
+            currentLoginId={userInfo.userInfo.id}
             boxInfo={{
               boxName: 'member',
               hostId: currentRoomInfo.host_user_id,
