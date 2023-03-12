@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import loadable from '@loadable/component';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { logInCheckFetcher } from '@utils/logInFetcher';
+import PrivateRoute from './PrivateRoute';
+import PublicRoute from './PublicRoute';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -13,35 +15,27 @@ const ImageRoom = loadable(() => import('@pages/ImageRoom'));
 const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
 
 const App = () => {
-  const { data: userInfo, isValidating } = useSWR(
-    '/user/my',
-    logInCheckFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data: userInfo, mutate } = useSWR('/user/my');
 
-  return isValidating ? (
-    <div>로딩중...</div>
-  ) : (
+  useEffect(() => {
+    if (userInfo?.logInState === 'LoggingOut') return;
+    mutate(logInCheckFetcher('/user/my'));
+  }, []);
+
+  return (
     <Routes>
-      <Route path="main_page" element={<MainPage />} />
-      {userInfo?.logInState ? (
-        <>
-          <Route path="booth/:roomId" element={<ImageRoom />} />
-          <Route path="my_page/*" element={<MyPage />} />
-          <Route path="people_management/*" element={<PeopleManagement />} />
-        </>
-      ) : (
-        <>
-          <Route path="login" element={<LogIn />} />
-          <Route path="signup" element={<SignUp />} />
-          <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
-        </>
-      )}
-      <Route path="*" element={<Navigate to="main_page" />} />
+      <Route index element={<MainPage />} />
+      <Route element={<PublicRoute />}>
+        <Route path="login" element={<LogIn />} />
+        <Route path="signup" element={<SignUp />} />
+        <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
+      </Route>
+      <Route element={<PrivateRoute />}>
+        <Route path="my_page/*" element={<MyPage />} />
+        <Route path="room/:roomId" element={<ImageRoom />} />
+        <Route path="people_management/*" element={<PeopleManagement />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
