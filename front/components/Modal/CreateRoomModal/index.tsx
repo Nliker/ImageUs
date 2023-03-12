@@ -8,7 +8,10 @@ import Scrollbars from 'react-custom-scrollbars';
 
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
-import { getUserFriendList } from '@utils/userDataFetcher';
+import {
+  getUserFriendList,
+  getUserRoomListFetcher,
+} from '@utils/userDataFetcher';
 import { createRoomFetcher } from '@utils/roomDataFetcher';
 import { Button } from '@styles/Button';
 import {
@@ -106,7 +109,10 @@ const CreateRoomModal = () => {
     createRoomTrigger({ selectMemberIdList, roomName })
       .then(() => {
         const userId = sessionStorage.getItem('user_id');
-        mutate(`/user/${userId}/roomlist`);
+        mutate(
+          `/user/${userId}/roomlist`,
+          getUserRoomListFetcher(`/user/${userId}/roomlist`),
+        );
         mutate('modalState', { currentModalState: '' });
       })
       .catch((err) => {
