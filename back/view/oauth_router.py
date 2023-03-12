@@ -134,7 +134,7 @@ def oauth_router(api,services,config,es):
                     'name':new_user['name']
                 }
             
-                es_res = es.index(index=config['ELASTIC_INDEX'], doc_type="_doc", body=doc,id=user_info['new_user_id'])
+                es_res = es.index(index=config['ELASTIC_INDEX'], doc_type="_doc", body=doc,id=new_user_id)
                 print('es insert result:',es_res)
                 
                 result=user_service.generate_token(new_user_id)
