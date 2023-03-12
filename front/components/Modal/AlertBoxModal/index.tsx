@@ -3,9 +3,10 @@ import { useNavigate, useParams } from 'react-router';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { deleteRoomImgFetcher } from '@utils/roomDataFetcher';
-import { deleteUserImage, leaveRoomFetcher } from '@utils/userDataFetcher';
+import { leaveRoomFetcher } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
 import { Wrapper } from './styles';
+import { deleteUserImage } from '@utils/imageFetcher';
 
 const AlertBox = () => {
   const userId = sessionStorage.getItem('user_id');
