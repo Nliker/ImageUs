@@ -8,7 +8,7 @@ import { RiKakaoTalkFill } from 'react-icons/ri';
 import { SiNaver } from 'react-icons/si';
 
 import UserFormBox from '@components/UserFormBox';
-import { logInRequestFetcher } from '@utils/logInFetcher';
+import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
 
@@ -20,7 +20,6 @@ const LogIn = () => {
     logInRequestFetcher,
   );
 
-  const [checked, setChecked] = useState<boolean>(false);
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
@@ -30,10 +29,6 @@ const LogIn = () => {
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])",
   );
-
-  const checkHandler = useCallback(() => {
-    return setChecked((prev) => !prev);
-  }, []);
 
   const emailValidation = useCallback((value: string) => {
     if (!value) {
@@ -83,12 +78,15 @@ const LogIn = () => {
       alert('비밀번호를 다시 확인해주세요.');
     } else {
       await trigger({ email: emailValue, password: passwordValue });
-      await mutate('/user/my');
     }
   };
 
   useEffect(() => {
-    if (logInSuccess) navigate('/main_page');
+    if (logInSuccess) {
+      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
+        navigate('/', { replace: true });
+      });
+    }
   }, [logInSuccess]);
 
   return (
@@ -142,7 +140,7 @@ const LogIn = () => {
         <span className="social_sign-in_title">간편 로그인</span>
         <div className="social_icon_box">
           <a
-            href={`/oauth-login?coperation=kakao`}
+            href={`/backapi/oauth-login?coperation=kakao`}
             className="kakao_icon social_icon_a"
           >
             <IconContext.Provider
@@ -155,7 +153,7 @@ const LogIn = () => {
             </IconContext.Provider>
           </a>
           <a
-            href="/oauth-login?coperation=naver"
+            href="/backapi/oauth-login?coperation=naver"
             className="naver_icon social_icon_a"
           >
             <IconContext.Provider
