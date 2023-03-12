@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const searchFetcher = async (url: string) => {
   return axios
-    .get(url)
+    .get('/backapi' + url)
     .then((res) => {
       const { result } = res.data;
       const searchData = result.slice(0, 5);
@@ -10,7 +10,7 @@ const searchFetcher = async (url: string) => {
       return [...searchData];
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
     });
 };
 
