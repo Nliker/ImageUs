@@ -85,6 +85,7 @@ export const PreviewBox = styled.div`
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      gap: 0.3rem;
 
       span:first-of-type {
         margin-bottom: 5px;
@@ -93,6 +94,8 @@ export const PreviewBox = styled.div`
   }
 
   ul li.preview_li {
+    border-bottom: 1px solid #e9ecef;
+
     &:hover {
       background-color: #f7f7f9;
       cursor: pointer;
