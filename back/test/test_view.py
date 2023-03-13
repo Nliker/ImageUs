@@ -3,7 +3,7 @@ sys.path.append((os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 import json
 from app import create_app
 import pytest
-from sqlalchemy import create_engine,text
+from sqlalchemy import text
 import config
 import shutil
 import bcrypt
@@ -289,7 +289,7 @@ def teardown_function():
 #검색 확인
 def test_get_user_search(api):
     search_keyword="test_odjqwopjd"
-    resp=api.get(f"/user/search?email={search_keyword=}")
+    resp=api.get(f"/backapi/user/search?email={search_keyword}")
     
     assert resp.status_code==200
     
@@ -297,7 +297,7 @@ def test_get_user_search(api):
     assert 'result' in resp_json
     assert type(resp_json['result'])==list
     
-    resp=api.get(f"/user/search")
+    resp=api.get(f"/backapi/user/search")
     
     assert resp.status_code==400
     
@@ -306,30 +306,30 @@ def test_get_user_search(api):
 def test_get_user_auth(api):
     #db상에 존재하지 않는 이메일일 경우 확인
     email="test5@test.com"
-    resp=api.get(f"/user/auth?email={email}")
+    resp=api.get(f"/backapi/user/auth?email={email}")
     assert resp.status_code==200
     
     #db상에 존재하는 경우 확인
     email="test1@naver.com"
-    resp=api.get(f"/user/auth?email={email}")
+    resp=api.get(f"/backapi/user/auth?email={email}")
     assert resp.status_code==402
     
 def test_post_user_auth(api):
     #이미 인증번호 발급한 이메일 활성화
     email="test5@test.com"
-    resp=api.get(f"/user/auth?email={email}")
+    resp=api.get(f"/backapi/user/auth?email={email}")
     assert resp.status_code==200
     
     email_auth_info=get_email_auth_info(email)
     
-    resp=api.post(f"/user/auth?email={email}",
+    resp=api.post(f"/backapi/user/auth?email={email}",
             data=json.dumps({'auth_password':email_auth_info['auth_password']}),
             content_type='application/json')
     
     assert resp.status_code==200
     
     #인증번호 불일치
-    resp=api.post(f"/user/auth?email={email}",
+    resp=api.post(f"/backapi/user/auth?email={email}",
             data=json.dumps({'auth_password':'wrong'}),
             content_type='application/json')
     
@@ -337,7 +337,7 @@ def test_post_user_auth(api):
     
     #인증번호 발급 안한 이메일 활성화
     email="test6@test.com"
-    resp=api.post(f"/user/auth?email={email}",
+    resp=api.post(f"/backapi/user/auth?email={email}",
             data=json.dumps({'auth_password':'wrong'}),
             content_type='application/json')
     
@@ -353,21 +353,22 @@ def test_post_user_sign_up(api):
         'password':'test_password',
         'profile':'hi'
     }
-    resp=api.get(f"/user/auth?email={new_user['email']}")
+    resp=api.get(f"/backapi/user/auth?email={new_user['email']}")
     assert resp.status_code==200
     
     email_auth_info=get_email_auth_info(new_user['email'])
-    resp=api.post(f"/user/auth?email={new_user['email']}",
+    resp=api.post(f"/backapi/user/auth?email={new_user['email']}",
             data=json.dumps({'auth_password':email_auth_info['auth_password']}),
             content_type='application/json')
     assert resp.status_code==200
     
-    resp=api.post('/user/sign-up',
+    resp=api.post('/backapi/user/sign-up',
             data=json.dumps(new_user),
             content_type='application/json')
     assert resp.status_code==200
 
     resp_json=json.loads(resp.data.decode('utf-8'))
+    
     assert resp_json=={
         'user_info':
         {
@@ -375,6 +376,7 @@ def test_post_user_sign_up(api):
             'name':new_user['name'],
             'email':new_user['email'],
             'profile':new_user['profile'],
+            'user_type':'image_us'
         }
     }
 
@@ -384,7 +386,7 @@ def test_get_user(api):
     login_user_id=1
     access_token=generate_access_token(login_user_id)
     user_id=2
-    resp=api.get(f"/user/{user_id}",headers={'Authorization':access_token})
+    resp=api.get(f"/backapi/user/{user_id}",headers={'Authorization':access_token})
     assert resp.status_code==200
     
     
@@ -394,7 +396,7 @@ def test_get_user(api):
     
     #존재하지 않는 유저 조회
     user_id=100
-    resp=api.get(f"/user/{user_id}",headers={'Authorization':access_token})
+    resp=api.get(f"/backapi/user/{user_id}",headers={'Authorization':access_token})
     assert resp.status_code==404
     
 #로그인한 유저의 정보 조회
@@ -403,7 +405,7 @@ def test_get_user_my(api):
     login_user_id=1
     access_token=generate_access_token(login_user_id)
     
-    resp=api.get(f"/user/{login_user_id}",headers={'Authorization':access_token})
+    resp=api.get(f"/backapi/user/{login_user_id}",headers={'Authorization':access_token})
     assert resp.status_code==200
     
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -418,7 +420,7 @@ def test_post_login(api):
         'email':'test1@naver.com',
         'password':'test_password'
     }
-    resp=api.post('/user/login',
+    resp=api.post('/backapi/user/login',
         data=json.dumps(credential),
         content_type='application/json')
 
@@ -440,7 +442,7 @@ def test_post_refresh(api):
         'email':'test1@naver.com',
         'password':'test_password'
     }
-    resp=api.post('/user/login',
+    resp=api.post('/backapi/user/login',
         data=json.dumps(credential),
         content_type='application/json')
 
@@ -451,7 +453,7 @@ def test_post_refresh(api):
     
     pre_refresh_token=resp_json['refresh_token']
     
-    resp=api.post('/user/1/refresh',
+    resp=api.post('/backapi/user/1/refresh',
         data=json.dumps({'refresh_token':resp_json['refresh_token']}),
         content_type='application/json')
     
@@ -465,7 +467,7 @@ def test_post_refresh(api):
         'email':'test1@naver.com',
         'password':'test_password'
     }
-    resp=api.post('/user/login',
+    resp=api.post('/backapi/user/login',
         data=json.dumps(credential),
         content_type='application/json')
 
@@ -474,7 +476,7 @@ def test_post_refresh(api):
     assert 'access_token' in resp_json
     assert 'refresh_token' in resp_json
     
-    resp=api.post('/user/1/refresh',
+    resp=api.post('/backapi/user/1/refresh',
         data=json.dumps({'refresh_token':pre_refresh_token}),
         content_type='application/json')
     assert resp.status_code==401
@@ -488,7 +490,7 @@ def test_unauthorize_login(api):
 
     }
     
-    resp=api.post('/user/login',
+    resp=api.post('/backapi/user/login',
         data=json.dumps(credential),
         content_type='application/json')
     
@@ -500,33 +502,30 @@ def test_unauthorize_login(api):
 
     }
     
-    resp=api.post('/user/login',
+    resp=api.post('/backapi/user/login',
         data=json.dumps(credential),
         content_type='application/json')
     
     assert resp.status_code==404
 
-# # #유저의 정보 불러오기
-# def test_get_user(api): 
-#     #존재하는 유저 정보 확인
-#     user_id=1
-#     resp=api.get(f"/user/{user_id}")
-#     assert resp.status_code==200
-#     resp_json=json.loads(resp.data.decode('utf-8'))
-#     assert resp_json=={
-#         'user_info':
-#         {
-#             'id':1,
-#             'name':'test1',
-#             'email':'test1@naver.com',
-#             'profile':'testuser1'
-#         }
-#     }
-
-#     #존재하지 않는 유저 정보 확인
-#     user_id=100
-#     resp=api.get(f"/user/{user_id}")
-#     assert resp.status_code==404
+# #유저의 정보 불러오기
+def test_get_user(api):
+    #로그인 후 존재하는 유저 정보 조회
+    login_user_id=1
+    access_token=generate_access_token(login_user_id)
+    user_id=2
+    resp=api.get(f"/backapi/user/{user_id}",headers={'Authorization':access_token})
+    assert resp.status_code==200
+    
+    
+    resp_json=json.loads(resp.data.decode('utf-8'))
+    assert 'user_info' in resp_json
+    assert resp_json['user_info']==get_user_info(user_id)
+    
+    #존재하지 않는 유저 조회
+    user_id=100
+    resp=api.get(f"/backapi/user/{user_id}",headers={'Authorization':access_token})
+    assert resp.status_code==404
 
 #유저의 이미지 목록 불러오기
 def test_get_user_imagelist(api):
@@ -535,7 +534,7 @@ def test_get_user_imagelist(api):
     access_token=generate_access_token(user_id)
     start=0
     limit=10
-    resp=api.get(f"/user/{user_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/user/{user_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -545,7 +544,7 @@ def test_get_user_imagelist(api):
     #2번 유저의 이미지 목록 확인
     user_id=2
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/user/{user_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/user/{user_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -555,7 +554,7 @@ def test_get_user_imagelist(api):
     #로그인한 유저와 조회하는 이미지 목록의 유저가 다를 경우 확인
     user_id=1
     access_token=generate_access_token(3)
-    resp=api.get(f"/user/{user_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/user/{user_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==403
 
@@ -563,7 +562,7 @@ def test_get_user_imagelist(api):
 def test_get_user_imagelist_len(api):
     user_id=1
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/user/{user_id}/imagelist-len",
+    resp=api.get(f"/backapi/user/{user_id}/imagelist-len",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -575,7 +574,7 @@ def test_get_user_friendlist(api):
     #1번 유저의 친구 목록 정보 확인
     user_id=1
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/user/{user_id}/friendlist",
+    resp=api.get(f"/backapi/user/{user_id}/friendlist",
             headers={'Authorization':access_token})
 
     assert resp.status_code==200
@@ -587,13 +586,14 @@ def test_get_user_friendlist(api):
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         }
     ]
         }
     #2번 유저의 친구 목록 정보 확인
     user_id=2
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/user/{user_id}/friendlist",
+    resp=api.get(f"/backapi/user/{user_id}/friendlist",
             headers={'Authorization':access_token})
 
     assert resp.status_code==200
@@ -605,18 +605,20 @@ def test_get_user_friendlist(api):
             'name':'test1',
             'email':'test1@naver.com',
             'profile':'testuser1',
+            'user_type':'image_us'
         },
         {
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
             'profile':'testuser3',
+            'user_type':'image_us'
         }
     ]}
     #로그인한 유저와 조회하려는 유저가 다른 경우 확인
     user_id=1
     access_token=generate_access_token(3)
-    resp=api.get(f"/user/{user_id}/friendlist",
+    resp=api.get(f"/backapi/user/{user_id}/friendlist",
             headers={'Authorization':access_token})
 
     assert resp.status_code==403
@@ -629,7 +631,7 @@ def test_delete_user_friend(api):
     delete_frined={
         'delete_friend_user_id':2
     }
-    resp=api.delete(f"user/{user_id}/friend",
+    resp=api.delete(f"/backapi/user/{user_id}/friend",
             data=json.dumps(delete_frined),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -645,7 +647,7 @@ def test_delete_user_friend(api):
     delete_frined={
         'delete_friend_user_id':2
     }
-    resp=api.delete(f"user/{user_id}/friend",
+    resp=api.delete(f"/backapi/user/{user_id}/friend",
             data=json.dumps(delete_frined),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -657,7 +659,7 @@ def test_delete_user_friend(api):
     delete_frined={
         'delete_friend_user_id':100
     }
-    resp=api.delete(f"user/{user_id}/friend",
+    resp=api.delete(f"/backapi/user/{user_id}/friend",
             data=json.dumps(delete_frined),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -670,7 +672,7 @@ def test_post_user_friend(api):
     user_id=1
     access_token=generate_access_token(user_id)
     friend={'friend_user_id':3}
-    resp=api.post(f"/user/{user_id}/friend",
+    resp=api.post(f"/backapi/user/{user_id}/friend",
             data=json.dumps(friend),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -680,7 +682,7 @@ def test_post_user_friend(api):
     assert user_friendlist==[2,3]
     #1번 유저가 이미 친구인 유저를 친구 추가 확인
     friend={'friend_user_id':2}
-    resp=api.post(f"/user/{user_id}/friend",
+    resp=api.post(f"/backapi/user/{user_id}/friend",
             data=json.dumps(friend),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -688,7 +690,7 @@ def test_post_user_friend(api):
     assert resp.status_code==402
     #1번 유저가 존재하지 않은 유저에게 친구 추가 확인
     friend={'friend_user_id':100}
-    resp=api.post(f"/user/{user_id}/friend",
+    resp=api.post(f"/backapi/user/{user_id}/friend",
             data=json.dumps(friend),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -697,7 +699,7 @@ def test_post_user_friend(api):
     #로그인한 유저와 신청하는 유저가 다를 경우 확인
     access_token=generate_access_token(3)
     friend={'friend_user_id':1}
-    resp=api.post(f"/user/{user_id}/friend",
+    resp=api.post(f"/backapi/user/{user_id}/friend",
             data=json.dumps(friend),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -709,7 +711,7 @@ def test_get_user_roomlist(api):
     #1번 유저의 방 목록 확인
     user_id=1
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/user/{user_id}/roomlist",
+    resp=api.get(f"/backapi/user/{user_id}/roomlist",
                 headers={'Authorization':access_token})
     assert resp.status_code==200    
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -739,7 +741,7 @@ def test_get_user_roomlist(api):
     #로그인한 유저와 불러오려는 유저가 다른경우
     user_id=1
     access_token=generate_access_token(3)
-    resp=api.get(f"/user/{user_id}/roomlist",
+    resp=api.get(f"/backapi/user/{user_id}/roomlist",
                 headers={'Authorization':access_token})
     assert resp.status_code==403
 
@@ -751,7 +753,7 @@ def test_delete_user_room(api):
     }
     user_id=1
     access_token=generate_access_token(1)
-    resp=api.delete(f"/user/{user_id}/room",
+    resp=api.delete(f"/backapi/user/{user_id}/room",
         data=json.dumps(delete_user_room),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -762,7 +764,7 @@ def test_delete_user_room(api):
 
     user_id=1
     access_token=generate_access_token(3)
-    resp=api.delete(f"/user/{user_id}/room",
+    resp=api.delete(f"/backapi/user/{user_id}/room",
         data=json.dumps(delete_user_room),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -771,14 +773,14 @@ def test_delete_user_room(api):
 def test_delete_user_delete(api):
     user_id=1
     access_token=generate_access_token(1)
-    resp=api.delete(f"/user",
+    resp=api.delete(f"/backapi/user",
         data=json.dumps({'delete_user_id':user_id}),
         headers={'Authorization':access_token},
         content_type='application/json')
     
     assert resp.status_code==200
 
-    resp=api.get(f"/user/{user_id}",headers={'Authorization':access_token})
+    resp=api.get(f"/backapi/user/{user_id}",headers={'Authorization':access_token})
 
     assert resp.status_code==404
 
@@ -790,7 +792,7 @@ def test_post_room(api):
         'userlist':[1,2,3],
         'title':'testroom3'
     }
-    resp=api.post(f"/room",
+    resp=api.post(f"/backapi/room",
         data=json.dumps(new_room),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -821,7 +823,7 @@ def test_post_room_image(api):
     access_token=generate_access_token(user_id)
     room_id=1
     
-    resp=api.post(f"/room/{room_id}/image",
+    resp=api.post(f"/backapi/room/{room_id}/image",
             data={'image':(BytesIO(image),filename)},
             headers={'Authorization':access_token},
             content_type='multipart/form-data')
@@ -844,7 +846,7 @@ def test_get_room_imagelist_by_date(api):
     start=0
     limit=0
     
-    resp=api.get(f"/room/{room_id}/imagelist/bydate?start_date={start_date}&end_date={end_date}&start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{room_id}/imagelist/bydate?start_date={start_date}&end_date={end_date}&start={start}&limit={limit}",
                 headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -858,7 +860,7 @@ def test_get_room_imagelist(api):
     room_id=1
     start=0
     limit=10
-    resp=api.get(f"/room/{room_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{room_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -867,7 +869,7 @@ def test_get_room_imagelist(api):
     
     #방에 속하지 않은 3번 유저가 1번 방의 이미지 정보 목록을 불러옵니다.
     access_token=generate_access_token(3)
-    resp=api.get(f"/room/{room_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{room_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==403
 
@@ -881,7 +883,7 @@ def test_get_room_unread_imagelist(api):
         'userlist':[1,2,3],
         'title':'testroom4'
     }
-    resp=api.post(f"/room",
+    resp=api.post(f"/backapi/room",
         data=json.dumps(new_room),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -891,7 +893,7 @@ def test_get_room_unread_imagelist(api):
     
     start=0
     limit=10
-    resp=api.get(f"/room/{new_room_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{new_room_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -910,7 +912,7 @@ def test_get_room_unread_imagelist(api):
         user_id=2
         access_token=generate_access_token(user_id)
         
-        resp=api.post(f"/room/{new_room_id}/image",
+        resp=api.post(f"/backapi/room/{new_room_id}/image",
                 data={'image':(BytesIO(image),filename)},
                 headers={'Authorization':access_token},
                 content_type='multipart/form-data')
@@ -920,7 +922,7 @@ def test_get_room_unread_imagelist(api):
     #다른사람이 업로드한 사진 확인
     user_id=1
     access_token=generate_access_token(user_id)
-    resp=api.get(f"/room/{new_room_id}/unread-imagelist",
+    resp=api.get(f"/backapi/room/{new_room_id}/unread-imagelist",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -936,7 +938,7 @@ def test_get_room_marker(api):
         'userlist':[1,2,3],
         'title':'testroom4'
     }
-    resp=api.post(f"/room",
+    resp=api.post(f"/backapi/room",
         data=json.dumps(new_room),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -946,7 +948,7 @@ def test_get_room_marker(api):
     
     start=0
     limit=10
-    resp=api.get(f"/room/{new_room_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{new_room_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -965,7 +967,7 @@ def test_get_room_marker(api):
         user_id=2
         access_token=generate_access_token(user_id)
         
-        resp=api.post(f"/room/{new_room_id}/image",
+        resp=api.post(f"/backapi/room/{new_room_id}/image",
                 data={'image':(BytesIO(image),filename)},
                 headers={'Authorization':access_token},
                 content_type='multipart/form-data')
@@ -977,14 +979,14 @@ def test_get_room_marker(api):
     
     start=0
     limit=10
-    resp=api.get(f"/room/{new_room_id}/imagelist?start={start}&limit={limit}",
+    resp=api.get(f"/backapi/room/{new_room_id}/imagelist?start={start}&limit={limit}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
     resp_json=json.loads(resp.data.decode('utf-8'))
     assert 'imagelist' in resp_json
     
-    resp=api.get(f"/room/{new_room_id}/marker",headers={'Authorization':access_token})
+    resp=api.get(f"/backapi/room/{new_room_id}/marker",headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
     
@@ -998,7 +1000,7 @@ def test_get_room_userlist(api):
     user_id=1
     access_token=generate_access_token(user_id)
     room_id=1
-    resp=api.get(f"/room/{room_id}/userlist",
+    resp=api.get(f"/backapi/room/{room_id}/userlist",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     resp_json=json.loads(resp.data.decode('utf-8'))
@@ -1020,7 +1022,7 @@ def test_get_room_userlist(api):
     }
     #방에 속하지 않은 3번 유저가 방의 정보 목록을 확인
     access_token=generate_access_token(3)
-    resp=api.get(f"/room/{room_id}/userlist",
+    resp=api.get(f"/backapi/room/{room_id}/userlist",
             headers={'Authorization':access_token})
     assert resp.status_code==403
 
@@ -1032,7 +1034,7 @@ def test_post_room_user(api):
     invite_user={
         'invite_userlist':[3]
     }
-    resp=api.post(f"/room/{room_id}/user",
+    resp=api.post(f"/backapi/room/{room_id}/user",
                   data=json.dumps(invite_user),
                   headers={'Authorization':access_token},
                   content_type='application/json')
@@ -1046,7 +1048,7 @@ def test_post_room_user(api):
     invite_user={
         'invite_userlist':[1,2]
     }
-    resp=api.post(f"/room/{room_id}/user",
+    resp=api.post(f"/backapi/room/{room_id}/user",
                   data=json.dumps(invite_user),
                   headers={'Authrization':access_token},
                   content_type='application/json')
@@ -1058,14 +1060,14 @@ def test_delete_room_user(api):
     access_token=generate_access_token(user_id)
     room_id=1
     delete_room_user_id=2
-    resp=api.delete(f"/room/{room_id}/user",
+    resp=api.delete(f"/backapi/room/{room_id}/user",
                     data=json.dumps({'delete_room_user_id':delete_room_user_id}),
                   headers={'Authorization':access_token},
                   content_type='application/json')
 
     assert resp.status_code==200
     
-    resp=api.get(f"/room/{room_id}/userlist",
+    resp=api.get(f"/backapi/room/{room_id}/userlist",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -1092,7 +1094,7 @@ def test_delete_room_image(api):
     access_token=generate_access_token(user_id)
     room_id=1
 
-    resp=api.delete(f"/room/{room_id}/image",
+    resp=api.delete(f"/backapi/room/{room_id}/image",
         data=json.dumps(delete_image),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -1103,7 +1105,7 @@ def test_delete_room_image(api):
     delete_image={
         'delete_room_image_id':1
     }
-    resp=api.delete(f"/room/{room_id}/image",
+    resp=api.delete(f"/backapi/room/{room_id}/image",
         data=json.dumps(delete_image),
         headers={'Authorization':access_token},
         content_type='application/json')
@@ -1121,7 +1123,7 @@ def test_post_image(api):
 
     user_id=1
     access_token=generate_access_token(user_id)
-    resp=api.post(f"/image",
+    resp=api.post(f"/backapi/image",
             data={'image':(BytesIO(image),filename)},
             headers={'Authorization':access_token},
             content_type='multipart/form-data')
@@ -1131,7 +1133,7 @@ def test_post_image(api):
     resp_json=json.loads(resp.data.decode('utf-8'))
     assert 'image_info' in resp_json
     
-    resp=api.post(f"/image",
+    resp=api.post(f"/backapi/image",
             data={'image':(BytesIO(image),None)},
             headers={'Authorization':access_token},
             content_type='multipart/form-data')
@@ -1147,7 +1149,7 @@ def test_delete_room_user(api):
     delete_room_user={
         'delete_room_user_id':2
     }
-    resp=api.delete(f"/room/{room_id}/user",
+    resp=api.delete(f"/backapi/room/{room_id}/user",
             data=json.dumps(delete_room_user),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -1159,7 +1161,7 @@ def test_delete_room_user(api):
         'delete_room_user_id':2
     }
     room_id=2
-    resp=api.delete(f"/room/{room_id}/user",
+    resp=api.delete(f"/backapi/room/{room_id}/user",
             data=json.dumps(delete_room_user),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -1174,7 +1176,7 @@ def test_delete_image(api):
         'delete_image_id':2
     }
 
-    resp=api.delete(f"/image",
+    resp=api.delete(f"/backapi/image",
             data=json.dumps(delete_image),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -1188,7 +1190,7 @@ def test_delete_image(api):
         'delete_image_id':1
     }
     
-    resp=api.delete(f"/image",
+    resp=api.delete(f"/backapi/image",
             data=json.dumps(delete_image),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -1199,7 +1201,7 @@ def test_delete_image(api):
         'delete_image_id':100
     }
     
-    resp=api.delete(f"/image",
+    resp=api.delete(f"/backapi/image",
             data=json.dumps(delete_image),
             headers={'Authorization':access_token},
             content_type='application/json')
@@ -1210,7 +1212,7 @@ def test_get_image(api):
     user_id=1
     access_token=generate_access_token(user_id)
     image_id=1
-    resp=api.get(f"/image/{image_id}",
+    resp=api.get(f"/backapi/image/{image_id}",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -1219,13 +1221,13 @@ def test_get_image(api):
     #사진의 방에 속하지 않은 사람이 불러옵니다.
     access_token=generate_access_token(3)
     image_id=1
-    resp=api.get(f"/image/{image_id}",
+    resp=api.get(f"/backapi/image/{image_id}",
             headers={'Authorization':access_token})
     assert resp.status_code==403
     #존재하지 않는 사진을 불러옵니다.
     access_token=generate_access_token(3)
     image_id=100
-    resp=api.get(f"/image/{image_id}",
+    resp=api.get(f"/backapi/image/{image_id}",
             headers={'Authorization':access_token})
     assert resp.status_code==404
 
@@ -1235,7 +1237,7 @@ def test_get_image_roomlist(api):
     user_id=2
     access_token=generate_access_token(user_id)
     image_id=2
-    resp=api.get(f"/image/{image_id}/roomlist",
+    resp=api.get(f"/backapi/image/{image_id}/roomlist",
             headers={'Authorization':access_token})
     assert resp.status_code==200
     
@@ -1257,13 +1259,13 @@ def test_get_image_roomlist(api):
     }
     #사진의 주인이 아닌 3번 유저가 사진의 방 권한 확인
     access_token=generate_access_token(3)
-    resp=api.get(f"/image/{image_id}/roomlist",
+    resp=api.get(f"/backapi/image/{image_id}/roomlist",
                 headers={'Authorization':access_token})
     assert resp.status_code==403
     #존재하지 않는 사진에 대한 방 권한 확인
     image_id=100
     access_token=generate_access_token(3)
-    resp=api.get(f"/image/{image_id}/roomlist",
+    resp=api.get(f"/backapi/image/{image_id}/roomlist",
                 headers={'Authorization':access_token})
     assert resp.status_code==404
 
@@ -1275,7 +1277,7 @@ def test_post_image_roomlist(api):
     image_id=2
     update_roomlist={'update_roomlist':[1]}
 
-    resp=api.post(f"/image/{image_id}/roomlist",
+    resp=api.post(f"/backapi/image/{image_id}/roomlist",
                 data=json.dumps(update_roomlist),
                 headers={'Authorization':access_token},
                 content_type='application/json')
@@ -1284,14 +1286,14 @@ def test_post_image_roomlist(api):
     assert image_roomlist==[1]
     #사진의 주인이 아닌 3번 유저가 사진의 방 권한 목록을 업데이트 확인
     access_token=generate_access_token(3)
-    resp=api.post(f"/image/{image_id}/roomlist",
+    resp=api.post(f"/backapi/image/{image_id}/roomlist",
                 data=json.dumps(update_roomlist),
                 headers={'Authorization':access_token},
                 content_type='application/json')
     assert resp.status_code==403
     #존재하지 않는 사진에 대한 사진의 방 권한 목록 확인
     image_id=100
-    resp=api.post(f"/image/{image_id}/roomlist",
+    resp=api.post(f"/backapi/image/{image_id}/roomlist",
                 data=json.dumps(update_roomlist),
                 headers={'Authorization':access_token},
                 content_type='application/json')

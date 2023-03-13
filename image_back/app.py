@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,Blueprint
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from model import ImageDao
@@ -14,8 +14,9 @@ def create_app(test_config=None):
     app=Flask(__name__)
 
     CORS(app)
-    
-    api = Api(app, title='API 문서', description='Swagger 문서', doc="/api-docs")
+    blueprint = Blueprint('imageapi', __name__, url_prefix='/imageapi')
+    api = Api(blueprint, title='ImageUs image_server api-docs', description='Swagger 문서', doc="/api-docs")
+    app.register_blueprint(blueprint)
 
     if test_config is None:
         app.config.from_pyfile("config.py")

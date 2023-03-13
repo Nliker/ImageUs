@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>ElasticSearch Flask Autosuggestions</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <input class="search-box" size="100" height="100">
+    <ul class="results"></ul>
+    <script>
+      $(document).ready(function() {
+        let debounce;
+        $('.search-box').on('keydown', function (e) { 
+          clearTimeout(debounce)
+          debounce = setTimeout(() => {
+                  getAutoComplete();  
+          }, 300);
+        })
+      })
+
+      function getAutoComplete() {
+              const query = $('.search-box').val();
+              fetch(`https://codakcodak.site/backapi/user/search?email=${encodeURIComponent(query.trim())}`)
+                .then((resp) => resp.json())
+                .then((data) => 
+                  {
+                    console.log(data.result)
+                    $('.results').empty();
+                    for (let i = 0; i < data.result.length; i++) {
+                            $('.results').append(`<li>email:${data.result[i].email} name:${data.result[i].name} id:${data.result[i].id}</li>`)
+                    }
+                  })
+      }
+    </script>
+  </body>
+</html>
