@@ -108,8 +108,9 @@ const SearchBox = () => {
                     onMouseDown={onClickPreviewItem(data)}
                   >
                     <div className="search_result_space">
-                      <span>email: {data.email}</span>
+                      <span>이메일: {data.email}</span>
                       <span>이름: {data.name}</span>
+                      <span>가입유형: {data.user_type}</span>
                     </div>
                   </li>
                 ))
