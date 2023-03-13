@@ -35,7 +35,10 @@ const ImageRoom = () => {
   };
 
   const onClickUploadModal = () => {
-    mutate('modalState', { currentModalState: 'upload' });
+    mutate('modalState', {
+      currentModalState: 'upload',
+      uploadLocation: 'room',
+    });
   };
 
   if (!checkValideRoomId()) {

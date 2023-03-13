@@ -1,12 +1,12 @@
 import React, { DragEvent, useState, useEffect, useRef } from 'react';
-import { useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { useParams } from 'react-router';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 
-import { postUploadImage } from '@utils/imageFetcher';
+import { postUploadRoomImage, postUploadUserImage } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
 import {
   HeaderContainer,
@@ -25,9 +25,15 @@ import useInput from '@hooks/useInput';
 const UploadModal = () => {
   const { roomId } = useParams<{ roomId: string | undefined }>();
   const { mutate } = useSWRConfig();
-  const { trigger: uploadImageTrigger } = useSWRMutation(
+
+  const { data: modalInfo } = useSWR('modalState');
+  const { trigger: uploadRoomImageTrigger } = useSWRMutation(
     `/room/${roomId}/image`,
-    postUploadImage,
+    postUploadRoomImage,
+  );
+  const { trigger: uploadUserImageTrigger } = useSWRMutation(
+    `/image`,
+    postUploadUserImage,
   );
 
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(
@@ -65,10 +71,17 @@ const UploadModal = () => {
       alert('이미지를 등록해주세요');
       return;
     }
-    uploadImageTrigger({ uploadImageFile }).then(() => {
-      mutate(`/room/${roomId}/unread-imagelist`);
-    });
-    mutate('modalState', { currentModalState: '' });
+    if (modalInfo?.uploadLocation === 'room') {
+      uploadRoomImageTrigger({ uploadImageFile }).then(() => {
+        mutate(`/room/${roomId}/unread-imagelist`);
+        mutate('modalState', { currentModalState: '' });
+      });
+    } else {
+      uploadUserImageTrigger({ uploadImageFile }).then(() => {
+        mutate('modalState', { currentModalState: '' });
+        window.location.reload();
+      });
+    }
   };
 
   const onDropData = (e: DragEvent<HTMLDivElement>) => {
@@ -139,7 +152,11 @@ const UploadModal = () => {
             <ModalHeaderWrapper>
               <ModalHeader>
                 <ModalTitle>
-                  <h1>방에 사진 업로드</h1>
+                  <h1>
+                    {modalInfo?.uploadLocation === 'room'
+                      ? '방에 사진 업로드'
+                      : '개인 저장소에 사진 업로드'}
+                  </h1>
                 </ModalTitle>
               </ModalHeader>
             </ModalHeaderWrapper>

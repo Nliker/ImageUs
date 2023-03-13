@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { NavLink } from 'react-router-dom';
@@ -30,6 +30,8 @@ import {
   WrapperBox,
 } from './styles';
 import { getImageData } from '@utils/imageFetcher';
+import { SlCloudUpload } from 'react-icons/sl';
+import { Button } from '@styles/Button';
 
 const MyPage = () => {
   const { pathname } = useLocation();
@@ -110,6 +112,13 @@ const MyPage = () => {
     });
   }, [requestImageList]);
 
+  const onClickUploadModal = () => {
+    mutate('modalState', {
+      currentModalState: 'upload',
+      uploadLocation: 'user',
+    });
+  };
+
   return (
     <AppLayout>
       <WrapperBox>
@@ -146,6 +155,9 @@ const MyPage = () => {
                 </ul>
               </ProfileInfo>
             </ProfileBox>
+            <div className="upload_image">
+              <Button onClick={onClickUploadModal}>이미지 업로드하기</Button>
+            </div>
             <EachRoomPictureList>
               <SubMenu>
                 <NavLink

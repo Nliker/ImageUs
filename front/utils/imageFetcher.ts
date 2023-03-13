@@ -7,15 +7,15 @@ interface AxiosCustomRequestConfig extends AxiosRequestConfig {
   retryCount: number;
 }
 
-const postUploadImage = async (
+const postUploadRoomImage = async (
   url: string,
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
   try {
-    const { token, message } = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
-      throw new Error(message);
+      throw new Error();
     }
 
     await axios.post('/backapi' + url, arg.uploadImageFile, {
@@ -128,4 +128,36 @@ const getImageData = async (
   }
 };
 
-export { postUploadImage, deleteUserImage, getImageData };
+const postUploadUserImage = async (
+  url: string,
+  { arg }: { arg: { uploadImageFile: FormData } },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.post('/backapi' + url, arg.uploadImageFile, {
+      headers: {
+        Authorization: token,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.status === 404) {
+      alert('파일이 존재하지 않습니다.');
+    } else if (err instanceof Error) {
+      alert('이미지를 업로드하지 못하였습니다..');
+    }
+    return;
+  }
+};
+
+export {
+  postUploadRoomImage,
+  postUploadUserImage,
+  deleteUserImage,
+  getImageData,
+};
