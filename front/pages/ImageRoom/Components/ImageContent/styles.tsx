@@ -9,13 +9,6 @@ export const ContentBox = styled.div`
 
   overflow: hidden;
 
-  a {
-    text-decoration: none;
-    color: black;
-  }
-  a:active {
-    color: black;
-  }
   img {
     position: absolute;
 

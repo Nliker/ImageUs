@@ -92,6 +92,8 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
         ref={thisArr.length - 1 === index ? observerRef : undefined}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
+        onTouchStart={() => setIsHover(true)}
+        onTouchEnd={() => setIsHover(false)}
       >
         <ImageCard>
           <img src={data.link} />
