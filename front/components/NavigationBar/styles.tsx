@@ -34,41 +34,35 @@ export const BottomContainer = styled.div`
     color: #47443e;
   }
 
-  .user_icon {
-    display: inline-flex;
-    align-items: center;
+  .user_icon_d {
+    display: flex;
     justify-content: center;
+    align-items: center;
 
-    flex: 0.8;
-    border-left: solid 1px #e4efef;
+    width: 66px;
+    border-left: 1px solid #dddddd;
 
-    .user_icon_d {
-      position: relative;
-      display: inline-block;
-
-      width: 24px;
-      height: 24px;
-
-      .user_icon_s {
-        display: inline-block;
-        height: 100%;
-
-        cursor: pointer;
-      }
-    }
+    cursor: pointer;
   }
 
   @media screen and (min-width: 1024px) {
+    box-sizing: border-box;
+
+    padding: 0 4rem;
     box-shadow: 0 2px 4px 0 rgb(33 37 41 / 8%);
+
+    .user_icon_d {
+      border-right: 1px solid #dddddd;
+    }
   }
 `;
 
-export const MobileNavList = styled.ul`
+export const NavList = styled.ul`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  flex: 10;
 
+  width: calc(100% - 66px);
   height: 100%;
   margin: 0;
   padding: 0;
@@ -82,20 +76,21 @@ export const MobileNavList = styled.ul`
     justify-content: start;
 
     gap: 4rem;
-    padding-left: 4rem;
   }
 `;
 
-export const MobileNavItem = styled.li`
+export const NavItem = styled.li`
   position: relative;
   display: flex;
   align-items: center;
 
   height: 100%;
-  padding: 0.5rem 1rem;
 
   list-style: none;
   box-sizing: border-box;
+
+  &:last-of-type {
+  }
 
   svg {
     display: block;
@@ -127,12 +122,12 @@ export const MobileNavItem = styled.li`
 
 export const UserBox = styled.div`
   position: absolute;
-  top: -153px;
+  top: -133px;
   flex-direction: column;
   z-index: 1000;
 
   height: auto;
-  right: -10px;
+  right: 12px;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 30%),
@@ -158,8 +153,8 @@ export const UserBox = styled.div`
   }
 
   @media screen and (min-width: 1024px) {
-    top: 42px;
-    right: -17px;
+    top: 67px;
+    right: 67px;
 
     &::before {
       content: '';
