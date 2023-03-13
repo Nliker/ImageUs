@@ -26,6 +26,11 @@ export const ContentBox = styled.main`
   li {
     list-style: none;
   }
+
+  .upload_image {
+    text-align: center;
+    margin-bottom: 50px;
+  }
 `;
 
 export const ProfileBox = styled.div`
@@ -33,7 +38,7 @@ export const ProfileBox = styled.div`
   justify-content: center;
   align-items: center;
 
-  padding: 2rem 0 4rem 0;
+  padding: 2rem 0;
 `;
 
 export const EachRoomPictureList = styled.div`
