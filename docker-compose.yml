@@ -31,28 +31,43 @@ services:
     container_name: nginx_imageus
     restart:  always
     ports:
-      - "0.0.0.0:4000:4000"
-      - "0.0.0.0:4001:4001"
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
     depends_on:
       - imageus_back
       - imageus_image
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     platform: linux/amd64
-    
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  
   elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     container_name: elasticsearch
     environment:
+      - cluster.name=es-docker
+      - node.name=node1
+      - bootstrap.memory_lock=true
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     ports:
       - 9200:9200
     restart: always
     platform: linux/amd64
     healthcheck:
       test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
-      interval: 10s
-      timeout: 10s
-      retries: 50
+      interval: 20s
+      timeout: 5s
+      retries: 100
 
   elasticsearch_config:
     build:  ./elasticsearch_config
@@ -61,6 +76,4 @@ services:
     depends_on:
       elasticsearch: 
         condition: service_healthy
-    extra_hosts:
-        - host.docker.internal:host-gateway 
-    entrypoint: [ "bash","init_index.sh"]     
+    entrypoint: [ "bash","init_index.sh"]    

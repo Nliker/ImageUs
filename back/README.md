@@ -1,135 +1,84 @@
-# insta_cloud
-개인의 이미지를 저장하고 공유 할 수 있는 서비스입니다.
+# BackServer
 
-#지식
-### 1.left join 시 왼쪽의 필터링을 먼저 해도 결국엔 무시된다.
-### 2.join 으로 나운 결과물은 자동으로 오름차순 정렬된다.
+>## Table of Contents
 
-기능
-### 1. 유저 회원가입
-### 2. 친구
-### 3. 사진 업로드
-### 4. 방 생성
-### 5. 선택적 사진 공유
-### 6. 앨범 단위(추후 완성)
-### 7. 방장이 방을 나갈시에 방장 바꾸기
-### 8. 친구 검색 서버 구축
-### 9. 이미지 서버 구축
+- [Settings](#Settings)
+- [Installation](#Installation)
+- [Erd](#Erd)
+- [Reference](#Reference)
+- [Memory monitoring](#Memory-monitoring)
 
-추가기능
-### 0.이미지 삭제 시 14일 유효기간 기능
-### 1.유저삭제
-### 2.유저 프로파일 이미지 업로드
-### 3.이미지 서버 구축
-### 4.소셜로그인
-### 5.이메일 인증
+<br/>
 
-## ERD
-## database 
-### insta_cloud
-## table
+>## Settings
 
-1. users
-CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
-  `hashed_password` varchar(255) NOT NULL,
-  `profile` varchar(255) NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
-  `name` varchar(255) NOT NULL,
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `type` varchar(255) NOT NULL DEFAULT 'image_us',
-  PRIMARY KEY (`id`),
-  KEY `email` (`email`)
-) 
+<br/>
 
+* Elastic search 7.10.2
 
-2. users_friend_list
-CREATE TABLE `users_friend_list` (
-  `user_id` int NOT NULL,
-  `friend_user_id` int NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`,`friend_user_id`)
-)
+* Mysql 8.0.30(arm)
 
-3. images
-CREATE TABLE `images` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `link` varchar(300) NOT NULL,
-  `user_id` int NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `public` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-)
+* Python 3.10.4
 
-4. rooms
-CREATE TABLE `rooms` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(300) NOT NULL,
-  `host_user_id` int NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) 
+<br/>
 
-5. rooms_user_list
-CREATE TABLE `rooms_user_list` (
-  `room_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`room_id`,`user_id`),
-  KEY `user_id` (`user_id`)
-)
+>## Installation
 
+<br/>
 
-6. images_room_list
-CREATE TABLE `images_room_list` (
-  `image_id` int NOT NULL,
-  `room_id` int NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`image_id`,`room_id`),
-  KEY `room_id` (`room_id`)
-)
+```
+#프로젝트 경로 입장
+cd cloudy
 
-7. email_auth
-CREATE TABLE `email_auth` (
-  `email` varchar(255) NOT NULL,
-  `auth_password` varchar(4) NOT NULL,
-  `activated` int NOT NULL DEFAULT '0',
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  PRIMARY KEY (`email`)
-)
+#Image_Us의 mysql database 생성(db이름은 imageus_back입니다.)
+mysql -u root -p < ./mysql/mysql-init-files/imageus_back.sql
 
-8. rooms_user_history
-CREATE TABLE `rooms_user_history` (
-  `room_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `last_unread_row` int NOT NULL DEFAULT '0',
-  `read_start_row` int NOT NULL DEFAULT '-1',
-  `marker_row` int NOT NULL DEFAULT '0',
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  PRIMARY KEY (`room_id`,`user_id`)
-) 
+#Image_Us의 elasticsearch index 생성(index이름은 image_us입니다.)
+Bash ./elasticsearch_config/init_index.sh
 
-9.users_refresh_token_auth
-CREATE TABLE `users_token_auth` (
-  `user_id` int NOT NULL,
-  `refresh_token_secret_key` varchar(255) NOT NULL,
-  `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`)
-)
+#필요한 python의 패키지 설치
+pip install -r ./back/requirements.txt
+Pip install -r ./image_back/requirements.txt
+
+#back-server 시작
+Cd cloudy/back
+gunicorn app:create_app
+
+#image-servcer 시작
+Cd cloudy/image_back
+gunicorn app:create_app
+```
+
+<br/>
+
+>## Erd
+
+<br/>
+
+&nbsp; <img width="500px" height="500px" src="https://user-images.githubusercontent.com/77044696/224538033-1fa4c70c-c16e-434f-b166-fc666fa32282.png" />
+
+<br/>
+
+>## Reference
+
+## &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ImageUs](https://velog.io/@tjwjdgus83/series/ImageUs)
+
+<br/>
+
+>## Memory monitoring
+
+```
+#모니터링 파일 경로 입장
+cd Cloudy/back/managements
+
+#파일 실행시 -i는 밀리초 단위로 간격,-t는 초단위로 모니터링 시간,-l은 기존의 저장된 np파일을 그래프로 보여주는 인자들입니다.
+python memory_monitor.py -i=1000 -t=3600
+
+#-i=100,-t=60일때 100ms단위로 그래프로 계속 표현되고 60s 동안의 데이터가 memory_history폴더에 저장됩니다.
+```
+
+*-i,-t는 -l과 같이 사용할 수 없습니다.
+
+@참고자료(https://velog.io/@tjwjdgus83/ImageUs-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81)
+
+<br/>

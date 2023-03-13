@@ -1,6 +1,6 @@
 FROM mysql:latest
 
-ENV MYSQL_ROOT_PASSWORD dkdrmaghEl83!
+ENV MYSQL_ROOT_PASSWORD test_mysql
 
 RUN rm /etc/my.cnf
 
