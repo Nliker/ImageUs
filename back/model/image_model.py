@@ -6,7 +6,7 @@ class ImageDao:
         self.db=database
 
     def insert_image(self,new_image):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             insert into images(
                 user_id,
                 link
@@ -14,12 +14,14 @@ class ImageDao:
                 :user_id,
                 :link
             )
-            """),new_image).lastrowid
+            """),new_image)
+        row=result.lastrowid
+        result.close()
         new_image_id=row
         return new_image_id
     
     def get_user_imagelist(self,user_id,pages):
-        rows=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 id,
                 link,
@@ -34,7 +36,9 @@ class ImageDao:
                     'user_id':user_id,
                     'limit':pages['limit'],
                     'start':pages['start']
-                }).fetchall()
+                })
+        rows=result.fetchall()
+        result.close()
 
         user_image_info_list=[
             {
@@ -48,7 +52,7 @@ class ImageDao:
         return user_image_info_list
     
     def get_image_info(self,image_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 id,
                 link,
@@ -59,7 +63,9 @@ class ImageDao:
             and deleted=0
             """),{
                     'image_id':image_id
-                }).fetchone()
+                })
+        row=result.fetchone()
+        result.close()
         
         image_info={
             'id':row['id'],
@@ -71,18 +77,21 @@ class ImageDao:
         return image_info
     
     def delete_image(self,delete_image_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update images
             set deleted=1
             where id=:delete_image_id
             and deleted=0
             """),{
                     'delete_image_id':delete_image_id
-                }).rowcount
+                })
+        row=result.rowcount
+        result.close()
+
         return row
     
     def get_image_roomlist(self,image_id):
-        rows=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 i_r.room_id as id,
                 r.title,
@@ -96,7 +105,9 @@ class ImageDao:
             order by title
             """),{
                     'image_id':image_id
-                }).fetchall()
+                })
+        rows=result.fetchall()
+        result.close()
 
         image_room_info_list=[{
             'id':image_room_info['id'],
@@ -108,7 +119,7 @@ class ImageDao:
     
     def insert_room_image(self,room_id,image_id):
         try:
-            row=self.db.execute(text("""
+            result=self.db.execute(text("""
             insert into images_room_list(
                 image_id,
                 room_id
@@ -119,13 +130,15 @@ class ImageDao:
             """),{
                     'image_id':image_id,
                     'room_id':room_id
-                }).rowcount
+                })
+            row=result.rowcount
+            result.close()
             return 1
         except IntegrityError as e:
             return 0
 
     def delete_room_image(self,room_id,image_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update images_room_list
             set deleted=1
             where image_id=:image_id
@@ -134,22 +147,27 @@ class ImageDao:
             """),{
                     'image_id':image_id,
                     'room_id':room_id
-                }).rowcount
+                })
+        row=result.rowcount
+        result.close()
 
         return row
 
     def get_room_imagelist(self,room_id,pages):
-        rows=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 i_r.image_id as id,
                 i.link,
                 i.user_id,
-                i.created_at
+                u.name,
+                i_r.created_at
             from images_room_list as i_r
             left join images  as i
             on (i_r.image_id=i.id 
             and i_r.deleted=0
             and i.deleted=0)
+            left join users as u
+            on (i.user_id=u.id)
             where i_r.room_id=:room_id
             order by i_r.created_at
             limit :start,:limit
@@ -157,19 +175,64 @@ class ImageDao:
                     'room_id':room_id,
                     'limit':pages['limit'],
                     'start':pages['start']
-                }).fetchall()
+                })
+        rows=result.fetchall()
+        result.close()
 
         room_image_info_list=[{
             'id':room_image_info['id'],
             'link':room_image_info['link'],
             'user_id':room_image_info['user_id'],
+            'user_name':room_image_info['name'],
             'created_at':room_image_info['created_at']
         } for room_image_info in rows]
 
         return room_image_info_list
     
+    def get_room_imagelist_by_date(self,room_id,dates,pages):
+        
+        result=self.db.execute(text("""
+            select
+                i_r.image_id as id,
+                i.link,
+                i.user_id,
+                u.name,
+                i_r.created_at
+            from images_room_list as i_r
+            left join images  as i
+            on (i_r.image_id=i.id 
+            and i_r.deleted=0
+            and i.deleted=0)
+            left join users as u
+            on (i.user_id=u.id)
+            where i_r.room_id=:room_id
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')>=DATE_FORMAT(:start_date,'%Y-%m-%d')
+            and DATE_FORMAT(i_r.created_at,'%Y-%m-%d')<=DATE_FORMAT(:end_date,'%Y-%m-%d')
+            order by i_r.created_at
+            limit :start,:limit
+            """),{
+                    'room_id':room_id,
+                    'start_date':dates['start_date'],
+                    'end_date':dates['end_date'],
+                    'limit':pages['limit'],
+                    'start':pages['start']
+                })
+    
+        rows=result.fetchall()
+        result.close()
+
+        room_image_info_list=[{
+            'id':room_image_info['id'],
+            'link':room_image_info['link'],
+            'user_id':room_image_info['user_id'],
+            'user_name':room_image_info['name'],
+            'created_at':room_image_info['created_at']
+        } for room_image_info in rows]
+        
+        return room_image_info_list
+    
     def delete_room_user_image(self,room_id,user_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update images_room_list as i_r
             left join images as i
             on i_r.image_id=i.id
@@ -177,21 +240,26 @@ class ImageDao:
             where i.user_id=:user_id
             and i_r.room_id=:room_id
             and i_r.deleted=0
-            """),{'room_id':room_id,'user_id':user_id}).rowcount
+            """),{'room_id':room_id,'user_id':user_id})
+        row=result.rowcount
+        result.close()
+        
         return row
     
     def delete_image_room(self,image_id):
-        row=self.db.execute(text("""
+        result=self.db.execute(text("""
             update images_room_list
             set deleted=1
             where image_id=:image_id
             and deleted=0
-            """),{'image_id':image_id}).rowcount
+            """),{'image_id':image_id})
+        row=result.rowcount
+        result.close()
         
         return row
 
     def image_room_userlist(self,image_id):
-        rows=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 i_r.room_id as room_id,
                 r_u.user_id as user_id
@@ -201,7 +269,9 @@ class ImageDao:
             and i_r.deleted=0
             and r_u.deleted=0)
             where i_r.image_id=:image_id
-            """),{'image_id':image_id}).fetchall()
+            """),{'image_id':image_id})
+        rows=result.fetchall()
+        result.close()
 
         image_room_userlist=[{
             'room_id':row['room_id'],
@@ -211,7 +281,7 @@ class ImageDao:
         return image_room_userlist
     
     def get_room_imagelist_len(self,room_id):
-        row_count=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 count(*)
             from images_room_list as i_r
@@ -222,11 +292,14 @@ class ImageDao:
             where i_r.room_id=:room_id
             """),{
                     'room_id':room_id
-                }).scalar()
-        return row_count
+                })
+        row=result.scalar()
+        result.close()
+        
+        return row
     
     def get_user_imagelist_len(self,user_id):
-        row_count=self.db.execute(text("""
+        result=self.db.execute(text("""
             select
                 count(*)
             from images
@@ -234,7 +307,20 @@ class ImageDao:
             and user_id=:user_id
             """),{
                     'user_id':user_id
-                }).scalar()
-        return row_count
+                })
+        row=result.scalar()
+        result.close()
+
+        return row
     
-    
+    def delete_user_imagelist(self,user_id):
+        result=self.db.execute(text("""
+            update images
+            set deleted=1
+            where user_id=:user_id
+            and deleted=0
+            """),{'user_id':user_id})
+        row=result.rowcount
+        result.close()
+        
+        return row

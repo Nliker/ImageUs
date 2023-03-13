@@ -22,7 +22,7 @@ def create_app(test_config=None):
     else:
         app.config.update(test_config)
         
-    database=create_engine(app.config['DB_URL'],encoding='utf-8',max_overflow=0)
+    database=create_engine(app.config['DB_URL'],encoding='utf-8',pool_size=app.config['POOL_SIZE'],max_overflow=app.config['MAX_OVERFLOW'])
 
     print("데이터베이스 연결 성공")
 
@@ -39,5 +39,3 @@ def create_app(test_config=None):
     image_router(api,services)
     
     return app
-
-app=create_app()

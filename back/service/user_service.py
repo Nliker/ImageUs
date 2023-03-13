@@ -1,11 +1,13 @@
 import bcrypt
+import os
 from datetime import datetime, timedelta
 import jwt
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
-
+import string
+import random
 
 class UserService:
     def __init__(self,user_dao,config):
@@ -68,36 +70,15 @@ class UserService:
         smtp.login(sender,password)
 
         msg = MIMEMultipart('alternative')
+        current_dir=os.getcwd()
+        if self.config['MODE']=='test':
+            current_dir=os.pardir
         
+        with open(current_dir+'/templates/email_auth.html', 'r') as f:
+           html = f.read()
         try:
             text=f"Hi,This is message for your email authentification of sign-up from ImageUs"
-            html='''
-            <!DOCTYPE html>
-            <html lang="ko">
-            <head>
-                <meta charset="utf-8">
-                <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-
-                <title>Email_Authentification</title>
-
-                <!-- 합쳐지고 최소화된 최신 CSS -->
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-            </head>
-            <body>
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                    <h3 class="panel-title">AUTH-PASSWORD</h3>
-                    </div>
-                    <div class="panel-body">
-                    %s
-                    </div>
-                </div>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-                <script src="js/bootstrap.min.js"></script>
-            </body>
-            </html>
-            ''' % (auth_password)
+            html=html % (auth_password)
             msg['Subject']='test_email_send'
             msg['From']=sender
             msg['To']=receiver
@@ -139,17 +120,18 @@ class UserService:
         return result
         
     
-    def is_email_exists(self,email):
-        user=self.user_dao.get_user_id_and_password(email)
+    def is_email_exists(self,email,type="image_us"):
+        user=self.user_dao.get_user_id_and_password(email,type)
         #유저가 없다면 False,있으면 True
         if user:
             return True
         else:
             return False
         
-    def create_new_user(self,new_user):
+    def create_new_user(self,new_user,type="image_us"):
         password=new_user['password']
         new_user['hashed_password']=bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+        new_user['type']=type
         new_user_id=self.user_dao.insert_user(new_user)
         return new_user_id
 
@@ -158,25 +140,98 @@ class UserService:
 
         return user
 
-    def login(self,credential):
-        user_credential=self.user_dao.get_user_id_and_password(credential['email'])
+    def login(self,credential,type="image_us"):
+        user_credential=self.user_dao.get_user_id_and_password(credential['email'],type)
         authorized=bcrypt.checkpw(credential['password'].encode('utf-8'),user_credential['hashed_password'].encode('utf-8')) if user_credential else None
 
         return authorized
     
+    def get_user_token_auth(self,user_id):
+        user_token_auth=self.user_dao.get_user_token_auth(user_id)
+        if user_token_auth and user_token_auth['deleted']==1:
+            return None
+        else:
+            return user_token_auth
+            
+    def decode_from_refresh_token(self,refresh_token,user_id):
+        user_token_auth=self.user_dao.get_user_token_auth(user_id)
+        refresh_token_secret_key=user_token_auth['refresh_token_secret_key']
+        try:
+            payload=jwt.decode(refresh_token,refresh_token_secret_key,'HS256')
+            return True
+        except:
+            return False
+        
     def generate_access_token(self,user_id):
-        jwt_expire_time= timedelta(seconds=self.config['JWT_EXPIRE_TIME'])
-        payload={
-            'user_id':user_id,
-            'exp':datetime.utcnow()+jwt_expire_time,
-            'iat':datetime.utcnow()
-        }
-        access_token=jwt.encode(payload,self.config['JWT_SECRET_KEY'],'HS256')
+        jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
+        time_now=datetime.utcnow()
+        access_token_expire=time_now+jwt_access_token_expire_time
 
-        return access_token
+        access_token_payload={
+            'user_id':user_id,
+            'exp':access_token_expire,
+            'iat':time_now
+        }
+        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],'HS256')
+
+        return {
+            'access_token':access_token,
+            'access_token_expire_time':(access_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S'),
+        }
     
-    def get_user_id_and_password(self,email):
-        user_credential=self.user_dao.get_user_id_and_password(email)
+
+    
+    def generate_token(self,user_id):
+        user_token_auth_info=self.user_dao.get_user_token_auth(user_id)
+            
+        refresh_token_len=self.config['JWT_REFRESH_TOKEN_NUM']
+        
+        refresh_token_secret_key=(''.join(random.choice(string.ascii_letters + string.digits) for _ in range(refresh_token_len)))
+
+        if user_token_auth_info ==None:
+            result=self.user_dao.insert_user_token_auth(user_id,refresh_token_secret_key)
+
+        elif user_token_auth_info['deleted']==1:
+            result=self.user_dao.update_user_token_auth(user_id,{'deleted':0,'refresh_token_secret_key':refresh_token_secret_key})
+
+        else:
+            result=self.user_dao.update_user_token_auth(user_id,{'refresh_token_secret_key':refresh_token_secret_key})
+
+        print(result)
+        
+        jwt_access_token_expire_time= timedelta(seconds=self.config['JWT_ACCESS_TOKEN_EXPIRE_TIME'])
+        jwt_refresh_token_expire_time= timedelta(seconds=self.config['JWT_REFRESH_TOKEN_EXPIRE_TIME'])
+
+        time_now=datetime.utcnow()
+
+        access_token_expire=time_now+jwt_access_token_expire_time
+        refresh_token_expire=time_now+jwt_refresh_token_expire_time
+        
+        
+        access_token_payload={
+            'user_id':user_id,
+            'exp':access_token_expire,
+            'iat':time_now
+        }
+        
+        refresh_token_payload={
+            'user_id':user_id,
+            'exp':refresh_token_expire,
+            'iat':time_now
+        }
+        print(self.config['JWT_SECRET_KEY'])
+        access_token=jwt.encode(access_token_payload,self.config['JWT_SECRET_KEY'],algorithm='HS256')
+        refresh_token=jwt.encode(refresh_token_payload,refresh_token_secret_key,algorithm='HS256')
+        
+        return {
+            'access_token':access_token,
+            'access_token_expire_time':(access_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S'),
+            'refresh_token':refresh_token,
+            'refresh_token_expire_time':(refresh_token_expire+timedelta(hours=self.config['MYSQL_TIMEZONE'])).strftime('%Y-%m-%d %H:%M:%S')
+        }
+    
+    def get_user_id_and_password(self,email,type="image_us"):
+        user_credential=self.user_dao.get_user_id_and_password(email,type)
 
         return user_credential
 
@@ -189,7 +244,14 @@ class UserService:
             return False
     
     def create_user_friend(self,user_id,friend_user_id):
-        result=self.user_dao.insert_user_friend(user_id,friend_user_id)
+        if user_id==friend_user_id:
+            return 0
+
+        if self.user_dao.get_deleted_user_friend(user_id,friend_user_id) or self.user_dao.get_deleted_user_friend(friend_user_id,user_id):
+            result=self.user_dao.update_user_deleted_friend(user_id,friend_user_id)
+        
+        else:    
+            result=self.user_dao.insert_user_friend(user_id,friend_user_id)
 
         return result
         
@@ -210,23 +272,13 @@ class UserService:
     
         return result
     
-    def get_user_room_history_row_info(self,user_id,room_id):
-        user_room_history_row_info=self.user_dao.get_user_room_history_row_info(user_id,room_id)
-
-        return user_room_history_row_info
-        
-    def create_user_room_history_row(self,user_id,room_id):
-        result=self.user_dao.insert_user_room_history_row(user_id,room_id)
-
-        return result
-
-    def update_user_room_history_row_info(self,user_id,room_id,update_row):
-        result=self.user_dao.update_user_room_history_row_info(user_id,room_id,update_row)
-
-        return result
-    
     def delete_user(self,delete_user_id):
         result=self.user_dao.delete_user(delete_user_id)
         print(result)
         return result
-                    
+    
+    def get_users_by_keyword(self,keyword):
+        result=self.user_dao.get_users_by_keyword(keyword)
+        return result
+    
+      
