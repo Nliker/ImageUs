@@ -30,7 +30,7 @@
 #프로젝트 경로 입장
 cd cloudy
 
-#Image_Us의 mysql database 생성(db이름은 imageus_back입니다.)
+#Image_Us의 mysql database 생성(db이름은 imageus_back,비밀번호는 test_mysql입니다.)
 mysql -u root -p < ./mysql/mysql-init-files/imageus_back.sql
 
 #Image_Us의 elasticsearch index 생성(index이름은 image_us입니다.)
