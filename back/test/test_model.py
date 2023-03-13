@@ -306,7 +306,8 @@ def test_insert_user(user_dao):
         'id':new_user_id,
         'name':new_user['name'],
         'email':new_user['email'],
-        'profile':new_user['profile']
+        'profile':new_user['profile'],
+        'user_type':new_user['type']
     }
 
 #1번 유저의 민감 정보 검증
@@ -329,7 +330,8 @@ def test_get_user_info(user_dao):
         'id':2,
         'name':'test2',
         'email':'test2@naver.com',
-        'profile':'testuser2'
+        'profile':'testuser2',
+        'user_type':'image_us'
     }
     #존재하지 않는 유저의 정보 확인
     user_info=user_dao.get_user_info(100)
@@ -345,6 +347,7 @@ def test_insert_user_friend(user_dao):
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         }
     ]
     #3번유저의 기존 친구 목록 확인
@@ -355,6 +358,7 @@ def test_insert_user_friend(user_dao):
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         }
     ]
     
@@ -368,12 +372,14 @@ def test_insert_user_friend(user_dao):
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         },
         {
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
             'profile':'testuser3',
+            'user_type':'image_us'
         }
     ]
 
@@ -385,12 +391,14 @@ def test_insert_user_friend(user_dao):
             'name':'test1',
             'email':'test1@naver.com',
             'profile':'testuser1',
+            'user_type':'image_us'
         },
         {
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
             'profile':'testuser2',
+            'user_type':'image_us'
         }
     ]
 
@@ -432,7 +440,8 @@ def test_deleted_user_friend(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
     #1번유저의 2번친구를 삭제
@@ -454,7 +463,8 @@ def test_update_user_deleted_friend(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
     #1번유저의 2번친구를 삭제
@@ -472,7 +482,8 @@ def test_update_user_deleted_friend(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
 
@@ -486,7 +497,8 @@ def test_get_user_friendlist(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
     #1번에서 3번을 친구 추가 후 1번과 3번의 친구 목록 정보 확인
@@ -497,13 +509,15 @@ def test_get_user_friendlist(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
         {
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
-            'profile':'testuser3'
+            'profile':'testuser3',
+            'user_type':'image_us'
         },
     ]
     user_friend_info_list=get_user_friendlist(3)
@@ -512,13 +526,15 @@ def test_get_user_friendlist(user_dao):
             'id':1,
             'name':'test1',
             'email':'test1@naver.com',
-            'profile':'testuser1'
+            'profile':'testuser1',
+            'user_type':'image_us'
         },
         {
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
 
@@ -531,7 +547,8 @@ def test_delete_user_friend(user_dao):
             'id':2,
             'name':'test2',
             'email':'test2@naver.com',
-            'profile':'testuser2'
+            'profile':'testuser2',
+            'user_type':'image_us'
         },
     ]
     #2번 유저의 기존 친구 목록 확인
@@ -541,13 +558,15 @@ def test_delete_user_friend(user_dao):
             'id':1,
             'name':'test1',
             'email':'test1@naver.com',
-            'profile':'testuser1'
+            'profile':'testuser1',
+            'user_type':'image_us'
         },
         {
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
-            'profile':'testuser3'
+            'profile':'testuser3',
+            'user_type':'image_us'
         },
     ]
     #친구 삭제 후 1번과 2번 유저 확인
@@ -561,7 +580,8 @@ def test_delete_user_friend(user_dao):
             'id':3,
             'name':'test3',
             'email':'test3@naver.com',
-            'profile':'testuser3'
+            'profile':'testuser3',
+            'user_type':'image_us'
         }
     ]
     #이미 삭제한 친구를 친구삭제 실패 확인
@@ -635,7 +655,8 @@ def test_update_user(user_dao):
         'id':1,
         'email':'test1@naver.com',
         'profile':sample_value,
-        'name':'test1'
+        'name':'test1',
+        'user_type':'image_us'
     }
 
 #유저 삭제 확인

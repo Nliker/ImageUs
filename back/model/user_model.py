@@ -52,7 +52,8 @@ class UserDao:
                 id,
                 name,
                 email,
-                profile
+                profile,
+                type
             from users
             where id=:user_id
             and deleted=0
@@ -65,7 +66,8 @@ class UserDao:
             'id':row['id'],
             'name':row['name'],
             'email':row['email'],
-            'profile':row['profile']
+            'profile':row['profile'],
+            'user_type':row['type']
         } if row else None
         
         return user_info
@@ -155,7 +157,8 @@ class UserDao:
                 u_f.friend_user_id as id,
                 u.name,
                 u.email,
-                u.profile
+                u.profile,
+                u.type
             from users_friend_list as u_f
             left join users as u
             on u_f.friend_user_id=u.id
@@ -171,7 +174,8 @@ class UserDao:
                 'id':user_friend_info['id'],
                 'name':user_friend_info['name'],
                 'email':user_friend_info['email'],
-                'profile':user_friend_info['profile']
+                'profile':user_friend_info['profile'],
+                'user_type':user_friend_info['type']
             } for user_friend_info in rows
         ]
         
