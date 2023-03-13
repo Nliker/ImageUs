@@ -9,7 +9,7 @@
 - [Domain](#Domain)
 - [Structural diagram](#Structural-diagram)
 - [Stacks](#Stacks)
-- [contributors](#contributors)
+- [Contributors](#Contributors)
 - [Demo](#Demo)
 
 <br/>
@@ -40,6 +40,16 @@
 <br/>
 
 ## &nbsp;:mag_right:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ImageUs](https://codakcodak.site)
+
+<br/>
+
+#### 다음은 테스트 아이디입니다.원하시는 아이디로 접속하셔서 사용해보세요!
+
+|유저|아이디|비밀번호|
+|-------|------|----------|
+|user1|<span style="color:yellow">test1@test.com</span>|<span style="color:yellow">testuser1</span>|
+|user2|<span style="color:green">test2@test.com</span>|<span style="color:green">testuser2</span>|
+|user3|<span style="color:blue">test3@test.com</span>|<span style="color:blue">testuser3</span>|
 
 <br/>
 
