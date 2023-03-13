@@ -53,13 +53,13 @@ const MyProfile = () => {
           <tr>
             <th>이메일</th>
             <td colSpan={2}>
-              <strong>{userInfo?.userInfo.email}</strong>
+              <strong>{userInfo?.userInfo?.email}</strong>
             </td>
           </tr>
           <tr>
             <th>가입 유형</th>
             <td>
-              <div>{userInfo?.userInfo.profile}</div>
+              <div>{userInfo?.userInfo?.user_type}</div>
             </td>
           </tr>
           <tr>
@@ -67,12 +67,14 @@ const MyProfile = () => {
             {!profileState.name ? (
               <>
                 <td>
-                  <div>{userInfo?.userInfo.name}</div>
+                  <div>{userInfo?.userInfo?.name}</div>
                 </td>
-                <td className="btn_group">
-                  <Button type="button" onClick={changeNameBox}>
-                    이름 변경
-                  </Button>
+                <td>
+                  <div className="btn_group">
+                    <Button type="button" onClick={changeNameBox}>
+                      이름 변경
+                    </Button>
+                  </div>
                 </td>
               </>
             ) : (
@@ -93,23 +95,26 @@ const MyProfile = () => {
                     </label>
                   </div>
                 </td>
-                <td className="btn_group">
-                  <Button type="button" onClick={onClickPostIntro('name')}>
-                    완료
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      setProfileState((prev) => {
-                        return {
-                          ...prev,
-                          name: false,
-                        };
-                      })
-                    }
-                  >
-                    취소
-                  </Button>
+                <td>
+                  <div className="btn_group">
+                    <Button type="button" onClick={onClickPostIntro('name')}>
+                      완료
+                    </Button>
+                    <Button
+                      type="button"
+                      className="cancel_btn"
+                      onClick={() =>
+                        setProfileState((prev) => {
+                          return {
+                            ...prev,
+                            name: false,
+                          };
+                        })
+                      }
+                    >
+                      취소
+                    </Button>
+                  </div>
                 </td>
               </>
             )}
