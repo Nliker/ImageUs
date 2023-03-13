@@ -13,7 +13,7 @@ export const WrapperBox = styled.section`
 export const ContentBox = styled.main`
   box-sizing: border-box;
 
-  min-width: 400px;
+  min-width: 480px;
   padding: 0 2rem;
 
   overflow: hidden;
@@ -31,6 +31,7 @@ export const ContentBox = styled.main`
 export const ProfileBox = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
 
   padding: 2rem 0 4rem 0;
 `;
@@ -63,8 +64,8 @@ export const SubMenu = styled.div`
 `;
 
 export const ProfileImage = styled.div`
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   margin-right: 30px;
 `;
 
