@@ -7,15 +7,15 @@ interface AxiosCustomRequestConfig extends AxiosRequestConfig {
   retryCount: number;
 }
 
-const postUploadImage = async (
+const postUploadRoomImage = async (
   url: string,
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
   try {
-    const { token, message } = await getToken();
+    const { token } = await getToken();
 
     if (!token) {
-      throw new Error(message);
+      throw new Error();
     }
 
     await axios.post('/backapi' + url, arg.uploadImageFile, {
@@ -57,45 +57,6 @@ const deleteUserImage = async (
     return;
   }
 };
-
-// const getImageData = async (
-//   url: string,
-//   { arg: newImageList }: { arg: DImageData[] },
-// ) => {
-//   try {
-//     const { token } = await getToken();
-
-//     if (!token) {
-//       throw new Error();
-//     }
-
-//     const imageDataList: CImageData[] = await Promise.all(
-//       newImageList.map(async (imageData) => {
-//         const res = await axios.get(
-//           '/imageapi' + `/image-download/${imageData.link}`,
-//           {
-//             headers: {
-//               Authorization: token,
-//             },
-//             responseType: 'blob',
-//           },
-//         );
-
-//         const url = window.URL.createObjectURL(
-//           new Blob([res.data], { type: res.headers['content-type'] }),
-//         );
-//         const created_at =
-//           imageData.created_at?.split(' ')[0] ?? '삭제된 이미지';
-//         return { ...imageData, id: imageData.id, created_at, link: url };
-//       }),
-//     );
-
-//     return [...imageDataList];
-//   } catch (err) {
-//     alert('이미지를 받아오지 못하였습니다..');
-//     return;
-//   }
-// };
 
 const getImageData = async (
   url: string,
@@ -147,7 +108,10 @@ const getImageData = async (
         const url = window.URL.createObjectURL(
           new Blob([response.data], { type: response.headers['content-type'] }),
         );
-        return { ...imageInfo, link: url, created_at };
+        const fileName = imageInfo.link
+          ? imageInfo.link.split('/')[1]
+          : 'Image';
+        return { ...imageInfo, link: url, fileName, created_at };
       }),
     );
 
@@ -164,4 +128,36 @@ const getImageData = async (
   }
 };
 
-export { postUploadImage, deleteUserImage, getImageData };
+const postUploadUserImage = async (
+  url: string,
+  { arg }: { arg: { uploadImageFile: FormData } },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.post('/backapi' + url, arg.uploadImageFile, {
+      headers: {
+        Authorization: token,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.status === 404) {
+      alert('파일이 존재하지 않습니다.');
+    } else if (err instanceof Error) {
+      alert('이미지를 업로드하지 못하였습니다..');
+    }
+    return;
+  }
+};
+
+export {
+  postUploadRoomImage,
+  postUploadUserImage,
+  deleteUserImage,
+  getImageData,
+};

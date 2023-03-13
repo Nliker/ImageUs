@@ -149,11 +149,60 @@ export const ModalImageBox = styled.div`
   height: 100%;
 
   box-sizing: border-box;
+
+  .select_box {
+    position: relative;
+    z-index: 3;
+  }
+
+  .filebox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .upload-name {
+      display: inline-block;
+
+      height: 35px;
+      padding: 0 10px;
+
+      vertical-align: middle;
+      border: 1px solid #dddddd;
+      width: 78%;
+      color: #999999;
+    }
+
+    label {
+      display: inline-block;
+
+      height: 15px;
+      padding: 9px 18px;
+      margin-left: 25px;
+      font-size: 0.7rem;
+      border-radius: 5px;
+
+      white-space: nowrap;
+      color: #fff;
+      vertical-align: middle;
+      background-color: #999999;
+      cursor: pointer;
+    }
+
+    input[type='file'] {
+      position: absolute;
+      width: 0;
+      height: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+    }
+  }
 `;
 
 export const ImageDiv = styled.div<{ image: HTMLImageElement | null }>`
   width: 100%;
   height: 100%;
+  z-index: 3;
 
   background-image: ${(props) => `url(${props.image?.src})`};
   background-size: contain;

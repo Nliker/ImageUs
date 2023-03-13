@@ -7,9 +7,10 @@ export interface DRoomData {
 
 export interface DFriendData {
   id: number;
-  email?: string;
+  email: string;
   name: string;
-  profile?: string;
+  profile: string;
+  user_type: string;
 }
 
 export interface DImageData {

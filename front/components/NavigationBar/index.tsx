@@ -13,8 +13,8 @@ import { Button } from '@styles/Button';
 import {
   BottomContainer,
   LogoutBtn,
-  MobileNavItem,
-  MobileNavList,
+  NavItem,
+  NavList,
   UserBox,
   UserInfo,
   Wrapper,
@@ -78,70 +78,42 @@ const NavigationBar = () => {
     <Wrapper>
       <BottomContainer>
         <MobileNav>
-          <MobileNavList>
-            <MobileNavItem>
+          <NavList>
+            <NavItem>
               <NavLink to={'/my_page'} className="nav_item">
                 <MdOutlineManageAccounts />
                 마이 페이지
               </NavLink>
-            </MobileNavItem>
-            <MobileNavItem>
+            </NavItem>
+            <NavItem>
               <h1>
                 <NavLink to={'/'}>
                   <HiOutlineHome />
                   ImageUs
                 </NavLink>
               </h1>
-            </MobileNavItem>
-            <MobileNavItem>
+            </NavItem>
+            <NavItem>
               <NavLink to={'/people_management'} className="nav_item">
                 <CgUserList />
                 친구목록
               </NavLink>
-            </MobileNavItem>
-          </MobileNavList>
-        </MobileNav>
-        <DeskTopNav>
-          <MobileNavList>
-            <MobileNavItem>
-              <h1>
-                <NavLink to={'/'}>
-                  <HiOutlineHome />
-                  ImageUs
-                </NavLink>
-              </h1>
-            </MobileNavItem>
-            <MobileNavItem>
-              <NavLink to={'/my_page'} className="navigate_link">
-                마이 페이지
-              </NavLink>
-            </MobileNavItem>
-            <MobileNavItem>
-              <NavLink to={'/people_management'} className="navigate_link">
-                친구목록
-              </NavLink>
-            </MobileNavItem>
-          </MobileNavList>
-        </DeskTopNav>
-        <div className="user_icon">
+            </NavItem>
+          </NavList>
           <div
             className="user_icon_d"
             onMouseEnter={onMouseEnterUserIcon}
             onMouseLeave={onMouseLeaveUserIcon}
+            onClick={() => setClickUserIcon((prev) => !prev)}
           >
-            <span
-              className="user_icon_s"
-              onClick={() => setClickUserIcon((prev) => !prev)}
+            <IconContext.Provider
+              value={{
+                size: '30px',
+                style: { display: 'inline-block', margin: 0 },
+              }}
             >
-              <IconContext.Provider
-                value={{
-                  size: '100%',
-                  style: { display: 'inline-block' },
-                }}
-              >
-                <BiUserCircle />
-              </IconContext.Provider>
-            </span>
+              <BiUserCircle />
+            </IconContext.Provider>
             {(clickUserIcon || hoverUserIcon) && (
               <UserBox ref={userInfoEl}>
                 <UserInfo>
@@ -168,7 +140,69 @@ const NavigationBar = () => {
               </UserBox>
             )}
           </div>
-        </div>
+        </MobileNav>
+        <DeskTopNav>
+          <NavList>
+            <NavItem>
+              <h1>
+                <NavLink to={'/'}>
+                  <HiOutlineHome />
+                  ImageUs
+                </NavLink>
+              </h1>
+            </NavItem>
+            <NavItem>
+              <NavLink to={'/my_page'} className="navigate_link">
+                마이 페이지
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to={'/people_management'} className="navigate_link">
+                친구목록
+              </NavLink>
+            </NavItem>
+          </NavList>
+          <div
+            className="user_icon_d"
+            onMouseEnter={onMouseEnterUserIcon}
+            onMouseLeave={onMouseLeaveUserIcon}
+            onClick={() => setClickUserIcon((prev) => !prev)}
+          >
+            <IconContext.Provider
+              value={{
+                size: '30px',
+                style: { display: 'inline-block', margin: 0 },
+              }}
+            >
+              <BiUserCircle />
+            </IconContext.Provider>
+            {(clickUserIcon || hoverUserIcon) && (
+              <UserBox ref={userInfoEl}>
+                <UserInfo>
+                  <div className={'info_words'}>
+                    <p>
+                      <strong>{userInfo.userInfo?.name ?? 'loading..'}</strong>{' '}
+                      님 어서오세요!
+                    </p>
+                    <p>
+                      <strong>email:</strong>{' '}
+                      {userInfo.userInfo?.email ?? '로딩중입니다..'}
+                    </p>
+                  </div>
+                </UserInfo>
+                <LogoutBtn>
+                  <Button
+                    className="error"
+                    type="button"
+                    onClick={onClickLogOut}
+                  >
+                    로그아웃
+                  </Button>
+                </LogoutBtn>
+              </UserBox>
+            )}
+          </div>
+        </DeskTopNav>
       </BottomContainer>
     </Wrapper>
   );

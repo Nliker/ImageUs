@@ -344,24 +344,33 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
                 )}
               </FilteringOption>
               {filterName === '기간 선택' && (
-                <div className="select_date">
-                  <div className="select_date_c">
-                    <label>시작날</label>
-                    <input type="date" ref={filterStartDateInputRef} />
+                <div className="select_box">
+                  <div className="select_date">
+                    <div className="select_date_c">
+                      <label>시작날</label>
+                      <input type="date" ref={filterStartDateInputRef} />
+                    </div>
+                    <div className="select_date_c">
+                      <label>마지막날</label>
+                      <input type="date" ref={filterEndDateInputRef} />
+                    </div>
+                    <div className="select_data_btn">
+                      <Button
+                        type="button"
+                        onClick={onClickCertainPeriodFilterBtn}
+                      >
+                        확인
+                      </Button>
+                    </div>
                   </div>
-                  <div className="select_date_c">
-                    <label>마지막날</label>
-                    <input type="date" ref={filterEndDateInputRef} />
-                  </div>
-                  <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
-                    확인
-                  </Button>
                 </div>
               )}
-              <div className="tag">
-                <span>
-                  {filterSelectTerm ? '필터링된 이미지' : '게시된 이미지'}
-                </span>
+              <div>
+                <div className="tag">
+                  <span>
+                    {filterSelectTerm ? '필터링된 이미지' : '게시된 이미지'}
+                  </span>
+                </div>
               </div>
               <ImageContentList
                 ImageData={filterSelectTerm ? filterImage : postedImage}

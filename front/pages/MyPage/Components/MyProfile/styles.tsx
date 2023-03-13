@@ -27,11 +27,8 @@ export const InfoTable = styled.table`
 
     tr {
       height: 5rem;
-      .btn_group {
-        display: flex;
-
-        gap: 1rem;
-        justify-content: center;
+      .btn_group .cancel_btn {
+        margin-left: 1rem;
       }
     }
 
