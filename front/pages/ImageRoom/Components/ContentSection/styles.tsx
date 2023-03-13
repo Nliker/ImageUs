@@ -147,6 +147,45 @@ export const ContentBox = styled.div`
 
     width: 85%;
     margin: auto;
+
+    .select_box::after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+
+    .select_date {
+      display: flex;
+      flex-direction: column;
+      float: right;
+
+      margin-bottom: 30px;
+      gap: 0.5rem;
+
+      .select_date_c {
+        display: inline-flex;
+        justify-content: end;
+
+        label {
+          margin-right: 8px;
+        }
+      }
+
+      .select_data_btn {
+        display: flex;
+        justify-content: right;
+        button {
+          font-size: 0.75rem;
+        }
+      }
+
+      @media screen and (min-width: 510px) {
+        flex-direction: row;
+        align-items: center;
+
+        gap: 1rem;
+      }
+    }
   }
 `;
 
