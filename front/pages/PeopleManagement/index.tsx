@@ -19,6 +19,32 @@ const PeopleManagement = () => {
               </div>
             </Header>
             <ContentBox>
+              {/* <TabBox>
+                <ul>
+                  <li>
+                    <NavLink
+                      to={''}
+                      className={({ isActive }) =>
+                        isActive ? 'active_tab' : undefined
+                      }
+                      end
+                      defaultChecked
+                    >
+                      친구 목록
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to={'search'}
+                      className={({ isActive }) =>
+                        isActive ? 'active_tab' : undefined
+                      }
+                    >
+                      유저 검색
+                    </NavLink>
+                  </li>
+                </ul>
+              </TabBox> */}
               <TabBox>
                 <ul>
                   <li>
