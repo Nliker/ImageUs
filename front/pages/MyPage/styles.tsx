@@ -13,7 +13,6 @@ export const WrapperBox = styled.section`
 export const ContentBox = styled.main`
   box-sizing: border-box;
 
-  min-width: 480px;
   padding: 0 2rem;
 
   overflow: hidden;
