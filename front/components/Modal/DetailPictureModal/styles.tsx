@@ -84,9 +84,10 @@ export const Wrapper = styled.div<{
 export const ImageSection = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
 
   width: 100%;
-  height: 70%;
+  height: 80%;
 `;
 
 export const InfoSection = styled.div`
