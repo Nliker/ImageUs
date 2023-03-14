@@ -1,5 +1,12 @@
 import styled from '@emotion/styled';
 
+export const Wrapper = styled.div`
+  width: fit-content;
+  min-width: 100%;
+  padding: 1rem 0.5rem;
+  box-sizing: border-box;
+`;
+
 export const Subtitle = styled.div`
   display: inline-flex;
 

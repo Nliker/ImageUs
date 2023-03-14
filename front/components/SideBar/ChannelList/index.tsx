@@ -6,7 +6,7 @@ import { mutate } from 'swr';
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
 import CollapseListBox from '../CollapseListBox';
-import { Collapse, CreateBtnBox, Subtitle } from './styles';
+import { Collapse, CreateBtnBox, Subtitle, Wrapper } from './styles';
 
 interface Props {
   roomlist?: { id: number; data: string }[];
@@ -32,7 +32,7 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
   if (!roomlist) return <Spinner />;
 
   return (
-    <div>
+    <Wrapper>
       <Subtitle onClick={toggleChannelCollapse}>
         <Collapse collapse={channelCollapse}>
           <IoMdArrowDropright />
@@ -57,7 +57,7 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
           </CreateBtnBox>
         </>
       )}
-    </div>
+    </Wrapper>
   );
 });
 
