@@ -97,12 +97,10 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               </label>
               <div className="tab_content">
                 <Scrollbars>
-                  <div className="tab_content_box">
-                    <ChannelList
-                      roomlist={extractRoomList}
-                      closeSidebar={close}
-                    />
-                  </div>
+                  <ChannelList
+                    roomlist={extractRoomList}
+                    closeSidebar={close}
+                  />
                 </Scrollbars>
               </div>
             </Tab>
@@ -113,9 +111,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               </label>
               <div className="tab_content">
                 <Scrollbars>
-                  <div className="tab_content_box">
-                    <MemberList currentRoomInfo={extractCurrentUserList} />
-                  </div>
+                  <MemberList currentRoomInfo={extractCurrentUserList} />
                 </Scrollbars>
               </div>
             </Tab>
