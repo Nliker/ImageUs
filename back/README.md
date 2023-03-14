@@ -61,7 +61,9 @@ gunicorn app:create_app
 
 >## Reference
 
-## &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ImageUs](https://velog.io/@tjwjdgus83/series/ImageUs)
+## &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Swagger_일반서버api](https://codakcodak.site/backapi/api-docs)
+
+## &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Swagger_이미지서버api](https://codakcodak.site/imageapi/api-docs)
 
 <br/>
 
