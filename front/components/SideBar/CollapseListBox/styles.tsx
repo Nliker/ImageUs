@@ -83,7 +83,7 @@ const fireworkAnimate = keyframes`
 export const Container = styled.div`
   position: relative;
 
-  padding: 10px 45px;
+  padding: 10px 25px;
   background: white;
 
   .check_box {
