@@ -12,7 +12,7 @@ const DetailPictureInfo = () => {
 
   const getCurrentModalSize = useCallback(() => {
     const modalHeight = (window.innerHeight * 0.7).toFixed(3);
-    const modalWidth = Number.parseFloat(modalHeight).toFixed(3);
+    const modalWidth = modalHeight;
 
     return {
       modalWidth,
@@ -43,25 +43,46 @@ const DetailPictureInfo = () => {
   }, []);
 
   const imageSizeCSS = useMemo(
-    () => (imageLink: string) => {
-      const imageObj = new Image();
-      imageObj.src = imageLink;
+    () =>
+      (imageLink: string): React.CSSProperties => {
+        const imageObj = new Image();
+        imageObj.src = imageLink;
 
-      const boxAspect = window.innerWidth <= 600 ? 1.0714 : 1.4285;
-      const imageAspect = imageObj.width / imageObj.height;
+        const boxAspect = window.innerWidth < 600 ? 0.9375 : 1.25;
+        const imageAspect = imageObj.width / imageObj.height;
 
-      if (boxAspect <= imageAspect) {
-        return {
-          width: 'auto',
-          height: '100%',
-        };
-      } else {
-        return {
-          width: '100%',
-          height: 'auto',
-        };
-      }
-    },
+        if (boxAspect <= imageAspect) {
+          const modalWidth =
+            window.innerWidth < 600 ? 300 : modalSize.modalWidth;
+
+          if (modalWidth > imageObj.width) {
+            return {
+              width: `${imageObj.width}px`,
+              objectFit: 'contain',
+            };
+          } else {
+            return {
+              width: '100%',
+              objectFit: 'contain',
+            };
+          }
+        } else {
+          const modalHeight =
+            window.innerWidth < 600 ? 400 : modalSize.modalHeight;
+
+          if (modalHeight > imageObj.height) {
+            return {
+              width: 'auto',
+              height: `${imageObj.height}px`,
+            };
+          } else {
+            return {
+              width: 'auto',
+              height: '100%',
+            };
+          }
+        }
+      },
     [imageInfo],
   );
 
