@@ -15,7 +15,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   position: absolute;
   top: 0;
 
-  width: 350px;
+  width: 240px;
   height: 100%;
   z-index: 100;
   box-sizing: border-box;
