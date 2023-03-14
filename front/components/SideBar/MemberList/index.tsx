@@ -10,7 +10,7 @@ import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
 
 import CollapseListBox from '../CollapseListBox';
-import { Collapse, CreateBtnBox, Subtitle } from './styles';
+import { Collapse, CreateBtnBox, Subtitle, Wrapper } from './styles';
 
 interface Props {
   currentRoomInfo: DRoomData;
@@ -53,7 +53,7 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
   if (!currentRoomInfo) return <Spinner />;
 
   return (
-    <div>
+    <Wrapper>
       <Subtitle onClick={toggleMemberCollapse}>
         <Collapse collapse={memberCollapse}>
           <IoMdArrowDropright />
@@ -82,7 +82,7 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
           </CreateBtnBox>
         </>
       )}
-    </div>
+    </Wrapper>
   );
 });
 
