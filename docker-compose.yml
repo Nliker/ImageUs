@@ -7,6 +7,8 @@ services:
     ports:
       - '3333:3306'
     platform: linux/amd64
+    environment:
+      - TZ=Asia/Seoul
   
   imageus_back:
     build:  ./back
