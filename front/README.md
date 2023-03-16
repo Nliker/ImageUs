@@ -44,6 +44,10 @@ $ cd ImageUs/front
 # 패키지 설치
 $ npm install
 
+# or
+
+$ npm install --force
+
 # webpack dev server 실행
 $ npm run dev
 
