@@ -12,9 +12,11 @@
 
 - [디렉토리 구조](#디렉토리구조)
 
-</h4>
+</h4>  
+  
+#
 
-## ⚡ Requirements
+## ⚡Requirements  
 
 - [npm 8.15.0](https://www.npmjs.com/package/npm/v/8.15.0)
 
@@ -33,107 +35,98 @@ $ npm install
 $ npm run dev
 ```
 
----
+---  
 
 > ## 화면 구성
 
+
 > ## 주요 기능
 
-### &nasp;&nasp;&nasp;⭐ 개인 저장소에 이미지 파일 저장 기능
 
-### &nasp;&nasp;&nasp;⭐ 이미지를 공유할 그룹(방)을 생성 기능
+- ### &nbsp;&nbsp; 개인 저장소에 이미지 파일 저장 기능
 
-### &nasp;&nasp;&nasp;⭐ 업로드한 이미지를 시간별로 조회 기능
+- ### &nbsp;&nbsp; 이미지를 공유할 그룹(방)을 생성 기능
 
-### &nasp;&nasp;&nasp;⭐ 선택한 이미지 다운로드 기능
+- ### &nbsp;&nbsp; 업로드한 이미지를 시간별로 조회 기능
 
-###
+- ### &nbsp;&nbsp; 선택한 이미지 다운로드 기능
+
+
+#
 
 ## 📦 디렉토리 구조
 
 ```bash
 📦front
- ┣ 📂assets
- ┃ ┣ 📂image
- ┃ ┗ 📜main_background_img.png
- ┣ 📂components
- ┃ ┣ 📂Modal
- ┃ ┃ ┣ 📂AlertBoxModal
- ┃ ┃ ┣ 📂CreateRoomModal
- ┃ ┃ ┣ 📂DetailPictureModal
- ┃ ┃ ┣ 📂InviteMemberModal
- ┃ ┃ ┣ 📂ModalLayout
- ┃ ┃ ┣ 📂UploadModal
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┃ ┣ 📂NavigationBar
- ┃ ┣ 📂SideBar
- ┃ ┃ ┣ 📂ChannelList
- ┃ ┃ ┣ 📂CollapseListBox
- ┃ ┃ ┣ 📂MemberList
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┃ ┗ 📂UserFormBox
+ ┣ 📂assets                : 이미지 관련 폴더
+ ┃   ┗ 📂image
+ ┣ 📂components            : 공통적으로 쓰이는 컴포넌트 폴더
+ ┃   ┣ 📂Modal
+ ┃   ┃   ┣ 📂AlertBoxModal
+ ┃   ┃   ┣ 📂CreateRoomModal
+ ┃   ┃   ┣ 📂DetailPictureModal
+ ┃   ┃   ┣ 📂InviteMemberModal
+ ┃   ┃   ┣ 📂ModalLayout
+ ┃   ┃   ┗ 📂UploadModal
+ ┃   ┣ 📂NavigationBar
+ ┃   ┣ 📂SideBar
+ ┃   ┃   ┣ 📂ChannelList
+ ┃   ┃   ┣ 📂CollapseListBox
+ ┃   ┃   ┗ 📂MemberList
+ ┃   ┗ 📂UserFormBox
  ┣ 📂hooks
- ┃ ┣ 📜throttle.ts
- ┃ ┣ 📜useInput.ts
- ┃ ┗ 📜useIntersect.ts
+ ┃    ┣ 📜throttle.ts
+ ┃    ┣ 📜useInput.ts
+ ┃    ┗ 📜useIntersect.ts
  ┣ 📂layouts
- ┃ ┣ 📂App
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┣ 📜PrivateRoute.tsx
- ┃ ┃ ┗ 📜PublicRoute.tsx
- ┃ ┗ 📂AppLayout
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┣ 📂pages
- ┃ ┣ 📂ImageRoom
- ┃ ┃ ┣ 📂Components
- ┃ ┃ ┃ ┣ 📂ContentSection
- ┃ ┃ ┃ ┣ 📂ImageContent
- ┃ ┃ ┃ ┗ 📂ImageContentList
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┃ ┣ 📂LogIn
- ┃ ┣ 📂MainPage
- ┃ ┣ 📂MyPage
- ┃ ┃ ┣ 📂Components
- ┃ ┃ ┃ ┣ 📂MyPictures
- ┃ ┃ ┃ ┗ 📂MyProfile
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┃ ┣ 📂PeopleManagement
- ┃ ┃ ┣ 📂Components
- ┃ ┃ ┃ ┣ 📂FriendList
- ┃ ┃ ┃ ┗ 📂SearchBox
- ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┗ 📜styles.tsx
- ┃ ┣ 📂SignUp
- ┃ ┗ 📂SocialLogInAuth
- ┣ 📂styles
- ┃ ┣ 📂ActiveButton
- ┃ ┣ 📂Button
- ┃ ┗ 📂Spinner
- ┣ 📂typings
- ┃ ┣ 📜client.ts
- ┃ ┗ 📜db.ts
- ┣ 📂utils
- ┃ ┣ 📜getToken.ts
- ┃ ┣ 📜imageFetcher.ts
- ┃ ┣ 📜logInFetcher.ts
- ┃ ┣ 📜roomDataFetcher.ts
- ┃ ┣ 📜searchFetcher.ts
- ┃ ┗ 📜userDataFetcher.ts
+ ┃   ┣ 📂App                : 라우팅 관련 폴더
+ ┃   ┃   ┣ 📜index.tsx
+ ┃   ┃   ┣ 📜PrivateRoute.tsx
+ ┃   ┃   ┗ 📜PublicRoute.tsx
+ ┃   ┗ 📂AppLayout
+ ┣ 📂pages                  : 페이지 컴포넌트 폴더
+ ┃   ┣ 📂ImageRoom
+ ┃   ┃   ┗ 📂Components
+ ┃   ┃     ┣ 📂ContentSection
+ ┃   ┃     ┣ 📂ImageContent
+ ┃   ┃     ┗ 📂ImageContentList
+ ┃   ┣ 📂LogIn
+ ┃   ┣ 📂MainPage
+ ┃   ┣ 📂MyPage
+ ┃   ┃   ┗ 📂Components
+ ┃   ┃       ┣ 📂MyPictures
+ ┃   ┃       ┗ 📂MyProfile
+ ┃   ┣ 📂PeopleManagement
+ ┃   ┃   ┗ 📂Components
+ ┃   ┃       ┣ 📂FriendList
+ ┃   ┃       ┗ 📂SearchBox
+ ┃   ┣ 📂SignUp
+ ┃   ┗ 📂SocialLogInAuth
+ ┣ 📂styles                : 공통으로 사용되는 UI 컴포넌트
+ ┃   ┣ 📂ActiveButton
+ ┃   ┣ 📂Button
+ ┃   ┗ 📂Spinner
+ ┣ 📂typings               : 타입 폴더
+ ┃   ┣ 📜client.ts
+ ┃   ┗ 📜db.ts
+ ┣ 📂utils                 : swr fetcher 파일 폴더 
+ ┃   ┣ 📜getToken.ts
+ ┃   ┣ 📜imageFetcher.ts
+ ┃   ┣ 📜logInFetcher.ts
+ ┃   ┣ 📜roomDataFetcher.ts
+ ┃   ┣ 📜searchFetcher.ts
+ ┃   ┗ 📜userDataFetcher.ts
  ┣ 📜.eslintrc
  ┣ 📜.gitignore
  ┣ 📜.prettierrc
- ┣ 📜client.tsx
- ┣ 📜index.html
+ ┣ 📜client.tsx            : 개발, 배포 모드에 따라 app.js를 index.html에 보여줌
+ ┣ 📜index.html            : 모든 페이지가 렌더링되며 보여질 html 파일
  ┣ 📜package-lock.json
  ┣ 📜package.json
  ┣ 📜README.md
  ┣ 📜tsconfig.eslint.json
  ┣ 📜tsconfig.json
  ┗ 📜webpack.config.ts
+ 
 
 ```
