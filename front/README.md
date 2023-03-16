@@ -1,4 +1,4 @@
-<h1 align="center">Frontend 소개</h1>
+<h1>Frontend</h1>
 
 <h4 align="left">
 
@@ -7,36 +7,47 @@
 - [주요 기능](#주요-기능)
 - [디렉토리 구조](#디렉토리-구조)
 
-</h4>  
+</h4>
 
-
----
-
-<br>
+<br><br>
 
 > ## Requirements
 
 <br>
 
-- [npm 8.15.0](https://www.npmjs.com/package/npm/v/8.15.0)
+- [Node.js](https://nodejs.org)
 
-<br>
+<br><br>
 
 > ## Installation
 
 <br>
 
-#### Clone the repository
+#### 레포지토리 클론
+
+<br>
 
 ```bash
 $ git clone https://github.com/kanghunK/ImageUs.git
 ```
 
-```
+<br>
+
+#### 패키지 설치 및 개발 모드 실행
+
+<br>
+
+```bash
+# ImageUs/front 경로 접속
 $ cd ImageUs/front
-$ nvm use v16.17.0
+
+# 패키지 설치
 $ npm install
+
+# webpack dev server 실행
 $ npm run dev
+
+# 이후 http://localhost:3090 접속
 ```
 
 <br>
@@ -47,17 +58,21 @@ $ npm run dev
 
 > ## 주요 기능
 
-- ### &nbsp;&nbsp; 개인 저장소에 이미지 파일 저장 기능
+<br>
 
-- ### &nbsp;&nbsp; 이미지를 공유할 그룹(방)을 생성 기능
+- #### &nbsp;&nbsp; 개인 저장소에 이미지 파일 저장 기능
 
-- ### &nbsp;&nbsp; 업로드한 이미지를 시간별로 조회 기능
+- #### &nbsp;&nbsp; 이미지를 공유할 그룹(방)을 생성 기능
 
-- ### &nbsp;&nbsp; 선택한 이미지 다운로드 기능
+- #### &nbsp;&nbsp; 업로드한 이미지를 시간별로 조회 기능
+
+- #### &nbsp;&nbsp; 선택한 이미지 다운로드 기능
 
 <br>
 
 > ## 디렉토리 구조
+
+<br>
 
 ```bash
 📦front
