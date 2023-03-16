@@ -78,12 +78,12 @@ const getUserImageLen = async (url: string) => {
   }
 };
 
-const deleteUserFriend = async (url: string, { arg }: { arg: number }) => {
+const deleteUserFriend = async (url: string, { arg }: { arg?: number }) => {
   try {
     const userId = sessionStorage.getItem('user_id');
     const { token } = await getToken();
 
-    if (!token) {
+    if (!token || !arg) {
       throw new Error();
     }
 
@@ -157,13 +157,13 @@ const postUserInfoFetcher = async (
 
 const postNewFriend = async (
   url: string,
-  { arg: friendId }: { arg: number },
+  { arg: friendId }: { arg?: number },
 ) => {
   try {
     const userId = sessionStorage.getItem('user_id');
     const { token } = await getToken();
 
-    if (!token) {
+    if (!token || !friendId) {
       throw new Error();
     }
 
@@ -198,7 +198,7 @@ const postNewFriend = async (
 
 const leaveRoomFetcher = async (
   url: string,
-  { arg: roomId }: { arg: string },
+  { arg: roomId }: { arg?: string },
 ) => {
   try {
     if (!roomId) throw new Error('올바른 요청이 아닙니다.');

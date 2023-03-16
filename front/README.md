@@ -2,25 +2,29 @@
 
 <h4 align="left">
 
-- [Requirements](#Requirements)
-
-- [Installation](#Installation)
-
-- [화면 구성](#화면구성)
-
-- [주요기능](#주요기능)
-
-- [디렉토리 구조](#디렉토리구조)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [주요 기능](#주요-기능)
+- [디렉토리 구조](#디렉토리-구조)
 
 </h4>  
-  
-#
 
-## ⚡Requirements  
+
+---
+
+<br>
+
+> ## Requirements
+
+<br>
 
 - [npm 8.15.0](https://www.npmjs.com/package/npm/v/8.15.0)
 
-## 🛠️ Installation
+<br>
+
+> ## Installation
+
+<br>
 
 #### Clone the repository
 
@@ -29,19 +33,19 @@ $ git clone https://github.com/kanghunK/ImageUs.git
 ```
 
 ```
-$ cd front
+$ cd ImageUs/front
 $ nvm use v16.17.0
 $ npm install
 $ npm run dev
 ```
 
----  
+<br>
 
-> ## 화면 구성
+---
 
+<br>
 
 > ## 주요 기능
-
 
 - ### &nbsp;&nbsp; 개인 저장소에 이미지 파일 저장 기능
 
@@ -51,10 +55,9 @@ $ npm run dev
 
 - ### &nbsp;&nbsp; 선택한 이미지 다운로드 기능
 
+<br>
 
-#
-
-## 📦 디렉토리 구조
+> ## 디렉토리 구조
 
 ```bash
 📦front
@@ -109,7 +112,7 @@ $ npm run dev
  ┣ 📂typings               : 타입 폴더
  ┃   ┣ 📜client.ts
  ┃   ┗ 📜db.ts
- ┣ 📂utils                 : swr fetcher 파일 폴더 
+ ┣ 📂utils                 : swr fetcher 파일 폴더
  ┃   ┣ 📜getToken.ts
  ┃   ┣ 📜imageFetcher.ts
  ┃   ┣ 📜logInFetcher.ts
@@ -127,6 +130,6 @@ $ npm run dev
  ┣ 📜tsconfig.eslint.json
  ┣ 📜tsconfig.json
  ┗ 📜webpack.config.ts
- 
+
 
 ```
