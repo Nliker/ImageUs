@@ -14,6 +14,98 @@
 
 <br/>
 
+* config.py
+    * back>config.py
+
+        ```python
+        db={
+            "user":"codakcodak",
+            "password":"test_mysql",
+            "hos  t":"db",
+            "port":3306,
+            "database":"imageus_back"
+        }
+
+        elastic_db={
+            'host':["http://127.0.0.1:9200"],
+            'index':"image_us"
+        }
+
+        JWT_SECRET_KEY="secretkey"
+
+        JWT_REFRESH_TOKEN_NUM=10
+        JWT_ACCESS_TOKEN_EXPIRE_TIME=60*30
+        JWT_REFRESH_TOKEN_EXPIRE_TIME=60*60*24*14
+
+        DB_URL=f"mysql+mysqlconnector://{db['user']}:{db['password']}@{db['host']}:{db['port']}/{db['database']}?charset=utf8"
+
+        IMAGE_UPLOAD_URL="http://127.0.0.1:5001/imageapi/upload/"
+        IMAGE_DOWNLOAD_URL="http://127.0.0.1:5001/imageapi/image-download/"
+
+        IMAGE_UPLOAD_KEY="secretimagekey"
+
+        ELASTIC_URL=elastic_db['host']
+        ELASTIC_INDEX=f"{elastic_db['index']}"
+        ELASTIC_MAX_SIZE=20
+
+        GOOGLE_MAIL_USER=메일인증 유저값
+        GOOGLE_MAIL_PASSWORD=메일인증 유저 패스워드값
+
+        AUTH_EMAIL_EXPIRE_TIME=180
+
+        GOOD_IP_LIST=[]
+        GOOD_IP_RANGE=[]
+        MYSQL_TIMEZONE=9
+
+        POOL_SIZE=10
+        MAX_OVERFLOW=10
+        POOL_RECYCLE=500
+
+        KAKAO_SECRET_KEY=카카오 비밀키
+        KAKAO_REST_API_KEY=카카오 RESTAPI 키
+
+        NAVER_SECRET_KEY=네이버 비밀키
+        NAVER_REST_API_KEY=네이버 RESTAPI 키
+
+        KAKAO_REDIRECT_URI=카카오의 리다이렉트 URL
+        NAVER_REDIRECT_URI=네이버의 리다이렉트 URL
+
+        PUBLIC=True
+        MODE='dev'     
+        ```
+
+    * image_back>config.py
+
+```python
+db={
+    "user":"codakcodak",
+    "password":"test_mysql",
+    "host":"db",
+    "port":3306,
+    "database":"imageus_back"
+}
+JWT_SECRET_KEY="secretkey"
+
+DB_URL=f"mysql+mysqlconnector://{db['user']}:{db['password']}@{db['host']}:{db['port']}/{db['database']}?charset=utf8"
+
+
+IMAGE_PATH="images"
+
+IMAGE_DOWNLOAD_URL="http://127.0.0.1:5001/imageapi/image-download/"
+
+IMAGE_UPLOAD_KEY="secretimagekey"
+
+IMAGE_SIZE_LIMIT=5
+
+POOL_SIZE=10
+
+MAX_OVERFLOW=10
+
+IMAGE_EXTENTIONS=['HEIF' , 'heif' , 'JPEG','jpeg' ,'JPG','jpg', 
+                  'GIF','gif', 'PDF', 'pdf','PNG','png']
+
+```
+
 * Elastic search 7.10.2
 
 * Mysql 8.0.30(arm)
