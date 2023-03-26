@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useMediaQuery } from 'react-responsive';
-import { BiUserCircle } from 'react-icons/bi';
+import { RiShutDownLine } from 'react-icons/ri';
 import { IconContext } from 'react-icons/lib';
 import { CgUserList } from 'react-icons/cg';
 import { HiOutlineHome } from 'react-icons/hi';
@@ -108,11 +108,11 @@ const NavigationBar = () => {
           >
             <IconContext.Provider
               value={{
-                size: '30px',
+                size: '18px',
                 style: { display: 'inline-block', margin: 0 },
               }}
             >
-              <BiUserCircle />
+              <RiShutDownLine />
             </IconContext.Provider>
             {(clickUserIcon || hoverUserIcon) && (
               <UserBox ref={userInfoEl}>
@@ -170,11 +170,11 @@ const NavigationBar = () => {
           >
             <IconContext.Provider
               value={{
-                size: '30px',
+                size: '18px',
                 style: { display: 'inline-block', margin: 0 },
               }}
             >
-              <BiUserCircle />
+              <RiShutDownLine />
             </IconContext.Provider>
             {(clickUserIcon || hoverUserIcon) && (
               <UserBox ref={userInfoEl}>
