@@ -30,7 +30,7 @@ const NavigationBar = () => {
   const userInfoEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.addEventListener('click', userIconBoxHandler);
+    window.addEventListener('click', userIconBoxHandler, { capture: true });
 
     return () => {
       window.removeEventListener('click', userIconBoxHandler);
