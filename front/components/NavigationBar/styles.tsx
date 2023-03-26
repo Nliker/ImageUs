@@ -39,10 +39,16 @@ export const BottomContainer = styled.div`
     justify-content: center;
     align-items: center;
 
-    width: 66px;
+    width: 70px;
     border-left: 1px solid #dddddd;
 
     cursor: pointer;
+
+    &:hover {
+      svg {
+        color: #f5642d;
+      }
+    }
   }
 
   @media screen and (min-width: 1024px) {
@@ -134,6 +140,7 @@ export const UserBox = styled.div`
     0 0.0625rem 0.125rem rgb(0 0 0 / 20%);
 
   background-color: white;
+  cursor: default;
 
   @media screen and (max-width: 1023px) {
     &::after {
