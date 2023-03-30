@@ -30,14 +30,15 @@ import {
   WrapperBox,
 } from './styles';
 import { getImageData } from '@utils/imageFetcher';
-import { SlCloudUpload } from 'react-icons/sl';
 import { Button } from '@styles/Button';
+import { DeviceCheckContext } from '@pages/ImageRoom';
 
 const MyPage = () => {
   const { pathname } = useLocation();
   const userId = sessionStorage.getItem('user_id');
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  const { data: roomlist, error } = useSWR(
+  const { data: roomlist } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
     {
@@ -92,6 +93,15 @@ const MyPage = () => {
       threshold: 0.5,
     },
   );
+
+  useEffect(() => {
+    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobileValue) {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (pathname !== '/my_page') return;
@@ -182,10 +192,12 @@ const MyPage = () => {
                 <Route
                   path="/"
                   element={
-                    <MyPictures
-                      imageList={userImageList}
-                      observerRef={observerRef}
-                    />
+                    <DeviceCheckContext.Provider value={isMobile}>
+                      <MyPictures
+                        imageList={userImageList}
+                        observerRef={observerRef}
+                      />
+                    </DeviceCheckContext.Provider>
                   }
                 />
                 <Route path="my_profile" element={<MyProfile />} />
