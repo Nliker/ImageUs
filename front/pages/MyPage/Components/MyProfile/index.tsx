@@ -79,21 +79,15 @@ const MyProfile = () => {
               </>
             ) : (
               <>
-                <td>
-                  <div>
-                    <label htmlFor="name_label">
-                      이름 수정
-                      <div>
-                        <input
-                          type="text"
-                          id="name_label"
-                          onChange={handleNameInput}
-                          value={nameInput}
-                          placeholder="이름 입력"
-                        />
-                      </div>
-                    </label>
-                  </div>
+                <td className="change_name">
+                  <p>새로운 이름 입력</p>
+                  <input
+                    type="text"
+                    id="name_label"
+                    onChange={handleNameInput}
+                    value={nameInput}
+                    placeholder="이름 입력"
+                  />
                 </td>
                 <td>
                   <div className="btn_group">

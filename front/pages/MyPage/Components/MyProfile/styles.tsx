@@ -27,18 +27,52 @@ export const InfoTable = styled.table`
 
     tr {
       height: 5rem;
-      .btn_group .cancel_btn {
-        margin-left: 1rem;
+
+      .btn_group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.5rem;
+
+        button {
+          font-size: 0.65rem;
+        }
+      }
+
+      .change_name {
+        p {
+          margin: 0;
+          margin-bottom: 5px;
+        }
+
+        input {
+          width: 130px;
+        }
       }
     }
 
     th {
       border-right: 1px solid #a39485;
     }
+  }
 
-    @media screen and (max-width: 600px) {
-      .btn_group button {
-        font-size: 0.65rem;
+  @media screen and (min-width: 600px) {
+    tbody {
+      tr {
+        .btn_group {
+          flex-direction: row;
+          button {
+            font-size: 1rem;
+          }
+        }
+
+        .change_name {
+          input {
+            width: 180px;
+          }
+        }
       }
     }
   }
