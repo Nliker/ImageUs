@@ -90,54 +90,65 @@ const InviteMemberModal = () => {
 
   return (
     <Wrapper>
+      <Title>
+        <h2>친구 초대하기</h2>
+      </Title>
       <Container>
-        <Title>
-          <h1>친구 초대하기</h1>
-        </Title>
         <Scrollbars>
           <Content>
             <div className="content_box">
-              <div className="content_select_box">
+              <div className="content_list_box">
                 <div className="content_subname">
-                  <h2>초대할 친구 목록</h2>
+                  <h3>초대할 친구 목록</h3>
                 </div>
-                <ul className="not_selected_ul">
-                  {checkFriendState.length !== 0 ? (
-                    checkFriendState.map((data: AppendCheckFriendData) => (
-                      <li key={data.id} onClick={onClickFriendList(data.id)}>
-                        <div className="list_layout">
-                          <div className="list_check_icon">
-                            {data.check ? (
-                              <AiFillCheckCircle />
-                            ) : (
-                              <AiOutlineCheckCircle />
-                            )}
-                          </div>
-                          <div className="list_info">
-                            <p>이름: {data.name}</p>
-                            <p>이메일: {data.email}</p>
-                          </div>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
-                    <p>등록할 친구가 없습니다.</p>
-                  )}
-                </ul>
+                <div className="content_list">
+                  <Scrollbars>
+                    <ul className="content_list_ul">
+                      {checkFriendState.length !== 0 ? (
+                        checkFriendState.map((data: AppendCheckFriendData) => (
+                          <li
+                            key={data.id}
+                            onClick={onClickFriendList(data.id)}
+                          >
+                            <div className="list_layout">
+                              <div className="list_check_icon">
+                                {data.check ? (
+                                  <AiFillCheckCircle />
+                                ) : (
+                                  <AiOutlineCheckCircle />
+                                )}
+                              </div>
+                              <div className="list_info">
+                                <p>이름: {data.name}</p>
+                                <p>이메일: {data.email}</p>
+                              </div>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <p>등록할 친구가 없습니다.</p>
+                      )}
+                    </ul>
+                  </Scrollbars>
+                </div>
               </div>
-              <div className="content_selected_box">
+              <div className="selected_list_box">
                 <div className="content_subname">
-                  <h2>선택한 친구들</h2>
+                  <h3>선택한 친구들</h3>
                 </div>
-                {checkFriendList.length !== 0 ? (
-                  <ul className="selected_member_ul">
-                    {checkFriendList.map((data) => (
-                      <li key={data.id}>{data.name}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>선택한 친구가 없습니다.</p>
-                )}
+                <div className="selected_list">
+                  <Scrollbars>
+                    {checkFriendList.length !== 0 ? (
+                      <ul className="selected_list_ul">
+                        {checkFriendList.map((data) => (
+                          <li key={data.id}>{data.name}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>선택한 친구가 없습니다.</p>
+                    )}
+                  </Scrollbars>
+                </div>
               </div>
               <div className="content_btn">
                 <Button type="button" onClick={onClickInviteFriends}>
