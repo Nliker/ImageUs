@@ -72,7 +72,7 @@ export const FilteringOption = styled.div`
   top: -65px;
   right: 0px;
 
-  width: 180px;
+  width: 120px;
   height: 20px;
   padding: 12px 14px;
 
@@ -118,7 +118,7 @@ export const FilteringOption = styled.div`
     left: 0;
     z-index: 10;
 
-    width: 209px;
+    width: 100%;
     border-radius: 4px;
     background-color: #fff;
     box-shadow: 0 0.125rem 0.05rem rgb(0 0 0 / 30%),
@@ -132,6 +132,10 @@ export const FilteringOption = styled.div`
     & .option:hover {
       background-color: whitesmoke;
     }
+  }
+
+  @media screen and (min-width: 768px) {
+    width: 180px;
   }
 `;
 
