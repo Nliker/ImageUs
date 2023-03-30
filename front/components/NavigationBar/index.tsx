@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { NavLink, useNavigate } from 'react-router-dom';
 
@@ -25,9 +25,9 @@ const NavigationBar = () => {
 
   const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
 
-  const [clickUserIcon, setClickUserIcon] = useState<boolean>(false);
-  const [hoverUserIcon, setHoverUserIcon] = useState<boolean>(false);
+  const [clickLogoutIcon, setClickLogoutIcon] = useState<boolean>(false);
   const userInfoEl = useRef<HTMLDivElement>(null);
+  const logoutBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.addEventListener('click', userIconBoxHandler, { capture: true });
@@ -36,6 +36,16 @@ const NavigationBar = () => {
       window.removeEventListener('click', userIconBoxHandler);
     };
   }, []);
+
+  const userIconBoxHandler = (e: MouseEvent) => {
+    if (
+      e.target instanceof (HTMLElement || SVGAElement) &&
+      !userInfoEl.current?.contains(e.target) &&
+      !logoutBoxRef.current?.contains(e.target)
+    ) {
+      setClickLogoutIcon(false);
+    }
+  };
 
   const MobileNav = ({ children }: any) => {
     const isMobile = useMediaQuery({ maxWidth: 1023 });
@@ -47,31 +57,17 @@ const NavigationBar = () => {
     return isDesktop ? children : null;
   };
 
-  const userIconBoxHandler = (e: MouseEvent) => {
-    if (
-      e.target instanceof HTMLElement &&
-      !userInfoEl.current?.contains(e.target)
-    ) {
-      setClickUserIcon(false);
-      setHoverUserIcon(false);
-    }
-  };
-
-  const onMouseEnterUserIcon = useCallback(() => {
-    if (clickUserIcon) return;
-    setHoverUserIcon(true);
-  }, [hoverUserIcon, clickUserIcon]);
-
-  const onMouseLeaveUserIcon = useCallback(() => {
-    if (clickUserIcon) return;
-    setHoverUserIcon(false);
-  }, [hoverUserIcon, clickUserIcon]);
-
   const onClickLogOut = async () => {
     sessionStorage.clear();
     upadateUserState({ logInState: 'LoggingOut' }).then(async () => {
       navigate('/');
     });
+  };
+
+  const onClickLogoutBox = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (userInfoEl.current?.contains(e.target as HTMLElement)) return;
+
+    setClickLogoutIcon((prev) => !prev);
   };
 
   return (
@@ -102,9 +98,8 @@ const NavigationBar = () => {
           </NavList>
           <div
             className="user_icon_d"
-            onMouseEnter={onMouseEnterUserIcon}
-            onMouseLeave={onMouseLeaveUserIcon}
-            onClick={() => setClickUserIcon((prev) => !prev)}
+            onClick={onClickLogoutBox}
+            ref={logoutBoxRef}
           >
             <IconContext.Provider
               value={{
@@ -114,7 +109,7 @@ const NavigationBar = () => {
             >
               <RiShutDownLine />
             </IconContext.Provider>
-            {(clickUserIcon || hoverUserIcon) && (
+            {clickLogoutIcon && (
               <UserBox ref={userInfoEl}>
                 <UserInfo>
                   <div className={'info_words'}>
@@ -164,9 +159,8 @@ const NavigationBar = () => {
           </NavList>
           <div
             className="user_icon_d"
-            onMouseEnter={onMouseEnterUserIcon}
-            onMouseLeave={onMouseLeaveUserIcon}
-            onClick={() => setClickUserIcon((prev) => !prev)}
+            onClick={onClickLogoutBox}
+            ref={logoutBoxRef}
           >
             <IconContext.Provider
               value={{
@@ -176,7 +170,7 @@ const NavigationBar = () => {
             >
               <RiShutDownLine />
             </IconContext.Provider>
-            {(clickUserIcon || hoverUserIcon) && (
+            {clickLogoutIcon && (
               <UserBox ref={userInfoEl}>
                 <UserInfo>
                   <div className={'info_words'}>
