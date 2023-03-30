@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { Navigate, useParams } from 'react-router';
 
@@ -11,9 +11,13 @@ import ContentSection from './Components/ContentSection';
 import { ContentSectionWrapper } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 
+export const DeviceCheckContext = createContext<boolean | null>(null);
+
 const ImageRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const userId = sessionStorage.getItem('user_id');
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
   const { data: roomListInfo } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
@@ -23,6 +27,15 @@ const ImageRoom = () => {
       revalidateOnReconnect: false,
     },
   );
+
+  useEffect(() => {
+    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobileValue) {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
+    }
+  }, []);
 
   const checkValideRoomId = () => {
     if (!roomListInfo) return false;
@@ -48,7 +61,9 @@ const ImageRoom = () => {
   return (
     <AppLayout isImageRoom>
       <ContentSectionWrapper>
-        <ContentSection key={roomId} roomId={roomId} />
+        <DeviceCheckContext.Provider value={isMobile}>
+          <ContentSection key={roomId} roomId={roomId} />
+        </DeviceCheckContext.Provider>
         <div onClick={onClickUploadModal} className="upload_icon">
           <IconContext.Provider
             value={{
