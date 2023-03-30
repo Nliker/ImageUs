@@ -24,10 +24,14 @@ export const Background = styled.div`
 
 export const Container = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
   z-index: 1001;
 
-  height: 100%;
+  width: 60%;
+  height: 80%;
+  min-width: 320px;
+  max-width: 520px;
 `;
 
 export const CloseBtn = styled.div`
