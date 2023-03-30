@@ -24,7 +24,7 @@ import {
   ResultActionBtn,
   ResultMembers,
   ResultRoomName,
-  RoomName,
+  RoomNameInput,
   Title,
 } from './styles';
 
@@ -126,12 +126,12 @@ const CreateRoomModal = () => {
     <ModalBoxContainer>
       <ModalBox>
         <Title>
-          <h1>방 생성하기</h1>
+          <h2>방 생성하기</h2>
         </Title>
         {currentStage === 0 ? (
           <ContentBox>
             <Content>
-              <RoomName>
+              <RoomNameInput>
                 <label htmlFor="room_name">방 이름</label>
                 <input
                   type="text"
@@ -139,9 +139,9 @@ const CreateRoomModal = () => {
                   onChange={handleRoomName}
                   value={roomName}
                 />
-              </RoomName>
-              <MemeberList>
-                <Scrollbars>
+              </RoomNameInput>
+              <Scrollbars>
+                <MemeberList>
                   <div className="member_list">
                     {friendCheckList.length !== 0 ? (
                       friendCheckList.map((friendData: AddCheckFriendData) => (
@@ -165,8 +165,8 @@ const CreateRoomModal = () => {
                       <p>등록된 친구가 없습니다.</p>
                     )}
                   </div>
-                </Scrollbars>
-              </MemeberList>
+                </MemeberList>
+              </Scrollbars>
             </Content>
             <ActionBtn>
               <Button type="button" onClick={onClickNext}>
@@ -179,11 +179,11 @@ const CreateRoomModal = () => {
             <ContentBox>
               <div className="result_content">
                 <ResultRoomName>
-                  <h2>방 이름</h2>
+                  <h3>방 이름</h3>
                   <p>{roomName}</p>
                 </ResultRoomName>
                 <ResultMembers>
-                  <h2>초대할 멤버</h2>
+                  <h3>초대할 멤버</h3>
                   {selectListState.length !== 0 ? (
                     <ul>
                       {selectListState
