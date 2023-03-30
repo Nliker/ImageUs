@@ -86,7 +86,7 @@ const SearchBox = () => {
               id="searchFriend"
               name="search"
               autoComplete="off"
-              placeholder="검색할 유저의 이메일을 입력하세요.."
+              placeholder="이메일을 입력하세요.."
               onChange={handleTmpInputData}
               onFocus={() => setFocusSearchBox(true)}
               onBlur={() => setFocusSearchBox(false)}
