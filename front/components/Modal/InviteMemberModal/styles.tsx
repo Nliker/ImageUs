@@ -1,29 +1,30 @@
 import styled from '@emotion/styled';
 
 export const Wrapper = styled.div`
-  width: 450px;
-  height: 80%;
-  border-radius: 6px;
-
-  @media screen and (min-width: 768px) {
-    width: 600px;
-  }
-`;
-
-export const Container = styled.div`
   display: flex;
   flex-direction: column;
 
+  width: 100%;
   height: 100%;
-  border-radius: 12px;
 
+  border-radius: 12px;
   background-color: white;
+`;
+
+export const Container = styled.div`
+  flex: 1;
 `;
 
 export const Title = styled.div`
   font-size: 18px;
-  padding: 5px 0;
+  padding: 1rem 0;
   text-align: center;
+
+  box-shadow: 0 2px 4px hsla(0, 0%, 81.2%, 0.5);
+
+  h2 {
+    margin: 0;
+  }
 
   span {
     display: inline-block;
@@ -32,6 +33,7 @@ export const Title = styled.div`
 
 export const Content = styled.div`
   width: 100%;
+  height: 100%;
   padding-bottom: 20px;
 
   box-sizing: border-box;
@@ -41,14 +43,21 @@ export const Content = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
     align-items: center;
 
     margin: 0 40px;
+    gap: 1rem;
 
-    .content_select_box {
+    .content_list_box {
       width: 100%;
 
-      .not_selected_ul {
+      .content_list {
+        position: relative;
+        height: 150px;
+      }
+
+      .content_list_ul {
         display: table;
 
         margin: auto;
@@ -88,22 +97,26 @@ export const Content = styled.div`
       }
     }
 
-    .content_selected_box {
+    .selected_list_box {
       width: 100%;
       text-align: center;
 
-      .selected_member_ul {
-        display: inline-block;
+      .selected_list {
+        height: 100px;
 
-        min-width: 100px;
-        margin: 0;
+        .selected_list_ul {
+          display: inline-block;
 
-        li {
-          list-style: circle;
-        }
+          min-width: 100px;
+          margin: 0;
 
-        & > li:not(& > li:last-child) {
-          margin-bottom: 0.5rem;
+          li {
+            list-style: circle;
+          }
+
+          & > li:not(& > li:last-child) {
+            margin-bottom: 0.5rem;
+          }
         }
       }
     }
@@ -111,9 +124,5 @@ export const Content = styled.div`
 
   .content_subname {
     text-align: center;
-  }
-
-  .content_btn {
-    margin-top: 40px;
   }
 `;
