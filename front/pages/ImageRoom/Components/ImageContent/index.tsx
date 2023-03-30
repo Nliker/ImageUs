@@ -11,6 +11,7 @@ import {
   ImageInfo,
   InfoContainer,
 } from './styles';
+import { DeviceCheckContext } from '@pages/ImageRoom';
 
 interface Props {
   data: CImageData;
@@ -42,7 +43,6 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   );
   const { data: deleteUserImageId, isLoading: userImageDeleting } =
     useSWR('userImageDelete');
-
   const [isHover, setIsHover] = useState(false);
 
   useEffect(() => {
@@ -63,9 +63,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
     fetchUserImage([...filteredList], false);
   }, [deleteUserImageId]);
 
-  const onClickShowAlertBox = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-
+  const onClickShowAlertBox = () => {
     const alertArgKey =
       currentPath === '/my_page' ? '/image' : `/room/${roomId}/image`;
 
@@ -79,55 +77,70 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
     });
   };
 
-  const onClickPictureInfo = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const onClickPictureInfo = () => {
     mutate('modalState', { currentModalState: 'detailPicture' });
     mutateDetailImageInfo({ index, data });
   };
 
+  const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {
+    if ((e.target as Element).closest('.detail_btn')) {
+      onClickPictureInfo();
+    } else if ((e.target as Element).closest('.delete_btn')) {
+      onClickShowAlertBox();
+    }
+
+    setIsHover((prev) => !prev);
+  };
+
+  const onClickContent = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as Element).closest('.detail_btn')) {
+      onClickPictureInfo();
+    } else if ((e.target as Element).closest('.delete_btn')) {
+      onClickShowAlertBox();
+    }
+  };
+
   return (
-    <>
-      <ContentBox
-        key={data.id}
-        ref={thisArr.length - 1 === index ? observerRef : undefined}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-        onTouchStart={() => setIsHover(true)}
-        onTouchEnd={() => setIsHover(false)}
-      >
-        <ImageCard>
-          <img src={data.link} />
-        </ImageCard>
-        <InfoContainer>
-          <ImageInfo>
-            <div>
-              <span>작성자: {data.user_name}</span>
-            </div>
-            <div>
-              <span>작성일: {data.created_at}</span>
-            </div>
-          </ImageInfo>
-        </InfoContainer>
-        {isHover && (
-          <HoverBox>
-            <div className="btn_group">
-              <Button type="button" onClick={onClickPictureInfo}>
-                자세히 보기
-              </Button>
-              {data.user_id + '' === sessionStorage.getItem('user_id') && (
-                <Button
-                  type="button"
-                  className="error"
-                  onClick={onClickShowAlertBox}
-                >
-                  게시물 삭제하기
+    <DeviceCheckContext.Consumer>
+      {(isMobile) => (
+        <ContentBox
+          key={data.id}
+          ref={thisArr.length - 1 === index ? observerRef : undefined}
+          onMouseEnter={isMobile ? undefined : () => setIsHover(true)}
+          onMouseLeave={isMobile ? undefined : () => setIsHover(false)}
+          onClick={isMobile ? undefined : onClickContent}
+          onTouchEnd={isMobile ? onTouchContent : undefined}
+        >
+          <ImageCard>
+            <img src={data.link} />
+          </ImageCard>
+          <InfoContainer>
+            <ImageInfo>
+              <div>
+                <span>작성자: {data.user_name}</span>
+              </div>
+              <div>
+                <span>작성일: {data.created_at}</span>
+              </div>
+            </ImageInfo>
+          </InfoContainer>
+          {isHover && (
+            <HoverBox>
+              <div className="btn_group">
+                <Button type="button" className="detail_btn">
+                  자세히 보기
                 </Button>
-              )}
-            </div>
-          </HoverBox>
-        )}
-      </ContentBox>
-    </>
+                {data.user_id + '' === sessionStorage.getItem('user_id') && (
+                  <Button type="button" className="error delete_btn">
+                    게시물 삭제하기
+                  </Button>
+                )}
+              </div>
+            </HoverBox>
+          )}
+        </ContentBox>
+      )}
+    </DeviceCheckContext.Consumer>
   );
 };
 
