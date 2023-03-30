@@ -15,36 +15,10 @@ const PeopleManagement = () => {
           <div className="content_wrapper">
             <Header>
               <div>
-                <h1>친구 관리</h1>
+                <h2>친구 관리</h2>
               </div>
             </Header>
             <ContentBox>
-              {/* <TabBox>
-                <ul>
-                  <li>
-                    <NavLink
-                      to={''}
-                      className={({ isActive }) =>
-                        isActive ? 'active_tab' : undefined
-                      }
-                      end
-                      defaultChecked
-                    >
-                      친구 목록
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={'search'}
-                      className={({ isActive }) =>
-                        isActive ? 'active_tab' : undefined
-                      }
-                    >
-                      유저 검색
-                    </NavLink>
-                  </li>
-                </ul>
-              </TabBox> */}
               <TabBox>
                 <ul>
                   <li>

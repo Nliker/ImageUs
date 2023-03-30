@@ -25,52 +25,33 @@ export const Wrapper = styled.div`
 
   .content_wrapper {
     position: relative;
-    right: 3px;
 
     padding-bottom: 40px;
   }
 `;
 
 export const Header = styled.header`
-  div {
-    padding: 28px 0;
-    height: 105px;
-    box-sizing: border-box;
-  }
+  margin-bottom: 5rem;
 
-  h1 {
-    margin-left: 2em;
+  div {
+    width: 80%;
+    height: 105px;
+    margin: auto;
+
+    h2 {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
   }
 `;
 
 export const ContentBox = styled.div`
   position: relative;
-  top: 65px;
 
-  width: fit-content;
+  width: 80%;
+  max-width: 850px;
   margin: auto;
-
-  table {
-    width: 100%;
-    position: relative;
-    padding-bottom: 0;
-    border: none;
-    border-collapse: collapse;
-
-    td,
-    th {
-      text-align: start;
-      padding: 16px;
-    }
-
-    th {
-      border-bottom: 1px solid #a39485;
-    }
-
-    tr td {
-      border-bottom: 1px solid #e5e5e5;
-    }
-  }
 
   @media screen and (max-width: 850px) {
     width: 100%;
@@ -119,13 +100,46 @@ export const TabContent = styled.div`
   position: relative;
 
   width: 100%;
+  min-height: 350px;
   border-top: 1px solid #a39485;
 
   background-color: white;
 
+  table {
+    position: relative;
+
+    width: 100%;
+    padding-bottom: 0;
+
+    border: none;
+    border-collapse: collapse;
+    user-select: text;
+
+    td,
+    th {
+      text-align: start;
+      padding: 16px 0;
+    }
+
+    th {
+      border-bottom: 1px solid #a39485;
+    }
+
+    tr td {
+      border-bottom: 1px solid #e5e5e5;
+    }
+  }
+
   @media screen and (min-width: 850px) {
-    width: 800px;
-    border-radius: 15px;
-    box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
+    border-radius: 10px;
+    box-shadow: 0px 2px 7px -4px;
+    border: none;
+
+    table {
+      td,
+      th {
+        padding: 16px;
+      }
+    }
   }
 `;
