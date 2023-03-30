@@ -3,7 +3,7 @@ FROM nginx:1.21.3
 
 COPY ./dist /usr/share/nginx/html/dist
 
-COPY ./images /usr/share/nginx/html/images
+COPY ./images /usr/share/nginx/html/assets
 
 RUN rm /usr/share/nginx/html/index.html
 
