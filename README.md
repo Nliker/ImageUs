@@ -1,9 +1,8 @@
 # ImageUs
 
-
 &nbsp; <img width="250px" height="250px" src="https://user-images.githubusercontent.com/77044696/224473232-d614b965-d2c1-4dd1-bade-9c3e3207dc6a.png" />
 
->## Table of Contents
+> ## Table of Contents
 
 - [Introduction](#Introduction)
 - [Domain](#Domain)
@@ -14,28 +13,28 @@
 
 <br/>
 
->## Introduction
+> ## Introduction
 
 <br/>
 
-*   Background
+- Background
 
-    *   Mybox 서비스 같은 경우는 사람들에게 사진을 공유할   때 사진마다 사람들을 초대하여 공유하는 번거로움이 있습니다.이에 ImageUs에서는 공유하고 싶은 그룹을 만들고 편리하게 여행 사진이나 추억이 남는 이미지에 대한 그룹의 공유 및 삭제를 할 수 있습니다.
-
-<br/>
-
-*   Service
-
-    *   사진을 업로드 할 수 있는 자신만의 공간
-    *   원하는 사진을 편리하게 공유 할 수 있는 친구들과의 그룹 공간
-    *   친구추가를 위한 유저 검색
-    *   간편한 가입 절차를 위한 소셜로그인
-    *   그룹 공간에서의 실시간 이미지 업데이트
-    *   그룹 공간에서의 날짜별 이미지 필터링
+  - Mybox 서비스 같은 경우는 사람들에게 사진을 공유할 때 사진마다 사람들을 초대하여 공유하는 번거로움이 있습니다.이에 ImageUs에서는 공유하고 싶은 그룹을 만들고 편리하게 여행 사진이나 추억이 남는 이미지에 대한 그룹의 공유 및 삭제를 할 수 있습니다.
 
 <br/>
 
->## Domain
+- Service
+
+  - 사진을 업로드 할 수 있는 자신만의 공간
+  - 원하는 사진을 편리하게 공유 할 수 있는 친구들과의 그룹 공간
+  - 친구추가를 위한 유저 검색
+  - 간편한 가입 절차를 위한 소셜로그인
+  - 그룹 공간에서의 실시간 이미지 업데이트
+  - 그룹 공간에서의 날짜별 이미지 필터링
+
+<br/>
+
+> ## Domain
 
 <br/>
 
@@ -45,15 +44,15 @@
 
 #### 다음은 테스트 아이디입니다.원하시는 아이디로 접속하셔서 사용해보세요!
 
-|유저|아이디|비밀번호|
-|-------|------|----------|
-|user1|<span style="color:yellow">test1@test.com</span>|<span style="color:yellow">testuser1</span>|
-|user2|<span style="color:green">test2@test.com</span>|<span style="color:green">testuser2</span>|
-|user3|<span style="color:blue">test3@test.com</span>|<span style="color:blue">testuser3</span>|
+| 유저  | 아이디                                           | 비밀번호                                    |
+| ----- | ------------------------------------------------ | ------------------------------------------- |
+| user1 | <span style="color:yellow">test1@test.com</span> | <span style="color:yellow">testuser1</span> |
+| user2 | <span style="color:green">test2@test.com</span>  | <span style="color:green">testuser2</span>  |
+| user3 | <span style="color:blue">test3@test.com</span>   | <span style="color:blue">testuser3</span>   |
 
 <br/>
 
->## Structural diagram
+> ## Structural diagram
 
 <br/>
 
@@ -61,31 +60,31 @@
 
 <br/>
 
->## Stacks
+> ## Stacks
 
 <br/>
 
-|역할|스택|
-|:---|:---:|
-|프론트엔드|![React](https://img.shields.io/badge/react-ffffff?style=for-the-badge&logo=react) ![Swr](https://img.shields.io/badge/swr-ffffff?style=for-the-badge&logo={data:image/svg+xml;base64,PCEtLSBSZXBsYWNlIHRoZSBjb250ZW50cyBvZiB0aGlzIGVkaXRvciB3aXRoIHlvdXIgU1ZHIGNvZGUgLS0+Cgo8c3ZnIHZpZXdCb3g9IjAgMCAyOTEgNjkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTAgMzYuNTNjLjA3IDE3LjYgMTQuNCAzMi4wMSAzMi4wMSAzMi4wMWEzMi4wNSAzMi4wNSAwIDAgMCAzMi4wMS0zMlYzMmExMy4yIDEzLjIgMCAwIDEgMjMuNC04LjMxaDIwLjdBMzIuMDcgMzIuMDcgMCAwIDAgNzcuMiAwYTMyLjA1IDMyLjA1IDAgMCAwLTMyIDMyLjAxdjQuNTJBMTMuMiAxMy4yIDAgMCAxIDMyIDQ5LjcxYTEzLjIgMTMuMiAwIDAgMS0xMy4xOC0xMy4xOCAzLjc3IDMuNzcgMCAwIDAtMy43Ny0zLjc3SDMuNzZBMy43NyAzLjc3IDAgMCAwIDAgMzYuNTN6bTEyMi40OSAzMi4wMWEzMi4xNCAzMi4xNCAwIDAgMS0zMC44OS0yMy43aDIwLjY3YTEzLjE2IDEzLjE2IDAgMCAwIDIzLjQtOC4zVjMyYTMyLjA1IDMyLjA1IDAgMCAxIDMyLjAxLTMyYzE3LjQzIDAgMzEuNjQgMTQgMzIgMzEuMzNsLjEgNS4yYTEzLjIgMTMuMiAwIDAgMCAyMy40IDguMzFoMjAuN2EzMi4wNyAzMi4wNyAwIDAgMS0zMC45MSAyMy43Yy0xNy42MSAwLTMxLjk0LTE0LjQyLTMyLjAxLTMybC0uMS00Ljd2LS4yYTEzLjIgMTMuMiAwIDAgMC0xMy4xOC0xMi44MSAxMy4yIDEzLjIgMCAwIDAtMTMuMTggMTMuMTh2NC41MmEzMi4wNSAzMi4wNSAwIDAgMS0zMi4wMSAzMi4wMXpNMjQ3Ljk0IDIzLjdhMTMuMTYgMTMuMTYgMCAwIDEgMjMuNCA4LjMxIDMuNzcgMy43NyAwIDAgMCAzLjc3IDMuNzdoMTEuM2EzLjc3IDMuNzcgMCAwIDAgMy43Ni0zLjc3QTMyLjA1IDMyLjA1IDAgMCAwIDI1OC4xNiAwYTMyLjA3IDMyLjA3IDAgMCAwLTMwLjkyIDIzLjdoMjAuN3oiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4=}) ![Emotion](https://img.shields.io/badge/Emotion-f26b00?style=for-the-badge)|
-|백엔드|<img src="https://img.shields.io/badge/Flask-white?style=for-the-badge&logo=Flask&logoColor=black"> <img src="https://img.shields.io/badge/Gunicorn-499848?style=for-the-badge&logo=Pytest&logoColor=white"> <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"> <img src="https://img.shields.io/badge/Elastic-005571?style=for-the-badge&logo=Elastic&logoColor=white">|
-|배포|<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=NGINX&logoColor=white">|
+| 역할       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            스택                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| :--------- | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| 프론트엔드 | ![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=white) ![Swr](https://img.shields.io/badge/SWR-white?style=flat&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTEycHgiIGhlaWdodD0iMTIxcHgiIHZpZXdCb3g9IjAgMCA1MTIgMTIxIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIj4KICAgIDx0aXRsZT5TV1I8L3RpdGxlPgogICAgPGc+CiAgICAgICAgPHBhdGggZD0iTTAsNjQuNDU2NTU5OSBDMC4xMjM1MTM4MDIsOTUuNTExNDU4OCAyNS40MDg1NTM2LDEyMC45Mzc2NTcgNTYuNDgxMDk3MywxMjAuOTM3NjU3IEM4Ny42NTA2ODc1LDEyMC44OTg4MzkgMTEyLjkxMjc4OSw5NS42NDU1NTk1IDExMi45NjIxOTUsNjQuNDc0MjA0OCBMMTEyLjk2MjE5NSw1Ni40NjM0NTI1IEMxMTMuMDUzOTQ4LDM4LjUzNDU0MTggMTMyLjUyMTQ4NywyNy40Mjg4ODY1IDE0OC4wMDMwNiwzNi40NzUzOTAzIEMxNTAuMzgzMzQ4LDM3Ljg2NTgwMjggMTUyLjQ5ODk2MywzOS42NjkxMDQzIDE1NC4yNTEwOTQsNDEuODAwNTk5NiBMMTkwLjc3NTg5LDQxLjgwMDU5OTYgQzE4NC4xMDI2MTYsMTcuMTU0MzAyNyAxNjEuNzUxOTExLDAuMDI5OTk2MjA5MSAxMzYuMjE4MDc5LDAgQzEwNS4wNDY3MjQsMC4wNDk0MDU1MjA5IDc5Ljc5MzQ0NTIsMjUuMzExNTA3IDc5Ljc1NDYyNjYsNTYuNDgxMDk3MyBMNzkuNzU0NjI2Niw2NC40NTY1NTk5IEM3OS43MzUyMTczLDc3LjMwNzI4ODggNjkuMzEyNDE2OSw4Ny43MTI0NDQ0IDU2LjQ2MzQ1MjUsODcuNzEyNDQ0NCBDNDMuNjI2ODM5NCw4Ny42OTMwMzUxIDMzLjIyNjk3NzMsNzcuMjkzMTczIDMzLjIwNzU2OCw2NC40NTY1NTk5IEMzMy4yMDc1NjgsNjAuNzgyOTA2NiAzMC4yMjkxMjA5LDU3LjgwNDQ1OTUgMjYuNTU1NDY3NSw1Ny44MDQ0NTk1IEw2LjYzNDQ1NTY2LDU3LjgwNDQ1OTUgQzIuOTY2MDk1NzQsNTcuODE1MDQ2NCAwLDYwLjc4OTk2NDUgMCw2NC40NTY1NTk5IFogTTIxNi4xMzE1MDksMTIwLjkzNzY1NyBDMTkwLjYyNTkwOSwxMjAuODQyMzc1IDE2OC4zMjI4NDUsMTAzLjczMDQyIDE2MS42MjY2MzMsNzkuMTE5NDEyOCBMMTk4LjA5ODQ5NCw3OS4xMTk0MTI4IEMyMDkuMzI1ODk5LDkzLjAyODgzMTQgMjMxLjM5OTU4LDg5LjU2ODY4MDQgMjM3LjgzMTEyLDcyLjg5MDc4ODIgQzIzOC44NjY4NzEsNzAuMjA1MjQ1MiAyMzkuMzk0NDUyLDY3LjM1MjA3NjQgMjM5LjM4NzM5NCw2NC40NzQyMDQ4IEwyMzkuMzg3Mzk0LDU2LjQ2MzQ1MjUgQzIzOS40MzUwMzUsMjUuMjkzODYyMiAyNjQuNjk3MTM2LDAuMDM4ODE4NjIzNiAyOTUuODY4NDkxLDAgQzMyNi42MjM0MjgsMCAzNTEuNjk2NzMsMjQuNzAyNzYwNSAzNTIuMzMxOTQzLDU1LjI4MTI0ODkgTDM1Mi41MDgzOTIsNjQuNDU2NTU5OSBDMzUyLjYwMDE0NSw4Mi4zODcyMzUxIDM3Mi4wNjc2ODQsOTMuNDkxMTI1OSAzODcuNTQ5MjU3LDg0LjQ0NjM4NjYgQzM4OS45Mjk1NDUsODMuMDU1OTc0MSAzOTIuMDQ1MTYsODEuMjUwOTA4MSAzOTMuNzk3MjkxLDc5LjExOTQxMjggTDQzMC4zMjIwODcsNzkuMTE5NDEyOCBDNDIzLjY1NzYzNSwxMDMuNzY3NDc0IDQwMS4zMTM5ODgsMTIwLjkwMDYwMyAzNzUuNzgxOTIxLDEyMC45Mzc2NTcgQzM0NC43MDkzNzcsMTIwLjkzNzY1NyAzMTkuNDI0MzM3LDk1LjQ5MzgxNCAzMTkuMzAwODI0LDY0LjQ3NDIwNDggTDMxOS4xMjQzNzUsNTYuMTgxMTM1MiBMMzE5LjEyNDM3NSw1NS44MjgyMzg2IEMzMTguNzUyMDY5LDQzLjI0OTI0MDEgMzA4LjQ1Mjc4MywzMy4yMzkzMjg3IDI5NS44Njg0OTEsMzMuMjI1MjEyOCBDMjgzLjAzMTg3OCwzMy4yNDQ2MjIxIDI3Mi42MzIwMTYsNDMuNjQ2MjQ4OCAyNzIuNjEyNjA2LDU2LjQ4MTA5NzMgTDI3Mi42MTI2MDYsNjQuNDU2NTU5OSBDMjcyLjU3Mzc4OCw5NS42MzQ5NzI2IDI0Ny4zMDgxNTcsMTIwLjg5ODgzOSAyMTYuMTMxNTA5LDEyMC45Mzc2NTcgWiBNNDM3LjQ4NTg4OCw0MS44MTgyNDQ1IEM0NDguNzEzMjkyLDI3LjkxMDU5MDMgNDcwLjc4Njk3MywzMS4zNzA3NDEzIDQ3Ny4yMTg1MTMsNDguMDQ4NjMzNiBDNDc4LjI1NjAyOSw1MC43Mzk0NyA0NzguNzgzNjEsNTMuNTk3OTMyMiA0NzguNzc0Nzg3LDU2LjQ4MTA5NzMgQzQ3OC43NzQ3ODcsNjAuMTU2NTE1MSA0ODEuNzUzMjM0LDYzLjEzMzE5NzggNDg1LjQyNjg4OCw2My4xMzMxOTc4IEw1MDUuMzY1NTQ0LDYzLjEzMzE5NzggQzUwOS4wMzIxNCw2My4xMjQzNzU0IDUxMiw2MC4xNDk0NTcyIDUxMiw1Ni40ODEwOTczIEM1MTEuOTYxMTgxLDI1LjMwNDQ0OTEgNDg2LjY5NTU1MSwwLjAzODgxODYyMzYgNDU1LjUxODkwMywwIEM0MjkuOTc5Nzc3LDAuMDMxNzYwNjkyIDQwNy42MjU1NDQsMTcuMTY0ODg5NSA0MDAuOTYxMDkyLDQxLjgxODI0NDUgTDQzNy40ODU4ODgsNDEuODE4MjQ0NSBaIiBmaWxsPSIjMDAwMDAwIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPgo=) ![Emotion](https://img.shields.io/badge/Emotion-C43BAD?style=flat) |
+| 백엔드     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <img src="https://img.shields.io/badge/Flask-white?style=for-the-badge&logo=Flask&logoColor=black"> <img src="https://img.shields.io/badge/Gunicorn-499848?style=for-the-badge&logo=Pytest&logoColor=white"> <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"> <img src="https://img.shields.io/badge/Elastic-005571?style=for-the-badge&logo=Elastic&logoColor=white">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 배포       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=NGINX&logoColor=white">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 <br/>
 
->## Contributors
+> ## Contributors
 
 <br/>
 
-| 권강훈 | 서정현 |
-| :------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                                      권강훈                                      |                                      서정현                                      |
+| :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
 | <img width="160px" src="https://avatars.githubusercontent.com/u/72805356?v=4" /> | <img width="160px" src="https://avatars.githubusercontent.com/u/77044696?v=4" /> |
-| [@kanghunK](https://github.com/kanghunK) | [@Nliker](https://github.com/Nliker) |
-| 프론트엔드 | 백엔드 |
+|                     [@kanghunK](https://github.com/kanghunK)                     |                       [@Nliker](https://github.com/Nliker)                       |
+|                                    프론트엔드                                    |                                      백엔드                                      |
 
 <br/>
 
->## Demo
+> ## Demo
 
 <br/>
 
