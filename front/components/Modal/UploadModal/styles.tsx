@@ -44,25 +44,14 @@ export const ModalContainer = styled.div`
   justify-content: center;
   z-index: 1001;
 
+  width: 450px;
+
   overflow-x: hidden;
   overflow-y: hidden;
 `;
 
-export const ModalBox = styled.div`
-  display: flex;
-
-  h1,
-  h2 {
-    font-size: 16px;
-    margin: 0;
-  }
-`;
-
 export const Modal = styled.div`
-  width: 495px;
-  max-width: calc(100vw - 40px);
-  min-width: 348px;
-  min-height: 391px;
+  width: 100%;
   border-radius: 12px;
 
   background-color: white;
@@ -109,7 +98,6 @@ export const ModalHeaderWrapper = styled.div`
 
 export const HeaderContainer = styled.div`
   display: flex;
-  padding: 0 3px;
 `;
 
 export const ModalHeader = styled.div`
@@ -131,9 +119,11 @@ export const ModalTitle = styled.div`
   width: calc(100% - 120px);
   height: 43px;
 
-  h1 {
+  h2 {
     width: 100%;
     margin: 0;
+
+    font-size: 16px;
     text-align: center;
   }
 `;
