@@ -3,13 +3,16 @@
 <h4 align="left">
 
 - [Requirements](#requirements)
+
 - [Installation](#installation)
+
 - [주요 기능](#주요-기능)
+
 - [디렉토리 구조](#디렉토리-구조)
 
 </h4>
 
-<br><br>
+<br>
 
 > ## Requirements
 
@@ -17,13 +20,13 @@
 
 - [Node.js](https://nodejs.org)
 
-<br><br>
+<br>
 
 > ## Installation
 
 <br>
 
-#### 레포지토리 클론
+&nbsp;&nbsp; 레포지토리 클론
 
 <br>
 
@@ -33,7 +36,7 @@ $ git clone https://github.com/kanghunK/ImageUs.git
 
 <br>
 
-#### 패키지 설치 및 개발 모드 실행
+&nbsp;&nbsp; 패키지 설치 및 개발 모드 실행
 
 <br>
 
