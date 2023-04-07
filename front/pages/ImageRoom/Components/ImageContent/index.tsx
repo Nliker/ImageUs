@@ -83,6 +83,8 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     if ((e.target as Element).closest('.detail_btn')) {
       onClickPictureInfo();
     } else if ((e.target as Element).closest('.delete_btn')) {
@@ -93,6 +95,8 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   };
 
   const onClickContent = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     if ((e.target as Element).closest('.detail_btn')) {
       onClickPictureInfo();
     } else if ((e.target as Element).closest('.delete_btn')) {

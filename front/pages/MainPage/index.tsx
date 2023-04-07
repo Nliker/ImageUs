@@ -101,7 +101,9 @@ const MainPage = () => {
           </div>
           <div className="create_room_btn">
             <ActionButton
-              onClickBtn={() => {
+              onClickBtn={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+
                 mutate('modalState', {
                   currentModalState: 'creatRoom',
                 });

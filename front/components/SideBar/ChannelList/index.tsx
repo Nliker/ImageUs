@@ -49,7 +49,9 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
           />
           <CreateBtnBox>
             <ActionButton
-              onClickBtn={() => {
+              onClickBtn={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+
                 mutate('modalState', { currentModalState: 'creatRoom' });
               }}
               btnTitle={'+'}

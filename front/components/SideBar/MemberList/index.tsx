@@ -74,7 +74,9 @@ const MemberList = memo(({ currentRoomInfo }: Props) => {
           />
           <CreateBtnBox>
             <ActionButton
-              onClickBtn={() => {
+              onClickBtn={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+
                 mutate('modalState', { currentModalState: 'inviteMember' });
               }}
               btnTitle={'+'}

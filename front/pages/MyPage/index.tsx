@@ -122,7 +122,9 @@ const MyPage = () => {
     });
   }, [requestImageList]);
 
-  const onClickUploadModal = () => {
+  const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
     mutate('modalState', {
       currentModalState: 'upload',
       uploadLocation: 'user',
