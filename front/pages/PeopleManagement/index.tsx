@@ -1,5 +1,5 @@
 import React from 'react';
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 
 import AppLayout from '@layouts/AppLayout';

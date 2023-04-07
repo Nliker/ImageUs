@@ -2,7 +2,7 @@ import React, { CSSProperties, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
 import { Link } from 'react-router-dom';
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 import { NavLink } from 'react-router-dom';
 
 import { DRoomData } from '@typing/db';

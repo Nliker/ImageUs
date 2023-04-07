@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 import { TbDoorExit } from 'react-icons/tb';
 import { IconContext } from 'react-icons/lib';
 import {

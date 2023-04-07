@@ -3,7 +3,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { useParams } from 'react-router';
 
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
 import { getUserFriendList } from '@utils/userDataFetcher';

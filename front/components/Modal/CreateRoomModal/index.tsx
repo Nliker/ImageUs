@@ -4,7 +4,7 @@ import useSWRMutation from 'swr/mutation';
 import { AxiosError } from 'axios';
 
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';

@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { Routes, Route, useLocation, Navigate } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import { CImageData } from '@typing/client';
 import useIntersect from '@hooks/useIntersect';
