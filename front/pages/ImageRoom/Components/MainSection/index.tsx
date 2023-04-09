@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -22,7 +22,7 @@ import { Button } from '@styles/Button';
 import Spinner from '@styles/Spinner';
 import { SidebarContext } from '@layouts/AppLayout';
 
-import ImageContentList from '../ImageContentList';
+import ImageSection from '../ImageSection';
 import {
   ContentBox,
   ActiveContentBox,
@@ -36,7 +36,7 @@ interface SelectTerm {
   endDate?: string;
 }
 
-const ContentSection = ({ roomId }: { roomId?: string }) => {
+const MainSection = ({ roomId }: { roomId?: string }) => {
   const { data: realTimeImageList } = useSWR(
     `/room/${roomId}/unread-imagelist`,
     getUnreadImageList,
@@ -47,18 +47,14 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
       refreshInterval: 300000,
     },
   );
-  const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
-    `/image/${roomId}`,
-    {
-      fallbackData: [],
-    },
-  );
-  const { data: filterImage, mutate: mutateFilterImage } = useSWR<CImageData[]>(
-    `/image/${roomId}/filter`,
-    {
-      fallbackData: [],
-    },
-  );
+
+  /*
+
+  현재까지 읽은 이미지 번호에 맞춰 이미지 링크를 저장하는 배열으로
+  defaultImageList은 기본 게시물에 대한 이미지들을 저장하는 리스트이고
+  filterImageList은 기간 필터링된 이미지들을 저장하는 리스트입니다.
+
+*/
 
   const {
     data: defaultImageList,
@@ -72,8 +68,31 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     isMutating: filterImgListLoading,
   } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
 
-  const { trigger: imgDataListTrigger, isMutating: imgDataLoading } =
+  /*
+
+  실제 이미지 주소리스트를 받는 함수
+
+*/
+
+  const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/room/imageData', getImageData);
+
+  /*
+
+  실제 이미지 주소리스트가 게시된 이미지, 필터링 된 이미지별로 나누어서 배열에 저장됩니다.
+
+*/
+
+  // const { data: postedImage, mutate: mutatePostedImage } = useSWR<CImageData[]>(
+  //   `/image/${roomId}`,
+  // );
+  // const { data: filterImage, mutate: mutateFilterImage } = useSWR<CImageData[]>(
+  //   `/image/${roomId}/filter`,
+  // );
+
+  const { data: roomImage, mutate: mutateRoomImage } = useSWR<
+    CImageData[] | null
+  >(`/image/${roomId}`);
 
   const [readStartNumber, setReadStartNumber] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
@@ -88,7 +107,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
       if (
         !filterSelectTerm &&
         !defaultImgListLoading &&
-        !imgDataLoading &&
+        !imgDataListLoading &&
         defaultImageList?.loadDataLength === 12
       ) {
         defaultImgListTrigger({
@@ -99,7 +118,7 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
       if (
         filterSelectTerm &&
         !filterImgListLoading &&
-        !imgDataLoading &&
+        !imgDataListLoading &&
         filterImageList?.loadDataLength === 12
       ) {
         filterImgListTrigger({
@@ -113,10 +132,6 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
       threshold: 0.5,
     },
   );
-
-  if (!postedImage || !filterImage) {
-    return <div>로딩중...</div>;
-  }
 
   useEffect(() => {
     if (!filterSelectTerm) {
@@ -132,55 +147,82 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
     }
 
     return () => {
-      mutatePostedImage([], false);
-      mutateFilterImage([], false);
+      // mutatePostedImage([], false);
+      // mutateFilterImage([], false);
+      setReadStartNumber(0);
+      mutateRoomImage(null, false);
     };
   }, [roomId, filterSelectTerm]);
 
   useEffect(() => {
-    if (!defaultImageList?.imagelist) return;
+    const newImgList = filterSelectTerm
+      ? filterImageList?.imagelist
+      : defaultImageList?.imagelist;
+
+    if (!newImgList) return;
 
     setReadStartNumber((prev) => prev + 12);
 
-    mutatePostedImage(
-      async () => await imgDataListTrigger(defaultImageList.imagelist),
-      {
-        populateCache: (newData, currentData) => {
-          if (currentData) {
-            return [...currentData, ...newData];
-          } else {
-            return [...newData];
-          }
-        },
-        revalidate: false,
+    // mutatePostedImage(
+    //   async () => await imgDataListTrigger(defaultImageList.imagelist),
+    //   {
+    //     populateCache: (newData, currentData) => {
+    //       if (currentData) {
+    //         return [...currentData, ...newData];
+    //       } else {
+    //         return [...newData];
+    //       }
+    //     },
+    //     revalidate: false,
+    //   },
+    // );
+    mutateRoomImage(async () => await imgDataListTrigger(newImgList), {
+      populateCache: (newData, currentData) => {
+        if (currentData) {
+          return [...currentData, ...newData];
+        } else {
+          return [...newData];
+        }
       },
-    );
-  }, [defaultImageList]);
+      revalidate: false,
+    });
+  }, [defaultImageList, filterImageList]);
 
-  useEffect(() => {
-    if (!filterImageList?.imagelist) return;
+  // useEffect(() => {
+  //   if (!filterImageList?.imagelist) return;
 
-    setReadStartNumber((prev) => prev + 12);
+  //   setReadStartNumber((prev) => prev + 12);
 
-    mutateFilterImage(
-      async () => await imgDataListTrigger(filterImageList.imagelist),
-      {
-        populateCache: (newData, currentData) => {
-          if (currentData) {
-            return [...currentData, ...newData];
-          } else {
-            return [...newData];
-          }
-        },
-        revalidate: false,
-      },
-    );
-  }, [filterImageList]);
+  //   mutateFilterImage(
+  //     async () => await imgDataListTrigger(filterImageList.imagelist),
+  //     {
+  //       populateCache: (newData, currentData) => {
+  //         if (currentData) {
+  //           return [...currentData, ...newData];
+  //         } else {
+  //           return [...newData];
+  //         }
+  //       },
+  //       revalidate: false,
+  //     },
+  //   );
+  // }, [filterImageList]);
 
   useEffect(() => {
     if (!realTimeImageList) return;
 
-    mutatePostedImage(async () => await imgDataListTrigger(realTimeImageList), {
+    // mutatePostedImage(async () => await imgDataListTrigger(realTimeImageList), {
+    //   populateCache: (newData, currentData) => {
+    //     if (currentData) {
+    //       return [...newData, ...currentData];
+    //     } else {
+    //       return [...newData];
+    //     }
+    //   },
+    //   revalidate: false,
+    // });
+
+    mutateRoomImage(async () => await imgDataListTrigger(realTimeImageList), {
       populateCache: (newData, currentData) => {
         if (currentData) {
           return [...newData, ...currentData];
@@ -372,13 +414,23 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
                   </span>
                 </div>
               </div>
-              <ImageContentList
-                ImageData={filterSelectTerm ? filterImage : postedImage}
-                observerRef={observerRef}
-              />
-              {(defaultImgListLoading ||
-                filterImgListLoading ||
-                imgDataLoading) && <Spinner />}
+              {defaultImgListLoading ||
+              filterImgListLoading ||
+              imgDataListLoading ||
+              !roomImage ? (
+                <Spinner />
+              ) : (
+                <ImageSection
+                  keyString={roomId}
+                  ImageData={roomImage}
+                  isLoading={
+                    defaultImgListLoading ||
+                    filterImgListLoading ||
+                    imgDataListLoading
+                  }
+                  observerRef={observerRef}
+                />
+              )}
             </div>
           </ContentBox>
         </MainContainer>
@@ -387,4 +439,4 @@ const ContentSection = ({ roomId }: { roomId?: string }) => {
   );
 };
 
-export default ContentSection;
+export default MainSection;

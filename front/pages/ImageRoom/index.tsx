@@ -7,7 +7,7 @@ import { SlCloudUpload } from 'react-icons/sl';
 
 import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
-import ContentSection from './Components/ContentSection';
+import MainSection from './Components/MainSection';
 import { ContentSectionWrapper } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 
@@ -47,7 +47,9 @@ const ImageRoom = () => {
     return isValidRoomId;
   };
 
-  const onClickUploadModal = () => {
+  const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     mutate('modalState', {
       currentModalState: 'upload',
       uploadLocation: 'room',
@@ -62,7 +64,7 @@ const ImageRoom = () => {
     <AppLayout isImageRoom>
       <ContentSectionWrapper>
         <DeviceCheckContext.Provider value={isMobile}>
-          <ContentSection key={roomId} roomId={roomId} />
+          <MainSection key={roomId} roomId={roomId} />
         </DeviceCheckContext.Provider>
         <div onClick={onClickUploadModal} className="upload_icon">
           <IconContext.Provider
