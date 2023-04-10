@@ -4,8 +4,6 @@ asgiref==3.5.2
 attrs==22.1.0
 Automat==20.2.0
 bcrypt==4.0.0
-boto3==1.24.96
-botocore==1.27.96
 Brotli==1.0.9
 certifi==2022.9.24
 charset-normalizer==2.1.1
@@ -15,7 +13,6 @@ constantly==15.1.0
 contourpy==1.0.7
 cryptography==39.0.1
 cycler==0.11.0
-Django==4.1.3
 elastic-transport==8.4.0
 elasticsearch==7.16.2
 Flask==2.2.2
