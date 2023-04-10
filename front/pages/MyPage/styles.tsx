@@ -30,6 +30,10 @@ export const ContentBox = styled.main`
     text-align: center;
     margin-bottom: 50px;
   }
+
+  @media screen and (min-width: 700px) {
+    padding: 0 5rem;
+  }
 `;
 
 export const ProfileBox = styled.div`

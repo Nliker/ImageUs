@@ -57,7 +57,16 @@ export const HoverBox = styled.div`
     gap: 1rem;
 
     button {
+      width: 80%;
+
+      white-space: pre-line;
       cursor: pointer;
+    }
+
+    @media screen and (min-width: 730px) {
+      button {
+        white-space: normal;
+      }
     }
   }
 `;
