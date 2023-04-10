@@ -2,13 +2,15 @@ import React, { memo, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import ImageContentList from '@pages/ImageRoom/Components/ImageContentLayout';
 import { CImageData } from '@typing/client';
-import { Wrapper } from './styles';
+import { ImageLayout, NotImageData, Wrapper } from './styles';
 import useIntersect from '@hooks/useIntersect';
 import { getImageData } from '@utils/imageFetcher';
 import { getUserImageList } from '@utils/userDataFetcher';
 import Spinner from '@styles/Spinner';
+import { IconContext } from 'react-icons/lib';
+import { FcRemoveImage } from 'react-icons/fc';
+import ImageContent from './ImageContent';
 
 const MyPictures = () => {
   const userId = sessionStorage.getItem('user_id');
@@ -20,28 +22,34 @@ const MyPictures = () => {
 */
 
   const {
-    data: requestImageList,
-    trigger: requestImageListInfo,
-    isMutating: requestImageLoading,
+    data: userImgList,
+    trigger: userImgListTrigger,
+    isMutating: userImgListLoading,
   } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
 
   const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
     useSWRMutation('/user/image-download', getImageData);
 
-  const { data: userImageList, mutate: mutateUserImageList } = useSWR<
-    CImageData[]
-  >('/user/imageDataList');
+  /*
+
+    실제 화면에 보여줄 이미지데이터들을` 저장하는 배열
+
+  */
+
+  const { data: userImage, mutate: mutateUserImage } = useSWR<CImageData[]>(
+    '/user/imageDataList',
+  );
 
   const [readStartNumber, setReadStartNumber] = useState(0);
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
       if (
-        !requestImageLoading &&
+        !userImgListLoading &&
         !imageDataLoading &&
-        requestImageList?.loadDataLength === 12
+        userImgList?.loadDataLength === 12
       ) {
-        requestImageListInfo(readStartNumber);
+        userImgListTrigger(readStartNumber);
       }
     },
     {
@@ -56,53 +64,66 @@ const MyPictures = () => {
   */
 
   useEffect(() => {
-    requestImageListInfo(readStartNumber);
+    userImgListTrigger(readStartNumber);
 
-    // console.log('번호: ', readStartNumber);
-    // if (readStartNumber === 0) {
-    //   requestImageListInfo(readStartNumber);
-    // }
     return () => {
-      console.log('제거 확인');
       setReadStartNumber(0);
-      mutateUserImageList(undefined, false);
+      mutateUserImage(undefined, false);
     };
   }, []);
 
   useEffect(() => {
-    if (!requestImageList || requestImageLoading) return;
+    if (!userImgList || userImgListLoading) return;
 
     setReadStartNumber((prev) => prev + 12);
-    // imageDataTrigger(requestImageList.imagelist).then((newImage) => {
-    //   if (newImage) mutateUserImageList([...userImageList, ...newImage]);
-    // });
 
-    mutateUserImageList(
-      async () => await imageDataTrigger(requestImageList.imagelist),
-      {
-        populateCache: (newData, currentData) => {
-          if (!currentData) {
-            return [...newData];
-          } else {
-            return [...newData, ...currentData];
-          }
-        },
-        revalidate: false,
+    mutateUserImage(async () => await imageDataTrigger(userImgList.imagelist), {
+      populateCache: (newData, currentData) => {
+        if (!currentData) {
+          return [...newData];
+        } else {
+          return [...currentData, ...newData];
+        }
       },
-    );
-  }, [requestImageList]);
+      revalidate: false,
+    });
+  }, [userImgList]);
+
+  const imageCard = (
+    data: CImageData,
+    index: number,
+    thisArr: CImageData[],
+  ) => (
+    <ImageContent
+      key={data.id}
+      data={data}
+      index={index}
+      thisArr={thisArr}
+      observerRef={observerRef}
+    />
+  );
+
+  if (!userImage) return <Spinner />;
 
   return (
     <Wrapper>
-      {!userImageList || requestImageLoading || imageDataLoading ? (
-        <Spinner />
+      {userImage.length !== 0 ? (
+        <>
+          <ImageLayout>{userImage.map(imageCard)}</ImageLayout>
+          {(imageDataLoading || userImgListLoading) && <Spinner />}
+        </>
       ) : (
-        <ImageContentList
-          keyString={'my_picture'}
-          ImageData={userImageList}
-          isLoading={requestImageLoading || imageDataLoading}
-          observerRef={observerRef}
-        />
+        <NotImageData>
+          <IconContext.Provider
+            value={{
+              size: '30%',
+              style: { display: 'inline-block', maxWidth: '250px' },
+            }}
+          >
+            <FcRemoveImage />
+          </IconContext.Provider>
+          <span>이미지가 없습니다.</span>
+        </NotImageData>
       )}
     </Wrapper>
   );
