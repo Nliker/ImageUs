@@ -5,7 +5,7 @@ export const ImageLayout = styled.div`
   grid-template-columns: repeat(2, auto);
   gap: 2rem;
 
-  @media screen and (min-width: 450px) {
+  @media screen and (min-width: 600px) {
     grid-template-columns: repeat(3, auto);
   }
 

@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
+import * as ReactDOMClient from 'react-dom/client';
 import axios from 'axios';
-import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import SWRDevtools from '@jjordy/swr-devtools';
 
 import App from '@layouts/App';
 
@@ -12,19 +11,15 @@ axios.defaults.baseURL =
     ? 'https://codakcodak.site'
     : 'http://localhost:3090';
 
-render(
+const container = document.getElementById('app');
+if (!container) throw new Error('Failed to find the root element');
+
+const root = ReactDOMClient.createRoot(container);
+
+root.render(
   <BrowserRouter>
-    {process.env.NODE_ENV === 'production' ? (
-      <Suspense fallback={<div>Loading...</div>}>
-        <App />
-      </Suspense>
-    ) : (
-      <SWRDevtools>
-        <Suspense fallback={<div>Loading...</div>}>
-          <App />
-        </Suspense>
-      </SWRDevtools>
-    )}
+    <Suspense fallback={<div>Loading...</div>}>
+      <App />
+    </Suspense>
   </BrowserRouter>,
-  document.querySelector('#app'),
 );

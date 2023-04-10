@@ -83,6 +83,8 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     if ((e.target as Element).closest('.detail_btn')) {
       onClickPictureInfo();
     } else if ((e.target as Element).closest('.delete_btn')) {
@@ -93,6 +95,8 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   };
 
   const onClickContent = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     if ((e.target as Element).closest('.detail_btn')) {
       onClickPictureInfo();
     } else if ((e.target as Element).closest('.delete_btn')) {
@@ -128,11 +132,13 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
             <HoverBox>
               <div className="btn_group">
                 <Button type="button" className="detail_btn">
-                  자세히 보기
+                  {`자세히 
+보기`}
                 </Button>
                 {data.user_id + '' === sessionStorage.getItem('user_id') && (
                   <Button type="button" className="error delete_btn">
-                    게시물 삭제하기
+                    {`게시물 
+삭제하기`}
                   </Button>
                 )}
               </div>

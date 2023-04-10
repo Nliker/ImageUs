@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { Routes, Route, useLocation, Navigate } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import { CImageData } from '@typing/client';
 import useIntersect from '@hooks/useIntersect';
@@ -36,8 +36,14 @@ import { DeviceCheckContext } from '@pages/ImageRoom';
 const MyPage = () => {
   const { pathname } = useLocation();
   const userId = sessionStorage.getItem('user_id');
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
+  /*
+
+  유저의 프로필, 이미지, 친구 정보를 받아오는 hook
+
+*/
+
+  const { data: userInfo } = useSWR('/user/my');
   const { data: roomlist } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
@@ -52,11 +58,6 @@ const MyPage = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  const { data: userImageList, mutate: mutateUserImageList } = useSWR<
-    CImageData[]
-  >('/user/imageDataList', {
-    fallbackData: [],
-  });
   const { data: allImageLen } = useSWR(
     `/user/${userId}/imagelist-len`,
     getUserImageLen,
@@ -66,36 +67,12 @@ const MyPage = () => {
       revalidateOnReconnect: false,
     },
   );
-  const { data: userInfo } = useSWR('/user/my');
 
-  const {
-    data: requestImageList,
-    trigger: requestImageListInfo,
-    isMutating: requestImageLoading,
-  } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
-
-  const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
-    useSWRMutation('/user/image-download', getImageData);
-
-  const [readStartNumber, setReadStartNumber] = useState(0);
-  const observerRef = useIntersect(
-    async (entry, observer) => {
-      observer.unobserve(entry.target);
-      if (
-        !requestImageLoading &&
-        !imageDataLoading &&
-        requestImageList?.loadDataLength === 12
-      ) {
-        requestImageListInfo(readStartNumber);
-      }
-    },
-    {
-      threshold: 0.5,
-    },
-  );
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     if (isMobileValue) {
       setIsMobile(true);
     } else {
@@ -103,26 +80,9 @@ const MyPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (pathname !== '/my_page') return;
-    requestImageListInfo(readStartNumber);
+  const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
 
-    return () => {
-      setReadStartNumber(0);
-      mutateUserImageList([]);
-    };
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!requestImageList || requestImageLoading || !userImageList) return;
-
-    setReadStartNumber((prev) => prev + 12);
-    imageDataTrigger(requestImageList.imagelist).then((newImage) => {
-      if (newImage) mutateUserImageList([...userImageList, ...newImage]);
-    });
-  }, [requestImageList]);
-
-  const onClickUploadModal = () => {
     mutate('modalState', {
       currentModalState: 'upload',
       uploadLocation: 'user',
@@ -193,10 +153,7 @@ const MyPage = () => {
                   path="/"
                   element={
                     <DeviceCheckContext.Provider value={isMobile}>
-                      <MyPictures
-                        imageList={userImageList}
-                        observerRef={observerRef}
-                      />
+                      <MyPictures />
                     </DeviceCheckContext.Provider>
                   }
                 />

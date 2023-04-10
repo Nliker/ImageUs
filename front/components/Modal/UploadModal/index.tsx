@@ -13,7 +13,6 @@ import {
   ImageCover,
   ImageDiv,
   Modal,
-  ModalBox,
   ModalContainer,
   ModalHeader,
   ModalHeaderWrapper,
@@ -146,63 +145,61 @@ const UploadModal = () => {
 
   return (
     <ModalContainer>
-      <ModalBox>
-        <Modal>
-          <HeaderContainer>
-            <ModalHeaderWrapper>
-              <ModalHeader>
-                <ModalTitle>
-                  <h1>
-                    {modalInfo?.uploadLocation === 'room'
-                      ? '방에 사진 업로드'
-                      : '개인 저장소에 사진 업로드'}
-                  </h1>
-                </ModalTitle>
-              </ModalHeader>
-            </ModalHeaderWrapper>
-          </HeaderContainer>
-          <div className={'content_box'}>
-            <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
-              <ImageDiv image={imageData}>
-                {!imageData && (
-                  <div className="default_image">
-                    <IconContext.Provider
-                      value={{
-                        size: '50%',
-                        style: { display: 'inline-block' },
-                      }}
-                    >
-                      <BiImageAdd />
-                    </IconContext.Provider>
-                  </div>
-                )}
-              </ImageDiv>
-              <div className="select_box">
-                <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
-                <div className="filebox">
-                  <input
-                    className="upload-name"
-                    value={uploadFileName}
-                    readOnly
-                    placeholder="첨부파일"
-                  />
-                  <label htmlFor="file">파일찾기</label>
-                  <input
-                    type="file"
-                    id="file"
-                    ref={inputFileRef}
-                    onChange={handleInputFile}
-                  />
+      <Modal>
+        <HeaderContainer>
+          <ModalHeaderWrapper>
+            <ModalHeader>
+              <ModalTitle>
+                <h2>
+                  {modalInfo?.uploadLocation === 'room'
+                    ? '방에 사진 업로드'
+                    : '개인 저장소에 사진 업로드'}
+                </h2>
+              </ModalTitle>
+            </ModalHeader>
+          </ModalHeaderWrapper>
+        </HeaderContainer>
+        <div className={'content_box'}>
+          <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
+            <ImageDiv image={imageData}>
+              {!imageData && (
+                <div className="default_image">
+                  <IconContext.Provider
+                    value={{
+                      size: '50%',
+                      style: { display: 'inline-block' },
+                    }}
+                  >
+                    <BiImageAdd />
+                  </IconContext.Provider>
                 </div>
+              )}
+            </ImageDiv>
+            <div className="select_box">
+              <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
+              <div className="filebox">
+                <input
+                  className="upload-name"
+                  value={uploadFileName}
+                  readOnly
+                  placeholder="첨부파일"
+                />
+                <label htmlFor="file">파일찾기</label>
+                <input
+                  type="file"
+                  id="file"
+                  ref={inputFileRef}
+                  onChange={handleInputFile}
+                />
               </div>
-              <ImageCover />
-            </ModalImageBox>
-          </div>
-          <div className={'upload_btn'}>
-            <Button onClick={onClickUpload}>업로드</Button>
-          </div>
-        </Modal>
-      </ModalBox>
+            </div>
+            <ImageCover />
+          </ModalImageBox>
+        </div>
+        <div className={'upload_btn'}>
+          <Button onClick={onClickUpload}>업로드</Button>
+        </div>
+      </Modal>
     </ModalContainer>
   );
 };

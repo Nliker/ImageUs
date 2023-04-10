@@ -15,8 +15,8 @@ const DetailPictureInfo = () => {
     const modalWidth = modalHeight;
 
     return {
-      modalWidth,
-      modalHeight,
+      modalWidth: parseInt(modalWidth),
+      modalHeight: parseInt(modalHeight),
     };
   }, [window.innerHeight]);
   const [modalSize, setModalSize] = useState(getCurrentModalSize());

@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 
 export const Wrapper = styled.div<{
   modalSize: {
-    modalWidth: string;
-    modalHeight: string;
+    modalWidth: number;
+    modalHeight: number;
   };
 }>`
   position: relative;

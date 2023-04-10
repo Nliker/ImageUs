@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router';
 
-import Scrollbars from 'react-custom-scrollbars';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import { DRoomData } from '@typing/db';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
