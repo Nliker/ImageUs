@@ -64,7 +64,7 @@ const ImageRoom = () => {
     <AppLayout isImageRoom>
       <ContentSectionWrapper>
         <DeviceCheckContext.Provider value={isMobile}>
-          <MainSection key={roomId} roomId={roomId} />
+          <MainSection key={roomId} />
         </DeviceCheckContext.Provider>
         <div onClick={onClickUploadModal} className="upload_icon">
           <IconContext.Provider
