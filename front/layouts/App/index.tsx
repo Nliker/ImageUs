@@ -10,6 +10,7 @@ import Spinner from '@styles/Spinner';
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
 const MainPage = loadable(() => import('@pages/MainPage'));
+const SelectRoom = loadable(() => import('@pages/SelectRoom'));
 const MyPage = loadable(() => import('@pages/MyPage'));
 const PeopleManagement = loadable(() => import('@pages/PeopleManagement'));
 const ImageRoom = loadable(() => import('@pages/ImageRoom'));
@@ -35,6 +36,10 @@ const App = () => {
         />
       </Route>
       <Route element={<PrivateRoute />}>
+        <Route
+          path="room-select"
+          element={<SelectRoom fallback={<Spinner />} />}
+        />
         <Route path="my_page/*" element={<MyPage fallback={<Spinner />} />} />
         <Route
           path="room/:roomId"
