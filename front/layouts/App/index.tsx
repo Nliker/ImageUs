@@ -9,7 +9,7 @@ import Spinner from '@styles/Spinner';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
-const MainPage = loadable(() => import('@pages/MainPage'));
+const Intro = loadable(() => import('@pages/Intro'));
 const SelectRoom = loadable(() => import('@pages/SelectRoom'));
 const MyPage = loadable(() => import('@pages/MyPage'));
 const PeopleManagement = loadable(() => import('@pages/PeopleManagement'));
@@ -26,7 +26,7 @@ const App = () => {
 
   return (
     <Routes>
-      <Route index element={<MainPage fallback={<Spinner />} />} />
+      <Route index element={<Intro fallback={<Spinner />} />} />
       <Route element={<PublicRoute />}>
         <Route path="login" element={<LogIn fallback={<Spinner />} />} />
         <Route path="signup" element={<SignUp fallback={<Spinner />} />} />

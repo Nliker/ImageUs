@@ -1,28 +1,36 @@
 import styled from '@emotion/styled';
 
-export const Wrappper = styled.div`
-  min-width: 370px;
+// export const Wrappper = styled.div`
+//   min-width: 370px;
+//   height: 100%;
+//   font-size: 0.85rem;
+
+//   overflow: hidden;
+// `;
+
+// export const ContentWrappper = styled.div`
+//   height: 100%;
+
+//   main {
+//     display: flex;
+
+//     height: 100%;
+
+//     section {
+//       height: 100%;
+//     }
+//   }
+// `;
+
+export const MainContainer = styled.main`
   height: 100%;
-  font-size: 0.85rem;
 
-  overflow: hidden;
-`;
-
-export const ContentWrappper = styled.div`
-  height: 100%;
-
-  main {
-    display: flex;
-
-    height: 100%;
-
-    section {
-      height: 100%;
-    }
-  }
+  box-sizing: border-box;
 `;
 
 export const MainIntroduction = styled.section`
+  height: 100%;
+
   .main_background {
     display: flex;
     flex-direction: column;
