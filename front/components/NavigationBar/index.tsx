@@ -83,7 +83,7 @@ const NavigationBar = () => {
             </NavItem>
             <NavItem>
               <h1>
-                <NavLink to={'/'}>
+                <NavLink to={'/room-select'}>
                   <HiOutlineHome />
                   ImageUs
                 </NavLink>

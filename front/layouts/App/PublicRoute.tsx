@@ -9,7 +9,11 @@ const PublicRoute = () => {
 
   if (!loginState) return <Spinner />;
 
-  return loginState === 'LoggedIn' ? <Navigate to="/" /> : <Outlet />;
+  return loginState === 'LoggedIn' ? (
+    <Navigate to="/room-select" />
+  ) : (
+    <Outlet />
+  );
 };
 
 export default PublicRoute;

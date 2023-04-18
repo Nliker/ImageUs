@@ -84,7 +84,7 @@ const LogIn = () => {
   useEffect(() => {
     if (logInSuccess) {
       mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-        navigate('/', { replace: true });
+        navigate('/room-select', { replace: true });
       });
     }
   }, [logInSuccess]);
