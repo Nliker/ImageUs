@@ -10,27 +10,17 @@ import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import { BackgroundImg } from '@assets/image';
-import {
-  ContentWrappper,
-  MainIntroduction,
-  MainRoomList,
-  Wrappper,
-} from './styles';
-import ActionButton from '@styles/ActiveButton';
+import { ContentWrappper, MainIntroduction, Wrappper } from './styles';
 import Spinner from '@styles/Spinner';
+import SelectRoom from './SelectRoom';
 
 const MainPage = () => {
-  const userId = sessionStorage.getItem('user_id');
   const { mutate } = useSWRConfig();
   const {
     data: userInfo,
     mutate: mutateUserState,
     isValidating,
   } = useSWR('/user/my');
-
-  const createBtnStyle: CSSProperties = {
-    width: '150px',
-  };
 
   useEffect(() => {
     if (userInfo?.logInState === 'LoggingOut') {
@@ -66,57 +56,6 @@ const MainPage = () => {
     );
   };
 
-  const IsLoginMainPage = () => {
-    const { data: roomlist, mutate: mutateRoomlist } = useSWR(
-      `/user/${userId}/roomlist`,
-    );
-
-    useEffect(() => {
-      if (!userInfo || userInfo.logInState === 'LoggedOut') return;
-      mutateRoomlist(getUserRoomListFetcher(`/user/${userId}/roomlist`));
-    }, []);
-
-    return (
-      <MainRoomList>
-        <header>
-          <h1>방에 입장하기</h1>
-        </header>
-        <div className="content_box">
-          <div className="content_list">
-            <Scrollbars>
-              <ul className="room_list">
-                {!roomlist ? (
-                  <div>로딩중...</div>
-                ) : roomlist.length === 0 ? (
-                  <div>등록된 방이 없습니다.</div>
-                ) : (
-                  roomlist.map((roomData: DRoomData) => (
-                    <Link key={roomData.id} to={`/room/${roomData.id}`}>
-                      <li>{roomData.title}</li>
-                    </Link>
-                  ))
-                )}
-              </ul>
-            </Scrollbars>
-          </div>
-          <div className="create_room_btn">
-            <ActionButton
-              onClickBtn={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.stopPropagation();
-
-                mutate('modalState', {
-                  currentModalState: 'creatRoom',
-                });
-              }}
-              btnTitle={'방 생성하기'}
-              customStyle={createBtnStyle}
-            />
-          </div>
-        </div>
-      </MainRoomList>
-    );
-  };
-
   if (!userInfo || userInfo.logInState === 'LoggingOut' || isValidating) {
     return <Spinner />;
   }
@@ -129,7 +68,7 @@ const MainPage = () => {
             {userInfo?.logInState === 'LoggedOut' ? (
               <IsNotLoginMainPage />
             ) : (
-              <IsLoginMainPage />
+              <SelectRoom />
             )}
           </main>
         </ContentWrappper>
