@@ -11,14 +11,33 @@ import useRoomlist from '@hooks/useRoomlist';
 import Spinner from '@styles/Spinner';
 import AppLayout from '@layouts/AppLayout';
 import Roomlist from './Components/Roomlist';
+import { IconContext } from 'react-icons/lib';
+import { AiOutlinePlus } from 'react-icons/ai';
 
 const SelectRoom = () => {
+  const handleCreateRoom = () => {
+    mutate('modalState', {
+      currentModalState: 'creatRoom',
+    });
+  };
+
   return (
     <AppLayout>
       <Scrollbars>
         <MainContainer>
-          <h1>그룹 목록</h1>
-          <Roomlist />
+          <div className="list_box">
+            <header>
+              <h1>
+                방 목록
+                <div className="create_btn" onClick={handleCreateRoom}>
+                  <IconContext.Provider value={{ size: '30px' }}>
+                    <AiOutlinePlus />
+                  </IconContext.Provider>
+                </div>
+              </h1>
+            </header>
+            <Roomlist />
+          </div>
         </MainContainer>
       </Scrollbars>
     </AppLayout>

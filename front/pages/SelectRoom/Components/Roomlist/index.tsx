@@ -20,11 +20,22 @@ function Roomlist() {
   return (
     <Container>
       {roomlistData.length !== 0 ? (
-        <ul>
+        <ul className="room_list">
           {roomlistData.map((roomData: DRoomData) => (
-            <Link key={roomData.id} to={`/room/${roomData.id}`}>
-              <li>{roomData.title}</li>
-            </Link>
+            <li key={roomData.id}>
+              <div className="item_box">
+                <Link to={`/room/${roomData.id}`}>
+                  <div className="item_info">
+                    <p style={{ textAlign: 'center', fontSize: '1.8rem' }}>
+                      {roomData.title}
+                    </p>
+                    <p style={{ marginLeft: '20px', color: '#999999' }}>
+                      멤버:{' '}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+            </li>
           ))}
         </ul>
       ) : (
