@@ -17,9 +17,7 @@ const SelectRoom = () => {
     <AppLayout>
       <Scrollbars>
         <MainContainer>
-          <header style={{ fontSize: '2rem', textAlign: 'center' }}>
-            그룹 목록
-          </header>
+          <h1>그룹 목록</h1>
           <Roomlist />
         </MainContainer>
       </Scrollbars>
