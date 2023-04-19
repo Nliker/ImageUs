@@ -7,6 +7,7 @@ import { Container, EmptyRoom } from './styles';
 import { IconContext } from 'react-icons/lib';
 import { ImUngroup } from 'react-icons/im';
 import { useMediaQuery } from 'react-responsive';
+import { EmptyRoomlistImg } from '@assets/image';
 
 function Roomlist() {
   const { data: roomlistData, isLoading, error } = useRoomlist();
@@ -28,21 +29,13 @@ function Roomlist() {
         </ul>
       ) : (
         <EmptyRoom>
-          <IconContext.Provider
-            value={
+          <EmptyRoomlistImg
+            style={
               isDesktop
-                ? {
-                    size: '110px',
-                    style: { display: 'inline-block' },
-                  }
-                : {
-                    size: '90px',
-                    style: { display: 'inline-block' },
-                  }
+                ? { width: '150px', height: 'auto' }
+                : { width: '100px', height: 'auto' }
             }
-          >
-            <ImUngroup />
-          </IconContext.Provider>
+          />
           <p className="text">등록된 방이 없습니다..</p>
         </EmptyRoom>
       )}
