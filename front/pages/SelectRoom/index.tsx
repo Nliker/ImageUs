@@ -23,23 +23,23 @@ const SelectRoom = () => {
 
   return (
     <AppLayout>
-      <Scrollbars>
-        <MainContainer>
-          <div className="list_box">
-            <header>
-              <h1>
-                방 목록
-                <div className="create_btn" onClick={handleCreateRoom}>
-                  <IconContext.Provider value={{ size: '30px' }}>
-                    <AiOutlinePlus />
-                  </IconContext.Provider>
-                </div>
-              </h1>
-            </header>
+      <MainContainer>
+        <div className="list_box">
+          <header>
+            <h1>
+              방 목록
+              <div className="create_btn" onClick={handleCreateRoom}>
+                <IconContext.Provider value={{ size: '30px' }}>
+                  <AiOutlinePlus />
+                </IconContext.Provider>
+              </div>
+            </h1>
+          </header>
+          <Scrollbars>
             <Roomlist />
-          </div>
-        </MainContainer>
-      </Scrollbars>
+          </Scrollbars>
+        </div>
+      </MainContainer>
     </AppLayout>
   );
 };

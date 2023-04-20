@@ -59,8 +59,7 @@ export const MainContainer = styled.main`
 
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: rgba(50, 50, 50, 0.1) 0px 16px 32px,
-        rgba(0, 0, 0, 0.07) 0px 6px 16px;
+      border: 1px solid #e7e7e7;
 
       header {
         width: 100%;
