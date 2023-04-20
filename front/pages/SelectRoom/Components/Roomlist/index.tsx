@@ -8,10 +8,24 @@ import { IconContext } from 'react-icons/lib';
 import { ImUngroup } from 'react-icons/im';
 import { useMediaQuery } from 'react-responsive';
 import { EmptyRoomlistImg } from '@assets/image';
+import { TbDoorExit } from 'react-icons/tb';
+import { mutate } from 'swr';
 
 function Roomlist() {
   const { data: roomlistData, isLoading, error } = useRoomlist();
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
+
+  const onClickLeaveRoom = () => {
+    const userId = sessionStorage.getItem('user_id');
+    console.log('확인');
+    mutate('modalState', {
+      currentModalState: 'alert',
+      data: {
+        content: '방에서 나가시겠습니까?',
+        mutateKey: `/user/${userId}/room`,
+      },
+    });
+  };
 
   if (isLoading) return <Spinner />;
 
@@ -26,14 +40,25 @@ function Roomlist() {
               <div className="item_box">
                 <Link to={`/room/${roomData.id}`}>
                   <div className="item_info">
-                    <p style={{ textAlign: 'center', fontSize: '1.8rem' }}>
-                      {roomData.title}
-                    </p>
-                    <p style={{ marginLeft: '20px', color: '#999999' }}>
+                    <p style={{ fontSize: '1.8rem' }}>{roomData.title}</p>
+                    <p style={{ color: '#999999' }}>
                       멤버:{' '}
+                      {roomData.userlist.map((data) => data.name).join(' ')}
                     </p>
                   </div>
                 </Link>
+                <div className="item_btn" onClick={onClickLeaveRoom}>
+                  <IconContext.Provider
+                    value={{
+                      size: '30px',
+                      style: {
+                        display: 'inline-block',
+                      },
+                    }}
+                  >
+                    <TbDoorExit />
+                  </IconContext.Provider>
+                </div>
               </div>
             </li>
           ))}
