@@ -145,9 +145,11 @@ const getUnreadImageList = async (url: string) => {
 
 const deleteRoomImgFetcher = async (
   url: string,
-  { arg: imageId }: { arg: number },
+  { arg: imageId }: { arg?: number },
 ) => {
   try {
+    if (!imageId) throw new Error('올바른 요청이 아닙니다.');
+
     const { token } = await getToken();
 
     if (!token) {
