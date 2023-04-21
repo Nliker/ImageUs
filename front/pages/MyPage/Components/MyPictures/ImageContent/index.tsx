@@ -12,6 +12,8 @@ import {
   InfoContainer,
 } from './styles';
 import { DeviceCheckContext } from '@pages/ImageRoom';
+import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
 
 interface Props {
   data: CImageData;
@@ -22,9 +24,10 @@ interface Props {
 }
 
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
-  const currentPath = useLocation().pathname;
   const { roomId } = useParams<{ roomId: string }>();
-  const { mutate } = useSWRConfig();
+
+  const { setModal } = useModal();
+  const { setUserPayload } = useUserData();
 
   const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
@@ -64,21 +67,19 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   }, [deleteUserImageId]);
 
   const onClickShowAlertBox = () => {
-    const alertArgKey =
-      currentPath === '/my_page' ? '/image' : `/room/${roomId}/image`;
-
-    mutate('modalState', {
-      currentModalState: 'alert',
-      data: {
-        content: '정말 삭제하시겠습니까?',
-        mutateKey: alertArgKey,
-        imageId: data.id,
+    setUserPayload({ imageId: data.id });
+    setModal({
+      currentModal: 'alert',
+      alertData: {
+        type: 'deleteStoreImage',
+        text: '이미지를 삭제하시겠습니까?',
       },
     });
   };
 
   const onClickPictureInfo = () => {
-    mutate('modalState', { currentModalState: 'detailPicture' });
+    setModal({ currentModal: 'detailPicture' });
+    // mutate('modalState', { currentModalState: 'detailPicture' });
     mutateDetailImageInfo({ index, data });
   };
 
