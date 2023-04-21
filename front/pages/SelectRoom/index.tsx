@@ -13,12 +13,15 @@ import AppLayout from '@layouts/AppLayout';
 import Roomlist from './Components/Roomlist';
 import { IconContext } from 'react-icons/lib';
 import { AiOutlinePlus } from 'react-icons/ai';
+import useModal from '@hooks/useModal';
 
 const SelectRoom = () => {
-  const handleCreateRoom = () => {
-    mutate('modalState', {
-      currentModalState: 'creatRoom',
-    });
+  const { setModal } = useModal();
+
+  const handleCreateRoom = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    setModal({ currentModal: 'createRoom' });
   };
 
   return (

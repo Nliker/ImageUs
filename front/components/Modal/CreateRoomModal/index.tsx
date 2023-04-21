@@ -27,10 +27,13 @@ import {
   RoomNameInput,
   Title,
 } from './styles';
+import useModal from '@hooks/useModal';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
 const CreateRoomModal = () => {
+  const { clearModalCache } = useModal();
+
   const { mutate } = useSWRConfig();
 
   const { data: friendList } = useSWR('friendlist', getUserFriendList, {
@@ -113,7 +116,7 @@ const CreateRoomModal = () => {
           `/user/${userId}/roomlist`,
           getUserRoomListFetcher(`/user/${userId}/roomlist`),
         );
-        mutate('modalState', { currentModalState: '' });
+        clearModalCache();
       })
       .catch((err) => {
         if (err instanceof AxiosError) {

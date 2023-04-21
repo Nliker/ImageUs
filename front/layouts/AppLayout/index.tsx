@@ -6,6 +6,7 @@ import SideBar from '@components/SideBar';
 import Modal from '@components/Modal';
 import { OuterContainer, InnerContainer, Wrapper } from './styles';
 import Spinner from '@styles/Spinner';
+import useModal from '@hooks/useModal';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -22,10 +23,8 @@ export const SidebarContext = createContext<ISidebarContext>({
 });
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
+  const { currentModal } = useModal();
   const { data: userInfo } = useSWR('/user/my');
-  const { data: modalStateData } = useSWR('modalState');
-
-  const currentModalState = modalStateData?.currentModalState;
   const [sidebarState, setSidebarState] = useState<boolean>(false);
   const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
 
@@ -37,7 +36,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
 
   return (
     <Wrapper>
-      <OuterContainer showModal={currentModalState}>
+      <OuterContainer showModal={currentModal}>
         {userInfo?.logInState === 'LoggedIn' && <NavigationBar />}
         <InnerContainer
           style={
@@ -52,7 +51,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
           </SidebarContext.Provider>
         </InnerContainer>
       </OuterContainer>
-      <Modal modalName={currentModalState} />
+      <Modal />
     </Wrapper>
   );
 };

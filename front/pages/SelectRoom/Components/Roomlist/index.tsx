@@ -10,22 +10,28 @@ import { useMediaQuery } from 'react-responsive';
 import { EmptyRoomlistImg } from '@assets/image';
 import { TbDoorExit } from 'react-icons/tb';
 import { mutate } from 'swr';
+import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
 
 function Roomlist() {
+  const { setModal } = useModal();
+  const { setUserPayload } = useUserData();
   const { data: roomlistData, isLoading, error } = useRoomlist();
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
 
-  const onClickLeaveRoom = () => {
-    const userId = sessionStorage.getItem('user_id');
-    console.log('확인');
-    mutate('modalState', {
-      currentModalState: 'alert',
-      data: {
-        content: '방에서 나가시겠습니까?',
-        mutateKey: `/user/${userId}/room`,
-      },
-    });
-  };
+  const onClickLeaveRoom =
+    (roomId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+
+      setModal({
+        currentModal: 'alert',
+        alertData: {
+          type: 'leaveRoom',
+          text: '방에서 나가시겠습니까?',
+        },
+      });
+      setUserPayload({ roomId });
+    };
 
   if (isLoading) return <Spinner />;
 
@@ -47,7 +53,10 @@ function Roomlist() {
                     </p>
                   </div>
                 </Link>
-                <div className="item_btn" onClick={onClickLeaveRoom}>
+                <div
+                  className="item_btn"
+                  onClick={onClickLeaveRoom('' + roomData.id)}
+                >
                   <IconContext.Provider
                     value={{
                       size: '30px',

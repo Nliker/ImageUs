@@ -3,20 +3,20 @@ import useSWR, { mutate } from 'swr';
 
 import { CgCloseO } from 'react-icons/cg';
 import { Background, CloseBtn, Container, Wrapper } from './styles';
+import useModal from '@hooks/useModal';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const ModalLayout = ({ children }: Props) => {
-  const { data: modalStateData } = useSWR('modalState');
-  const currentModalState = modalStateData?.currentModalState;
+  const { currentModal, clearModalCache } = useModal();
   const modalEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.addEventListener('click', onClickOuterModal);
+    document.addEventListener('click', onClickOuterModal);
     return () => {
-      window.removeEventListener('click', onClickOuterModal);
+      document.removeEventListener('click', onClickOuterModal);
     };
   }, []);
 
@@ -25,33 +25,32 @@ const ModalLayout = ({ children }: Props) => {
       e.target instanceof HTMLElement &&
       !modalEl.current?.contains(e.target)
     ) {
-      mutate('modalState', { currentModalState: '' });
+      clearModalCache();
     }
   };
 
-  if (!currentModalState) return null;
+  if (!currentModal) return null;
 
   return (
     <Wrapper>
       <Background
         style={
-          currentModalState === 'alert'
+          currentModal === 'alert'
             ? { backgroundColor: 'rgb(0 0 0 / 0%)' }
             : undefined
         }
       />
-      {currentModalState !== 'alert' && (
-        <>
-          <CloseBtn>
-            <div
-              onClick={() => {
-                mutate('modalState', { currentModalState: '' });
-              }}
-            >
-              <CgCloseO />
-            </div>
-          </CloseBtn>
-        </>
+      {currentModal !== 'alert' && (
+        <CloseBtn>
+          <div
+            onClick={() => {
+              // mutate('modalState', { currentModal: '' });
+              clearModalCache();
+            }}
+          >
+            <CgCloseO />
+          </div>
+        </CloseBtn>
       )}
       <Container ref={modalEl}>{children}</Container>
     </Wrapper>

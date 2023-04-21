@@ -6,14 +6,12 @@ import DetailPictureInfo from './DetailPictureModal';
 import InviteMemberModal from './InviteMemberModal';
 import UploadModal from './UploadModal';
 import ModalLayout from './ModalLayout';
+import useModal from '@hooks/useModal';
 
-interface IModalProps {
-  modalName: string;
-}
-
-const Modal = ({ modalName }: IModalProps) => {
+const Modal = () => {
+  const { currentModal } = useModal();
   const currentModalComponent = () => {
-    switch (modalName) {
+    switch (currentModal) {
       case 'detailPicture':
         return <DetailPictureInfo />;
 
@@ -23,7 +21,7 @@ const Modal = ({ modalName }: IModalProps) => {
       case 'upload':
         return <UploadModal />;
 
-      case 'creatRoom':
+      case 'createRoom':
         return <CreateRoomModal />;
 
       case 'inviteMember':
@@ -34,7 +32,7 @@ const Modal = ({ modalName }: IModalProps) => {
     }
   };
 
-  if (!modalName) return null;
+  if (!currentModal) return null;
 
   return <ModalLayout>{currentModalComponent()}</ModalLayout>;
 };
