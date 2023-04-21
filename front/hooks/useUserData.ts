@@ -9,7 +9,8 @@ interface IUserPayload {
   imageId?: number;
 }
 
-function useUserData(userId?: string | null) {
+function useUserData() {
+  const userId = sessionStorage.getItem('user_id');
   const { data: userImageList, mutate: userImageMutate } =
     useSWR('/user/image');
   const { data: requestPayload, mutate: requestPayloadMutate } =
@@ -30,7 +31,7 @@ function useUserData(userId?: string | null) {
   );
 
   const { trigger: deleteUserImgTrigger } = useSWRMutation(
-    `/user/deleteImage`,
+    '/image',
     deleteUserImage,
   );
 
