@@ -20,20 +20,15 @@ import {
   ModalTitle,
 } from './styles';
 import useInput from '@hooks/useInput';
+import useModal from '@hooks/useModal';
+import useUploadImage from '@hooks/useUploadImage';
 
 const UploadModal = () => {
   const { roomId } = useParams<{ roomId: string | undefined }>();
   const { mutate } = useSWRConfig();
 
-  const { data: modalInfo } = useSWR('modalState');
-  const { trigger: uploadRoomImageTrigger } = useSWRMutation(
-    `/room/${roomId}/image`,
-    postUploadRoomImage,
-  );
-  const { trigger: uploadUserImageTrigger } = useSWRMutation(
-    `/image`,
-    postUploadUserImage,
-  );
+  const { uploadImageLocate, clearModalCache } = useModal();
+  const { uploadRoomImage, uploadUserImage } = useUploadImage(roomId);
 
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(
     null,
@@ -70,14 +65,14 @@ const UploadModal = () => {
       alert('이미지를 등록해주세요');
       return;
     }
-    if (modalInfo?.uploadLocation === 'room') {
-      uploadRoomImageTrigger({ uploadImageFile }).then(() => {
+    if (uploadImageLocate === 'room') {
+      uploadRoomImage(uploadImageFile).then(() => {
         mutate(`/room/${roomId}/unread-imagelist`);
-        mutate('modalState', { currentModalState: '' });
+        clearModalCache();
       });
-    } else {
-      uploadUserImageTrigger({ uploadImageFile }).then(() => {
-        mutate('modalState', { currentModalState: '' });
+    } else if (uploadImageLocate === 'user') {
+      uploadUserImage(uploadImageFile).then(() => {
+        clearModalCache();
         window.location.reload();
       });
     }
@@ -151,7 +146,7 @@ const UploadModal = () => {
             <ModalHeader>
               <ModalTitle>
                 <h2>
-                  {modalInfo?.uploadLocation === 'room'
+                  {uploadImageLocate === 'room'
                     ? '방에 사진 업로드'
                     : '개인 저장소에 사진 업로드'}
                 </h2>

@@ -10,23 +10,27 @@ import AppLayout from '@layouts/AppLayout';
 import MainSection from './Components/MainSection';
 import { ContentSectionWrapper } from './styles';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import useRoomlist from '@hooks/useRoomlist';
+import useModal from '@hooks/useModal';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
 
 const ImageRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const userId = sessionStorage.getItem('user_id');
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  const { data: roomListInfo } = useSWR(
-    `/user/${userId}/roomlist`,
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data: roomListData } = useRoomlist();
+  const { setModal } = useModal();
+
+  // const { data: roomListData } = useSWR(
+  //   `/user/${userId}/roomlist`,
+  //   getUserRoomListFetcher,
+  //   {
+  //     revalidateIfStale: false,
+  //     revalidateOnFocus: false,
+  //     revalidateOnReconnect: false,
+  //   },
+  // );
 
   useEffect(() => {
     const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -38,9 +42,9 @@ const ImageRoom = () => {
   }, []);
 
   const checkValideRoomId = () => {
-    if (!roomListInfo) return false;
+    if (!roomListData) return false;
 
-    const isValidRoomId = roomListInfo.some((roomInfo: DRoomData) => {
+    const isValidRoomId = roomListData.some((roomInfo: DRoomData) => {
       return '' + roomInfo.id === roomId;
     });
 
@@ -50,10 +54,11 @@ const ImageRoom = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    mutate('modalState', {
-      currentModalState: 'upload',
-      uploadLocation: 'room',
-    });
+    setModal({ currentModal: 'upload', uploadImageLocate: 'room' });
+    // mutate('modalState', {
+    //   currentModalState: 'upload',
+    //   uploadLocation: 'room',
+    // });
   };
 
   if (!checkValideRoomId()) {
