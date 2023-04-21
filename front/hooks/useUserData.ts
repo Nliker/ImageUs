@@ -1,4 +1,5 @@
 import { deleteUserImage } from '@utils/imageFetcher';
+import { getUserImageLen } from '@utils/userDataFetcher';
 import { leaveRoomFetcher } from '@utils/userDataFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -8,12 +9,20 @@ interface IUserPayload {
   imageId?: number;
 }
 
-function useUserData() {
+function useUserData(userId?: string | null) {
   const { data: userImageList, mutate: userImageMutate } =
     useSWR('/user/image');
   const { data: requestPayload, mutate: requestPayloadMutate } =
     useSWR('/user/payload');
-  // const { roomId, imageId } = requestPayload;
+  const { data: imageLength } = useSWR(
+    `/user/${userId}/imagelist-len`,
+    getUserImageLen,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
 
   const { trigger: leaveRoomTrigger } = useSWRMutation(
     `/user/leaveRoom`,
@@ -38,6 +47,7 @@ function useUserData() {
 
   return {
     userImageList,
+    imageLength: imageLength?.imagelist_len,
     leaveRoom,
     deleteStoreImage,
     setUserPayload,
