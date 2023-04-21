@@ -1,4 +1,5 @@
 import { deleteRoomImgFetcher } from '@utils/roomDataFetcher';
+import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -8,29 +9,29 @@ interface IRoomPayload {
 }
 
 function useRoomData() {
-  const { data: roomImageList, mutate: roomImageMutate } =
-    useSWR('/room/image');
-  const { data: requestPayload, mutate: requestPayloadMutate } =
-    useSWR('/room/payload');
-  // const { roomId, imageId } = requestPayload;
+  const userId = sessionStorage.getItem('user_id');
 
-  const { trigger: deleteRoomImgTrigger } = useSWRMutation(
-    `/room/${requestPayload?.roomId}/image`,
-    deleteRoomImgFetcher,
-  );
+  // const { data: requestPayload, mutate: requestPayloadMutate } =
+  //   useSWR('/room/payload');
 
-  const deleteRoomImage = () => {
-    deleteRoomImgTrigger(requestPayload?.imageId).then((dataId) => {});
-  };
+  const {
+    data: roomList,
+    mutate: roomListMutate,
+    error: roomListError,
+    isValidating,
+  } = useSWR(`/user/${userId}/roomlist`, getUserRoomListFetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-  const setRoomPayload = (newData: IRoomPayload) => {
-    requestPayloadMutate({ ...requestPayload, ...newData });
-  };
+  // const setRoomPayload = (newData: IRoomPayload) => {
+  //   requestPayloadMutate({ ...requestPayload, ...newData });
+  // };
 
   return {
-    roomImageList,
-    deleteRoomImage,
-    setRoomPayload,
+    roomList,
+    refreshRoomlist: roomListMutate,
   };
 }
 
