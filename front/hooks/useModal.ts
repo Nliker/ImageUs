@@ -2,6 +2,7 @@ import useSWR, { useSWRConfig } from 'swr';
 
 interface IModalData {
   currentModal?: string | null;
+  uploadImageLocate?: string;
   alertData?: { type: string; text: string };
 }
 
@@ -19,6 +20,7 @@ function useModal() {
 
   return {
     currentModal: data?.currentModal ?? '',
+    uploadImageLocate: data?.uploadImageLocate ?? '',
     alertData: data?.alertData ?? null,
     error,
     loading: !data && !error,
