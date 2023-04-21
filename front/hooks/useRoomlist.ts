@@ -7,6 +7,11 @@ function useRoomlist() {
   const { data, mutate, error, isValidating } = useSWR(
     `/user/${userId}/roomlist`,
     getUserRoomListFetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   );
 
   return {
