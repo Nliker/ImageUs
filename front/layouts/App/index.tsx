@@ -26,8 +26,8 @@ const App = () => {
 
   return (
     <Routes>
-      <Route index element={<Intro fallback={<Spinner />} />} />
       <Route element={<PublicRoute />}>
+        <Route index element={<Intro fallback={<Spinner />} />} />
         <Route path="login" element={<LogIn fallback={<Spinner />} />} />
         <Route path="signup" element={<SignUp fallback={<Spinner />} />} />
         <Route
@@ -50,7 +50,7 @@ const App = () => {
           element={<PeopleManagement fallback={<Spinner />} />}
         />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<div>404 페이지</div>} />
     </Routes>
   );
 };
