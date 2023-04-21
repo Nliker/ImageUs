@@ -32,9 +32,12 @@ import {
 import { getImageData } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
 import { DeviceCheckContext } from '@pages/ImageRoom';
+import useRoomlist from '@hooks/useRoomlist';
+import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
+import useFriendData from '@hooks/useFriendData';
 
 const MyPage = () => {
-  const { pathname } = useLocation();
   const userId = sessionStorage.getItem('user_id');
 
   /*
@@ -44,29 +47,10 @@ const MyPage = () => {
 */
 
   const { data: userInfo } = useSWR('/user/my');
-  const { data: roomlist } = useSWR(
-    `/user/${userId}/roomlist`,
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
-  const { data: friendList } = useSWR('friendlist', getUserFriendList, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-  const { data: allImageLen } = useSWR(
-    `/user/${userId}/imagelist-len`,
-    getUserImageLen,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { setModal } = useModal();
+  const { data: roomlist } = useRoomlist();
+  const { imageLength } = useUserData();
+  const { friendNumber } = useFriendData();
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
@@ -83,10 +67,7 @@ const MyPage = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    mutate('modalState', {
-      currentModalState: 'upload',
-      uploadLocation: 'user',
-    });
+    setModal({ currentModal: 'upload', uploadImageLocate: 'user' });
   };
 
   return (
@@ -109,7 +90,7 @@ const MyPage = () => {
                 <ul>
                   <li>
                     <div>
-                      게시물 <span>{allImageLen?.imagelist_len ?? 0}</span>
+                      게시물 <span>{imageLength ?? 0}</span>
                     </div>
                   </li>
                   <li>
@@ -119,7 +100,7 @@ const MyPage = () => {
                   </li>
                   <li>
                     <div>
-                      친구수 <span>{friendList?.length ?? 0}</span>
+                      친구수 <span>{friendNumber ?? 0}</span>
                     </div>
                   </li>
                 </ul>
