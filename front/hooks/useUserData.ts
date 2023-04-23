@@ -1,5 +1,9 @@
 import { deleteUserImage } from '@utils/imageFetcher';
-import { getUserFriendList, getUserImageLen } from '@utils/userDataFetcher';
+import {
+  getUserFriendList,
+  getUserImageLen,
+  getUserRoomListFetcher,
+} from '@utils/userDataFetcher';
 import { leaveRoomFetcher } from '@utils/userDataFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -28,6 +32,16 @@ function useUserData() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
+  const {
+    data: roomList,
+    mutate: roomListMutate,
+    error: roomListError,
+  } = useSWR(`/user/${userId}/roomlist`, getUserRoomListFetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+
   const { trigger: leaveRoomTrigger } = useSWRMutation(
     `/user/leaveRoom`,
     leaveRoomFetcher,
@@ -42,6 +56,7 @@ function useUserData() {
   return {
     imageLength: imageLength?.imagelist_len,
     friendNumber: friendList?.length,
+    roomList,
     leaveRoom,
     setUserPayload,
   };

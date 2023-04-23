@@ -32,10 +32,8 @@ import {
 import { getImageData } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
 import { DeviceCheckContext } from '@pages/ImageRoom';
-import useRoomlist from '@hooks/useRoomlist';
 import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
-import useFriendData from '@hooks/useFriendData';
 
 const MyPage = () => {
   const userId = sessionStorage.getItem('user_id');
@@ -48,9 +46,7 @@ const MyPage = () => {
 
   const { data: userInfo } = useSWR('/user/my');
   const { setModal } = useModal();
-  const { data: roomlist } = useRoomlist();
-  const { imageLength } = useUserData();
-  const { friendNumber } = useFriendData();
+  const { roomList, imageLength, friendNumber } = useUserData();
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
@@ -95,7 +91,7 @@ const MyPage = () => {
                   </li>
                   <li>
                     <div>
-                      등록된 방 <span>{roomlist?.length ?? 0}</span>
+                      등록된 방 <span>{roomList?.length ?? 0}</span>
                     </div>
                   </li>
                   <li>
