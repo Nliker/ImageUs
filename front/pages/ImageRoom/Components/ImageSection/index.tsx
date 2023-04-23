@@ -17,9 +17,11 @@ import {
 import { getImageData } from '@utils/imageFetcher';
 import useIntersect from '@hooks/useIntersect';
 import { SelectTerm } from '../MainSection';
+import useImageData from '@hooks/useUserImgData';
+import useRoomImgData from '@hooks/useRoomImgData';
 
 interface Props {
-  loadImgTypeInfo: { isfiltered: boolean; info?: SelectTerm };
+  loadImgTypeInfo: { isfiltered: boolean; info: SelectTerm };
   sectionName?: string;
 }
 
@@ -32,16 +34,16 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
 
 */
 
-  const { data: realTimeImageList } = useSWR(
-    `/room/${roomId}/unread-imagelist`,
-    getUnreadImageList,
-    {
-      revalidateOnFocus: false,
-      revalidateOnMount: false,
-      revalidateOnReconnect: false,
-      refreshInterval: 300000,
-    },
-  );
+  // const { data: realTimeImageList } = useSWR(
+  //   `/room/${roomId}/unread-imagelist`,
+  //   getUnreadImageList,
+  //   {
+  //     revalidateOnFocus: false,
+  //     revalidateOnMount: false,
+  //     revalidateOnReconnect: false,
+  //     refreshInterval: 300000,
+  //   },
+  // );
 
   /*
 
@@ -51,17 +53,17 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
 
 */
 
-  const {
-    data: defaultImageList,
-    trigger: defaultImgListTrigger,
-    isMutating: defaultImgListLoading,
-  } = useSWRMutation(`/room/${roomId}/imagelist`, getDefaultImgFetcher);
+  // const {
+  //   data: defaultImageList,
+  //   trigger: defaultImgListTrigger,
+  //   isMutating: defaultImgListLoading,
+  // } = useSWRMutation(`/room/${roomId}/imagelist`, getDefaultImgFetcher);
 
-  const {
-    data: filterImageList,
-    trigger: filterImgListTrigger,
-    isMutating: filterImgListLoading,
-  } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
+  // const {
+  //   data: filterImageList,
+  //   trigger: filterImgListTrigger,
+  //   isMutating: filterImgListLoading,
+  // } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
 
   /*
 
@@ -69,8 +71,8 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
 
 */
 
-  const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
-    useSWRMutation('/room/imageData', getImageData);
+  // const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
+  //   useSWRMutation('/room/imageData', getImageData);
 
   /*
 
@@ -78,38 +80,49 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
 
 */
 
-  const { data: roomImage, mutate: mutateRoomImage } = useSWR<
-    CImageData[] | null
-  >(`/image/${roomId}`);
+  const {
+    roomImageList,
+    defaultImageLoading,
+    filterImageLoading,
+    loadNextDefaultImage,
+    loadNextFilterImage,
+    setRoomImagePayload,
+    clearRoomImageList,
+  } = useRoomImgData(roomId);
+  // const { data: roomImage, mutate: mutateRoomImage } = useSWR<
+  //   CImageData[] | null
+  // >(`/image/${roomId}`);
 
-  const [readStartNumber, setReadStartNumber] = useState(0);
+  // const [readStartNumber, setReadStartNumber] = useState(0);
 
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
 
       if (!loadImgTypeInfo.isfiltered) {
-        if (
-          !defaultImgListLoading &&
-          !imgDataListLoading &&
-          defaultImageList?.loadDataLength === 12
-        ) {
-          defaultImgListTrigger({
-            start: readStartNumber,
-          });
-        }
+        loadNextDefaultImage();
+        // if (
+        //   !defaultImgListLoading &&
+        //   !imgDataListLoading &&
+        //   defaultImageList?.loadDataLength === 12
+        // ) {
+        //   defaultImgListTrigger({
+        //     start: readStartNumber,
+        //   });
+        // }
       } else {
-        if (
-          !filterImgListLoading &&
-          !imgDataListLoading &&
-          filterImageList?.loadDataLength === 12
-        ) {
-          filterImgListTrigger({
-            start: readStartNumber,
-            start_date: loadImgTypeInfo.info?.startDate,
-            end_date: loadImgTypeInfo.info?.endDate,
-          });
-        }
+        loadNextFilterImage();
+        // if (
+        //   !filterImgListLoading &&
+        //   !imgDataListLoading &&
+        //   filterImageList?.loadDataLength === 12
+        // ) {
+        //   filterImgListTrigger({
+        //     start: readStartNumber,
+        //     start_date: loadImgTypeInfo.info?.startDate,
+        //     end_date: loadImgTypeInfo.info?.endDate,
+        //   });
+        // }
       }
     },
     {
@@ -119,82 +132,94 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
 
   useEffect(() => {
     if (loadImgTypeInfo.isfiltered) {
-      filterImgListTrigger({
-        start: 0,
-        start_date: loadImgTypeInfo.info?.startDate,
-        end_date: loadImgTypeInfo.info?.endDate,
-      });
+      if (!filterImageLoading) {
+        loadNextFilterImage();
+      }
+      // filterImgListTrigger({
+      //   start: 0,
+      //   start_date: loadImgTypeInfo.info?.startDate,
+      //   end_date: loadImgTypeInfo.info?.endDate,
+      // });
     } else {
-      defaultImgListTrigger({
-        start: 0,
-      });
+      if (!defaultImageLoading) {
+        loadNextDefaultImage();
+      }
+      // defaultImgListTrigger({
+      //   start: 0,
+      // });
     }
 
     return () => {
-      setReadStartNumber(0);
-      mutateRoomImage(null, false);
+      clearRoomImageList();
+      setRoomImagePayload({
+        startDate: loadImgTypeInfo.info.startDate,
+        endDate: loadImgTypeInfo.info.endDate,
+      });
+
+      // setReadStartNumber(0);
+      // mutateRoomImage(null, false);
     };
   }, [loadImgTypeInfo, roomId]);
 
-  useEffect(() => {
-    const newImgList = loadImgTypeInfo.isfiltered
-      ? filterImageList?.imagelist
-      : defaultImageList?.imagelist;
+  // useEffect(() => {
+  //   const newImgList = loadImgTypeInfo.isfiltered
+  //     ? filterImageList?.imagelist
+  //     : defaultImageList?.imagelist;
 
-    if (!newImgList) return;
+  //   if (!newImgList) return;
 
-    /*
+  //   /*
 
-     서버에서 받은 모든 이미지가 null인 경우에 intersectionObserver가 동작하지 않음으로
-     이미지 로드 요청을 한번 더 보낸다.
+  //    서버에서 받은 모든 이미지가 null인 경우에 intersectionObserver가 동작하지 않음으로
+  //    이미지 로드 요청을 한번 더 보낸다.
 
-    */
-    if (
-      newImgList.length !== 0 &&
-      newImgList.every((value) => value === null)
-    ) {
-      if (loadImgTypeInfo.isfiltered) {
-        filterImgListTrigger({
-          start: readStartNumber + 12,
-          start_date: loadImgTypeInfo.info?.startDate,
-          end_date: loadImgTypeInfo.info?.endDate,
-        });
-      } else {
-        defaultImgListTrigger({
-          start: readStartNumber + 12,
-        });
-      }
-      return;
-    }
+  //   */
+  //   if (
+  //     newImgList.length !== 0 &&
+  //     newImgList.every((value) => value === null)
+  //   ) {
+  //     if (loadImgTypeInfo.isfiltered) {
+  //       filterImgListTrigger({
+  //         start: readStartNumber + 12,
+  //         start_date: loadImgTypeInfo.info?.startDate,
+  //         end_date: loadImgTypeInfo.info?.endDate,
+  //       });
+  //     } else {
+  //       defaultImgListTrigger({
+  //         start: readStartNumber + 12,
+  //       });
+  //     }
+  //     return;
+  //   }
 
-    setReadStartNumber((prev) => prev + 12);
+  //   setReadStartNumber((prev) => prev + 12);
 
-    mutateRoomImage(async () => await imgDataListTrigger(newImgList), {
-      populateCache: (newData, currentData) => {
-        if (currentData) {
-          return [...currentData, ...newData];
-        } else {
-          return [...newData];
-        }
-      },
-      revalidate: false,
-    });
-  }, [defaultImageList, filterImageList]);
+  //   mutateRoomImage(async () => await imgDataListTrigger(newImgList), {
+  //     populateCache: (newData, currentData) => {
+  //       if (currentData) {
+  //         return [...currentData, ...newData];
+  //       } else {
+  //         return [...newData];
+  //       }
+  //     },
+  //     revalidate: false,
+  //   });
+  // }, [defaultImageList, filterImageList]);
 
-  useEffect(() => {
-    if (!realTimeImageList) return;
+  // useEffect(() => {
+  //   if (!realTimeImageList) return;
 
-    mutateRoomImage(async () => await imgDataListTrigger(realTimeImageList), {
-      populateCache: (newData, currentData) => {
-        if (currentData) {
-          return [...newData, ...currentData];
-        } else {
-          return [...newData];
-        }
-      },
-      revalidate: false,
-    });
-  }, [realTimeImageList]);
+  //   mutateRoomImage(async () => await imgDataListTrigger(realTimeImageList), {
+  //     populateCache: (newData, currentData) => {
+  //       if (currentData) {
+  //         return [...newData, ...currentData];
+  //       } else {
+  //         return [...newData];
+  //       }
+  //     },
+  //     revalidate: false,
+  //   });
+  // }, [realTimeImageList]);
 
   const imageCard = (
     data: CImageData,
@@ -211,16 +236,14 @@ const ImageSection = ({ sectionName, loadImgTypeInfo }: Props) => {
     />
   );
 
-  if (!roomImage) return <Spinner />;
+  if (!roomImageList) return <Spinner />;
 
   return (
     <>
-      {roomImage.length !== 0 ? (
+      {roomImageList.length !== 0 ? (
         <>
-          <ImageLayout>{roomImage.map(imageCard)}</ImageLayout>
-          {(filterImgListLoading ||
-            defaultImgListLoading ||
-            imgDataListLoading) && <Spinner />}
+          <ImageLayout>{roomImageList.map(imageCard)}</ImageLayout>
+          {(filterImageLoading || defaultImageLoading) && <Spinner />}
         </>
       ) : (
         <NotImageData>
