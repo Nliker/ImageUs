@@ -11,6 +11,8 @@ import Spinner from '@styles/Spinner';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 import ImageContent from './ImageContent';
+import useUserData from '@hooks/useUserData';
+import useUserImageData from '@hooks/useUserImgData';
 
 const MyPictures = () => {
   const userId = sessionStorage.getItem('user_id');
@@ -22,35 +24,43 @@ const MyPictures = () => {
 */
 
   const {
-    data: userImgList,
-    trigger: userImgListTrigger,
-    isMutating: userImgListLoading,
-  } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
+    userImageList,
+    userImgLoading,
+    loadNextUserImage,
+    clearUserImageList,
+  } = useUserImageData(userId);
 
-  const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
-    useSWRMutation('/user/image-download', getImageData);
+  // const {
+  //   data: userImgList,
+  //   trigger: userImgListTrigger,
+  //   isMutating: userImgListLoading,
+  // } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
 
-  /*
+  // const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
+  //   useSWRMutation('/user/image-download', getImageData);
 
-    실제 화면에 보여줄 이미지데이터들을` 저장하는 배열
+  // /*
 
-  */
+  //   실제 화면에 보여줄 이미지데이터들을` 저장하는 배열
 
-  const { data: userImage, mutate: mutateUserImage } = useSWR<CImageData[]>(
-    '/user/imageDataList',
-  );
+  // */
 
-  const [readStartNumber, setReadStartNumber] = useState(0);
+  // const { data: userImage, mutate: mutateUserImage } = useSWR<CImageData[]>(
+  //   '/user/imageDataList',
+  // );
+
+  // const [readStartNumber, setReadStartNumber] = useState(0);
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (
-        !userImgListLoading &&
-        !imageDataLoading &&
-        userImgList?.loadDataLength === 12
-      ) {
-        userImgListTrigger(readStartNumber);
-      }
+      loadNextUserImage();
+      // if (
+      //   !userImgListLoading &&
+      //   !imageDataLoading &&
+      //   userImgList?.loadDataLength === 12
+      // ) {
+      //   userImgListTrigger(readStartNumber);
+      // }
     },
     {
       threshold: 0.5,
@@ -64,30 +74,32 @@ const MyPictures = () => {
   */
 
   useEffect(() => {
-    userImgListTrigger(readStartNumber);
+    // userImgListTrigger(readStartNumber);
+    loadNextUserImage();
 
     return () => {
-      setReadStartNumber(0);
-      mutateUserImage(undefined, false);
+      // setReadStartNumber(0);
+      // mutateUserImage(undefined, false);
+      clearUserImageList();
     };
   }, []);
 
-  useEffect(() => {
-    if (!userImgList || userImgListLoading) return;
+  // useEffect(() => {
+  //   if (!userImgList || userImgListLoading) return;
 
-    setReadStartNumber((prev) => prev + 12);
+  //   setReadStartNumber((prev) => prev + 12);
 
-    mutateUserImage(async () => await imageDataTrigger(userImgList.imagelist), {
-      populateCache: (newData, currentData) => {
-        if (!currentData) {
-          return [...newData];
-        } else {
-          return [...currentData, ...newData];
-        }
-      },
-      revalidate: false,
-    });
-  }, [userImgList]);
+  //   mutateUserImage(async () => await imageDataTrigger(userImgList.imagelist), {
+  //     populateCache: (newData, currentData) => {
+  //       if (!currentData) {
+  //         return [...newData];
+  //       } else {
+  //         return [...currentData, ...newData];
+  //       }
+  //     },
+  //     revalidate: false,
+  //   });
+  // }, [userImgList]);
 
   const imageCard = (
     data: CImageData,
@@ -103,14 +115,14 @@ const MyPictures = () => {
     />
   );
 
-  if (!userImage) return <Spinner />;
+  if (!userImageList) return <Spinner />;
 
   return (
     <Wrapper>
-      {userImage.length !== 0 ? (
+      {userImageList.length !== 0 ? (
         <>
-          <ImageLayout>{userImage.map(imageCard)}</ImageLayout>
-          {(imageDataLoading || userImgListLoading) && <Spinner />}
+          <ImageLayout>{userImageList.map(imageCard)}</ImageLayout>
+          {userImgLoading && <Spinner />}
         </>
       ) : (
         <NotImageData>
