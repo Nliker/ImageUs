@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { DImageData } from '@typing/db';
 import { getToken } from './getToken';
 
-const getUserFriendList = async (url: string) => {
+const getUserFdListFetcher = async (url: string) => {
   try {
     const userId = sessionStorage.getItem('user_id');
     const { token } = await getToken();
@@ -24,7 +24,7 @@ const getUserFriendList = async (url: string) => {
   }
 };
 
-const getUserImageList = async (
+const getUserImgsFetcher = async (
   url: string,
   { arg: start }: { arg: number },
 ) => {
@@ -55,7 +55,7 @@ const getUserImageList = async (
   }
 };
 
-const getUserImageLen = async (url: string) => {
+const getUserImgLenFetcher = async (url: string) => {
   try {
     const { token } = await getToken();
 
@@ -78,7 +78,7 @@ const getUserImageLen = async (url: string) => {
   }
 };
 
-const deleteUserFriend = async (url: string, { arg }: { arg?: number }) => {
+const deleteFriendFetcher = async (url: string, { arg }: { arg?: number }) => {
   try {
     const userId = sessionStorage.getItem('user_id');
     const { token } = await getToken();
@@ -129,7 +129,7 @@ const getUserRoomListFetcher = async (url: string) => {
   }
 };
 
-const postUserInfoFetcher = async (
+const changeUserInfoFetcher = async (
   url: string,
   { arg }: { arg: { name?: string; profile?: string } },
 ) => {
@@ -155,7 +155,7 @@ const postUserInfoFetcher = async (
   }
 };
 
-const postNewFriend = async (
+const addFriendFetcher = async (
   url: string,
   { arg: friendId }: { arg?: number },
 ) => {
@@ -196,38 +196,12 @@ const postNewFriend = async (
   }
 };
 
-const leaveRoomFetcher = async (
-  url: string,
-  { arg: roomId }: { arg?: string },
-) => {
-  try {
-    if (!roomId) throw new Error('올바른 요청이 아닙니다.');
-    const { token } = await getToken();
-    const userId = sessionStorage.getItem('user_id');
-
-    if (!token) {
-      throw new Error();
-    }
-
-    await axios.delete('/backapi' + `/user/${userId}/room`, {
-      headers: { Authorization: token },
-      data: { delete_user_room_id: roomId },
-    });
-
-    alert('성공적으로 나갔습니다.');
-  } catch (err) {
-    alert('요청을 실패했습니다..');
-    return;
-  }
-};
-
 export {
-  getUserFriendList,
+  getUserFdListFetcher,
   getUserRoomListFetcher,
-  getUserImageList,
-  getUserImageLen,
-  postNewFriend,
-  postUserInfoFetcher,
-  deleteUserFriend,
-  leaveRoomFetcher,
+  getUserImgsFetcher,
+  getUserImgLenFetcher,
+  addFriendFetcher,
+  changeUserInfoFetcher,
+  deleteFriendFetcher,
 };

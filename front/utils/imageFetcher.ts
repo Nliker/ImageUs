@@ -7,8 +7,8 @@ interface AxiosCustomRequestConfig extends AxiosRequestConfig {
   retryCount: number;
 }
 
-const postUploadRoomImage = async (
-  url: string,
+const uploadRoomImgFetcher = async (
+  [url, type]: [string, string],
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
   try {
@@ -34,7 +34,7 @@ const postUploadRoomImage = async (
   }
 };
 
-const deleteUserImage = async (
+const deleteUserImageFetcher = async (
   url: string,
   { arg: imageId }: { arg?: number },
 ) => {
@@ -60,7 +60,7 @@ const deleteUserImage = async (
   }
 };
 
-const getImageData = async (
+const getImageDataFetcher = async (
   url: string,
   { arg: imageList }: { arg: DImageData[] },
 ) => {
@@ -130,7 +130,7 @@ const getImageData = async (
   }
 };
 
-const postUploadUserImage = async (
+const uploadUserImageFetcher = async (
   url: string,
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
@@ -157,9 +157,142 @@ const postUploadUserImage = async (
   }
 };
 
+const getDefaultImgFetcher = async (
+  url: string,
+  {
+    arg,
+  }: {
+    arg: {
+      start: number;
+    };
+  },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    const { start } = arg;
+    const loadNumber = 12;
+
+    const response = await axios.get(
+      '/backapi' + `${url}?start=${start}&limit=${loadNumber}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
+
+    return {
+      imagelist: newDataList,
+      loadCompleted: imagelist.length < 12 ? true : false,
+    };
+  } catch (err) {
+    alert('이미지정보를 받아오지 못했습니다..');
+    return {};
+  }
+};
+
+const getFilterImgFetcher = async (
+  url: string,
+  { arg }: { arg: { start: number; start_date?: string; end_date?: string } },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    const { start, start_date, end_date } = arg;
+    const limit = 12;
+
+    const response = await axios.get(
+      '/backapi' +
+        `${url}?start=${start}&limit=${limit}&start_date=${start_date}&end_date=${end_date}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
+
+    return {
+      imagelist: newDataList,
+      loadCompleted: imagelist.length < 12 ? true : false,
+    };
+  } catch (err) {
+    alert('이미지정보를 받아오지 못했습니다..');
+    return {};
+  }
+};
+
+const getUnreadImgFetcher = async (url: string) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+    const response = await axios.get('/backapi' + url, {
+      headers: { Authorization: token },
+    });
+    return response.data.imagelist;
+  } catch (err) {
+    console.error(err);
+    return;
+  }
+};
+
+const deleteRoomImgFetcher = async (
+  url: string,
+  { arg: imageId }: { arg?: number },
+) => {
+  try {
+    if (!imageId) throw new Error('올바른 요청이 아닙니다.');
+
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error();
+    }
+
+    await axios.delete('/backapi' + url, {
+      headers: { Authorization: token },
+      data: {
+        delete_room_image_id: imageId,
+      },
+    });
+    alert('이미지를 삭제하였습니다.');
+    return imageId;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 404) {
+        alert(err.response.data.message);
+      }
+    } else {
+      alert('이미지를 삭제하지 못하였습니다..');
+    }
+    return;
+  }
+};
+
 export {
-  postUploadRoomImage,
-  postUploadUserImage,
-  deleteUserImage,
-  getImageData,
+  getImageDataFetcher,
+  getDefaultImgFetcher,
+  getFilterImgFetcher,
+  uploadRoomImgFetcher,
+  deleteRoomImgFetcher,
+  uploadUserImageFetcher,
+  deleteUserImageFetcher,
+  getUnreadImgFetcher,
 };
