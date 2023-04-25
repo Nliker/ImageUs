@@ -20,19 +20,24 @@ import {
   FilteringOption,
   MainContainer,
 } from './styles';
-
-export interface SelectTerm {
-  startDate?: string;
-  endDate?: string;
-}
+import useModal from '@hooks/useModal';
+import { SelectTerm } from '@typing/client';
 
 const MainSection = () => {
+  const { setModal } = useModal();
+
+  const [filterNum, setFilterNum] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
-  const [filterName, setFilterName] = useState('전체 게시물');
-  const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>();
+  const [showSelectDateForm, setShowSelectDateForm] = useState(false);
+  const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>({
+    startDate: '',
+    endDate: '',
+  });
 
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
+
+  const filterState = ['전체 게시물', '오늘 날짜', '어제 날짜', '기간 선택'];
 
   const getDateString = (dateValue: Date) => {
     const selectDate = `${dateValue.getFullYear()}-${
@@ -51,16 +56,15 @@ const MainSection = () => {
     }
 
     if (targetElement.closest('#today')) {
-      setFilterName('오늘 날짜');
+      setFilterNum(1);
       const { selectDate } = getDateString(new Date());
 
       setFilterSelectTerm({
         startDate: selectDate,
         endDate: selectDate,
       });
-      setFilterBoxState(false);
     } else if (targetElement.closest('#yesterday')) {
-      setFilterName('어제 날짜');
+      setFilterNum(2);
       const dateValue = new Date();
       dateValue.setDate(dateValue.getDate() - 1);
       const { selectDate } = getDateString(dateValue);
@@ -69,52 +73,55 @@ const MainSection = () => {
         startDate: selectDate,
         endDate: selectDate,
       });
-      setFilterBoxState(false);
     } else if (targetElement.closest('#selectDay')) {
-      setFilterName('기간 선택');
-      setFilterBoxState(false);
+      setShowSelectDateForm(true);
     } else if (targetElement.closest('#default')) {
-      setFilterName('전체 게시물');
-      setFilterSelectTerm(undefined);
-      setFilterBoxState(false);
+      setFilterNum(0);
+      setFilterSelectTerm({
+        startDate: '',
+        endDate: '',
+      });
     }
+    setFilterBoxState(false);
   };
 
   const onClickCertainPeriodFilterBtn = () => {
     const startDate = filterStartDateInputRef.current?.value;
     const endDate = filterEndDateInputRef.current?.value;
 
-    if (
-      startDate === filterSelectTerm?.startDate &&
-      endDate === filterSelectTerm?.endDate
-    )
-      return;
-
     if (!startDate || !endDate) {
       alert('날짜가 선택되지 않았습니다.');
       return;
+    } else if (
+      startDate === filterSelectTerm.startDate &&
+      endDate === filterSelectTerm.endDate
+    ) {
+      setShowSelectDateForm(false);
+      return;
+    } else if (new Date(startDate) > new Date(endDate)) {
+      alert('시작날이 마지막날보다 뒤따를 수 없습니다..');
+      return;
     }
 
+    setFilterNum(3);
     setFilterSelectTerm({ startDate, endDate });
+    setShowSelectDateForm(false);
   };
 
   const onClickLeaveRoom = () => {
-    const userId = sessionStorage.getItem('user_id');
-    mutate('modalState', {
-      currentModalState: 'alert',
-      data: {
-        content: '방에서 나가시겠습니까?',
-        mutateKey: `/user/${userId}/room`,
-      },
+    setModal({
+      currentModal: 'alert',
+      alertData: { type: 'leaveRoom', text: '방에서 나가시겠습니까?' },
     });
   };
 
   const loadImgTypeInfo = useMemo(
     () => ({
-      isfiltered: filterSelectTerm ? true : false,
+      isfiltered: filterNum !== 0 ? true : false,
+      filterState: filterNum,
       info: filterSelectTerm,
     }),
-    [filterSelectTerm],
+    [filterSelectTerm, filterNum],
   );
 
   return (
@@ -161,7 +168,7 @@ const MainSection = () => {
                 <input type="checkbox" id="options-view-button" />
                 <div id="select-button">
                   <div className="selected-value">
-                    <span>{filterName}</span>
+                    <span>{filterState[filterNum]}</span>
                   </div>
                   <div id="chevrons">
                     <MdKeyboardArrowUp />
@@ -185,7 +192,7 @@ const MainSection = () => {
                   </div>
                 )}
               </FilteringOption>
-              {filterName === '기간 선택' && (
+              {showSelectDateForm && (
                 <div className="select_box">
                   <div className="select_date">
                     <div className="select_date_c">
@@ -210,7 +217,7 @@ const MainSection = () => {
               <div>
                 <div className="tag">
                   <span>
-                    {filterSelectTerm ? '필터링된 이미지' : '게시된 이미지'}
+                    {filterNum !== 0 ? '필터링된 이미지' : '전체 이미지'}
                   </span>
                 </div>
               </div>

@@ -6,3 +6,8 @@ export interface CImageData {
   created_at: string | null;
   user_name: string | null;
 }
+
+export interface SelectTerm {
+  startDate: string;
+  endDate: string;
+}

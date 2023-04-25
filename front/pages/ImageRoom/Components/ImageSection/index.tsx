@@ -4,7 +4,7 @@ import { FcRemoveImage } from 'react-icons/fc';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { CImageData } from '@typing/client';
+import { CImageData, SelectTerm } from '@typing/client';
 import ImageContent from './ImageContent';
 import { ImageLayout, NotImageData } from './styles';
 import Spinner from '@styles/Spinner';
@@ -16,12 +16,15 @@ import {
 } from '@utils/roomDataFetcher';
 import { getImageData } from '@utils/imageFetcher';
 import useIntersect from '@hooks/useIntersect';
-import { SelectTerm } from '../MainSection';
 import useImageData from '@hooks/useUserImgData';
 import useRoomImgData from '@hooks/useRoomImgData';
 
 interface Props {
-  loadImgTypeInfo: { isfiltered: boolean; info: SelectTerm };
+  loadImgTypeInfo: {
+    isfiltered: boolean;
+    filterState: number;
+    info: SelectTerm;
+  };
   sectionName?: string;
 }
 
