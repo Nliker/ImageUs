@@ -1,3 +1,4 @@
+import { CImageData } from '@typing/client';
 import { getImageData, postUploadRoomImage } from '@utils/imageFetcher';
 import {
   getUnreadImageList,
@@ -5,29 +6,37 @@ import {
   getFilterImgFetcher,
   deleteRoomImgFetcher,
 } from '@utils/roomDataFetcher';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-interface IRoomImagePayload {
-  imageId?: number;
-  startDate?: string;
-  endDate?: string;
+interface ILoadImage {
+  readStartNumber: number;
+  loadImgTypeInfo: {
+    isfiltered: boolean;
+    info: {
+      startDate: string;
+      endDate: string;
+    };
+  };
 }
 
 function useRoomImgData(roomId?: string) {
-  let readStartNumber = 0;
-
-  const { data: requestPayload, mutate: requestPayloadMutate } =
-    useSWR<IRoomImagePayload>('/room/payload');
-  const { data: roomImageList, mutate: mutateRoomImage } =
-    useSWR('/room/imagelist');
-  const { data: realTimeImageList } = useSWR(
-    `/room/${roomId}/unread-imagelist`,
-    getUnreadImageList,
+  const {
+    data: roomImageList,
+    mutate: mutateRoomImage,
+    isValidating: roomImgMutating,
+    error: roomImgListError,
+  } = useSWR('/room/imagelist', {
+    fallbackData: [],
+  });
+  const { data: realTimeImageList, mutate: mutateRealTimeImage } = useSWR(
+    '/room/imageUpdate',
+    updateImageList,
     {
-      revalidateOnFocus: false,
+      revalidateIfStale: false,
       revalidateOnMount: false,
+      revalidateOnFocus: false,
       revalidateOnReconnect: false,
       refreshInterval: 300000,
     },
@@ -35,16 +44,6 @@ function useRoomImgData(roomId?: string) {
 
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/room/imageData', getImageData);
-  const {
-    data: defaultImageList,
-    trigger: defaultImgListTrigger,
-    isMutating: defaultImgListLoading,
-  } = useSWRMutation(`/room/${roomId}/imagelist`, getDefaultImgFetcher);
-  const {
-    data: filterImageList,
-    trigger: filterImgListTrigger,
-    isMutating: filterImgListLoading,
-  } = useSWRMutation(`/room/${roomId}/imagelist/bydate`, getFilterImgFetcher);
   const { trigger: deleteRoomImgTrigger } = useSWRMutation(
     `/room/${roomId}/image`,
     deleteRoomImgFetcher,
@@ -54,134 +53,112 @@ function useRoomImgData(roomId?: string) {
     postUploadRoomImage,
   );
 
-  const uploadRoomImage = (uploadImageFile: FormData) =>
-    uploadRoomImageTrigger({ uploadImageFile });
-  const deleteRoomImage = () => {
-    deleteRoomImgTrigger(requestPayload?.imageId).then((dataId) => {});
+  const uploadRoomImage = async (uploadImageFile: FormData) => {
+    await uploadRoomImageTrigger({ uploadImageFile });
+
+    await mutateRealTimeImage();
   };
-  const loadNextDefaultImage = async () => {
-    if (!defaultImgListLoading && !imgDataListLoading) {
-      defaultImgListTrigger({
-        start: readStartNumber,
+  const deleteRoomImage = (imageId: number) => {
+    deleteRoomImgTrigger(imageId).then((dataId) => {});
+  };
+  const loadImage = async (fetchInfo: ILoadImage) => {
+    const { readStartNumber, loadImgTypeInfo } = fetchInfo;
+    const { info: dateValue } = loadImgTypeInfo;
+    const imageLoading =
+      (!roomImageList && !roomImgListError) || imgDataListLoading;
+
+    if (imageLoading) return false;
+
+    console.log('이미지 로드');
+    if (loadImgTypeInfo.isfiltered) {
+      const newData = await getFilterImgFetcher(
+        `/room/${roomId}/imagelist/bydate`,
+        {
+          arg: {
+            start: readStartNumber,
+            start_date: dateValue.startDate,
+            end_date: dateValue.endDate,
+          },
+        },
+      );
+      const { imagelist, loadCompleted } = newData;
+
+      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
+      mutateRoomImage(
+        (prevData: CImageData[]) => {
+          if (!prevData) {
+            return [...newImageDataList];
+          } else {
+            return [...prevData, ...newImageDataList];
+          }
+        },
+        {
+          revalidate: false,
+        },
+      );
+
+      if (loadCompleted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      const newData = await getDefaultImgFetcher(`/room/${roomId}/imagelist`, {
+        arg: {
+          start: readStartNumber,
+        },
       });
+
+      const { imagelist, loadCompleted } = newData;
+
+      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
+      mutateRoomImage(
+        (prevData: CImageData[]) => {
+          if (!prevData) {
+            return [...newImageDataList];
+          } else {
+            return [...prevData, ...newImageDataList];
+          }
+        },
+        {
+          revalidate: false,
+        },
+      );
+
+      if (loadCompleted) {
+        return true;
+      } else {
+        return false;
+      }
     }
   };
-  const loadNextFilterImage = async () => {
-    if (!filterImgListLoading && !imgDataListLoading) {
-      filterImgListTrigger({
-        start: readStartNumber,
-        start_date: requestPayload?.startDate,
-        end_date: requestPayload?.endDate,
-      });
-    }
-  };
-  const setRoomImagePayload = (newData: IRoomImagePayload) => {
-    requestPayloadMutate({ ...requestPayload, ...newData });
-  };
+
   const clearRoomImageList = () => {
-    readStartNumber = 0;
-    mutateRoomImage(false);
+    console.log('클리어');
+    mutateRoomImage([], false);
   };
 
-  useEffect(() => {
-    if (!realTimeImageList) return;
-
-    mutateRoomImage(async () => await imgDataListTrigger(realTimeImageList), {
-      populateCache: (newData, currentData) => {
-        if (currentData) {
+  async function updateImageList() {
+    await mutateRoomImage(
+      async () => await getUnreadImageList(`/room/${roomId}/unread-imagelist`),
+      {
+        populateCache: (newData, currentData) => {
           return [...newData, ...currentData];
-        } else {
-          return [...newData];
-        }
+        },
+        revalidate: false,
       },
-      revalidate: false,
-    });
-  }, [realTimeImageList]);
-
-  useEffect(() => {
-    // const newImgList = loadImgTypeInfo?.isfiltered
-    //   ? filterImageList?.imagelist
-    //   : defaultImageList?.imagelist;
-    const newImgList = defaultImageList?.imagelist;
-    if (!newImgList) return;
-
-    /*
-
-     서버에서 받은 모든 이미지가 null인 경우에 intersectionObserver가 동작하지 않음으로
-     이미지 로드 요청을 한번 더 보낸다.
-
-    */
-    if (
-      newImgList.length !== 0 &&
-      newImgList.every((value) => value === null)
-    ) {
-      defaultImgListTrigger({
-        start: readStartNumber + 12,
-      });
-      return;
-    }
-
-    readStartNumber += 12;
-
-    mutateRoomImage(async () => await imgDataListTrigger(newImgList), {
-      populateCache: (newData, currentData) => {
-        if (currentData) {
-          return [...currentData, ...newData];
-        } else {
-          return [...newData];
-        }
-      },
-      revalidate: false,
-    });
-  }, [defaultImageList]);
-
-  useEffect(() => {
-    const newImgList = filterImageList?.imagelist;
-    if (!newImgList) return;
-
-    /*
-
-     서버에서 받은 모든 이미지가 null인 경우에 intersectionObserver가 동작하지 않음으로
-     이미지 로드 요청을 한번 더 보낸다.
-
-    */
-    if (
-      newImgList.length !== 0 &&
-      newImgList.every((value) => value === null)
-    ) {
-      filterImgListTrigger({
-        start: readStartNumber + 12,
-        start_date: requestPayload?.startDate,
-        end_date: requestPayload?.endDate,
-      });
-      return;
-    }
-
-    readStartNumber += 12;
-
-    mutateRoomImage(async () => await imgDataListTrigger(newImgList), {
-      populateCache: (newData, currentData) => {
-        if (currentData) {
-          return [...currentData, ...newData];
-        } else {
-          return [...newData];
-        }
-      },
-      revalidate: false,
-    });
-  }, [filterImageList]);
+    );
+  }
 
   return {
     roomImageList,
-    defaultImageLoading:
-      imgDataListLoading || defaultImgListLoading || !defaultImageList,
-    filterImageLoading:
-      imgDataListLoading || filterImgListLoading || !filterImageList,
+    roomImgListLoading:
+      (!roomImageList && !roomImgListError) ||
+      imgDataListLoading ||
+      roomImgMutating,
     uploadRoomImage,
     deleteRoomImage,
-    loadNextDefaultImage,
-    loadNextFilterImage,
-    setRoomImagePayload,
+    loadImage,
     clearRoomImageList,
   };
 }
