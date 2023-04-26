@@ -254,7 +254,7 @@ const getUnreadImgFetcher = async (url: string) => {
 };
 
 const deleteRoomImgFetcher = async (
-  url: string,
+  [url, type]: [string, string],
   { arg: imageId }: { arg?: number },
 ) => {
   try {
