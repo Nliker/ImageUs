@@ -1,4 +1,3 @@
-import useRoomlist from '@hooks/useRoomlist';
 import Spinner from '@styles/Spinner';
 import { DRoomData } from '@typing/db';
 import React from 'react';
@@ -16,7 +15,7 @@ import useUserData from '@hooks/useUserData';
 function Roomlist() {
   const { setModal } = useModal();
   const { setUserPayload } = useUserData();
-  const { data: roomlistData, isLoading, error } = useRoomlist();
+  const { roomList, roomListLoading } = useUserData();
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
 
   const onClickLeaveRoom =
@@ -33,15 +32,15 @@ function Roomlist() {
       setUserPayload({ roomId });
     };
 
-  if (isLoading) return <Spinner />;
+  if (roomListLoading) return <Spinner />;
 
-  if (error) return <div>정보를 받아오지 못했습니다. 새로고침해주세요..</div>;
+  // if (error) return <div>정보를 받아오지 못했습니다. 새로고침해주세요..</div>;
 
   return (
     <Container>
-      {roomlistData.length !== 0 ? (
+      {roomList.length !== 0 ? (
         <ul className="room_list">
-          {roomlistData.map((roomData: DRoomData) => (
+          {roomList.map((roomData: DRoomData) => (
             <li key={roomData.id}>
               <div className="item_box">
                 <Link to={`/room/${roomData.id}`}>
