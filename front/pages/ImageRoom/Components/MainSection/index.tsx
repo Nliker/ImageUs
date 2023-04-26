@@ -27,6 +27,7 @@ const MainSection = () => {
   const { setModal } = useModal();
 
   const [filterNum, setFilterNum] = useState(0);
+  const [changeFilterDate, setChangeFilterDate] = useState(false);
   const [filterBoxState, setFilterBoxState] = useState(false);
   const [showSelectDateForm, setShowSelectDateForm] = useState(false);
   const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>({
@@ -56,31 +57,30 @@ const MainSection = () => {
     }
 
     if (targetElement.closest('#today')) {
-      setFilterNum(1);
       const { selectDate } = getDateString(new Date());
 
-      setFilterSelectTerm({
+      setFilterNum(1);
+      setFilterSelectTerm((prev) => ({
+        ...prev,
         startDate: selectDate,
         endDate: selectDate,
-      });
+      }));
     } else if (targetElement.closest('#yesterday')) {
-      setFilterNum(2);
       const dateValue = new Date();
       dateValue.setDate(dateValue.getDate() - 1);
       const { selectDate } = getDateString(dateValue);
 
-      setFilterSelectTerm({
+      setFilterNum(2);
+      setFilterSelectTerm((prev) => ({
+        ...prev,
         startDate: selectDate,
         endDate: selectDate,
-      });
+      }));
     } else if (targetElement.closest('#selectDay')) {
       setShowSelectDateForm(true);
     } else if (targetElement.closest('#default')) {
       setFilterNum(0);
-      setFilterSelectTerm({
-        startDate: '',
-        endDate: '',
-      });
+      setFilterSelectTerm((prev) => ({ ...prev, startDate: '', endDate: '' }));
     }
     setFilterBoxState(false);
   };
@@ -104,7 +104,7 @@ const MainSection = () => {
     }
 
     setFilterNum(3);
-    setFilterSelectTerm({ startDate, endDate });
+    setFilterSelectTerm((prev) => ({ ...prev, startDate, endDate }));
     setShowSelectDateForm(false);
   };
 
@@ -119,7 +119,8 @@ const MainSection = () => {
     () => ({
       isfiltered: filterNum !== 0 ? true : false,
       filterState: filterNum,
-      info: filterSelectTerm,
+      filterStartDate: filterSelectTerm.startDate,
+      filterEndDate: filterSelectTerm.endDate,
     }),
     [filterSelectTerm, filterNum],
   );

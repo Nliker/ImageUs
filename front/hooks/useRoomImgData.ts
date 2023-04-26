@@ -1,4 +1,4 @@
-import { CImageData } from '@typing/client';
+import { CImageData, ILoadImgTypeInfo } from '@typing/client';
 import {
   getImageDataFetcher,
   deleteRoomImgFetcher,
@@ -13,13 +13,7 @@ import useSWRMutation from 'swr/mutation';
 
 interface ILoadImage {
   readStartNumber: number;
-  loadImgTypeInfo: {
-    isfiltered: boolean;
-    info: {
-      startDate: string;
-      endDate: string;
-    };
-  };
+  loadImgTypeInfo: ILoadImgTypeInfo;
 }
 
 function useRoomImgData(roomId?: string) {
@@ -64,7 +58,7 @@ function useRoomImgData(roomId?: string) {
   };
   const loadImage = async (fetchInfo: ILoadImage) => {
     const { readStartNumber, loadImgTypeInfo } = fetchInfo;
-    const { info: dateValue } = loadImgTypeInfo;
+    const { filterStartDate, filterEndDate } = loadImgTypeInfo;
     const imageLoading =
       (!roomImageList && !roomImgListError) || imgDataListLoading;
 
@@ -77,8 +71,8 @@ function useRoomImgData(roomId?: string) {
         {
           arg: {
             start: readStartNumber,
-            start_date: dateValue.startDate,
-            end_date: dateValue.endDate,
+            start_date: filterStartDate,
+            end_date: filterEndDate,
           },
         },
       );

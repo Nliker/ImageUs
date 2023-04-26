@@ -2,7 +2,7 @@ import React, { memo, useEffect, useMemo, useRef } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
-import { CImageData, SelectTerm } from '@typing/client';
+import { CImageData, ILoadImgTypeInfo, SelectTerm } from '@typing/client';
 import ImageContent from './ImageContent';
 import { ImageLayout, NotImageData } from './styles';
 import Spinner from '@styles/Spinner';
@@ -11,12 +11,7 @@ import useIntersect from '@hooks/useIntersect';
 import useRoomImgData from '@hooks/useRoomImgData';
 
 interface Props {
-  loadImgTypeInfo: {
-    isfiltered: boolean;
-    filterState: number;
-    info: SelectTerm;
-  };
-  sectionName?: string;
+  loadImgTypeInfo: ILoadImgTypeInfo;
 }
 
 interface IImageCard {
@@ -77,7 +72,12 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
     return () => {
       clearRoomImageList();
     };
-  }, [loadImgTypeInfo, roomId]);
+  }, [
+    loadImgTypeInfo.filterStartDate,
+    loadImgTypeInfo.filterEndDate,
+    loadImgTypeInfo.filterState,
+    roomId,
+  ]);
 
   const ImageCard = memo(
     ({ data, index, thisArr, observerRef }: IImageCard) => (
