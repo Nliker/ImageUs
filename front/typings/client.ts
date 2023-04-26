@@ -11,3 +11,10 @@ export interface SelectTerm {
   startDate: string;
   endDate: string;
 }
+
+export interface ILoadImgTypeInfo {
+  isfiltered: boolean;
+  filterState: number;
+  filterStartDate: string;
+  filterEndDate: string;
+}
