@@ -5,12 +5,13 @@ import { CgCloseO } from 'react-icons/cg';
 import { Background, CloseBtn, Container, Wrapper } from './styles';
 import useModal from '@hooks/useModal';
 
-interface Props {
+interface IProps {
+  currentModal: string | null;
   children: React.ReactNode;
 }
 
-const ModalLayout = ({ children }: Props) => {
-  const { currentModal, clearModalCache } = useModal();
+const ModalLayout = ({ currentModal, children }: IProps) => {
+  const { clearModalCache } = useModal();
   const modalEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,7 +45,6 @@ const ModalLayout = ({ children }: Props) => {
         <CloseBtn>
           <div
             onClick={() => {
-              // mutate('modalState', { currentModal: '' });
               clearModalCache();
             }}
           >
