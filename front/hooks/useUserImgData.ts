@@ -1,16 +1,9 @@
 import {
-  deleteUserImage,
-  getImageData,
-  postUploadRoomImage,
-  postUploadUserImage,
+  getImageDataFetcher,
+  deleteUserImageFetcher,
+  uploadUserImageFetcher,
 } from '@utils/imageFetcher';
-import {
-  deleteRoomImgFetcher,
-  getDefaultImgFetcher,
-  getFilterImgFetcher,
-  getUnreadImageList,
-} from '@utils/roomDataFetcher';
-import { getUserImageList } from '@utils/userDataFetcher';
+import { getUserImgsFetcher } from '@utils/userDataFetcher';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -22,25 +15,25 @@ interface IImagePayload {
 function useUserImageData(userId: string | null) {
   let readStartNumber = 0;
 
-  const { data: userImageList, mutate: mutateUserImgList } =
-    useSWR('/user/imagelist');
   const { data: requestPayload, mutate: requestPayloadMutate } =
     useSWR('/user/payload');
+  const { data: userImageList, mutate: mutateUserImgList } =
+    useSWR('/user/imagelist');
 
   const {
     data: userNextImage,
     trigger: nextImgListTrigger,
     isMutating: userImgListLoading,
-  } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
+  } = useSWRMutation(`/user/${userId}/imagelist`, getUserImgsFetcher);
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
-    useSWRMutation('/user/image-download', getImageData);
+    useSWRMutation('/user/image-download', getImageDataFetcher);
   const { trigger: deleteUserImgTrigger } = useSWRMutation(
     '/image',
-    deleteUserImage,
+    deleteUserImageFetcher,
   );
   const { trigger: uploadUserImageTrigger } = useSWRMutation(
     '/image',
-    postUploadUserImage,
+    uploadUserImageFetcher,
   );
 
   const loadNextUserImage = async () => {

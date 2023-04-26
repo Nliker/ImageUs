@@ -8,9 +8,9 @@ import { IconContext } from 'react-icons/lib';
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
 import searchFetcher from '@utils/searchFetcher';
-import { postNewFriend } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
+import { addFriendFetcher } from '@utils/userDataFetcher';
 
 const SearchBox = () => {
   const { mutate } = useSWRConfig();
@@ -28,7 +28,7 @@ const SearchBox = () => {
   );
   const { trigger: registerFriendTrigger } = useSWRMutation(
     '/user/friend',
-    postNewFriend,
+    addFriendFetcher,
   );
 
   const [focusSearchBox, setFocusSearchBox] = useState(false);

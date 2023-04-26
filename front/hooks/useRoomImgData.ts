@@ -1,11 +1,12 @@
 import { CImageData } from '@typing/client';
-import { getImageData, postUploadRoomImage } from '@utils/imageFetcher';
 import {
-  getUnreadImageList,
-  getDefaultImgFetcher,
-  getFilterImgFetcher,
+  getImageDataFetcher,
   deleteRoomImgFetcher,
-} from '@utils/roomDataFetcher';
+  uploadRoomImgFetcher,
+  getFilterImgFetcher,
+  getDefaultImgFetcher,
+  getUnreadImgFetcher,
+} from '@utils/imageFetcher';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -43,14 +44,14 @@ function useRoomImgData(roomId?: string) {
   );
 
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
-    useSWRMutation('/room/imageData', getImageData);
+    useSWRMutation('/room/imageData', getImageDataFetcher);
   const { trigger: deleteRoomImgTrigger } = useSWRMutation(
-    `/room/${roomId}/image`,
+    [`/room/${roomId}/image`, 'delete'],
     deleteRoomImgFetcher,
   );
   const { trigger: uploadRoomImageTrigger } = useSWRMutation(
-    `/room/${roomId}/image`,
-    postUploadRoomImage,
+    [`/room/${roomId}/image`, 'upload'],
+    uploadRoomImgFetcher,
   );
 
   const uploadRoomImage = async (uploadImageFile: FormData) => {
@@ -140,7 +141,7 @@ function useRoomImgData(roomId?: string) {
 
   async function updateImageList() {
     await mutateRoomImage(
-      async () => await getUnreadImageList(`/room/${roomId}/unread-imagelist`),
+      async () => await getUnreadImgFetcher(`/room/${roomId}/unread-imagelist`),
       {
         populateCache: (newData, currentData) => {
           return [...newData, ...currentData];

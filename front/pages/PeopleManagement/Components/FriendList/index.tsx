@@ -4,18 +4,21 @@ import useSWRMutation from 'swr/mutation';
 
 import { DFriendData } from '@typing/db';
 import { Button } from '@styles/Button';
-import { deleteUserFriend, getUserFriendList } from '@utils/userDataFetcher';
 import { Wrapper } from './styles';
+import {
+  getUserFdListFetcher,
+  deleteFriendFetcher,
+} from '@utils/userDataFetcher';
 
 const FriendList = () => {
   const { data: friendListData, mutate: friendListMutate } = useSWR<
     DFriendData[]
-  >('friendlist', getUserFriendList, {
+  >('friendlist', getUserFdListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  const { trigger } = useSWRMutation('deleteFriend', deleteUserFriend);
+  const { trigger } = useSWRMutation('deleteFriend', deleteFriendFetcher);
 
   const handleDeleteFriend = useCallback(
     (friendId: number | undefined) => async () => {

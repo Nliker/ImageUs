@@ -3,16 +3,16 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import useInput from '@hooks/useInput';
-import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
 import { InfoSection, InfoTable } from './styles';
 import { logInCheckFetcher } from '@utils/logInFetcher';
+import { changeUserInfoFetcher } from '@utils/userDataFetcher';
 
 const MyProfile = () => {
   const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
   const { trigger: postUserInfoTrigger } = useSWRMutation(
     '/user/my',
-    postUserInfoFetcher,
+    changeUserInfoFetcher,
   );
 
   const [profileState, setProfileState] = useState({
