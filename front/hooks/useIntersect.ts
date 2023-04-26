@@ -1,16 +1,28 @@
 import { useCallback, useEffect, useRef } from 'react';
 import throttle from './throttle';
 
-type IntersectHandler = (entry: IntersectionObserverEntry, observer: IntersectionObserver) => void;
+type IntersectHandler = (
+  entry: IntersectionObserverEntry,
+  observer: IntersectionObserver,
+) => void;
 
-const useIntersect = (onIntersect: IntersectHandler, options?: IntersectionObserverInit) => {
+const useIntersect = (
+  onIntersect: IntersectHandler,
+  options?: IntersectionObserverInit,
+) => {
   const ref = useRef(null);
   const callback = useCallback(
-    throttle((entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) onIntersect(entry, observer);
-      });
-    }, 200),
+    throttle(
+      (
+        entries: IntersectionObserverEntry[],
+        observer: IntersectionObserver,
+      ) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) onIntersect(entry, observer);
+        });
+      },
+      500,
+    ),
     [onIntersect],
   );
 
