@@ -18,3 +18,20 @@ export interface ILoadImgTypeInfo {
   filterStartDate: string;
   filterEndDate: string;
 }
+
+export interface IDetailPictureInfo {
+  index: number;
+  data: CImageData;
+}
+
+export interface IAertData {
+  type: string;
+  text: string;
+}
+
+export interface IModalData {
+  currentModal: string | null;
+  uploadImageLocate: string;
+  alertData: IAertData;
+  detailPictureInfo: IDetailPictureInfo;
+}
