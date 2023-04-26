@@ -32,7 +32,6 @@ function useModal() {
   return {
     data,
     error,
-    modalLoading: !data && !error,
     setModalType,
     setUploadImgLocate,
     setAlertData,

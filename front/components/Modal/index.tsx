@@ -10,7 +10,7 @@ import useModal from '@hooks/useModal';
 import { IModalData } from '@typing/client';
 
 const Modal = () => {
-  const { data, modalLoading } = useModal();
+  const { data } = useModal();
 
   const currentModalComponent = (data: IModalData) => {
     const { currentModal, uploadImageLocate, alertData, detailPictureInfo } =
@@ -21,10 +21,10 @@ const Modal = () => {
         return <DetailPictureInfo imageInfo={detailPictureInfo} />;
 
       case 'alert':
-        return <AlertBox />;
+        return <AlertBox alertData={alertData} />;
 
       case 'upload':
-        return <UploadModal />;
+        return <UploadModal uploadImageLocate={uploadImageLocate} />;
 
       case 'createRoom':
         return <CreateRoomModal />;
@@ -37,9 +37,13 @@ const Modal = () => {
     }
   };
 
-  if (!data || modalLoading) return;
+  if (!data) return null;
 
-  return <ModalLayout>{currentModalComponent(data)}</ModalLayout>;
+  return (
+    <ModalLayout currentModal={data.currentModal}>
+      {currentModalComponent(data)}
+    </ModalLayout>
+  );
 };
 
 export default Modal;
