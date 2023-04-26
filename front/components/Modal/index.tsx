@@ -7,13 +7,18 @@ import InviteMemberModal from './InviteMemberModal';
 import UploadModal from './UploadModal';
 import ModalLayout from './ModalLayout';
 import useModal from '@hooks/useModal';
+import { IModalData } from '@typing/client';
 
 const Modal = () => {
-  const { currentModal } = useModal();
-  const currentModalComponent = () => {
+  const { data, modalLoading } = useModal();
+
+  const currentModalComponent = (data: IModalData) => {
+    const { currentModal, uploadImageLocate, alertData, detailPictureInfo } =
+      data;
+
     switch (currentModal) {
       case 'detailPicture':
-        return <DetailPictureInfo />;
+        return <DetailPictureInfo imageInfo={detailPictureInfo} />;
 
       case 'alert':
         return <AlertBox />;
@@ -32,9 +37,9 @@ const Modal = () => {
     }
   };
 
-  if (!currentModal) return null;
+  if (!data || modalLoading) return;
 
-  return <ModalLayout>{currentModalComponent()}</ModalLayout>;
+  return <ModalLayout>{currentModalComponent(data)}</ModalLayout>;
 };
 
 export default Modal;

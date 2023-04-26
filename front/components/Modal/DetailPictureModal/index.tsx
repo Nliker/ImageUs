@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
 
 import { IconContext } from 'react-icons/lib';
 import { BiUserPin } from 'react-icons/bi';
 
 import { ImageSection, Wrapper } from './styles';
 import { AiOutlineDownload } from 'react-icons/ai';
+import { IDetailPictureInfo } from '@typing/client';
 
-const DetailPictureInfo = () => {
-  const { data: imageInfo } = useSWR('detailImageInfo');
-
+const DetailPictureInfo = ({
+  imageInfo,
+}: {
+  imageInfo: IDetailPictureInfo;
+}) => {
   const getCurrentModalSize = useCallback(() => {
     const modalHeight = (window.innerHeight * 0.7).toFixed(3);
     const modalWidth = modalHeight;
@@ -86,11 +88,6 @@ const DetailPictureInfo = () => {
     [imageInfo],
   );
 
-  if (!imageInfo.data) {
-    alert('잘못된 이미지 정보입니다.');
-    return null;
-  }
-
   return (
     <Wrapper modalSize={modalSize}>
       <div className="head_info">
@@ -107,7 +104,7 @@ const DetailPictureInfo = () => {
         </div>
         <div className="date_info">
           <div className="down_btn">
-            <a href={imageInfo?.data.link} download={imageInfo?.data.fileName}>
+            <a href={imageInfo.data.link} download={imageInfo.data.fileName}>
               <IconContext.Provider
                 value={{
                   size: '100%',
