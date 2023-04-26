@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from 'react';
-import useSWR, { mutate } from 'swr';
 import { Navigate, useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
@@ -9,9 +8,8 @@ import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
 import MainSection from './Components/MainSection';
 import { ContentSectionWrapper } from './styles';
-import { getUserRoomListFetcher } from '@utils/userDataFetcher';
-import useRoomlist from '@hooks/useRoomlist';
 import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
 
@@ -19,18 +17,8 @@ const ImageRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  const { data: roomListData } = useRoomlist();
-  const { setModal } = useModal();
-
-  // const { data: roomListData } = useSWR(
-  //   `/user/${userId}/roomlist`,
-  //   getUserRoomListFetcher,
-  //   {
-  //     revalidateIfStale: false,
-  //     revalidateOnFocus: false,
-  //     revalidateOnReconnect: false,
-  //   },
-  // );
+  const { roomList } = useUserData();
+  const { setModalType, setUploadImgLocate } = useModal();
 
   useEffect(() => {
     const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -42,9 +30,9 @@ const ImageRoom = () => {
   }, []);
 
   const checkValideRoomId = () => {
-    if (!roomListData) return false;
+    if (!roomList) return false;
 
-    const isValidRoomId = roomListData.some((roomInfo: DRoomData) => {
+    const isValidRoomId = roomList.some((roomInfo: DRoomData) => {
       return '' + roomInfo.id === roomId;
     });
 
@@ -54,11 +42,8 @@ const ImageRoom = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    setModal({ currentModal: 'upload', uploadImageLocate: 'room' });
-    // mutate('modalState', {
-    //   currentModalState: 'upload',
-    //   uploadLocation: 'room',
-    // });
+    setModalType('upload');
+    setUploadImgLocate('room');
   };
 
   if (!checkValideRoomId()) {

@@ -23,7 +23,7 @@ export const SidebarContext = createContext<ISidebarContext>({
 });
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
-  const { currentModal } = useModal();
+  const { data: modalData } = useModal();
   const { data: userInfo } = useSWR('/user/my');
   const [sidebarState, setSidebarState] = useState<boolean>(false);
   const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
@@ -36,7 +36,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
 
   return (
     <Wrapper>
-      <OuterContainer showModal={currentModal}>
+      <OuterContainer showModal={modalData?.currentModal}>
         {userInfo?.logInState === 'LoggedIn' && <NavigationBar />}
         <InnerContainer
           style={

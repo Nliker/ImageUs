@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import { useLocation, useParams } from 'react-router';
+import useSWR from 'swr';
+import { useParams } from 'react-router';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
@@ -26,10 +26,9 @@ interface Props {
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { setModal } = useModal();
+  const { setModalType, setAlertData, setDetailPictureInfo } = useModal();
   const { setUserPayload } = useUserData();
 
-  const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
     `/image/${roomId}`,
   );
@@ -68,26 +67,23 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
 
   const onClickShowAlertBox = () => {
     setUserPayload({ imageId: data.id });
-    setModal({
-      currentModal: 'alert',
-      alertData: {
-        type: 'deleteStoreImage',
-        text: '이미지를 삭제하시겠습니까?',
-      },
+    setModalType('alert');
+    setAlertData({
+      type: 'deleteStoreImage',
+      text: '이미지를 삭제하시겠습니까?',
     });
   };
 
-  const onClickPictureInfo = () => {
-    setModal({ currentModal: 'detailPicture' });
-    // mutate('modalState', { currentModalState: 'detailPicture' });
-    mutateDetailImageInfo({ index, data });
+  const onClickOpenImage = () => {
+    setModalType('detailPicture');
+    setDetailPictureInfo({ index, data });
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
     if ((e.target as Element).closest('.detail_btn')) {
-      onClickPictureInfo();
+      onClickOpenImage();
     } else if ((e.target as Element).closest('.delete_btn')) {
       onClickShowAlertBox();
     }
@@ -99,7 +95,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
     e.stopPropagation();
 
     if ((e.target as Element).closest('.detail_btn')) {
-      onClickPictureInfo();
+      onClickOpenImage();
     } else if ((e.target as Element).closest('.delete_btn')) {
       onClickShowAlertBox();
     }

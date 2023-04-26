@@ -28,14 +28,8 @@ import useUserData from '@hooks/useUserData';
 const MyPage = () => {
   const userId = sessionStorage.getItem('user_id');
 
-  /*
-
-  유저의 프로필, 이미지, 친구 정보를 받아오는 hook
-
-*/
-
   const { data: userInfo } = useSWR('/user/my');
-  const { setModal } = useModal();
+  const { setModalType, setUploadImgLocate } = useModal();
   const { roomList, imageLength, friendNumber } = useUserData();
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -53,7 +47,8 @@ const MyPage = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    setModal({ currentModal: 'upload', uploadImageLocate: 'user' });
+    setModalType('upload');
+    setUploadImgLocate('user');
   };
 
   return (

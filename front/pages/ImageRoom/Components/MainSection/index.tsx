@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { mutate } from 'swr';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { TbDoorExit } from 'react-icons/tb';
@@ -24,7 +23,7 @@ import useModal from '@hooks/useModal';
 import { SelectTerm } from '@typing/client';
 
 const MainSection = () => {
-  const { setModal } = useModal();
+  const { setModalType, setAlertData } = useModal();
 
   const [filterNum, setFilterNum] = useState(0);
   const [changeFilterDate, setChangeFilterDate] = useState(false);
@@ -109,10 +108,8 @@ const MainSection = () => {
   };
 
   const onClickLeaveRoom = () => {
-    setModal({
-      currentModal: 'alert',
-      alertData: { type: 'leaveRoom', text: '방에서 나가시겠습니까?' },
-    });
+    setModalType('alert');
+    setAlertData({ type: 'leaveRoom', text: '방에서 나가시겠습니까?' });
   };
 
   const loadImgTypeInfo = useMemo(

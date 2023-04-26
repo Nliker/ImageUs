@@ -1,6 +1,5 @@
-import React, { memo, useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import { useLocation, useParams } from 'react-router';
+import React, { memo, useState } from 'react';
+import { useParams } from 'react-router';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
@@ -13,75 +12,29 @@ import {
 } from './styles';
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
-import useRoomData from '@hooks/useRoomData';
 
 interface Props {
   data: CImageData;
   index: number;
   thisArr: CImageData[];
   observerRef?: React.MutableRefObject<null>;
-  sectionName?: string;
 }
 
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
-  const currentPath = useLocation().pathname;
-  const { roomId } = useParams<{ roomId: string }>();
-  const { mutate } = useSWRConfig();
+  const { setModalType, setAlertData } = useModal();
 
-  const { setModal } = useModal();
-  const { setRoomPayload } = useRoomData();
-
-  const { mutate: mutateDetailImageInfo } = useSWR('detailImageInfo');
-  const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
-    `/image/${roomId}`,
-  );
-  const { data: deleteRoomImageId, isLoading: roomImageDeleting } = useSWR(
-    'roomImageDelete',
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
-  const { data: userImageList, mutate: fetchUserImage } = useSWR(
-    '/user/imageDataList',
-  );
-  const { data: deleteUserImageId, isLoading: userImageDeleting } =
-    useSWR('userImageDelete');
   const [isHover, setIsHover] = useState(false);
 
-  useEffect(() => {
-    if (!roomImageList || roomImageDeleting || deleteRoomImageId !== data.id)
-      return;
-    const filteredList = roomImageList.filter(
-      (image: CImageData) => image.id !== data.id,
-    );
-    fetchRoomImage([...filteredList], false);
-  }, [deleteRoomImageId]);
-
-  useEffect(() => {
-    if (!userImageList || userImageDeleting || deleteUserImageId !== data.id)
-      return;
-    const filteredList = userImageList.filter(
-      (image: CImageData) => image.id !== data.id,
-    );
-    fetchUserImage([...filteredList], false);
-  }, [deleteUserImageId]);
-
   const onClickShowAlertBox = () => {
-    setRoomPayload({ roomId, imageId: data.id });
-    setModal({
-      currentModal: 'alert',
-      alertData: {
-        type: 'deleteRoomImage',
-        text: '이미지를 삭제하시겠습니까?',
-      },
+    setModalType('alert');
+    setAlertData({
+      type: 'deleteRoomImage',
+      text: '이미지를 삭제하시겠습니까?',
     });
   };
 
   const onClickPictureInfo = () => {
-    setModal({ currentModal: 'detailPicture' });
-    mutateDetailImageInfo({ index, data });
+    setModalType('detailPicture');
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {

@@ -8,7 +8,7 @@ export const Wrapper = styled.div`
 `;
 
 export const OuterContainer = styled.div<{
-  showModal: string | undefined;
+  showModal?: string | null;
 }>`
   height: 100%;
   width: 100%;
