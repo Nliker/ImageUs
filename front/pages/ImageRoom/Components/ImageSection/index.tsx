@@ -1,22 +1,13 @@
-import React, { memo, useState, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useEffect, useMemo, useRef } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 import { CImageData, SelectTerm } from '@typing/client';
 import ImageContent from './ImageContent';
 import { ImageLayout, NotImageData } from './styles';
 import Spinner from '@styles/Spinner';
 import { useParams } from 'react-router';
-import {
-  getDefaultImgFetcher,
-  getFilterImgFetcher,
-  getUnreadImageList,
-} from '@utils/roomDataFetcher';
-import { getImageData } from '@utils/imageFetcher';
 import useIntersect from '@hooks/useIntersect';
-import useImageData from '@hooks/useUserImgData';
 import useRoomImgData from '@hooks/useRoomImgData';
 
 interface Props {

@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import useSWR, { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route, useLocation, Navigate } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { CImageData } from '@typing/client';
-import useIntersect from '@hooks/useIntersect';
 import AppLayout from '@layouts/AppLayout';
-import {
-  getUserFriendList,
-  getUserImageLen,
-  getUserImageList,
-  getUserRoomListFetcher,
-} from '@utils/userDataFetcher';
 
 import MyProfile from './Components/MyProfile';
 import MyPictures from './Components/MyPictures';
@@ -29,7 +20,6 @@ import {
   SubMenu,
   WrapperBox,
 } from './styles';
-import { getImageData } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';

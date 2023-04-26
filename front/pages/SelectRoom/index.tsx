@@ -7,7 +7,6 @@ import Scrollbars from 'react-custom-scrollbars-2';
 import { Link } from 'react-router-dom';
 import { mutate } from 'swr';
 import { MainContainer } from './styles';
-import useRoomlist from '@hooks/useRoomlist';
 import Spinner from '@styles/Spinner';
 import AppLayout from '@layouts/AppLayout';
 import Roomlist from './Components/Roomlist';

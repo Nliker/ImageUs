@@ -1,17 +1,12 @@
-import React, { memo, useEffect, useState } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { memo, useEffect } from 'react';
 
 import { CImageData } from '@typing/client';
 import { ImageLayout, NotImageData, Wrapper } from './styles';
 import useIntersect from '@hooks/useIntersect';
-import { getImageData } from '@utils/imageFetcher';
-import { getUserImageList } from '@utils/userDataFetcher';
 import Spinner from '@styles/Spinner';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 import ImageContent from './ImageContent';
-import useUserData from '@hooks/useUserData';
 import useUserImageData from '@hooks/useUserImgData';
 
 const MyPictures = () => {
