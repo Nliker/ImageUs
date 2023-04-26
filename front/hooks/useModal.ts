@@ -1,17 +1,28 @@
+import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
 import useSWR, { useSWRConfig } from 'swr';
 
-interface IModalData {
-  currentModal?: string | null;
-  uploadImageLocate?: string;
-  alertData?: { type: string; text: string };
-}
-
 function useModal() {
-  const { data, error, mutate: modalMutate } = useSWR('modal');
+  const { data, error, mutate: modalMutate } = useSWR<IModalData>('modal');
   const { mutate } = useSWRConfig();
 
-  const setModal = (newData: IModalData) => {
-    modalMutate({ ...data, ...newData });
+  const setModalType = (newData: string | null) => {
+    if (!data) return;
+    modalMutate({ ...data, currentModal: newData });
+  };
+
+  const setUploadImgLocate = (newData: string) => {
+    if (!data) return;
+    modalMutate({ ...data, uploadImageLocate: newData });
+  };
+
+  const setAlertData = (newData: IAertData) => {
+    if (!data) return;
+    modalMutate({ ...data, alertData: { ...newData } });
+  };
+
+  const setDetailPictureInfo = (newData: IDetailPictureInfo) => {
+    if (!data) return;
+    modalMutate({ ...data, detailPictureInfo: { ...newData } });
   };
 
   const clearModalCache = () => {
@@ -19,12 +30,13 @@ function useModal() {
   };
 
   return {
-    currentModal: data?.currentModal ?? '',
-    uploadImageLocate: data?.uploadImageLocate ?? '',
-    alertData: data?.alertData ?? null,
+    data,
     error,
-    loading: !data && !error,
-    setModal,
+    modalLoading: !data && !error,
+    setModalType,
+    setUploadImgLocate,
+    setAlertData,
+    setDetailPictureInfo,
     clearModalCache,
   };
 }
