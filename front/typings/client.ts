@@ -1,3 +1,5 @@
+import { DFriendData } from './db';
+
 export interface CImageData {
   id: number;
   user_id: number | null;
@@ -35,4 +37,14 @@ export interface IModalData {
   uploadImageLocate?: string;
   alertData?: IAertData;
   detailPictureInfo?: IDetailPictureInfo;
+}
+
+export interface IRefineRoomData {
+  id: number;
+  title: string;
+}
+
+export interface IUserListByRoom {
+  hostId: number;
+  userList: DFriendData[];
 }
