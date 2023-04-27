@@ -18,19 +18,13 @@ interface ISidebarContext {
   setSidebarState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const SidebarContext = createContext<ISidebarContext>({
-  setSidebarState: () => {},
-});
+export const SidebarContext = createContext<ISidebarContext | null>(null);
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: modalData } = useModal();
   const { data: userInfo } = useSWR('/user/my');
   const [sidebarState, setSidebarState] = useState<boolean>(false);
   const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
-
-  const closeSidebar = useCallback(() => {
-    setSidebarState(false);
-  }, [sidebarState]);
 
   if (!userInfo || userInfo.logInState === 'LoggingOut') return <Spinner />;
 
@@ -45,8 +39,8 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
               : undefined
           }
         >
-          {isImageRoom && <SideBar show={sidebarState} close={closeSidebar} />}
           <SidebarContext.Provider value={value}>
+            {isImageRoom && <SideBar show={sidebarState} />}
             {children}
           </SidebarContext.Provider>
         </InnerContainer>
