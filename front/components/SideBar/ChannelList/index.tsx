@@ -1,35 +1,31 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
-import { mutate } from 'swr';
 
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
-import CollapseListBox from '../CollapseListBox';
-import { Collapse, CreateBtnBox, Subtitle, Wrapper } from './styles';
+import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
+import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
+import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
+import { SidebarContext } from '@layouts/AppLayout';
 
-interface Props {
-  roomlist?: { id: number; data: string }[];
-  closeSidebar: () => void;
-}
-
-const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
-  const { roomId } = useParams<{ roomId: string }>();
+const ChannelList = memo(() => {
   const navigate = useNavigate();
-
+  const sidebarContext = useContext(SidebarContext);
+  const { roomId } = useParams<{ roomId: string }>();
   const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
 
-  const onClickRoom = useCallback((roomId: number) => {
-    closeSidebar();
-    navigate(`/room/${roomId}`);
-  }, []);
+  const { showCreateRoomModal } = useModal();
+  const { refineRoomList } = useUserData();
 
-  const toggleChannelCollapse = useCallback(
-    () => setChannelCollapse((prev) => !prev),
-    [],
-  );
+  const toggleChannelCollapse = () => setChannelCollapse((prev) => !prev);
+  const onClickDataLabel = (id: number) => () => {
+    sidebarContext?.setSidebarState(false);
+    navigate(`/room/${id}`);
+  };
 
-  if (!roomlist) return <Spinner />;
+  if (!roomId) return <Spinner />;
 
   return (
     <Wrapper>
@@ -41,18 +37,35 @@ const ChannelList = memo(({ roomlist, closeSidebar }: Props) => {
       </Subtitle>
       {channelCollapse && (
         <>
-          <CollapseListBox
-            data={roomlist}
-            dataClickCallBack={onClickRoom}
-            currentLoginId={roomId}
-            boxInfo={{ boxName: 'channel' }}
-          />
+          <Container>
+            {refineRoomList.map((item) => {
+              return (
+                <div key={item.id} className="check_box">
+                  <div className="check_label_box">
+                    <DataCheckLabel
+                      type="radio"
+                      id={`${item.id}`}
+                      name={`radio-group-channel`}
+                      defaultChecked={roomId === '' + item.id}
+                      boxName={'channel'}
+                    />
+                    <DataLabel
+                      htmlFor={`${item.id}`}
+                      onClick={onClickDataLabel(item.id)}
+                    >
+                      <span className="item_text">{item.title}</span>
+                    </DataLabel>
+                  </div>
+                </div>
+              );
+            })}
+          </Container>
           <CreateBtnBox>
             <ActionButton
               onClickBtn={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.stopPropagation();
 
-                mutate('modalState', { currentModalState: 'creatRoom' });
+                showCreateRoomModal();
               }}
               btnTitle={'+'}
             />
