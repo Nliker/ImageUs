@@ -71,7 +71,7 @@ const getUserImgLenFetcher = async (url: string) => {
 
     const { imagelist_len } = response.data;
 
-    return { imagelist_len };
+    return imagelist_len;
   } catch (err) {
     console.error(err);
     return;
