@@ -1,5 +1,4 @@
 import React, { memo, useState } from 'react';
-import { useParams } from 'react-router';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
@@ -21,27 +20,26 @@ interface Props {
 }
 
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
-  const { setModalType, setAlertData } = useModal();
+  const { showAlertModal, showDetailPictureModal } = useModal();
 
   const [isHover, setIsHover] = useState(false);
 
   const onClickShowAlertBox = () => {
-    setModalType('alert');
-    setAlertData({
+    showAlertModal({
       type: 'deleteRoomImage',
       text: '이미지를 삭제하시겠습니까?',
     });
   };
 
-  const onClickPictureInfo = () => {
-    setModalType('detailPicture');
+  const onClickOpenImage = () => {
+    showDetailPictureModal({ index, data });
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
     if ((e.target as Element).closest('.detail_btn')) {
-      onClickPictureInfo();
+      onClickOpenImage();
     } else if ((e.target as Element).closest('.delete_btn')) {
       onClickShowAlertBox();
     }
@@ -53,7 +51,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
     e.stopPropagation();
 
     if ((e.target as Element).closest('.detail_btn')) {
-      onClickPictureInfo();
+      onClickOpenImage();
     } else if ((e.target as Element).closest('.delete_btn')) {
       onClickShowAlertBox();
     }

@@ -26,7 +26,7 @@ interface Props {
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { setModalType, setAlertData, setDetailPictureInfo } = useModal();
+  const { showAlertModal, showDetailPictureModal } = useModal();
   const { setUserPayload } = useUserData();
 
   const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
@@ -67,16 +67,14 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
 
   const onClickShowAlertBox = () => {
     setUserPayload({ imageId: data.id });
-    setModalType('alert');
-    setAlertData({
+    showAlertModal({
       type: 'deleteStoreImage',
       text: '이미지를 삭제하시겠습니까?',
     });
   };
 
   const onClickOpenImage = () => {
-    setModalType('detailPicture');
-    setDetailPictureInfo({ index, data });
+    showDetailPictureModal({ index, data });
   };
 
   const onTouchContent = (e: React.TouchEvent<HTMLDivElement>) => {

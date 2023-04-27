@@ -8,12 +8,12 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import useModal from '@hooks/useModal';
 
 const SelectRoom = () => {
-  const { setModalType } = useModal();
+  const { showCreateRoomModal } = useModal();
 
   const handleCreateRoom = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    setModalType('createRoom');
+    showCreateRoomModal();
   };
 
   return (

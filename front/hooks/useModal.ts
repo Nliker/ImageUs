@@ -1,41 +1,83 @@
 import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 
 function useModal() {
-  const { data, error, mutate: modalMutate } = useSWR<IModalData>('modal');
-  const { mutate } = useSWRConfig();
+  const initialValue: IModalData = {
+    state: 'off',
+  };
+  const {
+    data,
+    error,
+    mutate: modalMutate,
+  } = useSWR<IModalData>('modal', {
+    fallbackData: initialValue,
+  });
 
-  const setModalType = (newData: string | null) => {
+  const showDetailPictureModal = (detailPictureInfo: IDetailPictureInfo) => {
     if (!data) return;
-    modalMutate({ ...data, currentModal: newData });
+
+    modalMutate({
+      ...data,
+      state: 'on',
+      currentModal: 'detailPicture',
+      detailPictureInfo,
+    });
   };
 
-  const setUploadImgLocate = (newData: string) => {
+  const showAlertModal = (alertData: IAertData) => {
     if (!data) return;
-    modalMutate({ ...data, uploadImageLocate: newData });
+
+    modalMutate({
+      ...data,
+      state: 'on',
+      currentModal: 'alert',
+      alertData,
+    });
   };
 
-  const setAlertData = (newData: IAertData) => {
+  const showUploadImgModal = (uploadImageLocate: string) => {
     if (!data) return;
-    modalMutate({ ...data, alertData: { ...newData } });
+
+    modalMutate({
+      ...data,
+      state: 'on',
+      currentModal: 'upload',
+      uploadImageLocate,
+    });
   };
 
-  const setDetailPictureInfo = (newData: IDetailPictureInfo) => {
+  const showCreateRoomModal = () => {
     if (!data) return;
-    modalMutate({ ...data, detailPictureInfo: { ...newData } });
+
+    modalMutate({
+      ...data,
+      state: 'on',
+      currentModal: 'createRoom',
+    });
+  };
+
+  const showInviteMemberModal = () => {
+    if (!data) return;
+
+    modalMutate({
+      ...data,
+      state: 'on',
+      currentModal: 'inviteMember',
+    });
   };
 
   const clearModalCache = () => {
-    mutate('modal', undefined, { revalidate: false });
+    modalMutate({ ...initialValue });
   };
 
   return {
-    data,
+    data: data ?? initialValue,
     error,
-    setModalType,
-    setUploadImgLocate,
-    setAlertData,
-    setDetailPictureInfo,
+    showDetailPictureModal,
+    showAlertModal,
+    showUploadImgModal,
+    showCreateRoomModal,
+    showInviteMemberModal,
     clearModalCache,
   };
 }

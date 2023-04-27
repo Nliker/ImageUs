@@ -29,7 +29,7 @@ const MyPage = () => {
   const userId = sessionStorage.getItem('user_id');
 
   const { data: userInfo } = useSWR('/user/my');
-  const { setModalType, setUploadImgLocate } = useModal();
+  const { showUploadImgModal } = useModal();
   const { roomList, imageLength, friendNumber } = useUserData();
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -47,8 +47,7 @@ const MyPage = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    setModalType('upload');
-    setUploadImgLocate('user');
+    showUploadImgModal('user');
   };
 
   return (

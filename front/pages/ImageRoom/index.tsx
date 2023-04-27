@@ -18,7 +18,7 @@ const ImageRoom = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   const { roomList } = useUserData();
-  const { setModalType, setUploadImgLocate } = useModal();
+  const { showUploadImgModal } = useModal();
 
   useEffect(() => {
     const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -42,8 +42,7 @@ const ImageRoom = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    setModalType('upload');
-    setUploadImgLocate('room');
+    showUploadImgModal('room');
   };
 
   if (!checkValideRoomId()) {

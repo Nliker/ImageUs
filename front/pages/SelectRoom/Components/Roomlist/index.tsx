@@ -11,7 +11,7 @@ import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
 
 function Roomlist() {
-  const { setModalType, setAlertData } = useModal();
+  const { showAlertModal } = useModal();
   const { setUserPayload } = useUserData();
   const { roomList, roomListLoading } = useUserData();
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
@@ -20,12 +20,11 @@ function Roomlist() {
     (roomId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
 
-      setModalType('alert');
-      setAlertData({
+      setUserPayload({ roomId });
+      showAlertModal({
         type: 'leaveRoom',
         text: '방에서 나가시겠습니까?',
       });
-      setUserPayload({ roomId });
     };
 
   if (roomListLoading) return <Spinner />;

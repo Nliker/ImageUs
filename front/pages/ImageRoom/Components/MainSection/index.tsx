@@ -23,7 +23,7 @@ import useModal from '@hooks/useModal';
 import { SelectTerm } from '@typing/client';
 
 const MainSection = () => {
-  const { setModalType, setAlertData } = useModal();
+  const { showAlertModal } = useModal();
 
   const [filterNum, setFilterNum] = useState(0);
   const [changeFilterDate, setChangeFilterDate] = useState(false);
@@ -108,8 +108,7 @@ const MainSection = () => {
   };
 
   const onClickLeaveRoom = () => {
-    setModalType('alert');
-    setAlertData({ type: 'leaveRoom', text: '방에서 나가시겠습니까?' });
+    showAlertModal({ type: 'leaveRoom', text: '방에서 나가시겠습니까?' });
   };
 
   const loadImgTypeInfo = useMemo(
