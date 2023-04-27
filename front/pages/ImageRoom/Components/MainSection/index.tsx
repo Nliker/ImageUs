@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useContext } from 'react';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { TbDoorExit } from 'react-icons/tb';
@@ -24,6 +24,7 @@ import { SelectTerm } from '@typing/client';
 
 const MainSection = () => {
   const { showAlertModal } = useModal();
+  const sideBarContext = useContext(SidebarContext);
 
   const [filterNum, setFilterNum] = useState(0);
   const [changeFilterDate, setChangeFilterDate] = useState(false);
@@ -127,25 +128,21 @@ const MainSection = () => {
         <MainContainer>
           <ActiveContentBox>
             <div className="active_icon_box">
-              <SidebarContext.Consumer>
-                {({ setSidebarState }) => (
-                  <div
-                    className="sidebar_icon"
-                    onClick={() => {
-                      setSidebarState((prev) => !prev);
-                    }}
-                  >
-                    <IconContext.Provider
-                      value={{
-                        size: '30px',
-                        style: { display: 'inline-block' },
-                      }}
-                    >
-                      <MdOutlineSpaceDashboard />
-                    </IconContext.Provider>
-                  </div>
-                )}
-              </SidebarContext.Consumer>
+              <div
+                className="sidebar_icon"
+                onClick={() => {
+                  sideBarContext?.setSidebarState((prev) => !prev);
+                }}
+              >
+                <IconContext.Provider
+                  value={{
+                    size: '30px',
+                    style: { display: 'inline-block' },
+                  }}
+                >
+                  <MdOutlineSpaceDashboard />
+                </IconContext.Provider>
+              </div>
               <div className="leave_icon" onClick={onClickLeaveRoom}>
                 <IconContext.Provider
                   value={{
