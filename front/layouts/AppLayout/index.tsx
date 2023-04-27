@@ -51,7 +51,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
           </SidebarContext.Provider>
         </InnerContainer>
       </OuterContainer>
-      <Modal />
+      <Modal modalData={modalData} />
     </Wrapper>
   );
 };
