@@ -30,8 +30,9 @@ export interface IAertData {
 }
 
 export interface IModalData {
-  currentModal: string | null;
-  uploadImageLocate: string;
-  alertData: IAertData;
-  detailPictureInfo: IDetailPictureInfo;
+  state: string;
+  currentModal?: string;
+  uploadImageLocate?: string;
+  alertData?: IAertData;
+  detailPictureInfo?: IDetailPictureInfo;
 }
