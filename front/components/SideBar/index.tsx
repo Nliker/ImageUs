@@ -13,14 +13,19 @@ import {
   Wrapper,
 } from './styles';
 import useUserData from '@hooks/useUserData';
-import { SidebarContext } from '../../layouts/AppLayout/index';
+import SidebarContext from '@utils/SidebarContext';
+import useRoomList from '@hooks/useRoomList';
 
 interface SidebarProps {
   show: boolean;
 }
 
 const SideBar = memo(({ show }: SidebarProps) => {
-  const { roomList } = useUserData();
+  const userId = sessionStorage.getItem('user_id');
+  const { roomId } = useParams<{ roomId: string }>();
+  if (!roomId || !userId) return null;
+
+  const { roomList } = useRoomList(userId);
   const sidebarContext = useContext(SidebarContext);
 
   const sideBarEl = useRef<HTMLDivElement>(null);
@@ -39,7 +44,7 @@ const SideBar = memo(({ show }: SidebarProps) => {
         e.target instanceof HTMLElement &&
         !sideBarEl.current?.contains(e.target)
       ) {
-        sidebarContext?.setSidebarState(false);
+        sidebarContext.setSidebarState(false);
       }
     },
     [show],

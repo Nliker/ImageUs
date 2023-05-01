@@ -9,7 +9,7 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
 import {
-  getUserFriendList,
+  getUserFdListFetcher,
   getUserRoomListFetcher,
 } from '@utils/userDataFetcher';
 import { createRoomFetcher } from '@utils/roomDataFetcher';
@@ -28,23 +28,24 @@ import {
   Title,
 } from './styles';
 import useModal from '@hooks/useModal';
+import useUserData from '@hooks/useUserData';
+import { useParams } from 'react-router';
+import useRoomList from '@hooks/useRoomList';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
 const CreateRoomModal = () => {
+  const userId = sessionStorage.getItem('user_id');
+  if (!userId) return null;
+
   const { clearModalCache } = useModal();
+  const { createRoom, fetchRoomList } = useRoomList(userId);
 
-  const { mutate } = useSWRConfig();
-
-  const { data: friendList } = useSWR('friendlist', getUserFriendList, {
+  const { data: friendList } = useSWR('friendlist', getUserFdListFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  const { trigger: createRoomTrigger } = useSWRMutation(
-    '/room',
-    createRoomFetcher,
-  );
 
   const [currentStage, setCurrentStage] = useState(0);
   const [friendCheckList, setFriendCheckList] = useState<AddCheckFriendData[]>(
@@ -105,24 +106,13 @@ const CreateRoomModal = () => {
     });
   };
 
-  const onClickCreateRequest = async () => {
+  const createRoomRequest = async () => {
     const selectMemberIdList = selectListState.map(
       (data: AddCheckFriendData) => data.id,
     );
-    createRoomTrigger({ selectMemberIdList, roomName })
-      .then(() => {
-        const userId = sessionStorage.getItem('user_id');
-        mutate(
-          `/user/${userId}/roomlist`,
-          getUserRoomListFetcher(`/user/${userId}/roomlist`),
-        );
-        clearModalCache();
-      })
-      .catch((err) => {
-        if (err instanceof AxiosError) {
-          alert('오류가 발생했습니다.');
-        }
-      });
+    await createRoom({ selectMemberIdList, roomName });
+    await fetchRoomList();
+    clearModalCache();
   };
 
   return (
@@ -204,7 +194,7 @@ const CreateRoomModal = () => {
                 <Button type="button" onClick={onClickPrevStage}>
                   이전
                 </Button>
-                <Button type="button" onClick={onClickCreateRequest}>
+                <Button type="button" onClick={createRoomRequest}>
                   생성하기
                 </Button>
               </ResultActionBtn>

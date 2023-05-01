@@ -8,22 +8,29 @@ import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
 import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
-import { SidebarContext } from '@layouts/AppLayout';
+import SidebarContext from '@utils/SidebarContext';
+import Roomlist from '@pages/SelectRoom/Components/Roomlist';
+import useRoomList from '@hooks/useRoomList';
 
 const ChannelList = memo(() => {
+  const userId = sessionStorage.getItem('user_id');
+  const { roomId } = useParams<{ roomId: string }>();
+  if (!roomId || !userId) return null;
+
   const navigate = useNavigate();
   const sidebarContext = useContext(SidebarContext);
-  const { roomId } = useParams<{ roomId: string }>();
   const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
 
   const { showCreateRoomModal } = useModal();
-  const { refineRoomList } = useUserData();
+  const { refineRoomList } = useRoomList(userId);
 
   const toggleChannelCollapse = () => setChannelCollapse((prev) => !prev);
   const onClickDataLabel = (id: number) => () => {
-    sidebarContext?.setSidebarState(false);
+    sidebarContext.setSidebarState(false);
     navigate(`/room/${id}`);
   };
+
+  // console.log('확인', refineRoomList, roomList);
 
   if (!roomId) return <Spinner />;
 

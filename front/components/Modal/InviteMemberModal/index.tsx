@@ -1,92 +1,81 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
-import { getUserFriendList } from '@utils/userDataFetcher';
-import { DFriendData } from '@typing/db';
-import {
-  getUserListFetcher,
-  inviteFriendFetcher,
-} from '@utils/roomDataFetcher';
+import { DFriendData, DRoomData } from '@typing/db';
 import { Button } from '@styles/Button';
 import { Container, Content, Title, Wrapper } from './styles';
+import useUserData from '@hooks/useUserData';
+import useModal from '@hooks/useModal';
+import useRoomList from '@hooks/useRoomList';
+import useFriendList from '@hooks/useFriendList';
+import useUserListByRoom from '@hooks/useUserListByRoom';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
 const InviteMemberModal = () => {
+  const userId = sessionStorage.getItem('user_id');
   const { roomId } = useParams<{ roomId: string }>();
-  const { mutate } = useSWRConfig();
+  if (!roomId || !userId) return null;
 
-  const { data: userFriendList } = useSWR('friendlist', getUserFriendList, {
-    revalidateOnFocus: false,
-  });
-  const { data: roomMemberList } = useSWR(
-    `/room/${roomId}/userlist`,
-    getUserListFetcher,
-    {
-      revalidateOnFocus: false,
-    },
-  );
-  const { trigger: inviteFriendsTrigger } = useSWRMutation(
-    `/room/${roomId}/user`,
-    inviteFriendFetcher,
-  );
+  const { clearModalCache } = useModal();
+  const { roomList } = useRoomList(userId);
+  const { friendList } = useFriendList();
+  const { userListByRoom, inviteMemberToRoom } = useUserListByRoom(roomId);
 
-  const [checkFriendState, setCheckFriendState] = useState<
+  const [canInviteFriends, setCanInviteFriends] = useState<
     AppendCheckFriendData[]
-  >([]);
+  >(
+    useMemo<AppendCheckFriendData[]>(() => {
+      if (!roomList || !friendList || !roomId) return [];
 
-  useEffect(() => {
-    if (!userFriendList || !roomMemberList) return;
+      const newList = friendList.filter((friend: DFriendData) => {
+        const isRoomMember = userListByRoom?.some(
+          (roomMember) => roomMember.id === friend.id,
+        );
+        return !isRoomMember;
+      });
 
-    const newList = userFriendList.filter((userInfo: DFriendData) => {
-      for (const roomUserInfo of roomMemberList) {
-        if (roomUserInfo.id === userInfo.id) return false;
-      }
-      return true;
+      const appendCheckList = newList.map((data: DFriendData) => {
+        return { ...data, check: false };
+      });
+
+      return [...appendCheckList];
+    }, [roomList, friendList]),
+  );
+
+  const checkFriends = useMemo<AppendCheckFriendData[]>(() => {
+    const checkList = canInviteFriends.filter((data) => data.check);
+    return [...checkList];
+  }, [canInviteFriends]);
+
+  const onClickFriendList = (clickId: number) => () => {
+    setCanInviteFriends((prevData: AppendCheckFriendData[]) => {
+      const newData = prevData.map((data) => {
+        if (data.id === clickId) {
+          return { ...data, check: !data.check };
+        }
+        return { ...data };
+      });
+
+      return [...newData];
     });
-
-    const appendCheckList = newList.map((data: DFriendData) => {
-      return { ...data, check: false };
-    });
-
-    setCheckFriendState([...appendCheckList]);
-  }, [userFriendList, roomMemberList]);
-
-  const onClickFriendList = (dataId: number) => () => {
-    const newData = checkFriendState.map((data) => {
-      if (data.id === dataId) {
-        return { ...data, check: !data.check };
-      }
-      return { ...data };
-    });
-    setCheckFriendState([...newData]);
   };
 
-  const onClickInviteFriends = useCallback(() => {
-    const selectDataId = checkFriendState
-      .filter((data) => data.check)
-      .map((data) => data.id);
+  const requestInviteMember = () => {
+    if (!roomId) return;
 
-    if (selectDataId.length === 0) {
+    const selectIdList = checkFriends.map((data) => data.id);
+
+    if (selectIdList.length === 0) {
       alert('선택된 친구가 없습니다.');
     } else {
-      inviteFriendsTrigger(selectDataId).then(() => {
-        const userId = sessionStorage.getItem('user_id');
-        mutate(`/user/${userId}/roomlist`);
-        mutate('modalState', { currentModalState: '' });
-      });
+      inviteMemberToRoom([...selectIdList]);
+      clearModalCache();
     }
-  }, [checkFriendState]);
-
-  const checkFriendList = useMemo(
-    () => checkFriendState.filter((data) => data.check),
-    [checkFriendState],
-  );
+  };
 
   return (
     <Wrapper>
@@ -104,8 +93,8 @@ const InviteMemberModal = () => {
                 <div className="content_list">
                   <Scrollbars>
                     <ul className="content_list_ul">
-                      {checkFriendState.length !== 0 ? (
-                        checkFriendState.map((data: AppendCheckFriendData) => (
+                      {canInviteFriends.length !== 0 ? (
+                        canInviteFriends.map((data: AppendCheckFriendData) => (
                           <li
                             key={data.id}
                             onClick={onClickFriendList(data.id)}
@@ -138,9 +127,9 @@ const InviteMemberModal = () => {
                 </div>
                 <div className="selected_list">
                   <Scrollbars>
-                    {checkFriendList.length !== 0 ? (
+                    {checkFriends.length !== 0 ? (
                       <ul className="selected_list_ul">
-                        {checkFriendList.map((data) => (
+                        {checkFriends.map((data) => (
                           <li key={data.id}>{data.name}</li>
                         ))}
                       </ul>
@@ -151,7 +140,7 @@ const InviteMemberModal = () => {
                 </div>
               </div>
               <div className="content_btn">
-                <Button type="button" onClick={onClickInviteFriends}>
+                <Button type="button" onClick={requestInviteMember}>
                   초대하기
                 </Button>
               </div>

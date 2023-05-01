@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route, Navigate } from 'react-router';
+import { Routes, Route, Navigate, useParams } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import { Scrollbars } from 'react-custom-scrollbars-2';
@@ -24,13 +24,18 @@ import { Button } from '@styles/Button';
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
+import useRoomList from '@hooks/useRoomList';
+import useFriendList from '@hooks/useFriendList';
 
 const MyPage = () => {
   const userId = sessionStorage.getItem('user_id');
+  if (!userId) return null;
 
   const { data: userInfo } = useSWR('/user/my');
   const { showUploadImgModal } = useModal();
-  const { roomList, imageLength, friendNumber } = useUserData();
+  const { totalFriendCount } = useFriendList();
+  const { totalRoomCount } = useRoomList(userId);
+  const { totalImageCount } = useUserData(userId);
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
@@ -70,17 +75,17 @@ const MyPage = () => {
                 <ul>
                   <li>
                     <div>
-                      게시물 <span>{imageLength ?? 0}</span>
+                      게시물 <span>{totalImageCount ?? 0}</span>
                     </div>
                   </li>
                   <li>
                     <div>
-                      등록된 방 <span>{roomList?.length ?? 0}</span>
+                      등록된 방 <span>{totalRoomCount ?? 0}</span>
                     </div>
                   </li>
                   <li>
                     <div>
-                      친구수 <span>{friendNumber ?? 0}</span>
+                      친구수 <span>{totalFriendCount ?? 0}</span>
                     </div>
                   </li>
                 </ul>
@@ -111,7 +116,7 @@ const MyPage = () => {
               </SubMenu>
               <Routes>
                 <Route
-                  path="/"
+                  index
                   element={
                     <DeviceCheckContext.Provider value={isMobile}>
                       <MyPictures />

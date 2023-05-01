@@ -6,7 +6,6 @@ import { useParams } from 'react-router';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 
-import { postUploadRoomImage, postUploadUserImage } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
 import {
   HeaderContainer,
@@ -21,14 +20,17 @@ import {
 } from './styles';
 import useInput from '@hooks/useInput';
 import useModal from '@hooks/useModal';
-import useUploadImage from '@hooks/useUploadImage';
+import useImageData from '@hooks/useUserImgData';
+import useUserImageData from '@hooks/useUserImgData';
+import useRoomImgData from '@hooks/useRoomImgData';
 
-const UploadModal = () => {
+const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
+  const userId = sessionStorage.getItem('user_id');
   const { roomId } = useParams<{ roomId: string | undefined }>();
-  const { mutate } = useSWRConfig();
 
-  const { uploadImageLocate, clearModalCache } = useModal();
-  const { uploadRoomImage, uploadUserImage } = useUploadImage(roomId);
+  const { clearModalCache } = useModal();
+  const { uploadUserImage } = useUserImageData(userId);
+  const { uploadRoomImage } = useRoomImgData(roomId);
 
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(
     null,
@@ -60,22 +62,20 @@ const UploadModal = () => {
     return () => clearTimeout(debounce);
   }, [tmpImageData]);
 
-  const onClickUpload = () => {
+  const onClickUpload = async () => {
     if (!uploadImageFile) {
       alert('이미지를 등록해주세요');
       return;
     }
+
+    console.log('위치 확인', uploadImageLocate, uploadImageFile);
+
     if (uploadImageLocate === 'room') {
-      uploadRoomImage(uploadImageFile).then(() => {
-        mutate(`/room/${roomId}/unread-imagelist`);
-        clearModalCache();
-      });
+      await uploadRoomImage(uploadImageFile);
     } else if (uploadImageLocate === 'user') {
-      uploadUserImage(uploadImageFile).then(() => {
-        clearModalCache();
-        window.location.reload();
-      });
+      await uploadUserImage(uploadImageFile);
     }
+    clearModalCache();
   };
 
   const onDropData = (e: DragEvent<HTMLDivElement>) => {
