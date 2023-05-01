@@ -8,7 +8,7 @@ export const Wrapper = styled.nav`
 
   width: 100%;
   min-width: 330px;
-  font-size: 0.75rem;
+  font-size: 1.1rem;
 
   h1 {
     margin: 0;
@@ -122,7 +122,7 @@ export const NavItem = styled.li`
   }
 
   @media screen and (min-width: 1024px) {
-    font-size: 0.8rem;
+    font-size: 1.3rem;
   }
 `;
 

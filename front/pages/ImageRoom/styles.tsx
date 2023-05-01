@@ -173,6 +173,8 @@ export const ContentBox = styled.div`
     width: 85%;
     margin: auto;
 
+    font-size: 1.2rem;
+
     .select_box::after {
       content: '';
       display: block;
@@ -223,7 +225,7 @@ export const UploadButton = styled.div`
   width: 40px;
   padding: 7px;
   border-radius: 5px;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
 
   color: #6296de;
   background-color: ghostwhite;

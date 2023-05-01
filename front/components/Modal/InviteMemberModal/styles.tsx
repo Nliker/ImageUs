@@ -16,7 +16,6 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.div`
-  font-size: 18px;
   padding: 1rem 0;
   text-align: center;
 

@@ -54,6 +54,8 @@ export const Wrapper = styled.div<{
       height: 100%;
       gap: 1rem;
 
+      font-size: 1.2rem;
+
       .down_btn {
         width: 30px;
         height: 30px;

@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 export const Wrapper = styled.div`
   height: 100%;
 
+  font-size: 1.4rem;
+
   h1,
   h2,
   ul {

@@ -67,12 +67,19 @@ export const Modal = styled.div`
     overflow: auto;
   }
 
-  .result_box {
-    display: flex;
-  }
+  .upload_btn {
+    position: relative;
 
-  .upload_btn button {
     width: 100%;
+    height: 40px;
+
+    button {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
   }
 
   @media screen and (max-width: 688px) {
@@ -123,7 +130,7 @@ export const ModalTitle = styled.div`
     width: 100%;
     margin: 0;
 
-    font-size: 16px;
+    font-size: 1.5rem;
     text-align: center;
   }
 `;
@@ -168,7 +175,8 @@ export const ModalImageBox = styled.div`
       height: 15px;
       padding: 9px 18px;
       margin-left: 25px;
-      font-size: 0.7rem;
+      font-size: 1.2rem;
+      line-height: 16px;
       border-radius: 5px;
 
       white-space: nowrap;

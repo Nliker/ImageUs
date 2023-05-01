@@ -30,7 +30,7 @@ export const InfoContainer = styled.div`
   align-items: center;
   flex: 1;
 
-  font-size: 80%;
+  font-size: 1.1rem;
   text-align: center;
 
   background-color: whitesmoke;

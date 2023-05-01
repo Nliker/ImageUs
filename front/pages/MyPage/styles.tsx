@@ -64,7 +64,7 @@ export const SubMenu = styled.div`
   display: flex;
 
   gap: 1rem;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 
   a.menu_active {
     border-top: 1px solid rgb(38, 38, 38);
@@ -85,9 +85,14 @@ export const ProfileInfo = styled.div`
 
   gap: 1rem;
 
+  h2.user_name {
+    font-size: 2rem;
+  }
+
   ul {
     display: flex;
     gap: 1rem;
+    font-size: 1.2rem;
   }
 
   @media screen and (max-width: 600px) {

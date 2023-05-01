@@ -32,6 +32,8 @@ export const Container = styled.div`
   height: 80%;
   min-width: 320px;
   max-width: 520px;
+
+  font-size: 1.5rem;
 `;
 
 export const CloseBtn = styled.div`
