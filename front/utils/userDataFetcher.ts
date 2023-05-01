@@ -48,10 +48,13 @@ const getUserImgsFetcher = async (
 
     const { imagelist } = await response.data;
     const filteredImageList = imagelist.filter((data: DImageData) => data.link);
-    return { imagelist: filteredImageList, loadDataLength: imagelist.length };
+    return {
+      imagelist: filteredImageList,
+      loadCompleted: imagelist.length < 12 ? true : false,
+    };
   } catch (err) {
     alert('이미지정보를 받아오지 못했습니다..');
-    return;
+    return {};
   }
 };
 
