@@ -6,7 +6,6 @@ export interface CImageData {
   link: string;
   fileName: string;
   created_at: string | null;
-  user_name: string | null;
 }
 
 export interface SelectTerm {
@@ -27,8 +26,8 @@ export interface IDetailPictureInfo {
 }
 
 export interface IAertData {
-  type: string;
   text: string;
+  executeWork: () => void;
 }
 
 export interface IModalData {

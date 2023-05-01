@@ -18,5 +18,4 @@ export interface DImageData {
   id: number;
   link: string | null;
   user_id: number | null;
-  user_name: string | null;
 }
