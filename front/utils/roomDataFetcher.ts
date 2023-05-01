@@ -1,8 +1,8 @@
-import { DImageData } from '@typing/db';
+import { DFriendData, DImageData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
 
-const getRoomUserListFetcher = async (url: string) => {
+const getUserListByRmFetcher = async (url: string) => {
   const { token } = await getToken();
 
   if (!token) {
@@ -15,11 +15,10 @@ const getRoomUserListFetcher = async (url: string) => {
         Authorization: token,
       },
     });
-    const userlist = response.data.userlist;
-    return userlist;
+    const userlist: DFriendData[] = response.data.userlist;
+    return [...userlist];
   } catch (err) {
-    alert('친구목록을 받아오지 못했습니다..');
-    return;
+    throw new Error('예기치 못한 오류가 발생하였습니다.');
   }
 };
 
@@ -92,13 +91,12 @@ const leaveRoomFetcher = async (
   try {
     if (!roomId) throw new Error('올바른 요청이 아닙니다.');
     const { token } = await getToken();
-    const userId = sessionStorage.getItem('user_id');
 
     if (!token) {
       throw new Error();
     }
 
-    await axios.delete('/backapi' + `/user/${userId}/room`, {
+    await axios.delete('/backapi' + url, {
       headers: { Authorization: token },
       data: { delete_user_room_id: roomId },
     });
@@ -127,24 +125,19 @@ const deleteMemberFetcher = async (
         delete_room_user_id: memberId,
       },
     });
-
-    alert('강퇴하였습니다.');
-
-    return true;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 403) {
-        alert('방장이 아닙니다.');
-      }
+    if (err instanceof AxiosError && err.response?.status === 403) {
+      throw new Error('방장이 아닙니다.');
+      // alert('방장이 아닙니다.');
     } else {
-      alert('요청을 실패하였습니다..');
+      throw new Error('예기치 못한 오류가 발생하였습니다.');
+      // alert('예기치 못한 오류가 발생하였습니다.');
     }
-    return false;
   }
 };
 
 export {
-  getRoomUserListFetcher,
+  getUserListByRmFetcher,
   inviteFriendFetcher,
   createRoomFetcher,
   deleteMemberFetcher,
