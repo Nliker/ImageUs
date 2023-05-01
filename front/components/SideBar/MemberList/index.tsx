@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { IoMdArrowDropright } from 'react-icons/io';
@@ -7,10 +7,12 @@ import Spinner from '@styles/Spinner';
 
 import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
 import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
 import { Button } from '@styles/Button';
 import { DFriendData } from '@typing/db';
+import useUserData from '@hooks/useUserData';
+import useRoomList from '@hooks/useRoomList';
+import useUserListByRoom from '@hooks/useUserListByRoom';
 
 const preventClickCSS = {
   pointerEvents: 'none' as React.CSSProperties['pointerEvents'],
@@ -23,33 +25,33 @@ const labelMarginCSS = {
 const MemberList = memo(() => {
   const userId = sessionStorage.getItem('user_id');
   const { roomId } = useParams<{ roomId: string }>();
+  if (!roomId || !userId) return null;
+
+  const { showAlertModal, showInviteMemberModal } = useModal();
+  const { roomList, getHostIdByRoom } = useRoomList(userId);
+  const { userListByRoom, kickOutMember } = useUserListByRoom(roomId);
   const [memberCollapse, setMemberCollapse] = useState<boolean>(true);
-
-  const { showInviteMemberModal } = useModal();
-  const { getUserListByRoom, kickOutMember } = useUserData();
-
-  const userListData = useMemo(() => {
-    if (!roomId) {
-      return;
-    } else {
-      const data = getUserListByRoom(roomId);
-      return {
-        hostId: data?.hostId,
-        userList: data?.userList,
-      };
-    }
-  }, [roomId]);
-  const hostId = userListData?.hostId;
+  const hostId = useMemo(() => {
+    if (!roomList) return null;
+    return getHostIdByRoom(roomId);
+  }, [roomList]);
 
   const toggleMemberCollapse = () => setMemberCollapse((prev) => !prev);
   const onClickKickOut = (memberInfo: DFriendData) => async () => {
     if (!roomId) return;
 
-    await kickOutMember(roomId, memberInfo.id);
-    alert(`${memberInfo.name}님을 강퇴하였습니다..`);
+    const executeWork = async () =>
+      await kickOutMember(memberInfo.id, memberInfo.name);
+
+    showAlertModal({
+      text: '방에서 나가시겠습니까?',
+      executeWork,
+    });
   };
 
-  if (!roomId || !userListData?.userList) return <Spinner />;
+  console.log(roomId, userListByRoom);
+
+  if (!roomId || !userListByRoom) return <Spinner />;
 
   return (
     <Wrapper>
@@ -62,7 +64,7 @@ const MemberList = memo(() => {
       {memberCollapse && (
         <>
           <Container>
-            {userListData.userList.map((item) => {
+            {userListByRoom.map((item) => {
               return (
                 <div key={item.id} className="check_box">
                   <div className="check_label_box" style={preventClickCSS}>

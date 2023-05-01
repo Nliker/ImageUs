@@ -1,7 +1,7 @@
 import Spinner from '@styles/Spinner';
 import { DRoomData } from '@typing/db';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Container, EmptyRoom } from './styles';
 import { IconContext } from 'react-icons/lib';
 import { useMediaQuery } from 'react-responsive';
@@ -9,25 +9,34 @@ import { EmptyRoomlistImg } from '@assets/image';
 import { TbDoorExit } from 'react-icons/tb';
 import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
+import useRoomList from '@hooks/useRoomList';
 
 function Roomlist() {
+  const userId = sessionStorage.getItem('user_id');
+  const { roomId } = useParams<{ roomId: string }>();
+
+  if (!userId) return null;
+
   const { showAlertModal } = useModal();
-  const { setUserPayload } = useUserData();
-  const { roomList, roomListLoading } = useUserData();
+  const { roomList, fetchRoomList, leaveRoom } = useRoomList(userId);
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
 
   const onClickLeaveRoom =
-    (roomId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
+    (selectRoomId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
 
-      setUserPayload({ roomId });
+      const executeWork = async () => {
+        await leaveRoom(selectRoomId);
+        await fetchRoomList();
+      };
+
       showAlertModal({
-        type: 'leaveRoom',
         text: '방에서 나가시겠습니까?',
+        executeWork,
       });
     };
 
-  if (roomListLoading) return <Spinner />;
+  if (!roomList) return <Spinner />;
 
   return (
     <Container>

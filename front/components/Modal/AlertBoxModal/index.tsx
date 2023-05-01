@@ -1,48 +1,25 @@
-import React, { useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import useSWR, { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
-import { deleteRoomImgFetcher } from '@utils/roomDataFetcher';
-import { leaveRoomFetcher } from '@utils/userDataFetcher';
+import React, { useRef } from 'react';
 import { Button } from '@styles/Button';
 import { Wrapper } from './styles';
-import { deleteUserImage } from '@utils/imageFetcher';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
-import useRoomData from '@hooks/useRoomData';
-import useRoomlist from '@hooks/useRoomlist';
+import { IAertData } from '@typing/client';
 
-const AlertBox = () => {
+const AlertBox = ({ alertData }: { alertData: IAertData }) => {
   const userId = sessionStorage.getItem('user_id');
+  if (!userId) return null;
+
   const alertBoxEl = useRef<HTMLDivElement>(null);
-
-  const { currentModal, alertData, clearModalCache } = useModal();
-  const { refresh: refreshRoomlist } = useRoomlist();
-  const { leaveRoom, deleteStoreImage } = useUserData();
-  const { deleteRoomImage } = useRoomData();
-  const navigate = useNavigate();
-
-  const executeFetch = () => {
-    if (alertData.type === 'deleteRoomImage') {
-      deleteRoomImage();
-    } else if (alertData.type === 'leaveRoom') {
-      leaveRoom().then(() => {
-        refreshRoomlist();
-        navigate('/room-select');
-      });
-    } else if (alertData.type === 'deleteStoreImage') {
-      deleteStoreImage();
-    }
-  };
+  const { clearModalCache } = useModal();
+  const { executeWork } = alertData;
 
   return (
     <Wrapper ref={alertBoxEl}>
-      <p>{alertData.text}</p>
+      <p>{alertData?.text}</p>
       <div className="btn_group">
         <Button
           type="button"
           onClick={() => {
-            executeFetch();
+            executeWork();
             clearModalCache();
           }}
         >

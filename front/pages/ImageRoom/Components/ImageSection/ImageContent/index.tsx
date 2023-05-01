@@ -11,6 +11,7 @@ import {
 } from './styles';
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
+import useRoomImgData from '@hooks/useRoomImgData';
 
 interface Props {
   data: CImageData;
@@ -21,13 +22,18 @@ interface Props {
 
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const { showAlertModal, showDetailPictureModal } = useModal();
+  const { deleteRoomImage } = useRoomImgData();
 
   const [isHover, setIsHover] = useState(false);
 
+  const executeWork = async () => {
+    await deleteRoomImage(0);
+  };
+
   const onClickShowAlertBox = () => {
     showAlertModal({
-      type: 'deleteRoomImage',
       text: '이미지를 삭제하시겠습니까?',
+      executeWork,
     });
   };
 
@@ -73,9 +79,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
           </ImageCard>
           <InfoContainer>
             <ImageInfo>
-              <div>
-                <span>작성자: {data.user_name}</span>
-              </div>
+              <div>{/* <span>작성자: {data.user_name}</span> */}</div>
               <div>
                 <span>작성일: {data.created_at}</span>
               </div>
