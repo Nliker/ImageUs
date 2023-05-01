@@ -37,7 +37,7 @@ const App = () => {
       </Route>
       <Route element={<PrivateRoute />}>
         <Route
-          path="room-select"
+          path="select-room"
           element={<SelectRoom fallback={<Spinner />} />}
         />
         <Route path="my_page/*" element={<MyPage fallback={<Spinner />} />} />
