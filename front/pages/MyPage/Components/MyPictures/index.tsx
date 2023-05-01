@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 
 import { CImageData } from '@typing/client';
 import { ImageLayout, NotImageData, Wrapper } from './styles';
@@ -9,114 +9,95 @@ import { FcRemoveImage } from 'react-icons/fc';
 import ImageContent from './ImageContent';
 import useUserImageData from '@hooks/useUserImgData';
 
+interface IImageCard {
+  data: CImageData;
+  index: number;
+  thisArr: CImageData[];
+  observerRef?: React.MutableRefObject<null>;
+}
+
 const MyPictures = () => {
   const userId = sessionStorage.getItem('user_id');
 
-  /*
+  const { userImageList, userImgLoading, loadUserImage, clearUserImageList } =
+    useUserImageData(userId);
 
-    유저의 개인 이미지를 받아오는 hook
+  const fetchingData = useRef(false);
+  const imgLoadEnd = useRef(false);
+  const readStartNumber = useRef(0);
 
-*/
-
-  const {
-    userImageList,
-    userImgLoading,
-    loadNextUserImage,
-    clearUserImageList,
-  } = useUserImageData(userId);
-
-  // const {
-  //   data: userImgList,
-  //   trigger: userImgListTrigger,
-  //   isMutating: userImgListLoading,
-  // } = useSWRMutation(`/user/${userId}/imagelist`, getUserImageList);
-
-  // const { trigger: imageDataTrigger, isMutating: imageDataLoading } =
-  //   useSWRMutation('/user/image-download', getImageData);
-
-  // /*
-
-  //   실제 화면에 보여줄 이미지데이터들을` 저장하는 배열
-
-  // */
-
-  // const { data: userImage, mutate: mutateUserImage } = useSWR<CImageData[]>(
-  //   '/user/imageDataList',
-  // );
-
-  // const [readStartNumber, setReadStartNumber] = useState(0);
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      loadNextUserImage();
-      // if (
-      //   !userImgListLoading &&
-      //   !imageDataLoading &&
-      //   userImgList?.loadDataLength === 12
-      // ) {
-      //   userImgListTrigger(readStartNumber);
-      // }
+
+      if (fetchingData.current || imgLoadEnd.current) {
+        return;
+      }
+      fetchingData.current = true;
+
+      await fetchData();
+
+      fetchingData.current = false;
     },
     {
       threshold: 0.5,
     },
   );
 
-  /*
+  const fetchData = async () => {
+    imgLoadEnd.current = await loadUserImage({
+      readStartNumber: readStartNumber.current,
+    });
+    if (!imgLoadEnd.current) {
+      readStartNumber.current += 12;
+    }
 
-    사진첩에 접속할 때 초기화 시키고 이미지 리스트요청을 트리거하는 effect 
-
-  */
+    console.log('fetchData', imgLoadEnd.current);
+  };
 
   useEffect(() => {
-    // userImgListTrigger(readStartNumber);
-    loadNextUserImage();
+    readStartNumber.current = 0;
+    imgLoadEnd.current = false;
+
+    fetchData();
 
     return () => {
-      // setReadStartNumber(0);
-      // mutateUserImage(undefined, false);
       clearUserImageList();
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (!userImgList || userImgListLoading) return;
-
-  //   setReadStartNumber((prev) => prev + 12);
-
-  //   mutateUserImage(async () => await imageDataTrigger(userImgList.imagelist), {
-  //     populateCache: (newData, currentData) => {
-  //       if (!currentData) {
-  //         return [...newData];
-  //       } else {
-  //         return [...currentData, ...newData];
-  //       }
-  //     },
-  //     revalidate: false,
-  //   });
-  // }, [userImgList]);
-
-  const imageCard = (
-    data: CImageData,
-    index: number,
-    thisArr: CImageData[],
-  ) => (
-    <ImageContent
-      key={data.id}
-      data={data}
-      index={index}
-      thisArr={thisArr}
-      observerRef={observerRef}
-    />
+  const ImageCard = memo(
+    ({ data, index, thisArr, observerRef }: IImageCard) => (
+      <ImageContent
+        data={data}
+        index={index}
+        thisArr={thisArr}
+        observerRef={observerRef}
+      />
+    ),
   );
 
-  if (!userImageList) return <Spinner />;
+  console.log(userImageList);
 
   return (
     <Wrapper>
-      {userImageList.length !== 0 ? (
+      {!userImageList ? (
+        <Spinner />
+      ) : userImageList.length !== 0 ? (
         <>
-          <ImageLayout>{userImageList.map(imageCard)}</ImageLayout>
+          <ImageLayout>
+            {userImageList.map(
+              (image: CImageData, index: number, thisArr: CImageData[]) => (
+                <ImageCard
+                  key={image.id}
+                  data={image}
+                  index={index}
+                  thisArr={thisArr}
+                  observerRef={observerRef}
+                />
+              ),
+            )}
+          </ImageLayout>
           {userImgLoading && <Spinner />}
         </>
       ) : (
