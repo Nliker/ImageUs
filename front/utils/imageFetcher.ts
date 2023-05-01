@@ -141,12 +141,15 @@ const uploadUserImageFetcher = async (
       throw new Error();
     }
 
-    await axios.post('/backapi' + url, arg.uploadImageFile, {
+    const response = await axios.post('/backapi' + url, arg.uploadImageFile, {
       headers: {
         Authorization: token,
         'Content-Type': 'multipart/form-data',
       },
     });
+    const { image_info }: { image_info: DImageData } = response.data;
+
+    return { image_info };
   } catch (err) {
     if (err instanceof AxiosError && err.response?.status === 404) {
       alert('파일이 존재하지 않습니다.');
