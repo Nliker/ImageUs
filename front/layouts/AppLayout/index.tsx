@@ -7,6 +7,7 @@ import Modal from '@components/Modal';
 import { OuterContainer, InnerContainer, Wrapper } from './styles';
 import Spinner from '@styles/Spinner';
 import useModal from '@hooks/useModal';
+import SidebarContext from '@utils/SidebarContext';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -14,17 +15,22 @@ interface AppLayoutProps {
   isImageRoom?: boolean;
 }
 
-interface ISidebarContext {
-  setSidebarState: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const SidebarContext = createContext<ISidebarContext | null>(null);
-
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: modalData } = useModal();
   const { data: userInfo } = useSWR('/user/my');
   const [sidebarState, setSidebarState] = useState<boolean>(false);
-  const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
+
+  // const toggleSidebar = useCallback(() => {
+  //   setSidebarState((prev) => !prev);
+  // }, []);
+
+  // const value = useMemo(
+  //   () => ({
+  //     setState: setSidebarState,
+  //   }),
+  //   [sidebarState],
+  // );
+  // console.log('사이드바', sidebarState);
 
   if (!userInfo || userInfo.logInState === 'LoggingOut') return <Spinner />;
 
@@ -39,7 +45,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
               : undefined
           }
         >
-          <SidebarContext.Provider value={value}>
+          <SidebarContext.Provider value={{ setSidebarState }}>
             {isImageRoom && <SideBar show={sidebarState} />}
             {children}
           </SidebarContext.Provider>
