@@ -1,3 +1,5 @@
+import { CImageData } from '@typing/client';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getImageDataFetcher,
   deleteUserImageFetcher,
@@ -8,25 +10,26 @@ import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-interface IImagePayload {
-  imageId?: number;
+interface IUserImgInfo {
+  readStartNumber: number;
 }
 
 function useUserImageData(userId: string | null) {
-  let readStartNumber = 0;
+  // let readStartNumber = 0;
 
-  const { data: requestPayload, mutate: requestPayloadMutate } =
-    useSWR('/user/payload');
+  // const { data: requestPayload, mutate: requestPayloadMutate } =
+  //   useSWR('/user/payload');
   const { data: userImageList, mutate: mutateUserImgList } =
     useSWR('/user/imagelist');
 
-  const {
-    data: userNextImage,
-    trigger: nextImgListTrigger,
-    isMutating: userImgListLoading,
-  } = useSWRMutation(`/user/${userId}/imagelist`, getUserImgsFetcher);
+  // const {
+  //   data: userNextImage,
+  //   trigger: nextImgListTrigger,
+  //   isMutating: userImgListLoading,
+  // } = useSWRMutation(`/user/${userId}/imagelist`, getUserImgsFetcher);
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/user/image-download', getImageDataFetcher);
+
   const { trigger: deleteUserImgTrigger } = useSWRMutation(
     '/image',
     deleteUserImageFetcher,
@@ -36,54 +39,77 @@ function useUserImageData(userId: string | null) {
     uploadUserImageFetcher,
   );
 
-  const loadNextUserImage = async () => {
-    if (!userImgListLoading && !imgDataListLoading) {
-      nextImgListTrigger(readStartNumber);
-    }
-  };
-  const uploadUserImage = (uploadImageFile: FormData) =>
-    uploadUserImageTrigger({ uploadImageFile });
-  const deleteStoreImage = () => {
-    deleteUserImgTrigger(requestPayload?.imageId).then((dataId) => {
-      // /user/image 캐시 데이터 업데이트 optimistic UI
-      // userImageMutate(dataId)
+  const loadUserImage = async (fetchInfo: IUserImgInfo) => {
+    const { readStartNumber } = fetchInfo;
+    const imageLoading = imgDataListLoading;
+
+    if (imageLoading) return false;
+
+    const newData = await getUserImgsFetcher(`/user/${userId}/imagelist`, {
+      arg: readStartNumber,
     });
-  };
-  const setUserImagePayload = (newData: IImagePayload) => {
-    requestPayloadMutate({ ...requestPayload, ...newData });
-  };
-  const clearUserImageList = () => {
-    readStartNumber = 0;
-    mutateUserImgList(undefined, false);
-  };
+    const { imagelist, loadCompleted } = newData;
 
-  useEffect(() => {
-    if (!userNextImage) return;
-
-    readStartNumber += 12;
-
+    const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
     mutateUserImgList(
-      async () => await imgDataListTrigger(userNextImage.imagelist),
+      (prevData: CImageData[]) => {
+        if (!prevData) {
+          return [...newImageDataList];
+        } else {
+          return [...prevData, ...newImageDataList];
+        }
+      },
       {
-        populateCache: (newData, currentData) => {
-          if (!currentData) {
-            return [...newData];
-          } else {
-            return [...currentData, ...newData];
-          }
-        },
         revalidate: false,
       },
     );
-  }, [userNextImage]);
+
+    if (loadCompleted) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const uploadUserImage = async (uploadImageFile: FormData) => {
+    try {
+      const response = await uploadUserImageTrigger({ uploadImageFile });
+      // const {imageInfo} = response;
+      if (!response) throw new Error('이미지를 업로드하지 못했습니다..');
+
+      mutateUserImgList(
+        async () => await imgDataListTrigger([response.image_info]),
+        {
+          populateCache(newData, currentData) {
+            if (!currentData) {
+              return [...newData];
+            } else {
+              return [...newData, ...currentData];
+            }
+          },
+          rollbackOnError: true,
+        },
+      );
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(error);
+    }
+  };
+
+  const deleteStoreImage = (dataId: number) => {
+    deleteUserImgTrigger(dataId);
+  };
+
+  const clearUserImageList = () => {
+    mutateUserImgList(undefined, false);
+  };
 
   return {
     userImageList,
     userImgLoading: imgDataListLoading || !userImageList,
-    loadNextUserImage,
+    loadUserImage,
     uploadUserImage,
     deleteStoreImage,
-    setUserImagePayload,
     clearUserImageList,
   };
 }
