@@ -20,11 +20,12 @@ function useRoomImgData(roomId?: string) {
   const {
     data: roomImageList,
     mutate: mutateRoomImage,
-    isValidating: roomImgMutating,
+    isValidating: roomImgValidating,
     error: roomImgListError,
   } = useSWR('/room/imagelist', {
     fallbackData: [],
   });
+
   const { data: realTimeImageList, mutate: mutateRealTimeImage } = useSWR(
     '/room/imageUpdate',
     updateImageList,
@@ -39,10 +40,12 @@ function useRoomImgData(roomId?: string) {
 
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/room/imageData', getImageDataFetcher);
+
   const { trigger: deleteRoomImgTrigger } = useSWRMutation(
     [`/room/${roomId}/image`, 'delete'],
     deleteRoomImgFetcher,
   );
+
   const { trigger: uploadRoomImageTrigger } = useSWRMutation(
     [`/room/${roomId}/image`, 'upload'],
     uploadRoomImgFetcher,
@@ -53,9 +56,11 @@ function useRoomImgData(roomId?: string) {
 
     await mutateRealTimeImage();
   };
+
   const deleteRoomImage = (imageId: number) => {
     deleteRoomImgTrigger(imageId).then((dataId) => {});
   };
+
   const loadImage = async (fetchInfo: ILoadImage) => {
     const { readStartNumber, loadImgTypeInfo } = fetchInfo;
     const { filterStartDate, filterEndDate } = loadImgTypeInfo;
@@ -64,7 +69,6 @@ function useRoomImgData(roomId?: string) {
 
     if (imageLoading) return false;
 
-    console.log('이미지 로드');
     if (loadImgTypeInfo.isfiltered) {
       const newData = await getFilterImgFetcher(
         `/room/${roomId}/imagelist/bydate`,
@@ -134,15 +138,17 @@ function useRoomImgData(roomId?: string) {
   };
 
   async function updateImageList() {
-    await mutateRoomImage(
-      async () => await getUnreadImgFetcher(`/room/${roomId}/unread-imagelist`),
-      {
-        populateCache: (newData, currentData) => {
-          return [...newData, ...currentData];
-        },
-        revalidate: false,
-      },
+    const newData = await getUnreadImgFetcher(
+      `/room/${roomId}/unread-imagelist`,
     );
+
+    await mutateRoomImage(async () => await imgDataListTrigger([...newData]), {
+      populateCache: (newData, currentData) => {
+        if (!newData) return [...currentData];
+        return [...newData, ...currentData];
+      },
+      revalidate: false,
+    });
   }
 
   return {
@@ -150,7 +156,7 @@ function useRoomImgData(roomId?: string) {
     roomImgListLoading:
       (!roomImageList && !roomImgListError) ||
       imgDataListLoading ||
-      roomImgMutating,
+      roomImgValidating,
     uploadRoomImage,
     deleteRoomImage,
     loadImage,
