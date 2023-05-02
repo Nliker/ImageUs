@@ -37,10 +37,9 @@ export const Container = styled.section`
       width: 70%;
       border-radius: 20px;
 
+      border: 1px solid #ddd;
       transition: all 0.4s ease 0s;
       transform: translate3d(0px, 0px, 0px);
-      box-shadow: rgba(50, 50, 50, 0.1) 0px 10px 12px,
-        rgba(0, 0, 0, 0.07) 0px 6px 6px;
       background: #ffffff;
       overflow: hidden;
 
@@ -50,7 +49,7 @@ export const Container = styled.section`
 
       & > a {
         flex: 5;
-        border-right: 1px solid rgb(153, 153, 153);
+        border-right: 1px solid #ddd;
 
         &:hover {
           background-color: #e7e7e7;
@@ -87,6 +86,15 @@ export const Container = styled.section`
         svg {
           cursor: pointer;
         }
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .room_list {
+      .item_box {
+        box-shadow: 0 4px 2px 0 rgba(0, 0, 0, 0.16),
+          0 2px 4px 0 rgba(0, 0, 0, 0.12);
       }
     }
   }
