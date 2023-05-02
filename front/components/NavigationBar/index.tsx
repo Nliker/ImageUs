@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import useSWR from 'swr';
 import { NavLink, useNavigate } from 'react-router-dom';
 
@@ -9,36 +9,18 @@ import { CgUserList } from 'react-icons/cg';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
 
-import { Button } from '@styles/Button';
-import {
-  Container,
-  LogoutBtn,
-  NavItem,
-  NavList,
-  UserBox,
-  UserInfo,
-  Wrapper,
-} from './styles';
+import { Container, NavItem, NavList, Wrapper } from './styles';
 import { TbListDetails } from 'react-icons/tb';
+import useModal from '@hooks/useModal';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
 
   const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
+  const { showAlertModal } = useModal();
 
   const [clickLogoutIcon, setClickLogoutIcon] = useState<boolean>(false);
   const userInfoEl = useRef<HTMLDivElement>(null);
-  const logoutBoxRef = useRef<HTMLDivElement>(null);
-
-  const userIconBoxHandler = (e: MouseEvent) => {
-    if (
-      e.target instanceof (HTMLElement || SVGAElement) &&
-      !userInfoEl.current?.contains(e.target) &&
-      !logoutBoxRef.current?.contains(e.target)
-    ) {
-      setClickLogoutIcon(false);
-    }
-  };
 
   const MobileNav = ({ children }: any) => {
     const isMobile = useMediaQuery({ maxWidth: 1023 });
@@ -50,26 +32,20 @@ const NavigationBar = () => {
     return isDesktop ? children : null;
   };
 
-  const onClickLogOut = async () => {
-    sessionStorage.clear();
-    upadateUserState({ logInState: 'LoggingOut' }).then(async () => {
+  const onClickLogOut = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    const executeWork = async () => {
+      await upadateUserState({ logInState: 'LoggingOut' });
+      sessionStorage.clear();
       navigate('/');
+    };
+
+    showAlertModal({
+      text: '로그아웃 하시겠습니까?',
+      executeWork,
     });
   };
-
-  const onClickLogoutBox = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (userInfoEl.current?.contains(e.target as HTMLElement)) return;
-
-    setClickLogoutIcon((prev) => !prev);
-  };
-
-  useEffect(() => {
-    window.addEventListener('click', userIconBoxHandler, { capture: true });
-
-    return () => {
-      window.removeEventListener('click', userIconBoxHandler);
-    };
-  }, []);
 
   return (
     <Wrapper>
@@ -128,11 +104,7 @@ const NavigationBar = () => {
               <span>친구목록</span>
             </NavItem>
             <NavItem>
-              <div
-                className="logout_icon"
-                onClick={onClickLogoutBox}
-                ref={logoutBoxRef}
-              >
+              <div className="logout_icon" onClick={onClickLogOut}>
                 <IconContext.Provider
                   value={{
                     size: '25px',
@@ -144,45 +116,7 @@ const NavigationBar = () => {
               </div>
             </NavItem>
           </NavList>
-          {/* <div
-            className="user_icon_d"
-            onClick={onClickLogoutBox}
-            ref={logoutBoxRef}
-          >
-            <IconContext.Provider
-              value={{
-                size: '18px',
-                style: { display: 'inline-block', margin: 0 },
-              }}
-            >
-              <RiShutDownLine />
-            </IconContext.Provider>
-            {clickLogoutIcon && (
-              <UserBox ref={userInfoEl}>
-                <UserInfo>
-                  <div className={'info_words'}>
-                    <p>
-                      <strong>{userInfo.userInfo?.name ?? 'loading..'}</strong>{' '}
-                      님 어서오세요!
-                    </p>
-                    <p>
-                      <strong>email:</strong>{' '}
-                      {userInfo.userInfo?.email ?? '로딩중입니다..'}
-                    </p>
-                  </div>
-                </UserInfo>
-                <LogoutBtn>
-                  <Button
-                    className="error"
-                    type="button"
-                    onClick={onClickLogOut}
-                  >
-                    로그아웃
-                  </Button>
-                </LogoutBtn>
-              </UserBox>
-            )}
-          </div> */}
+          {}
         </MobileNav>
         <DeskTopNav>
           <div className="home">
@@ -209,11 +143,7 @@ const NavigationBar = () => {
               <span>친구목록</span>
             </NavItem>
           </NavList>
-          <div
-            className="logout_icon"
-            onClick={onClickLogoutBox}
-            ref={logoutBoxRef}
-          >
+          <div className="logout_icon" onClick={onClickLogOut}>
             <IconContext.Provider
               value={{
                 size: '25px',
