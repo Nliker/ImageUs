@@ -11,7 +11,7 @@ import { MdOutlineManageAccounts } from 'react-icons/md';
 
 import { Button } from '@styles/Button';
 import {
-  BottomContainer,
+  Container,
   LogoutBtn,
   NavItem,
   NavList,
@@ -19,6 +19,7 @@ import {
   UserInfo,
   Wrapper,
 } from './styles';
+import { TbListDetails } from 'react-icons/tb';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -28,14 +29,6 @@ const NavigationBar = () => {
   const [clickLogoutIcon, setClickLogoutIcon] = useState<boolean>(false);
   const userInfoEl = useRef<HTMLDivElement>(null);
   const logoutBoxRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    window.addEventListener('click', userIconBoxHandler, { capture: true });
-
-    return () => {
-      window.removeEventListener('click', userIconBoxHandler);
-    };
-  }, []);
 
   const userIconBoxHandler = (e: MouseEvent) => {
     if (
@@ -70,33 +63,88 @@ const NavigationBar = () => {
     setClickLogoutIcon((prev) => !prev);
   };
 
+  useEffect(() => {
+    window.addEventListener('click', userIconBoxHandler, { capture: true });
+
+    return () => {
+      window.removeEventListener('click', userIconBoxHandler);
+    };
+  }, []);
+
   return (
     <Wrapper>
-      <BottomContainer>
+      <Container>
         <MobileNav>
           <NavList>
-            <NavItem>
-              <NavLink to={'/my_page'} className="nav_item">
-                <MdOutlineManageAccounts />
-                마이 페이지
-              </NavLink>
+            <NavItem className="link_item">
+              <NavLink to={'/my_page'} className="nav_link" />
+              <span className="nav_icon">
+                <IconContext.Provider
+                  value={{
+                    size: '25px',
+                  }}
+                >
+                  <MdOutlineManageAccounts />
+                </IconContext.Provider>
+              </span>
+              <span>마이 페이지</span>
             </NavItem>
-            <NavItem>
-              <h1>
-                <NavLink to={'/select-room'}>
+            <NavItem className="link_item">
+              <NavLink to={'/select-room'} className="nav_link" />
+              <span className="nav_icon">
+                <IconContext.Provider
+                  value={{
+                    size: '25px',
+                  }}
+                >
+                  <TbListDetails />
+                </IconContext.Provider>
+              </span>
+              <span>방 목록</span>
+            </NavItem>
+            <NavItem className="home">
+              <span className="nav_icon">
+                <IconContext.Provider
+                  value={{
+                    size: '25px',
+                  }}
+                >
                   <HiOutlineHome />
-                  ImageUs
-                </NavLink>
-              </h1>
+                </IconContext.Provider>
+              </span>
+              <span>ImageUs</span>
+            </NavItem>
+            <NavItem className="link_item">
+              <NavLink to={'/people_management'} className="nav_link" />
+              <span className="nav_icon">
+                <IconContext.Provider
+                  value={{
+                    size: '25px',
+                  }}
+                >
+                  <CgUserList />
+                </IconContext.Provider>
+              </span>
+              <span>친구목록</span>
             </NavItem>
             <NavItem>
-              <NavLink to={'/people_management'} className="nav_item">
-                <CgUserList />
-                친구목록
-              </NavLink>
+              <div
+                className="logout_icon"
+                onClick={onClickLogoutBox}
+                ref={logoutBoxRef}
+              >
+                <IconContext.Provider
+                  value={{
+                    size: '25px',
+                  }}
+                >
+                  <RiShutDownLine />
+                </IconContext.Provider>
+                <span>로그아웃</span>
+              </div>
             </NavItem>
           </NavList>
-          <div
+          {/* <div
             className="user_icon_d"
             onClick={onClickLogoutBox}
             ref={logoutBoxRef}
@@ -134,70 +182,49 @@ const NavigationBar = () => {
                 </LogoutBtn>
               </UserBox>
             )}
-          </div>
+          </div> */}
         </MobileNav>
         <DeskTopNav>
+          <div className="home">
+            <IconContext.Provider
+              value={{
+                size: '2.5rem',
+              }}
+            >
+              <HiOutlineHome />
+            </IconContext.Provider>
+            <span>ImageUs</span>
+          </div>
           <NavList>
-            <NavItem>
-              <h1>
-                <NavLink to={'/'}>
-                  <HiOutlineHome />
-                  ImageUs
-                </NavLink>
-              </h1>
+            <NavItem className="link_item">
+              <NavLink to={'/select-room'} className="nav_link" />
+              <span>방 목록</span>
             </NavItem>
-            <NavItem>
-              <NavLink to={'/my_page'} className="navigate_link">
-                마이 페이지
-              </NavLink>
+            <NavItem className="link_item">
+              <NavLink to={'/my_page'} className="nav_link" />
+              <span>마이 페이지</span>
             </NavItem>
-            <NavItem>
-              <NavLink to={'/people_management'} className="navigate_link">
-                친구목록
-              </NavLink>
+            <NavItem className="link_item">
+              <NavLink to={'/people_management'} className="nav_link" />
+              <span>친구목록</span>
             </NavItem>
           </NavList>
           <div
-            className="user_icon_d"
+            className="logout_icon"
             onClick={onClickLogoutBox}
             ref={logoutBoxRef}
           >
             <IconContext.Provider
               value={{
-                size: '18px',
-                style: { display: 'inline-block', margin: 0 },
+                size: '25px',
               }}
             >
               <RiShutDownLine />
             </IconContext.Provider>
-            {clickLogoutIcon && (
-              <UserBox ref={userInfoEl}>
-                <UserInfo>
-                  <div className={'info_words'}>
-                    <p>
-                      <strong>{userInfo.userInfo?.name ?? 'loading..'}</strong>{' '}
-                      님 어서오세요!
-                    </p>
-                    <p>
-                      <strong>email:</strong>{' '}
-                      {userInfo.userInfo?.email ?? '로딩중입니다..'}
-                    </p>
-                  </div>
-                </UserInfo>
-                <LogoutBtn>
-                  <Button
-                    className="error"
-                    type="button"
-                    onClick={onClickLogOut}
-                  >
-                    로그아웃
-                  </Button>
-                </LogoutBtn>
-              </UserBox>
-            )}
+            <span>로그아웃</span>
           </div>
         </DeskTopNav>
-      </BottomContainer>
+      </Container>
     </Wrapper>
   );
 };

@@ -19,7 +19,7 @@ export const Wrapper = styled.nav`
   }
 `;
 
-export const BottomContainer = styled.div`
+export const Container = styled.div`
   position: relative;
   display: flex;
 
@@ -29,96 +29,107 @@ export const BottomContainer = styled.div`
 
   background-color: #fff;
 
-  a {
-    text-decoration: none;
-    color: #47443e;
-  }
-
-  .user_icon_d {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 70px;
-    border-left: 1px solid #dddddd;
-
-    cursor: pointer;
-
-    &:hover {
-      svg {
-        color: #f5642d;
-      }
-    }
-  }
-
   @media screen and (min-width: 1024px) {
     box-sizing: border-box;
 
     padding: 0 4rem;
     box-shadow: 0 2px 4px 0 rgb(33 37 41 / 8%);
 
-    .user_icon_d {
-      border-right: 1px solid #dddddd;
+    .home {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      width: 150px;
+      gap: 0.3rem;
+      font-size: 2rem;
+
+      .nav_icon {
+        width: 66px;
+      }
+    }
+
+    .logout_icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      width: 72px;
+
+      cursor: pointer;
+
+      &:hover {
+        color: #f5642d;
+      }
     }
   }
 `;
 
 export const NavList = styled.ul`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
 
-  width: calc(100% - 66px);
+  width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 
-  .navigate_link:hover,
-  .nav_item:hover {
-    color: #0d6efd;
-  }
-
   @media screen and (min-width: 1024px) {
     justify-content: start;
-
     gap: 4rem;
+    margin-left: 1.5rem;
   }
 `;
 
 export const NavItem = styled.li`
   position: relative;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 
+  width: 72px;
   height: 100%;
 
   list-style: none;
   box-sizing: border-box;
 
-  &:last-of-type {
+  &.link_item:hover {
+    color: #0d6efd;
   }
 
-  svg {
+  .nav_icon svg,
+  .logout_icon svg {
     display: block;
 
-    width: 25px;
     height: auto;
     margin: 0 auto 3px;
   }
 
-  h1 {
-    a {
-      display: flex;
-      gap: 0.5rem;
-
-      svg {
-        margin: 0 auto;
-      }
-    }
+  .nav_link {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 1;
   }
 
-  .upload_btn {
+  .logout_icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
     cursor: pointer;
+
+    &:hover {
+      color: #f5642d;
+    }
   }
 
   @media screen and (min-width: 1024px) {
