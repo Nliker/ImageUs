@@ -13,7 +13,6 @@ import useRoomList from '@hooks/useRoomList';
 
 function Roomlist() {
   const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
 
   if (!userId) return null;
 
@@ -22,16 +21,16 @@ function Roomlist() {
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
 
   const onClickLeaveRoom =
-    (selectRoomId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
+    (roomData: DRoomData) => (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
 
       const executeWork = async () => {
-        await leaveRoom(selectRoomId);
+        await leaveRoom('' + roomData.id);
         await fetchRoomList();
       };
 
       showAlertModal({
-        text: '방에서 나가시겠습니까?',
+        text: `${roomData.title}에서 나가시겠습니까?`,
         executeWork,
       });
     };
@@ -54,10 +53,7 @@ function Roomlist() {
                     </p>
                   </div>
                 </Link>
-                <div
-                  className="item_btn"
-                  onClick={onClickLeaveRoom('' + roomData.id)}
-                >
+                <div className="item_btn" onClick={onClickLeaveRoom(roomData)}>
                   <IconContext.Provider
                     value={{
                       size: '30px',
