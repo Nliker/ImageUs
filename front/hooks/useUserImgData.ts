@@ -6,7 +6,6 @@ import {
   uploadUserImageFetcher,
 } from '@utils/imageFetcher';
 import { getUserImgsFetcher } from '@utils/userDataFetcher';
-import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -15,18 +14,12 @@ interface IUserImgInfo {
 }
 
 function useUserImageData(userId: string | null) {
-  // let readStartNumber = 0;
-
-  // const { data: requestPayload, mutate: requestPayloadMutate } =
-  //   useSWR('/user/payload');
   const { data: userImageList, mutate: mutateUserImgList } =
     useSWR('/user/imagelist');
+  const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
+    '/user/uploadImgCount',
+  );
 
-  // const {
-  //   data: userNextImage,
-  //   trigger: nextImgListTrigger,
-  //   isMutating: userImgListLoading,
-  // } = useSWRMutation(`/user/${userId}/imagelist`, getUserImgsFetcher);
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/user/image-download', getImageDataFetcher);
 
@@ -74,25 +67,21 @@ function useUserImageData(userId: string | null) {
   const uploadUserImage = async (uploadImageFile: FormData) => {
     try {
       const response = await uploadUserImageTrigger({ uploadImageFile });
-      // const {imageInfo} = response;
+
       if (!response) throw new Error('이미지를 업로드하지 못했습니다..');
 
-      mutateUserImgList(
-        async () => await imgDataListTrigger([response.image_info]),
-        {
-          populateCache(newData, currentData) {
-            if (!currentData) {
-              return [...newData];
-            } else {
-              return [...newData, ...currentData];
-            }
-          },
-          rollbackOnError: true,
-        },
-      );
+      // 업로드 개수 변화로 MyPicture 컴포넌트에서 userImageList 최신화 트리거
+
+      setUploadImgCount((prevData: number | undefined) => {
+        if (!prevData || prevData >= 1000) {
+          return 1;
+        } else {
+          return prevData + 1;
+        }
+      }, false);
     } catch (error) {
       const message = getErrorMessage(error);
-      alert(error);
+      alert(message);
     }
   };
 
@@ -107,6 +96,7 @@ function useUserImageData(userId: string | null) {
   return {
     userImageList,
     userImgLoading: imgDataListLoading || !userImageList,
+    uploadImgSensorNum: uploadImgCount,
     loadUserImage,
     uploadUserImage,
     deleteStoreImage,

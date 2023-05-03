@@ -19,8 +19,13 @@ interface IImageCard {
 const MyPictures = () => {
   const userId = sessionStorage.getItem('user_id');
 
-  const { userImageList, userImgLoading, loadUserImage, clearUserImageList } =
-    useUserImageData(userId);
+  const {
+    userImageList,
+    userImgLoading,
+    uploadImgSensorNum,
+    loadUserImage,
+    clearUserImageList,
+  } = useUserImageData(userId);
 
   const fetchingData = useRef(false);
   const imgLoadEnd = useRef(false);
@@ -51,8 +56,6 @@ const MyPictures = () => {
     if (!imgLoadEnd.current) {
       readStartNumber.current += 12;
     }
-
-    console.log('fetchData', imgLoadEnd.current);
   };
 
   useEffect(() => {
@@ -64,7 +67,7 @@ const MyPictures = () => {
     return () => {
       clearUserImageList();
     };
-  }, []);
+  }, [uploadImgSensorNum]);
 
   const ImageCard = memo(
     ({ data, index, thisArr, observerRef }: IImageCard) => (
@@ -77,7 +80,7 @@ const MyPictures = () => {
     ),
   );
 
-  console.log(userImageList);
+  // console.log('업로드 판별기:', uploadImgSensorNum, userImageList);
 
   return (
     <Wrapper>
