@@ -6,6 +6,7 @@ export interface CImageData {
   link: string;
   fileName: string;
   created_at: string | null;
+  user_name?: string | null;
 }
 
 export interface SelectTerm {
