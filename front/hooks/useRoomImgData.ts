@@ -1,4 +1,5 @@
 import { CImageData, ILoadImgTypeInfo } from '@typing/client';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getImageDataFetcher,
   deleteRoomImgFetcher,
@@ -22,9 +23,7 @@ function useRoomImgData(roomId?: string) {
     mutate: mutateRoomImage,
     isValidating: roomImgValidating,
     error: roomImgListError,
-  } = useSWR('/room/imagelist', {
-    fallbackData: [],
-  });
+  } = useSWR<CImageData[]>('/room/imagelist');
 
   const { data: realTimeImageList, mutate: mutateRealTimeImage } = useSWR(
     '/room/imageUpdate',
@@ -57,17 +56,28 @@ function useRoomImgData(roomId?: string) {
     await mutateRealTimeImage();
   };
 
-  const deleteRoomImage = (imageId: number) => {
-    deleteRoomImgTrigger(imageId).then((dataId) => {});
+  const deleteRoomImage = async (imageId: number) => {
+    try {
+      if (!roomImageList) return;
+
+      await deleteRoomImgTrigger(imageId);
+      alert('이미지를 삭제하였습니다');
+      // 해당 아이디를 필터링해서 mutate 시키기
+      const filterImgList = roomImageList.filter((data) => data.id !== imageId);
+      mutateRoomImage([...filterImgList], false);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
   };
 
   const loadImage = async (fetchInfo: ILoadImage) => {
     const { readStartNumber, loadImgTypeInfo } = fetchInfo;
     const { filterStartDate, filterEndDate } = loadImgTypeInfo;
-    const imageLoading =
-      (!roomImageList && !roomImgListError) || imgDataListLoading;
+    // const imageLoading =
+    //   (!roomImageList && !roomImgListError) || imgDataListLoading;
 
-    if (imageLoading) return false;
+    if (imgDataListLoading) return false;
 
     if (loadImgTypeInfo.isfiltered) {
       const newData = await getFilterImgFetcher(
@@ -84,7 +94,7 @@ function useRoomImgData(roomId?: string) {
 
       const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
       mutateRoomImage(
-        (prevData: CImageData[]) => {
+        (prevData: CImageData[] | undefined) => {
           if (!prevData) {
             return [...newImageDataList];
           } else {
@@ -112,7 +122,7 @@ function useRoomImgData(roomId?: string) {
 
       const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
       mutateRoomImage(
-        (prevData: CImageData[]) => {
+        (prevData: CImageData[] | undefined) => {
           if (!prevData) {
             return [...newImageDataList];
           } else {
@@ -134,7 +144,7 @@ function useRoomImgData(roomId?: string) {
 
   const clearRoomImageList = () => {
     console.log('클리어');
-    mutateRoomImage([], false);
+    mutateRoomImage(undefined, false);
   };
 
   async function updateImageList() {
@@ -144,6 +154,7 @@ function useRoomImgData(roomId?: string) {
 
     await mutateRoomImage(async () => await imgDataListTrigger([...newData]), {
       populateCache: (newData, currentData) => {
+        if (!currentData) return [];
         if (!newData) return [...currentData];
         return [...newData, ...currentData];
       },
