@@ -15,7 +15,7 @@ interface IUserImgInfo {
 
 function useUserImageData(userId: string | null) {
   const { data: userImageList, mutate: mutateUserImgList } =
-    useSWR('/user/imagelist');
+    useSWR<CImageData[]>('/user/imagelist');
   const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
     '/user/uploadImgCount',
   );
@@ -45,7 +45,7 @@ function useUserImageData(userId: string | null) {
 
     const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
     mutateUserImgList(
-      (prevData: CImageData[]) => {
+      (prevData: CImageData[] | undefined) => {
         if (!prevData) {
           return [...newImageDataList];
         } else {
@@ -85,8 +85,18 @@ function useUserImageData(userId: string | null) {
     }
   };
 
-  const deleteStoreImage = (dataId: number) => {
-    deleteUserImgTrigger(dataId);
+  const deleteStoreImage = async (imageId: number) => {
+    try {
+      if (!userImageList) return;
+
+      await deleteUserImgTrigger(imageId);
+
+      const filterImgList = userImageList.filter((data) => data.id !== imageId);
+      mutateUserImgList([...filterImgList], false);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
   };
 
   const clearUserImageList = () => {
