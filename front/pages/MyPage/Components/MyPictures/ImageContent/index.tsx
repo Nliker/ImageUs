@@ -1,6 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
-import useSWR from 'swr';
-import { useParams } from 'react-router';
+import React, { memo, useState } from 'react';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
@@ -13,7 +11,6 @@ import {
 } from './styles';
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
 import useUserImageData from '@hooks/useUserImgData';
 
 interface Props {
@@ -26,54 +23,14 @@ interface Props {
 
 const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const userId = sessionStorage.getItem('user_id');
-  // if (!userId) return null;
 
   const { showAlertModal, showDetailPictureModal } = useModal();
-  // const { deleteStoreImage } = useUserImageData(userId);
+  const { deleteStoreImage } = useUserImageData(userId);
 
   const [isHover, setIsHover] = useState(false);
 
-  // const { data: roomImageList, mutate: fetchRoomImage } = useSWR(
-  //   `/image/${roomId}`,
-  // );
-  // const { data: deleteRoomImageId, isLoading: roomImageDeleting } = useSWR(
-  //   'roomImageDelete',
-  //   {
-  //     revalidateIfStale: false,
-  //     revalidateOnFocus: false,
-  //     revalidateOnReconnect: false,
-  //   },
-  // );
-  // const { data: userImageList, mutate: fetchUserImage } = useSWR(
-  //   '/user/imageDataList',
-  // );
-  // const { data: deleteUserImageId, isLoading: userImageDeleting } =
-  //   useSWR('userImageDelete');
-  // const [isHover, setIsHover] = useState(false);
-
-  // useEffect(() => {
-  //   if (!roomImageList || roomImageDeleting || deleteRoomImageId !== data.id)
-  //     return;
-  //   const filteredList = roomImageList.filter(
-  //     (image: CImageData) => image.id !== data.id,
-  //   );
-  //   fetchRoomImage([...filteredList], false);
-  // }, [deleteRoomImageId]);
-
-  // useEffect(() => {
-  //   if (!userImageList || userImageDeleting || deleteUserImageId !== data.id)
-  //     return;
-  //   const filteredList = userImageList.filter(
-  //     (image: CImageData) => image.id !== data.id,
-  //   );
-  //   fetchUserImage([...filteredList], false);
-  // }, [deleteUserImageId]);
-
   const onClickShowAlertBox = () => {
-    // setUserPayload({ imageId: data.id });
-    const executeWork = async () => {
-      // await deleteStoreImage();
-    };
+    const executeWork = async () => await deleteStoreImage(data.id);
 
     showAlertModal({
       text: '이미지를 삭제하시겠습니까?',
@@ -123,7 +80,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
           </ImageCard>
           <InfoContainer>
             <ImageInfo>
-              <div>{/* <span>작성자: {data.user_name}</span> */}</div>
+              <div>{}</div>
               <div>
                 <span>작성일: {data.created_at}</span>
               </div>
