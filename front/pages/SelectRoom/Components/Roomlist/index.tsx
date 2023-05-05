@@ -17,7 +17,7 @@ function Roomlist() {
   if (!userId) return null;
 
   const { showAlertModal } = useModal();
-  const { roomList, fetchRoomList, leaveRoom } = useRoomList(userId);
+  const { roomList, leaveRoom } = useRoomList(userId);
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
 
   const onClickLeaveRoom =
@@ -26,7 +26,6 @@ function Roomlist() {
 
       const executeWork = async () => {
         await leaveRoom('' + roomData.id);
-        await fetchRoomList();
       };
 
       showAlertModal({
