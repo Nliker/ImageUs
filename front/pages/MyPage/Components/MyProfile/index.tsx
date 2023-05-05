@@ -7,9 +7,11 @@ import { Button } from '@styles/Button';
 import { InfoSection, InfoTable } from './styles';
 import { logInCheckFetcher } from '@utils/logInFetcher';
 import { changeUserInfoFetcher } from '@utils/userDataFetcher';
+import useAuth from '@hooks/useAuth';
 
 const MyProfile = () => {
-  const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
+  // const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
+  const { userInfo } = useAuth();
   const { trigger: postUserInfoTrigger } = useSWRMutation(
     '/user/my',
     changeUserInfoFetcher,
@@ -30,12 +32,10 @@ const MyProfile = () => {
     });
   }, [profileState]);
 
-  const onClickPostIntro = (postTitle: string) => () => {
+  const onClickPostIntro = (postTitle: string) => async () => {
     if (postTitle === 'name') {
-      postUserInfoTrigger({ [postTitle]: nameInput }).then(() => {
-        setProfileState((prev) => ({ ...prev, name: false }));
-        updateUserInfo(logInCheckFetcher('/user/my'));
-      });
+      await postUserInfoTrigger({ [postTitle]: nameInput });
+      setProfileState((prev) => ({ ...prev, name: false }));
     } else {
       alert('잘못된 요청입니다.');
     }
@@ -53,13 +53,13 @@ const MyProfile = () => {
           <tr>
             <th>이메일</th>
             <td colSpan={2}>
-              <strong>{userInfo?.userInfo?.email}</strong>
+              <strong>{userInfo?.email}</strong>
             </td>
           </tr>
           <tr>
             <th>가입 유형</th>
             <td>
-              <div>{userInfo?.userInfo?.user_type}</div>
+              <div>{userInfo?.user_type}</div>
             </td>
           </tr>
           <tr>
@@ -67,7 +67,7 @@ const MyProfile = () => {
             {!profileState.name ? (
               <>
                 <td>
-                  <div>{userInfo?.userInfo?.name}</div>
+                  <div>{userInfo?.name}</div>
                 </td>
                 <td>
                   <div className="btn_group">

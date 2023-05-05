@@ -1,19 +1,24 @@
+import useAuth from '@hooks/useAuth';
 import Spinner from '@styles/Spinner';
+import { CAuthData } from '@typing/client';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
 import useSWR from 'swr';
 
-const PublicRoute = () => {
-  const { data: userInfo } = useSWR('/user/my');
-  const loginState = userInfo?.logInState;
+interface IProps {
+  authData: CAuthData;
+}
 
-  if (!loginState) return <Spinner />;
+const PublicRoute = ({ authData }: IProps) => {
+  // const { data: userInfo } = useSWR('/user/my');
+  // const loginState = userInfo?.logInState;
+  // const { isAuthenticated, loading } = useAuth();
 
-  return loginState === 'LoggedIn' ? (
-    <Navigate to="/select-room" />
-  ) : (
-    <Outlet />
-  );
+  const { isAuthenticated, loading } = authData;
+
+  if (loading) return <Spinner />;
+
+  return isAuthenticated ? <Navigate to="/select-room" /> : <Outlet />;
 };
 
 export default PublicRoute;

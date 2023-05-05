@@ -11,14 +11,11 @@ import UserFormBox from '@components/UserFormBox';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
+import useAuth from '@hooks/useAuth';
 
 const LogIn = () => {
   const navigate = useNavigate();
-
-  const { data: logInSuccess, trigger } = useSWRMutation(
-    '/user/login',
-    logInRequestFetcher,
-  );
+  const { logInRequest } = useAuth();
 
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -77,17 +74,18 @@ const LogIn = () => {
     } else if (!pwCheck) {
       alert('비밀번호를 다시 확인해주세요.');
     } else {
-      await trigger({ email: emailValue, password: passwordValue });
+      await logInRequest({ email: emailValue, password: passwordValue });
+      navigate('/select-room', { replace: true });
     }
   };
 
-  useEffect(() => {
-    if (logInSuccess) {
-      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-        navigate('/select-room', { replace: true });
-      });
-    }
-  }, [logInSuccess]);
+  // useEffect(() => {
+  //   if (logInSuccess) {
+  //     navigate('/select-room', { replace: true });
+  //     // mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
+  //     // });
+  //   }
+  // }, [logInSuccess]);
 
   return (
     <UserFormBox pageName={'로그인'}>
