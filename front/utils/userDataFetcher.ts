@@ -134,7 +134,7 @@ const getUserRoomListFetcher = async (url: string) => {
 
 const changeUserInfoFetcher = async (
   url: string,
-  { arg }: { arg: { name?: string; profile?: string } },
+  { arg }: { arg: { name: string } },
 ) => {
   try {
     const { token } = await getToken();
@@ -143,10 +143,7 @@ const changeUserInfoFetcher = async (
       throw new Error();
     }
 
-    const postData: { name?: string; profile?: string } = {};
-
-    if (arg.name) postData.name = arg.name;
-    if (arg.profile) postData.profile = arg.profile;
+    const postData: { name: string } = { name: arg.name };
 
     await axios.post('/backapi' + url, postData, {
       headers: { Authorization: token },
