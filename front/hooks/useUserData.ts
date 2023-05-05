@@ -6,16 +6,6 @@ import {
 import useSWRMutation from 'swr/mutation';
 
 function useUserData(userId: string) {
-  const { data: totalImageCount } = useSWR<number>(
-    `/user/${userId}/imagelist-len`,
-    getUserImgLenFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
-
   const { trigger: changeUserNameTrigger } = useSWRMutation(
     '/user/my',
     changeUserInfoFetcher,
@@ -25,7 +15,6 @@ function useUserData(userId: string) {
     await changeUserNameTrigger({ name: nameValue });
 
   return {
-    totalImageCount,
     requestChangeName,
   };
 }

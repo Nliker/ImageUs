@@ -28,6 +28,7 @@ import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
 import useAuth from '@hooks/useAuth';
 import { DUserInfo } from '@typing/db';
+import useUserImageData from '@hooks/useUserImgData';
 
 const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
@@ -38,7 +39,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const { showUploadImgModal } = useModal();
   const { totalFriendCount } = useFriendList();
   const { totalRoomCount } = useRoomList(userId);
-  const { totalImageCount } = useUserData(userId);
+  const { totalImageCount } = useUserImageData(userId);
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 

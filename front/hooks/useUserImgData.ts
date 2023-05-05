@@ -5,7 +5,10 @@ import {
   deleteUserImageFetcher,
   uploadUserImageFetcher,
 } from '@utils/imageFetcher';
-import { getUserImgsFetcher } from '@utils/userDataFetcher';
+import {
+  getUserImgLenFetcher,
+  getUserImgsFetcher,
+} from '@utils/userDataFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -19,6 +22,12 @@ function useUserImageData(userId: string | null) {
   const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
     '/user/uploadImgCount',
   );
+  const { data: totalImageCount, mutate: refreshTotalImgCount } =
+    useSWR<number>(`/user/${userId}/imagelist-len`, getUserImgLenFetcher, {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    });
 
   const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
     useSWRMutation('/user/image-download', getImageDataFetcher);
@@ -79,6 +88,8 @@ function useUserImageData(userId: string | null) {
           return prevData + 1;
         }
       }, false);
+
+      await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
       alert(message);
@@ -93,6 +104,7 @@ function useUserImageData(userId: string | null) {
 
       const filterImgList = userImageList.filter((data) => data.id !== imageId);
       mutateUserImgList([...filterImgList], false);
+      await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
       alert(message);
@@ -107,6 +119,7 @@ function useUserImageData(userId: string | null) {
     userImageList,
     userImgLoading: imgDataListLoading || !userImageList,
     uploadImgSensorNum: uploadImgCount,
+    totalImageCount,
     loadUserImage,
     uploadUserImage,
     deleteStoreImage,
