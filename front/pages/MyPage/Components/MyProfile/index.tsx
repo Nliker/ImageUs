@@ -8,37 +8,25 @@ import { InfoSection, InfoTable } from './styles';
 import { logInCheckFetcher } from '@utils/logInFetcher';
 import { changeUserInfoFetcher } from '@utils/userDataFetcher';
 import useAuth from '@hooks/useAuth';
+import useUserData from '@hooks/useUserData';
+import { DUserInfo } from '@typing/db';
 
-const MyProfile = () => {
+const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
+  const userId = sessionStorage.getItem('user_id');
+
+  if (!userId) return null;
+
   // const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
-  const { userInfo } = useAuth();
-  const { trigger: postUserInfoTrigger } = useSWRMutation(
-    '/user/my',
-    changeUserInfoFetcher,
-  );
-
-  const [profileState, setProfileState] = useState({
-    intro: false,
-    name: false,
-  });
+  // const { userInfo } = useAuth();
+  const { requestChangeName } = useUserData(userId);
   const [nameInput, setNameInput, handleNameInput] = useInput('');
 
-  const changeNameBox = useCallback(() => {
-    setProfileState((prev) => {
-      return {
-        ...prev,
-        name: true,
-      };
-    });
-  }, [profileState]);
+  const [nameBoxState, setNameBoxState] = useState(false);
 
-  const onClickPostIntro = (postTitle: string) => async () => {
-    if (postTitle === 'name') {
-      await postUserInfoTrigger({ [postTitle]: nameInput });
-      setProfileState((prev) => ({ ...prev, name: false }));
-    } else {
-      alert('잘못된 요청입니다.');
-    }
+  const onClickChangeName = async () => {
+    await requestChangeName(nameInput);
+    setNameInput('');
+    setNameBoxState(false);
   };
 
   return (
@@ -64,14 +52,14 @@ const MyProfile = () => {
           </tr>
           <tr>
             <th>이름</th>
-            {!profileState.name ? (
+            {!nameBoxState ? (
               <>
                 <td>
                   <div>{userInfo?.name}</div>
                 </td>
                 <td>
                   <div className="btn_group">
-                    <Button type="button" onClick={changeNameBox}>
+                    <Button type="button" onClick={() => setNameBoxState(true)}>
                       이름 변경
                     </Button>
                   </div>
@@ -91,20 +79,13 @@ const MyProfile = () => {
                 </td>
                 <td>
                   <div className="btn_group">
-                    <Button type="button" onClick={onClickPostIntro('name')}>
+                    <Button type="button" onClick={onClickChangeName}>
                       완료
                     </Button>
                     <Button
                       type="button"
                       className="cancel_btn"
-                      onClick={() =>
-                        setProfileState((prev) => {
-                          return {
-                            ...prev,
-                            name: false,
-                          };
-                        })
-                      }
+                      onClick={() => setNameBoxState(false)}
                     >
                       취소
                     </Button>
@@ -118,9 +99,6 @@ const MyProfile = () => {
             <td>
               <strong>********</strong>
             </td>
-            {/* <td className="btn_group">
-              <Button type="button">비밀번호 변경</Button>
-            </td> */}
           </tr>
         </tbody>
       </InfoTable>
