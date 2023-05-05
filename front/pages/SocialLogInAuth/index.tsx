@@ -1,36 +1,26 @@
 import React, { useEffect } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router';
 
-import { logInCheckFetcher, socialLoginFetcher } from '@utils/logInFetcher';
+import useSocialAuth from '@hooks/useSocialAuth';
 
 const SocialLogInAuth = () => {
-  const navigate = useNavigate();
-  const { mutate } = useSWRConfig();
   const { coperation, code } = queryString.parse(window.location.search);
 
-  const { data: socialLoginRequest } = useSWR(
-    ['/oauth-login/callback', coperation, code],
-    socialLoginFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const navigate = useNavigate();
+  const { isAuthenticated, loading } = useSocialAuth({ coperation, code });
 
   useEffect(() => {
-    if (!socialLoginRequest) return;
+    if (loading) return;
 
-    if (socialLoginRequest.result === 'success') {
-      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-        navigate('/', { replace: true });
-      });
+    if (isAuthenticated) {
+      alert('인증되었습니다.');
+      navigate('/select-room', { replace: true });
     } else {
+      alert('인증에 실패하였습니다.. 다시 로그인 해주세요..');
       navigate('/login');
     }
-  }, [socialLoginRequest]);
+  }, [isAuthenticated]);
 
   return <div>로그인 요청 처리중..</div>;
 };
