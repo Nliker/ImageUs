@@ -16,7 +16,7 @@ import useModal from '@hooks/useModal';
 const NavigationBar = () => {
   const navigate = useNavigate();
 
-  const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
+  // const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
   const { showAlertModal } = useModal();
 
   const [clickLogoutIcon, setClickLogoutIcon] = useState<boolean>(false);
@@ -36,7 +36,7 @@ const NavigationBar = () => {
     e.stopPropagation();
 
     const executeWork = async () => {
-      await upadateUserState({ logInState: 'LoggingOut' });
+      // await upadateUserState({ logInState: 'LoggingOut' });
       sessionStorage.clear();
       navigate('/');
     };
