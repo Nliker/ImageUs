@@ -1,3 +1,11 @@
+export interface DUserInfo {
+  id: number;
+  name: string;
+  email: string;
+  profile: string;
+  user_type: string;
+}
+
 export interface DRoomData {
   id: number;
   title: string;

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
+import { DUserInfo } from '@typing/db';
 
 const logInCheckFetcher = async (url: string) => {
   try {
@@ -13,11 +14,11 @@ const logInCheckFetcher = async (url: string) => {
         Authorization: token,
       },
     });
-    const { user_info } = response.data;
+    const { user_info }: { user_info: DUserInfo } = response.data;
 
-    return { logInState: 'LoggedIn', userInfo: user_info };
+    return { isAuthenticated: true, userInfo: user_info };
   } catch (err) {
-    return { logInState: 'LoggedOut' };
+    return { isAuthenticated: false, userInfo: null };
   }
 };
 

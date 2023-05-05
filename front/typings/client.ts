@@ -1,4 +1,10 @@
-import { DFriendData } from './db';
+import { DFriendData, DUserInfo } from './db';
+
+export interface CAuthData {
+  isAuthenticated: boolean;
+  loading: boolean;
+  userInfo?: DUserInfo | null;
+}
 
 export interface CImageData {
   id: number;
