@@ -63,6 +63,8 @@ const socialLoginFetcher = async ([url, coperation, code]: [
   string,
 ]) => {
   try {
+    if (!coperation || !code) throw new Error('올바른 요청이 아닙니다..');
+
     const response = await axios.get(
       '/backapi' + `${url}?coperation=${coperation}&code=${code}`,
     );
@@ -80,10 +82,10 @@ const socialLoginFetcher = async ([url, coperation, code]: [
     );
     sessionStorage.setItem('user_id', user_id);
 
-    return { result: 'success' };
+    return true;
   } catch (err) {
     alert('로그인 요청에 실패했습니다..');
-    return { result: 'fail' };
+    return false;
   }
 };
 
