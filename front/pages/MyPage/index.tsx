@@ -27,13 +27,14 @@ import useUserData from '@hooks/useUserData';
 import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
 import useAuth from '@hooks/useAuth';
+import { DUserInfo } from '@typing/db';
 
-const MyPage = () => {
+const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
   if (!userId) return null;
 
   // const { data: userInfo } = useSWR('/user/my');
-  const { userInfo } = useAuth();
+  // const { userInfo } = useAuth();
   const { showUploadImgModal } = useModal();
   const { totalFriendCount } = useFriendList();
   const { totalRoomCount } = useRoomList(userId);
@@ -125,7 +126,10 @@ const MyPage = () => {
                     </DeviceCheckContext.Provider>
                   }
                 />
-                <Route path="my_profile" element={<MyProfile />} />
+                <Route
+                  path="my_profile"
+                  element={<MyProfile userInfo={userInfo} />}
+                />
                 <Route path="*" element={<Navigate to="/my_page" />} />
               </Routes>
             </EachRoomPictureList>

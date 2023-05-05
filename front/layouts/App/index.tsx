@@ -24,7 +24,7 @@ const App = () => {
   //   if (userInfo?.logInState === 'LoggingOut') return;
   //   mutate(logInCheckFetcher('/user/my'));
   // }, []);
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, userInfo } = useAuth();
 
   const authData = useMemo(
     () => ({ isAuthenticated, loading }),
@@ -43,7 +43,7 @@ const App = () => {
       </Route>
       <Route element={<PrivateRoute authData={authData} />}>
         <Route path="select-room" element={<SelectRoom />} />
-        <Route path="my_page/*" element={<MyPage />} />
+        <Route path="my_page/*" element={<MyPage userInfo={userInfo} />} />
         <Route path="room/:roomId" element={<ImageRoom />} />
         <Route path="people_management/*" element={<PeopleManagement />} />
       </Route>
