@@ -30,8 +30,6 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
   const { roomImageList, roomImgListLoading, loadImage, clearRoomImageList } =
     useRoomImgData(roomId);
 
-  const memoizedRoomImageList = useMemo(() => roomImageList, [roomImageList]);
-
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
@@ -90,12 +88,16 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
     ),
   );
 
+  console.log('리스트 확인', roomImageList);
+
   return (
     <>
-      {memoizedRoomImageList.length !== 0 ? (
+      {!roomImageList ? (
+        <Spinner />
+      ) : roomImageList.length !== 0 ? (
         <>
           <ImageLayout>
-            {memoizedRoomImageList.map(
+            {roomImageList.map(
               (image: CImageData, index: number, thisArr: CImageData[]) => (
                 <ImageCard
                   key={image.id}
@@ -109,8 +111,6 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
           </ImageLayout>
           {roomImgListLoading && <Spinner />}
         </>
-      ) : roomImgListLoading ? (
-        <Spinner />
       ) : (
         <NotImageData>
           <IconContext.Provider
