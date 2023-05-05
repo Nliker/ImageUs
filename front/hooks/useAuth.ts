@@ -14,7 +14,7 @@ function useAuth() {
     fallbackData: { isAuthenticated: false, userInfo: null },
   });
 
-  const { trigger: logInRequestTrigger } = useSWRMutation(
+  const { trigger: logInTrigger } = useSWRMutation(
     '/user/login',
     logInRequestFetcher,
   );
@@ -26,7 +26,7 @@ function useAuth() {
     email: string;
     password: string;
   }) => {
-    await logInRequestTrigger({ email, password });
+    await logInTrigger({ email, password });
     await updateLogInData();
   };
 
