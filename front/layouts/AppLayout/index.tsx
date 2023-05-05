@@ -17,7 +17,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: modalData } = useModal();
-  const { data: userInfo } = useSWR('/user/my');
+  // const { data: userInfo } = useSWR('/user/my');
   const [sidebarState, setSidebarState] = useState<boolean>(false);
 
   // const toggleSidebar = useCallback(() => {
@@ -32,19 +32,11 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   // );
   // console.log('사이드바', sidebarState);
 
-  if (!userInfo || userInfo.logInState === 'LoggingOut') return <Spinner />;
-
   return (
     <Wrapper>
       <OuterContainer showModal={modalData?.currentModal}>
-        {userInfo?.logInState === 'LoggedIn' && <NavigationBar />}
-        <InnerContainer
-          style={
-            userInfo?.logInState === 'LoggedIn'
-              ? { height: 'calc(100% - 66px)' }
-              : undefined
-          }
-        >
+        <NavigationBar />
+        <InnerContainer>
           <SidebarContext.Provider value={{ setSidebarState }}>
             {isImageRoom && <SideBar show={sidebarState} />}
             {children}
