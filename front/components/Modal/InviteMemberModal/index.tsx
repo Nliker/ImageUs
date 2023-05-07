@@ -67,7 +67,7 @@ const InviteMemberModal = () => {
     });
   };
 
-  const requestInviteMember = () => {
+  const requestInviteMember = async () => {
     if (!roomId) return;
 
     const selectIdList = checkFriends.map((data) => data.id);
@@ -75,7 +75,8 @@ const InviteMemberModal = () => {
     if (selectIdList.length === 0) {
       alert('선택된 친구가 없습니다.');
     } else {
-      inviteMemberToRoom([...selectIdList]);
+      await inviteMemberToRoom([...selectIdList]);
+      alert('초대하였습니다!');
       clearModalCache();
     }
   };
