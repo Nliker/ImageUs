@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
@@ -21,17 +21,24 @@ const InviteMemberModal = () => {
   if (!roomId || !userId) return null;
 
   const { clearModalCache } = useModal();
-  const { roomList } = useRoomList(userId);
   const { friendList } = useFriendList();
   const { userListByRoom, inviteMemberToRoom } = useUserListByRoom(roomId);
 
   const size = { width: 412, height: 550 };
+
   const [canInviteFriends, setCanInviteFriends] = useState<
     AppendCheckFriendData[]
-  >(
-    useMemo<AppendCheckFriendData[]>(() => {
-      if (!roomList || !friendList || !roomId) return [];
+  >([]);
 
+  const checkFriends = useMemo<AppendCheckFriendData[]>(() => {
+    const checkList = canInviteFriends.filter((data) => data.check);
+    return [...checkList];
+  }, [canInviteFriends]);
+
+  useEffect(() => {
+    if (!friendList || !userListByRoom) return;
+
+    setCanInviteFriends((prev) => {
       const newList = friendList.filter((friend: DFriendData) => {
         const isRoomMember = userListByRoom?.some(
           (roomMember) => roomMember.id === friend.id,
@@ -43,14 +50,9 @@ const InviteMemberModal = () => {
         return { ...data, check: false };
       });
 
-      return [...appendCheckList];
-    }, [roomList, friendList]),
-  );
-
-  const checkFriends = useMemo<AppendCheckFriendData[]>(() => {
-    const checkList = canInviteFriends.filter((data) => data.check);
-    return [...checkList];
-  }, [canInviteFriends]);
+      return [...prev, ...appendCheckList];
+    });
+  }, [friendList, userListByRoom]);
 
   const onClickFriendList = (clickId: number) => () => {
     setCanInviteFriends((prevData: AppendCheckFriendData[]) => {

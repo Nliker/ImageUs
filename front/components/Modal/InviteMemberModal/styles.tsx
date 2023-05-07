@@ -25,7 +25,6 @@ export const ContentBox = styled.div`
         flex-direction: column;
         justify-content: center;
 
-        height: 100%;
         margin: auto;
         padding: 0 1rem;
         gap: 0.7rem;
