@@ -1,28 +1,31 @@
-import React, { DragEvent, useState, useEffect, useRef } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, {
+  DragEvent,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 
 import { useParams } from 'react-router';
+import { GoPlusSmall } from 'react-icons/go';
+import {
+  BsFilePlus,
+  BsPlusCircleDotted,
+  BsPlusLg,
+  BsPlusSquareDotted,
+} from 'react-icons/bs';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 
 import { Button } from '@styles/Button';
-import {
-  HeaderContainer,
-  ImageCover,
-  ImageDiv,
-  Modal,
-  ModalContainer,
-  ModalHeader,
-  ModalHeaderWrapper,
-  ModalImageBox,
-  ModalTitle,
-} from './styles';
+import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
 import useInput from '@hooks/useInput';
 import useModal from '@hooks/useModal';
-import useImageData from '@hooks/useUserImgData';
 import useUserImageData from '@hooks/useUserImgData';
 import useRoomImgData from '@hooks/useRoomImgData';
+import ModalLayout from '../ModalLayout';
+import { MdOutlineImageNotSupported } from 'react-icons/md';
 
 const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   const userId = sessionStorage.getItem('user_id');
@@ -32,10 +35,13 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   const { uploadUserImage } = useUserImageData(userId);
   const { uploadRoomImage } = useRoomImgData(roomId);
 
+  const size = { width: 412, height: 550 };
+
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(
     null,
   );
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
+  const [showImageCover, setShowImageCover] = useState(false);
   const [uploadFileName, setUploadFileName, handleUploadFileName] =
     useInput('');
   const [uploadImageFile, setUploadImageFile] = useState<FormData | null>(null);
@@ -68,18 +74,18 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
       return;
     }
 
-    console.log('위치 확인', uploadImageLocate, uploadImageFile);
-
     if (uploadImageLocate === 'room') {
       await uploadRoomImage(uploadImageFile);
     } else if (uploadImageLocate === 'user') {
       await uploadUserImage(uploadImageFile);
     }
+    alert('사진을 업로드하였습니다!');
     clearModalCache();
   };
 
   const onDropData = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setShowImageCover(false);
     const formData: any = new FormData();
 
     if (e.dataTransfer.items) {
@@ -106,14 +112,25 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
       }
     }
     const image = new Image();
-    image.src = URL.createObjectURL(formData.get('image'));
+    const imageData = formData.get('image');
+    image.src = URL.createObjectURL(imageData);
 
+    setUploadFileName(imageData.name);
     setTmpImageData(image);
     setUploadImageFile(formData);
   };
 
-  const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useMemo(
+    () => (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setShowImageCover(true);
+    },
+    [setShowImageCover],
+  );
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setShowImageCover(false);
   };
 
   const handleInputFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,63 +156,71 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   };
 
   return (
-    <ModalContainer>
-      <Modal>
-        <HeaderContainer>
-          <ModalHeaderWrapper>
-            <ModalHeader>
-              <ModalTitle>
-                <h2>
-                  {uploadImageLocate === 'room'
-                    ? '방에 사진 업로드'
-                    : '개인 저장소에 사진 업로드'}
-                </h2>
-              </ModalTitle>
-            </ModalHeader>
-          </ModalHeaderWrapper>
-        </HeaderContainer>
-        <div className={'content_box'}>
-          <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
-            <ImageDiv image={imageData}>
-              {!imageData && (
-                <div className="default_image">
-                  <IconContext.Provider
-                    value={{
-                      size: '50%',
-                      style: { display: 'inline-block' },
-                    }}
-                  >
-                    <BiImageAdd />
-                  </IconContext.Provider>
-                </div>
-              )}
-            </ImageDiv>
-            <div className="select_box">
-              <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
-              <div className="filebox">
-                <input
-                  className="upload-name"
-                  value={uploadFileName}
-                  readOnly
-                  placeholder="첨부파일"
-                />
-                <label htmlFor="file">파일찾기</label>
-                <input
-                  type="file"
-                  id="file"
-                  ref={inputFileRef}
-                  onChange={handleInputFile}
-                />
-              </div>
+    <ModalLayout currentModal="upload" size={size}>
+      <ContentBox>
+        <ImageBox onDrop={onDropData} onDragOver={handleDragOver}>
+          {!imageData ? (
+            <div className="default_image">
+              <IconContext.Provider
+                value={{
+                  size: '30%',
+                  style: { display: 'inline-block' },
+                }}
+              >
+                <BiImageAdd />
+              </IconContext.Provider>
             </div>
-            <ImageCover />
-          </ModalImageBox>
-        </div>
+          ) : (
+            <ImageDiv image={imageData} />
+          )}
+          <div className="select_box">
+            <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
+            <div className="filebox">
+              <input
+                className="upload-name"
+                value={uploadFileName}
+                readOnly
+                placeholder="첨부파일"
+              />
+              <label htmlFor="file">파일찾기</label>
+              <input
+                type="file"
+                id="file"
+                ref={inputFileRef}
+                onChange={handleInputFile}
+              />
+            </div>
+          </div>
+          {showImageCover && (
+            <ImageCover onDragLeave={handleDragLeave}>
+              <IconContext.Provider
+                value={{
+                  size: '30%',
+                  style: {
+                    display: 'inline-block',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: '#4d4d4d',
+                    pointerEvents: 'none',
+                  },
+                }}
+              >
+                <BsFilePlus
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                  }}
+                />
+              </IconContext.Provider>
+            </ImageCover>
+          )}
+        </ImageBox>
         <div className={'upload_btn'}>
           <Button onClick={onClickUpload}>업로드</Button>
         </div>
-      </Modal>
-    </ModalContainer>
+      </ContentBox>
+    </ModalLayout>
   );
 };
 
