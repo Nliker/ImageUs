@@ -13,8 +13,10 @@ const Modal = ({ modalData }: { modalData: IModalData }) => {
 
   if (state === 'off' || !currentModal) return null;
 
+  // console.log(currentModal, modalData);
+
   return (
-    <ModalLayout currentModal={currentModal}>
+    <>
       {currentModal === 'detailPicture' ? (
         <DetailPictureInfo
           imageInfo={modalData.detailPictureInfo as IDetailPictureInfo}
@@ -27,10 +29,10 @@ const Modal = ({ modalData }: { modalData: IModalData }) => {
         />
       ) : currentModal === 'createRoom' ? (
         <CreateRoomModal />
-      ) : (
+      ) : currentModal === 'inviteMember' ? (
         <InviteMemberModal />
-      )}
-    </ModalLayout>
+      ) : null}
+    </>
   );
 };
 
