@@ -41,7 +41,7 @@ const ModalLayout = ({ currentModal, size, children }: IProps) => {
 
     if (screenWidth * 0.8 < size.width) {
       const width = screenWidth * 0.8;
-      const height = width * (size.width / size.height);
+      const height = width * (size.height / size.width);
 
       return {
         width,
