@@ -44,6 +44,7 @@ export const ImageBox = styled.div`
   .select_box {
     flex: 1;
     position: relative;
+    text-align: center;
 
     .filebox {
       display: flex;
