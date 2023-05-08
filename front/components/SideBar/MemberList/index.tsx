@@ -37,19 +37,21 @@ const MemberList = memo(() => {
   }, [roomList]);
 
   const toggleMemberCollapse = () => setMemberCollapse((prev) => !prev);
-  const onClickKickOut = (memberInfo: DFriendData) => async () => {
-    if (!roomId) return;
 
-    const executeWork = async () =>
-      await kickOutMember(memberInfo.id, memberInfo.name);
+  const onClickKickOut =
+    (memberInfo: DFriendData) =>
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!roomId) return;
+      e.stopPropagation();
 
-    showAlertModal({
-      text: '방에서 나가시겠습니까?',
-      executeWork,
-    });
-  };
+      const executeWork = async () =>
+        await kickOutMember(memberInfo.id, memberInfo.name);
 
-  console.log(roomId, userListByRoom);
+      showAlertModal({
+        text: `${memberInfo.name}님을 강퇴하시겠습니까?`,
+        executeWork,
+      });
+    };
 
   if (!roomId || !userListByRoom) return <Spinner />;
 
