@@ -24,8 +24,7 @@ export const Background = styled.div`
   top: 0;
   z-index: 1000;
 
-  background-color: rgb(0 0 0 / 0%);
-  /* background-color: rgba(0, 0, 0, 0.65); */
+  background-color: rgb(0 0 0 / 40%);
 `;
 
 export const CloseBtn = styled.div`
@@ -71,8 +70,6 @@ export const Container = styled.div<IContainerProps>`
   align-items: center;
   z-index: 1001;
 
-  /* width: 60%;
-  height: 80%; */
   width: ${({ size }) => size.width + 'px'};
   height: ${({ size }) => size.height + 'px'};
   min-width: 320px;
@@ -88,7 +85,6 @@ export const Container = styled.div<IContainerProps>`
 `;
 
 export const Content = styled.div`
-  flex: 1 0 auto;
-
   width: 100%;
+  height: calc(100% - 40px);
 `;
