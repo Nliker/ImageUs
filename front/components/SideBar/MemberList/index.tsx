@@ -13,6 +13,7 @@ import { DFriendData } from '@typing/db';
 import useUserData from '@hooks/useUserData';
 import useRoomList from '@hooks/useRoomList';
 import useUserListByRoom from '@hooks/useUserListByRoom';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const preventClickCSS = {
   pointerEvents: 'none' as React.CSSProperties['pointerEvents'],
@@ -44,8 +45,15 @@ const MemberList = memo(() => {
       if (!roomId) return;
       e.stopPropagation();
 
-      const executeWork = async () =>
-        await kickOutMember(memberInfo.id, memberInfo.name);
+      const executeWork = async () => {
+        try {
+          await kickOutMember(memberInfo.id);
+          alert(`${memberInfo.name}님을 강퇴하였습니다..`);
+        } catch (error) {
+          const message = getErrorMessage(error);
+          alert(message);
+        }
+      };
 
       showAlertModal({
         text: `${memberInfo.name}님을 강퇴하시겠습니까?`,

@@ -18,18 +18,22 @@ function useUserListByRoom(roomId: string) {
   );
 
   const inviteMemberToRoom = async (selectIdList: number[]) => {
-    await inviteFriendFetcher(`/room/${roomId}/user`, { arg: selectIdList });
-    await userListMutate();
-  };
-
-  const kickOutMember = async (memberId: number, memberName: string) => {
     try {
-      await deleteMemberFetcher(`/room/${roomId}/user`, { arg: memberId });
-      alert(`${memberName}님을 강퇴하였습니다..`);
+      await inviteFriendFetcher(`/room/${roomId}/user`, { arg: selectIdList });
       await userListMutate();
     } catch (error) {
       const message = getErrorMessage(error);
-      alert(message);
+      throw new Error(message);
+    }
+  };
+
+  const kickOutMember = async (memberId: number) => {
+    try {
+      await deleteMemberFetcher(`/room/${roomId}/user`, { arg: memberId });
+      await userListMutate();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
     }
   };
 

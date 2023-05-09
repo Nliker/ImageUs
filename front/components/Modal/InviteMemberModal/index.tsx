@@ -12,6 +12,7 @@ import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
 import useUserListByRoom from '@hooks/useUserListByRoom';
 import ModalLayout from '../ModalLayout';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
@@ -70,14 +71,19 @@ const InviteMemberModal = () => {
   const requestInviteMember = async () => {
     if (!roomId) return;
 
-    const selectIdList = checkFriends.map((data) => data.id);
+    try {
+      const selectIdList = checkFriends.map((data) => data.id);
 
-    if (selectIdList.length === 0) {
-      alert('선택된 친구가 없습니다.');
-    } else {
-      await inviteMemberToRoom([...selectIdList]);
-      alert('초대하였습니다!');
-      clearModalCache();
+      if (selectIdList.length === 0) {
+        alert('선택된 친구가 없습니다.');
+      } else {
+        await inviteMemberToRoom([...selectIdList]);
+        alert('초대하였습니다!');
+        clearModalCache();
+      }
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
     }
   };
 

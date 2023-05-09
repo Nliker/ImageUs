@@ -4,13 +4,13 @@ import { getToken } from './getToken';
 import { getErrorMessage } from './getErrorMessage';
 
 const getUserListByRmFetcher = async (url: string) => {
-  const { token } = await getToken();
-
-  if (!token) {
-    throw new Error();
-  }
-
   try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+    }
+
     const response = await axios.get('/backapi' + url, {
       headers: {
         Authorization: token,
@@ -19,7 +19,12 @@ const getUserListByRmFetcher = async (url: string) => {
     const userlist: DFriendData[] = response.data.userlist;
     return [...userlist];
   } catch (err) {
-    throw new Error('예기치 못한 오류가 발생하였습니다.');
+    if (err instanceof AxiosError) {
+      throw new Error('방의 멤버 목록을 받아오지 못했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
@@ -33,7 +38,7 @@ const inviteFriendFetcher = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     await axios.post(
@@ -48,8 +53,12 @@ const inviteFriendFetcher = async (
       },
     );
   } catch (err) {
-    alert('친구를 초대하지 못했습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('친구를 초대하지 못했습니다..다시 시도해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
@@ -121,7 +130,7 @@ const deleteMemberFetcher = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     await axios.delete('/backapi' + url, {
@@ -131,12 +140,11 @@ const deleteMemberFetcher = async (
       },
     });
   } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 403) {
-      throw new Error('방장이 아닙니다.');
-      // alert('방장이 아닙니다.');
+    if (err instanceof AxiosError) {
+      throw new Error('멤버를 강퇴하지 못했습니다..다시시도 해주세요.');
     } else {
-      throw new Error('예기치 못한 오류가 발생하였습니다.');
-      // alert('예기치 못한 오류가 발생하였습니다.');
+      const message = getErrorMessage(err);
+      throw new Error(message);
     }
   }
 };
