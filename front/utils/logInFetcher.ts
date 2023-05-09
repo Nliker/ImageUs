@@ -61,7 +61,7 @@ const socialLoginFetcher = async ([url, coperation, code]: [
   string,
 ]) => {
   try {
-    if (!coperation || !code) throw new Error('올바른 요청이 아닙니다..');
+    if (!coperation || !code) throw new Error('유효한 요청이 아닙니다..');
 
     const response = await axios.get(
       '/backapi' + `${url}?coperation=${coperation}&code=${code}`,
@@ -82,8 +82,12 @@ const socialLoginFetcher = async ([url, coperation, code]: [
 
     return true;
   } catch (err) {
-    alert('로그인 요청에 실패했습니다..');
-    return false;
+    if (err instanceof AxiosError) {
+      throw new Error('로그인 요청에 실패했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 

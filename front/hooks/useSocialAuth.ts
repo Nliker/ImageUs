@@ -44,13 +44,14 @@ function useSocialAuth(props: IProps) {
         code: code as string,
       }));
     } else {
-      throw new Error('Invalid Param');
+      throw new Error('유효한 요청이 아닙니다..');
     }
   }, [props]);
 
   return {
     isAuthenticated,
     loading: (!isAuthenticated && !error) || isValidating,
+    error,
   };
 }
 
