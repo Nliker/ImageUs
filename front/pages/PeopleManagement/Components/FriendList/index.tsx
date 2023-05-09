@@ -9,24 +9,33 @@ import {
   getUserFdListFetcher,
   deleteFriendFetcher,
 } from '@utils/userDataFetcher';
+import useFriendList from '@hooks/useFriendList';
+import { getErrorMessage } from '@utils/getErrorMessage';
+import useModal from '@hooks/useModal';
 
 const FriendList = () => {
-  const { data: friendListData, mutate: friendListMutate } = useSWR<
-    DFriendData[]
-  >('friendlist', getUserFdListFetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-  const { trigger } = useSWRMutation('deleteFriend', deleteFriendFetcher);
+  // const { data: friendListData, mutate: friendListMutate } = useSWR<
+  //   DFriendData[]
+  // >('friendlist', getUserFdListFetcher, {
+  //   revalidateIfStale: false,
+  //   revalidateOnFocus: false,
+  //   revalidateOnReconnect: false,
+  // });
+  // const { trigger } = useSWRMutation('deleteFriend', deleteFriendFetcher);
+  const { showAlertModal } = useModal();
+  const { friendList, deleteFriend } = useFriendList();
 
-  const handleDeleteFriend = useCallback(
-    (friendId: number | undefined) => async () => {
-      await trigger(friendId);
-      await friendListMutate();
-    },
-    [],
-  );
+  const handleDeleteFriend =
+    (friendData: DFriendData) =>
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+
+      const executeWork = async () => await deleteFriend(friendData.id);
+      showAlertModal({
+        text: `${friendData.name}을 친구목록에서 삭제하시겠습니까?`,
+        executeWork,
+      });
+    };
 
   return (
     <Wrapper>
@@ -46,15 +55,15 @@ const FriendList = () => {
           </tr>
         </thead>
         <tbody>
-          {friendListData?.length !== 0 ? (
-            friendListData?.map((data: DFriendData) => (
+          {friendList?.length !== 0 ? (
+            friendList?.map((data: DFriendData) => (
               <tr key={data.id}>
                 <td>{data.name}</td>
                 <td>{data.email}</td>
                 <td>{data.user_type}</td>
                 <td>
                   <div className="delete_btn">
-                    <Button type="button" onClick={handleDeleteFriend(data.id)}>
+                    <Button type="button" onClick={handleDeleteFriend(data)}>
                       삭제
                     </Button>
                   </div>
