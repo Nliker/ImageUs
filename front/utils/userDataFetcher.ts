@@ -120,7 +120,7 @@ const getUserRoomListFetcher = async (url: string) => {
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     const response = await axios.get('/backapi' + url, {
@@ -133,8 +133,12 @@ const getUserRoomListFetcher = async (url: string) => {
 
     return roomlist;
   } catch (err) {
-    console.error('에러', err);
-    return null;
+    if (err instanceof AxiosError) {
+      throw new Error('방의 목록을 불러오는데 실패했습니다..새로고침 하세요..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 

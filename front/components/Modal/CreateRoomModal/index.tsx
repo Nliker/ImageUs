@@ -17,6 +17,7 @@ import useModal from '@hooks/useModal';
 import useRoomList from '@hooks/useRoomList';
 import ModalLayout from '../ModalLayout';
 import useFriendList from '@hooks/useFriendList';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
@@ -78,9 +79,14 @@ const CreateRoomModal = () => {
   };
 
   const createRoomRequest = async () => {
-    const selectMemberIdList = checkFriends.map((data) => data.id);
-    await createRoom({ selectMemberIdList, roomName });
-    clearModalCache();
+    try {
+      const selectMemberIdList = checkFriends.map((data) => data.id);
+      await createRoom({ selectMemberIdList, roomName });
+      clearModalCache();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
   };
 
   return (

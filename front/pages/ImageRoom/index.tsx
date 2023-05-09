@@ -32,6 +32,7 @@ import ImageSection from './Components/ImageSection';
 import { SelectTerm } from '@typing/client';
 import SidebarContext from '@utils/SidebarContext';
 import useRoomList from '@hooks/useRoomList';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
 
@@ -144,8 +145,13 @@ const ImageRoom = () => {
 
   const onClickLeaveRoom = () => {
     const executeWork = async () => {
-      await leaveRoom(roomId);
-      navigate('/select-room');
+      try {
+        await leaveRoom(roomId);
+        navigate('/select-room', { replace: true });
+      } catch (error) {
+        const message = getErrorMessage(error);
+        alert(message);
+      }
     };
 
     showAlertModal({ text: '방에서 나가시겠습니까?', executeWork });

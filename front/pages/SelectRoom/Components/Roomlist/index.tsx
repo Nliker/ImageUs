@@ -10,6 +10,7 @@ import { TbDoorExit } from 'react-icons/tb';
 import useModal from '@hooks/useModal';
 import useUserData from '@hooks/useUserData';
 import useRoomList from '@hooks/useRoomList';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 function Roomlist() {
   const userId = sessionStorage.getItem('user_id');
@@ -25,7 +26,12 @@ function Roomlist() {
       e.stopPropagation();
 
       const executeWork = async () => {
-        await leaveRoom('' + roomData.id);
+        try {
+          await leaveRoom('' + roomData.id);
+        } catch (error) {
+          const message = getErrorMessage(error);
+          alert(message);
+        }
       };
 
       showAlertModal({

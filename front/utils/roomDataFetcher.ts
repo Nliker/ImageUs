@@ -1,6 +1,7 @@
 import { DFriendData, DImageData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
+import { getErrorMessage } from './getErrorMessage';
 
 const getUserListByRmFetcher = async (url: string) => {
   const { token } = await getToken();
@@ -60,7 +61,7 @@ const createRoomFetcher = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     const { selectMemberIdList, roomName } = arg;
@@ -77,34 +78,38 @@ const createRoomFetcher = async (
         },
       },
     );
-    alert('방을 생성하였습니다.');
   } catch (err) {
-    alert('방을 생성하지 못했습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('방을 생성하지 못했습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
 const leaveRoomFetcher = async (
   url: string,
-  { arg: roomId }: { arg?: string },
+  { arg: roomId }: { arg: string },
 ) => {
   try {
-    if (!roomId) throw new Error('올바른 요청이 아닙니다.');
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     await axios.delete('/backapi' + url, {
       headers: { Authorization: token },
       data: { delete_user_room_id: roomId },
     });
-
-    alert('성공적으로 나갔습니다.');
   } catch (err) {
-    alert('요청을 실패했습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('방에서 나가지 못하였습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 

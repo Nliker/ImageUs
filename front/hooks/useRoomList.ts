@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { DRoomData } from '@typing/db';
 import { createRoomFetcher, leaveRoomFetcher } from '@utils/roomDataFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 interface ICreateRoomParam {
   selectMemberIdList: number[];
@@ -56,13 +57,23 @@ function useRoomList(userId: string) {
     selectMemberIdList,
     roomName,
   }: ICreateRoomParam) => {
-    await createRoomTrigger({ selectMemberIdList, roomName });
-    await roomListMutate();
+    try {
+      await createRoomTrigger({ selectMemberIdList, roomName });
+      await roomListMutate();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
   };
 
   const leaveRoom = async (roomId: string) => {
-    await leaveRoomTrigger(roomId);
-    await roomListMutate();
+    try {
+      await leaveRoomTrigger(roomId);
+      await roomListMutate();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
   };
 
   return {
