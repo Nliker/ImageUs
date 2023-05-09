@@ -10,6 +10,7 @@ import { changeUserInfoFetcher } from '@utils/userDataFetcher';
 import useAuth from '@hooks/useAuth';
 import useUserData from '@hooks/useUserData';
 import { DUserInfo } from '@typing/db';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
@@ -18,15 +19,20 @@ const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
 
   // const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
   // const { userInfo } = useAuth();
-  const { requestChangeName } = useUserData(userId);
+  const { requestChangeName } = useUserData();
   const [nameInput, setNameInput, handleNameInput] = useInput('');
 
   const [nameBoxState, setNameBoxState] = useState(false);
 
   const onClickChangeName = async () => {
-    await requestChangeName(nameInput);
-    setNameInput('');
-    setNameBoxState(false);
+    try {
+      await requestChangeName(nameInput);
+      setNameInput('');
+      setNameBoxState(false);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
   };
 
   return (

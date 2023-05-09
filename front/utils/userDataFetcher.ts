@@ -150,7 +150,7 @@ const changeUserInfoFetcher = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     const postData: { name: string } = { name: arg.name };
@@ -158,10 +158,13 @@ const changeUserInfoFetcher = async (
     await axios.post('/backapi' + url, postData, {
       headers: { Authorization: token },
     });
-    alert('변경되었습니다.');
   } catch (err) {
-    alert('요청을 실패하였습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('정보를 변경하지 못하였습니다다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 

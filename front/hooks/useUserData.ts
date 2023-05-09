@@ -4,15 +4,22 @@ import {
   getUserImgLenFetcher,
 } from '@utils/userDataFetcher';
 import useSWRMutation from 'swr/mutation';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
-function useUserData(userId: string) {
+function useUserData() {
   const { trigger: changeUserNameTrigger } = useSWRMutation(
     '/user/my',
     changeUserInfoFetcher,
   );
 
-  const requestChangeName = async (nameValue: string) =>
-    await changeUserNameTrigger({ name: nameValue });
+  const requestChangeName = async (nameValue: string) => {
+    try {
+      await changeUserNameTrigger({ name: nameValue });
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
+  };
 
   return {
     requestChangeName,
