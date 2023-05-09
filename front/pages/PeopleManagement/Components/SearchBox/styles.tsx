@@ -71,34 +71,40 @@ export const PreviewBox = styled.div`
   position: absolute;
 
   width: calc(100% - 180px);
+  height: 200px;
   margin-left: 20px;
 
   border-radius: 5px;
   box-shadow: rgb(0 0 0 / 30%) 0px 8px 12px 0px;
   background-color: white;
 
-  ul li {
-    padding: 10px 0;
+  ul {
+    li.preview_li {
+      border-bottom: 1px solid #e9ecef;
 
-    .search_result_space {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 0.3rem;
+      &:hover {
+        background-color: #f7f7f9;
+        cursor: pointer;
+      }
 
-      span:first-of-type {
-        margin-bottom: 5px;
+      .search_result_space {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
 
-  ul li.preview_li {
-    border-bottom: 1px solid #e9ecef;
+  .no_data {
+    height: 100%;
 
-    &:hover {
-      background-color: #f7f7f9;
-      cursor: pointer;
+    text-align: center;
+
+    p {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
     }
   }
 `;
