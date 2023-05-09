@@ -51,9 +51,13 @@ function useRoomImgData(roomId?: string) {
   );
 
   const uploadRoomImage = async (uploadImageFile: FormData) => {
-    await uploadRoomImageTrigger({ uploadImageFile });
-
-    await mutateRealTimeImage();
+    try {
+      await uploadRoomImageTrigger({ uploadImageFile });
+      await mutateRealTimeImage();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
   };
 
   const deleteRoomImage = async (imageId: number) => {
@@ -61,13 +65,11 @@ function useRoomImgData(roomId?: string) {
       if (!roomImageList) return;
 
       await deleteRoomImgTrigger(imageId);
-      alert('이미지를 삭제하였습니다');
-      // 해당 아이디를 필터링해서 mutate 시키기
       const filterImgList = roomImageList.filter((data) => data.id !== imageId);
       mutateRoomImage([...filterImgList], false);
     } catch (error) {
       const message = getErrorMessage(error);
-      alert(message);
+      throw new Error(message);
     }
   };
 
@@ -79,87 +81,104 @@ function useRoomImgData(roomId?: string) {
 
     if (imgDataListLoading) return false;
 
-    if (loadImgTypeInfo.isfiltered) {
-      const newData = await getFilterImgFetcher(
-        `/room/${roomId}/imagelist/bydate`,
-        {
-          arg: {
-            start: readStartNumber,
-            start_date: filterStartDate,
-            end_date: filterEndDate,
+    try {
+      if (loadImgTypeInfo.isfiltered) {
+        const newData = await getFilterImgFetcher(
+          `/room/${roomId}/imagelist/bydate`,
+          {
+            arg: {
+              start: readStartNumber,
+              start_date: filterStartDate,
+              end_date: filterEndDate,
+            },
           },
-        },
-      );
-      const { imagelist, loadCompleted } = newData;
+        );
+        const { imagelist, loadCompleted } = newData;
 
-      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
-      mutateRoomImage(
-        (prevData: CImageData[] | undefined) => {
-          if (!prevData) {
-            return [...newImageDataList];
-          } else {
-            return [...prevData, ...newImageDataList];
-          }
-        },
-        {
-          revalidate: false,
-        },
-      );
+        const newImageDataList =
+          (await imgDataListTrigger([...imagelist])) ?? [];
+        mutateRoomImage(
+          (prevData: CImageData[] | undefined) => {
+            if (!prevData) {
+              return [...newImageDataList];
+            } else {
+              return [...prevData, ...newImageDataList];
+            }
+          },
+          {
+            revalidate: false,
+          },
+        );
 
-      if (loadCompleted) {
-        return true;
+        if (loadCompleted) {
+          return true;
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        const newData = await getDefaultImgFetcher(
+          `/room/${roomId}/imagelist`,
+          {
+            arg: {
+              start: readStartNumber,
+            },
+          },
+        );
+
+        const { imagelist, loadCompleted } = newData;
+
+        const newImageDataList =
+          (await imgDataListTrigger([...imagelist])) ?? [];
+        mutateRoomImage(
+          (prevData: CImageData[] | undefined) => {
+            if (!prevData) {
+              return [...newImageDataList];
+            } else {
+              return [...prevData, ...newImageDataList];
+            }
+          },
+          {
+            revalidate: false,
+          },
+        );
+
+        if (loadCompleted) {
+          return true;
+        } else {
+          return false;
+        }
       }
-    } else {
-      const newData = await getDefaultImgFetcher(`/room/${roomId}/imagelist`, {
-        arg: {
-          start: readStartNumber,
-        },
-      });
-
-      const { imagelist, loadCompleted } = newData;
-
-      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
-      mutateRoomImage(
-        (prevData: CImageData[] | undefined) => {
-          if (!prevData) {
-            return [...newImageDataList];
-          } else {
-            return [...prevData, ...newImageDataList];
-          }
-        },
-        {
-          revalidate: false,
-        },
-      );
-
-      if (loadCompleted) {
-        return true;
-      } else {
-        return false;
-      }
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
     }
   };
 
   const clearRoomImageList = () => {
-    console.log('클리어');
     mutateRoomImage(undefined, false);
   };
 
   async function updateImageList() {
-    const newData = await getUnreadImgFetcher(
-      `/room/${roomId}/unread-imagelist`,
-    );
+    try {
+      const newData = await getUnreadImgFetcher(
+        `/room/${roomId}/unread-imagelist`,
+      );
 
-    await mutateRoomImage(async () => await imgDataListTrigger([...newData]), {
-      populateCache: (newData, currentData) => {
-        if (!currentData) return [];
-        if (!newData) return [...currentData];
-        return [...newData, ...currentData];
-      },
-      revalidate: false,
-    });
+      await mutateRoomImage(
+        async () => await imgDataListTrigger([...newData]),
+        {
+          populateCache: (newData, currentData) => {
+            if (!currentData) return [];
+            if (!newData) return [...currentData];
+            return [...newData, ...currentData];
+          },
+          revalidate: false,
+        },
+      );
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
   }
 
   return {

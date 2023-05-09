@@ -26,6 +26,7 @@ import useUserImageData from '@hooks/useUserImgData';
 import useRoomImgData from '@hooks/useRoomImgData';
 import ModalLayout from '../ModalLayout';
 import { MdOutlineImageNotSupported } from 'react-icons/md';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   const userId = sessionStorage.getItem('user_id');
@@ -69,18 +70,22 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   }, [tmpImageData]);
 
   const onClickUpload = async () => {
-    if (!uploadImageFile) {
-      alert('이미지를 등록해주세요');
-      return;
-    }
+    try {
+      if (!uploadImageFile) {
+        throw new Error('이미지를 등록해주세요');
+      }
 
-    if (uploadImageLocate === 'room') {
-      await uploadRoomImage(uploadImageFile);
-    } else if (uploadImageLocate === 'user') {
-      await uploadUserImage(uploadImageFile);
+      if (uploadImageLocate === 'room') {
+        await uploadRoomImage(uploadImageFile);
+      } else if (uploadImageLocate === 'user') {
+        await uploadUserImage(uploadImageFile);
+      }
+      alert('사진을 업로드하였습니다!');
+      clearModalCache();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
     }
-    alert('사진을 업로드하였습니다!');
-    clearModalCache();
   };
 
   const onDropData = (e: DragEvent<HTMLDivElement>) => {
