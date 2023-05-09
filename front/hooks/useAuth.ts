@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@utils/getErrorMessage';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -26,8 +27,13 @@ function useAuth() {
     email: string;
     password: string;
   }) => {
-    await logInTrigger({ email, password });
-    await updateLogInData();
+    try {
+      await logInTrigger({ email, password });
+      await updateLogInData();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
+    }
   };
 
   return {

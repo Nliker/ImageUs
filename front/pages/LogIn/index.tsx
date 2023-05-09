@@ -12,6 +12,7 @@ import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
 import useAuth from '@hooks/useAuth';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const LogIn = () => {
   const navigate = useNavigate();
@@ -74,8 +75,13 @@ const LogIn = () => {
     } else if (!pwCheck) {
       alert('비밀번호를 다시 확인해주세요.');
     } else {
-      await logInRequest({ email: emailValue, password: passwordValue });
-      navigate('/select-room', { replace: true });
+      try {
+        await logInRequest({ email: emailValue, password: passwordValue });
+        navigate('/select-room', { replace: true });
+      } catch (error) {
+        const message = getErrorMessage(error);
+        alert(message);
+      }
     }
   };
 

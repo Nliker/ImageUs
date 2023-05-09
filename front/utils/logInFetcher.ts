@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { DUserInfo } from '@typing/db';
+import { getErrorMessage } from './getErrorMessage';
 
 const logInCheckFetcher = async (url: string) => {
   try {
@@ -42,18 +43,15 @@ const logInRequestFetcher = async (
       response.data.refresh_token_expire_time,
     );
     sessionStorage.setItem('user_id', response.data.user_id);
-
-    return true;
   } catch (err) {
     if (
       err instanceof AxiosError &&
       (err.response?.status === 404 || err.response?.status === 401)
     ) {
-      alert(err.response.data.message);
+      throw new Error(err.response.data.message);
     } else {
-      alert('로그인 요청에 실패했습니다..');
+      throw new Error('로그인 요청에 실패하였습니다..');
     }
-    return false;
   }
 };
 
