@@ -105,12 +105,12 @@ const deleteFriendFetcher = async (url: string, { arg }: { arg: number }) => {
     });
   } catch (err) {
     if (err instanceof AxiosError) {
-      const message = getErrorMessage(err);
-      throw new Error(message);
-    } else {
       throw new Error(
         '친구 목록에서 삭제하지 못하였습니다..다시 시도해주세요..',
       );
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
     }
   }
 };
