@@ -32,23 +32,21 @@ function useFriendList() {
   const registerFriend = async (friendId: number) => {
     try {
       await registerFriendTrigger(friendId);
+      await mutateFriendList();
     } catch (error) {
       const message = getErrorMessage(error);
-      alert('친구 목록에 추가하지 못하였습니다..다시 시도해주세요');
-      console.error(message);
+      throw new Error(message);
     }
-    await mutateFriendList();
   };
 
   const deleteFriend = async (friendId: number) => {
     try {
       await deleteFreindTrigger(friendId);
+      await mutateFriendList();
     } catch (error) {
       const message = getErrorMessage(error);
-      alert('친구 목록에서 삭제하지 못하였습니다..다시 시도해주세요');
-      console.error(message);
+      throw new Error(message);
     }
-    await mutateFriendList();
   };
 
   return {

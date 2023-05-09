@@ -13,6 +13,7 @@ import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 import { addFriendFetcher } from '@utils/userDataFetcher';
 import useFriendList from '@hooks/useFriendList';
 import Scrollbars from 'react-custom-scrollbars-2';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const SearchBox = () => {
   // const { mutate } = useSWRConfig();
@@ -67,7 +68,13 @@ const SearchBox = () => {
   );
 
   const onClickAddFriend = (friendId: number) => async () => {
-    await registerFriend(friendId);
+    try {
+      await registerFriend(friendId);
+      alert('친구 목록에 추가하였습니다!');
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
   };
 
   return (

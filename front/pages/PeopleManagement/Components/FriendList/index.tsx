@@ -30,7 +30,15 @@ const FriendList = () => {
     async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
 
-      const executeWork = async () => await deleteFriend(friendData.id);
+      const executeWork = async () => {
+        try {
+          await deleteFriend(friendData.id);
+          alert('친구 목록에서 삭제하였습니다!');
+        } catch (error) {
+          const message = getErrorMessage(error);
+          alert(message);
+        }
+      };
       showAlertModal({
         text: `${friendData.name}을 친구목록에서 삭제하시겠습니까?`,
         executeWork,
