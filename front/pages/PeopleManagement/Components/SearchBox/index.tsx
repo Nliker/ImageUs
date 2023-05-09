@@ -11,11 +11,17 @@ import searchFetcher from '@utils/searchFetcher';
 import { Button } from '@styles/Button';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 import { addFriendFetcher } from '@utils/userDataFetcher';
+import useFriendList from '@hooks/useFriendList';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 const SearchBox = () => {
-  const { mutate } = useSWRConfig();
+  // const { mutate } = useSWRConfig();
   const [queryParams, setQueryParams] = useState('');
+  const [focusSearchBox, setFocusSearchBox] = useState(false);
+  const [searchData, setSearchData] = useState<DFriendData>();
+  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
 
+  const { registerFriend } = useFriendList();
   const { data: prevSearchDataList } = useSWR(
     `/user/search?email=${queryParams}`,
     searchFetcher,
@@ -26,14 +32,6 @@ const SearchBox = () => {
       keepPreviousData: true,
     },
   );
-  const { trigger: registerFriendTrigger } = useSWRMutation(
-    '/user/friend',
-    addFriendFetcher,
-  );
-
-  const [focusSearchBox, setFocusSearchBox] = useState(false);
-  const [searchData, setSearchData] = useState<DFriendData>();
-  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -68,12 +66,9 @@ const SearchBox = () => {
     [prevSearchDataList],
   );
 
-  const onClickAddFriend = useCallback(
-    (friendId?: number) => () => {
-      mutate('friendlist', registerFriendTrigger(friendId));
-    },
-    [searchData],
-  );
+  const onClickAddFriend = (friendId: number) => async () => {
+    await registerFriend(friendId);
+  };
 
   return (
     <Wrapper>
@@ -99,29 +94,29 @@ const SearchBox = () => {
         </form>
         {focusSearchBox && (
           <PreviewBox>
-            <ul>
+            <Scrollbars>
               {prevSearchDataList && prevSearchDataList?.length !== 0 ? (
                 prevSearchDataList.map((data: DFriendData) => (
-                  <li
-                    key={data.id}
-                    className={'preview_li'}
-                    onMouseDown={onClickPreviewItem(data)}
-                  >
-                    <div className="search_result_space">
-                      <span>이메일: {data.email}</span>
-                      <span>이름: {data.name}</span>
-                      <span>가입유형: {data.user_type}</span>
-                    </div>
-                  </li>
+                  <ul>
+                    <li
+                      key={data.id}
+                      className={'preview_li'}
+                      onMouseDown={onClickPreviewItem(data)}
+                    >
+                      <div className="search_result_space">
+                        <span>이름: {data.name}</span>
+                        <span>이메일: {data.email}</span>
+                        <span>가입유형: {data.user_type}</span>
+                      </div>
+                    </li>
+                  </ul>
                 ))
               ) : (
-                <li>
-                  <div>
-                    <span>검색 결과가 없습니다.</span>
-                  </div>
-                </li>
+                <div className="no_data">
+                  <p>검색 결과가 없습니다.</p>
+                </div>
               )}
-            </ul>
+            </Scrollbars>
           </PreviewBox>
         )}
       </InputBox>
