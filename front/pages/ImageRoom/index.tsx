@@ -1,7 +1,5 @@
 import React, {
   createContext,
-  useContext,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -17,13 +15,11 @@ import AppLayout from '@layouts/AppLayout';
 import {
   LeftHeaderIcon,
   ContentBox,
-  ContentSectionWrapper,
   FilteringOption,
   MainContainer,
   UploadButton,
 } from './styles';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
 import Scrollbars from 'react-custom-scrollbars-2';
 import {
   MdKeyboardArrowDown,
@@ -34,7 +30,7 @@ import { TbDoorExit } from 'react-icons/tb';
 import { Button } from '@styles/Button';
 import ImageSection from './Components/ImageSection';
 import { SelectTerm } from '@typing/client';
-import SidebarContext, { useSidebarContext } from '@utils/SidebarContext';
+import SidebarContext from '@utils/SidebarContext';
 import useRoomList from '@hooks/useRoomList';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
@@ -48,11 +44,10 @@ const ImageRoom = () => {
   const { showUploadImgModal } = useModal();
   const { showAlertModal } = useModal();
   const { roomList, leaveRoom } = useRoomList(userId);
-  // const { setState } = useSidebarContext();
-  const { setSidebarState } = useContext(SidebarContext);
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  const [filterNum, setFilterNum] = useState(0);
+  const [filterTagName, setFilterTagName] = useState('전체 게시물');
+  const [filterStateNum, setFilterStateNum] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
   const [showSelectDateForm, setShowSelectDateForm] = useState(false);
   const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>({
@@ -62,8 +57,6 @@ const ImageRoom = () => {
 
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
-
-  const filterState = ['전체 게시물', '오늘 날짜', '어제 날짜', '기간 선택'];
 
   useEffect(() => {
     const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -93,7 +86,9 @@ const ImageRoom = () => {
     if (targetElement.closest('#today')) {
       const { selectDate } = getDateString(new Date());
 
-      setFilterNum(1);
+      setShowSelectDateForm(false);
+      setFilterStateNum(1);
+      setFilterTagName('오늘 게시물');
       setFilterSelectTerm((prev) => ({
         ...prev,
         startDate: selectDate,
@@ -104,7 +99,9 @@ const ImageRoom = () => {
       dateValue.setDate(dateValue.getDate() - 1);
       const { selectDate } = getDateString(dateValue);
 
-      setFilterNum(2);
+      setShowSelectDateForm(false);
+      setFilterStateNum(2);
+      setFilterTagName('어제 날짜');
       setFilterSelectTerm((prev) => ({
         ...prev,
         startDate: selectDate,
@@ -112,8 +109,11 @@ const ImageRoom = () => {
       }));
     } else if (targetElement.closest('#selectDay')) {
       setShowSelectDateForm(true);
+      setFilterTagName('날짜 선택');
     } else if (targetElement.closest('#default')) {
-      setFilterNum(0);
+      setShowSelectDateForm(false);
+      setFilterTagName('전체 게시물');
+      setFilterStateNum(0);
       setFilterSelectTerm((prev) => ({ ...prev, startDate: '', endDate: '' }));
     }
     setFilterBoxState(false);
@@ -137,7 +137,7 @@ const ImageRoom = () => {
       return;
     }
 
-    setFilterNum(3);
+    setFilterStateNum(3);
     setFilterSelectTerm((prev) => ({ ...prev, startDate, endDate }));
     setShowSelectDateForm(false);
   };
@@ -145,7 +145,6 @@ const ImageRoom = () => {
   const onClickLeaveRoom = () => {
     const executeWork = async () => {
       await leaveRoom(roomId);
-      // await fetchRoomList();
       navigate('/select-room');
     };
 
@@ -154,12 +153,12 @@ const ImageRoom = () => {
 
   const loadImgTypeInfo = useMemo(
     () => ({
-      isfiltered: filterNum !== 0 ? true : false,
-      filterState: filterNum,
+      isfiltered: filterStateNum !== 0 ? true : false,
+      filterState: filterStateNum,
       filterStartDate: filterSelectTerm.startDate,
       filterEndDate: filterSelectTerm.endDate,
     }),
-    [filterSelectTerm, filterNum],
+    [filterSelectTerm, filterStateNum],
   );
 
   const checkValideRoomId = () => {
@@ -178,19 +177,15 @@ const ImageRoom = () => {
     showUploadImgModal('room');
   };
 
-  const handleSideBar = () => {
-    console.log(setSidebarState);
-    setSidebarState(true);
-  };
-
   if (!checkValideRoomId()) {
-    return <Navigate to="/" />;
+    alert('잘못된 접근입니다.');
+    return <Navigate to="/select-room" />;
   }
 
   return (
     <AppLayout isImageRoom>
       <DeviceCheckContext.Provider value={isMobile}>
-        {/* <MainSection key={roomId} /> */}
+        {}
         <Scrollbars>
           <MainContainer>
             <LeftHeaderIcon>
@@ -231,7 +226,7 @@ const ImageRoom = () => {
                   <input type="checkbox" id="options-view-button" />
                   <div id="select-button">
                     <div className="selected-value">
-                      <span>{filterState[filterNum]}</span>
+                      <span>{filterTagName}</span>
                     </div>
                     <div id="chevrons">
                       <MdKeyboardArrowUp />
@@ -247,7 +242,7 @@ const ImageRoom = () => {
                         <span>어제 날짜</span>
                       </div>
                       <div className="option" id="selectDay">
-                        <span>기간 선택</span>
+                        <span>날짜 선택</span>
                       </div>
                       <div className="option" id="default">
                         <span>전체 게시물</span>
@@ -280,7 +275,9 @@ const ImageRoom = () => {
                 <div>
                   <div className="tag">
                     <span>
-                      {filterNum !== 0 ? '필터링된 이미지' : '전체 이미지'}
+                      {filterStateNum === 3
+                        ? `${filterSelectTerm.startDate} ~ ${filterSelectTerm.endDate}`
+                        : filterTagName}
                     </span>
                   </div>
                 </div>
