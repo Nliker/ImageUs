@@ -12,6 +12,7 @@ import {
 import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
 import useUserImageData from '@hooks/useUserImgData';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 interface Props {
   data: CImageData;
@@ -30,7 +31,14 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const [isHover, setIsHover] = useState(false);
 
   const onClickShowAlertBox = () => {
-    const executeWork = async () => await deleteStoreImage(data.id);
+    const executeWork = async () => {
+      try {
+        await deleteStoreImage(data.id);
+      } catch (error) {
+        const message = getErrorMessage(error);
+        alert(message);
+      }
+    };
 
     showAlertModal({
       text: '이미지를 삭제하시겠습니까?',

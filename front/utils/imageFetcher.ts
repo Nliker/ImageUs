@@ -40,7 +40,8 @@ const deleteUserImageFetcher = async (
   { arg: imageId }: { arg?: number },
 ) => {
   try {
-    if (!imageId) throw new Error('올바른 요청이 아닙니다.');
+    if (!imageId)
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
 
     const { token } = await getToken();
 
@@ -53,11 +54,14 @@ const deleteUserImageFetcher = async (
       data: { delete_image_id: imageId },
     });
 
-    alert('이미지를 삭제하였습니다!');
     return imageId;
   } catch (err) {
-    alert('이미지 삭제요청에 실패했습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('이미지 삭제요청에 실패했습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
@@ -145,7 +149,7 @@ const uploadUserImageFetcher = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     const response = await axios.post('/backapi' + url, arg.uploadImageFile, {
@@ -158,12 +162,12 @@ const uploadUserImageFetcher = async (
 
     return { image_info };
   } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 404) {
-      alert('파일이 존재하지 않습니다.');
-    } else if (err instanceof Error) {
-      alert('이미지를 업로드하지 못하였습니다..');
+    if (err instanceof AxiosError) {
+      throw new Error('이미지를 업로드하지 못하였습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
     }
-    return;
   }
 };
 

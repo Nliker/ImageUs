@@ -47,37 +47,40 @@ function useUserImageData(userId: string | null) {
 
     if (imageLoading) return false;
 
-    const newData = await getUserImgsFetcher(`/user/${userId}/imagelist`, {
-      arg: readStartNumber,
-    });
-    const { imagelist, loadCompleted } = newData;
+    try {
+      const newData = await getUserImgsFetcher(`/user/${userId}/imagelist`, {
+        arg: readStartNumber,
+      });
+      const { imagelist, loadCompleted } = newData;
 
-    const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
-    mutateUserImgList(
-      (prevData: CImageData[] | undefined) => {
-        if (!prevData) {
-          return [...newImageDataList];
-        } else {
-          return [...prevData, ...newImageDataList];
-        }
-      },
-      {
-        revalidate: false,
-      },
-    );
+      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
+      mutateUserImgList(
+        (prevData: CImageData[] | undefined) => {
+          if (!prevData) {
+            return [...newImageDataList];
+          } else {
+            return [...prevData, ...newImageDataList];
+          }
+        },
+        {
+          revalidate: false,
+        },
+      );
 
-    if (loadCompleted) {
-      return true;
-    } else {
-      return false;
+      if (loadCompleted) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      const message = getErrorMessage(error);
+      throw new Error(message);
     }
   };
 
   const uploadUserImage = async (uploadImageFile: FormData) => {
     try {
-      const response = await uploadUserImageTrigger({ uploadImageFile });
-
-      if (!response) throw new Error('이미지를 업로드하지 못했습니다..');
+      await uploadUserImageTrigger({ uploadImageFile });
 
       // 업로드 개수 변화로 MyPicture 컴포넌트에서 userImageList 최신화 트리거
 
@@ -92,7 +95,7 @@ function useUserImageData(userId: string | null) {
       await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
-      alert(message);
+      throw new Error(message);
     }
   };
 
@@ -107,7 +110,7 @@ function useUserImageData(userId: string | null) {
       await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
-      alert(message);
+      throw new Error(message);
     }
   };
 

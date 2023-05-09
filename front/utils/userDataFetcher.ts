@@ -37,7 +37,7 @@ const getUserImgsFetcher = async (
   const { token } = await getToken();
 
   if (!token) {
-    throw new Error();
+    throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
   }
 
   const limit = 12;
@@ -58,8 +58,12 @@ const getUserImgsFetcher = async (
       loadCompleted: imagelist.length < 12 ? true : false,
     };
   } catch (err) {
-    alert('이미지정보를 받아오지 못했습니다..');
-    return {};
+    if (err instanceof AxiosError) {
+      throw new Error('이미지정보를 받아오지 못했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
@@ -68,7 +72,7 @@ const getUserImgLenFetcher = async (url: string) => {
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     const response = await axios.get('/backapi' + url, {
@@ -81,8 +85,12 @@ const getUserImgLenFetcher = async (url: string) => {
 
     return imagelist_len;
   } catch (err) {
-    console.error(err);
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('정보를 받아오지 못했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 

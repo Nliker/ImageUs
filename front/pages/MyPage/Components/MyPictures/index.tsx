@@ -8,6 +8,7 @@ import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 import ImageContent from './ImageContent';
 import useUserImageData from '@hooks/useUserImgData';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 interface IImageCard {
   data: CImageData;
@@ -50,11 +51,16 @@ const MyPictures = () => {
   );
 
   const fetchData = async () => {
-    imgLoadEnd.current = await loadUserImage({
-      readStartNumber: readStartNumber.current,
-    });
-    if (!imgLoadEnd.current) {
-      readStartNumber.current += 12;
+    try {
+      imgLoadEnd.current = await loadUserImage({
+        readStartNumber: readStartNumber.current,
+      });
+      if (!imgLoadEnd.current) {
+        readStartNumber.current += 12;
+      }
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
     }
   };
 
