@@ -11,10 +11,13 @@ import { TbListDetails } from 'react-icons/tb';
 
 import useModal from '@hooks/useModal';
 import { Container, NavItem, NavList, Wrapper } from './styles';
+import useAuth from '@hooks/useAuth';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
 
+  const { logOut } = useAuth();
   const { showAlertModal } = useModal();
 
   const MobileNav = ({ children }: any) => {
@@ -31,8 +34,13 @@ const NavigationBar = () => {
     e.stopPropagation();
 
     const executeWork = async () => {
-      sessionStorage.clear();
-      navigate('/');
+      try {
+        navigate('/');
+        await logOut();
+      } catch (error) {
+        const message = getErrorMessage(error);
+        alert(message);
+      }
     };
 
     showAlertModal({

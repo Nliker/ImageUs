@@ -36,11 +36,22 @@ function useAuth() {
     }
   };
 
+  const logOut = async () => {
+    try {
+      sessionStorage.clear();
+      await updateLogInData();
+    } catch (error) {
+      throw new Error('예기치 못한 오류가 발생하였습니다..새로고침해주세요');
+    }
+  };
+
   return {
     isAuthenticated: logInData.isAuthenticated,
     userInfo: logInData.userInfo,
     loading: (!logInData && !error) || isValidating,
+    error,
     logInRequest,
+    logOut,
   };
 }
 
