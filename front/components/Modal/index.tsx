@@ -1,19 +1,17 @@
 import React from 'react';
+
+import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
 import AlertBox from './AlertBoxModal';
 import CreateRoomModal from './CreateRoomModal';
 import DetailPictureInfo from './DetailPictureModal';
 import InviteMemberModal from './InviteMemberModal';
 import UploadModal from './UploadModal';
-import ModalLayout from './ModalLayout';
-import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
 
 const Modal = ({ modalData }: { modalData: IModalData }) => {
   const { state } = modalData;
   const currentModal = modalData?.currentModal;
 
   if (state === 'off' || !currentModal) return null;
-
-  // console.log(currentModal, modalData);
 
   return (
     <>

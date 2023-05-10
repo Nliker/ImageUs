@@ -1,11 +1,14 @@
 import React from 'react';
+
 import Scrollbars from 'react-custom-scrollbars-2';
-import { MainContainer } from './styles';
-import AppLayout from '@layouts/AppLayout';
-import Roomlist from './Components/Roomlist';
 import { IconContext } from 'react-icons/lib';
 import { AiOutlinePlus } from 'react-icons/ai';
+
+import AppLayout from '@layouts/AppLayout';
 import useModal from '@hooks/useModal';
+
+import Roomlist from './Components/Roomlist';
+import { MainContainer } from './styles';
 
 const SelectRoom = () => {
   const { showCreateRoomModal } = useModal();

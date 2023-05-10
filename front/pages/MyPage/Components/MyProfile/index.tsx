@@ -1,24 +1,17 @@
-import React, { useCallback, useState } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useState } from 'react';
 
 import useInput from '@hooks/useInput';
 import { Button } from '@styles/Button';
-import { InfoSection, InfoTable } from './styles';
-import { logInCheckFetcher } from '@utils/logInFetcher';
-import { changeUserInfoFetcher } from '@utils/userDataFetcher';
-import useAuth from '@hooks/useAuth';
 import useUserData from '@hooks/useUserData';
 import { DUserInfo } from '@typing/db';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { InfoSection, InfoTable } from './styles';
 
 const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
 
   if (!userId) return null;
 
-  // const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
-  // const { userInfo } = useAuth();
   const { requestChangeName } = useUserData();
   const [nameInput, setNameInput, handleNameInput] = useInput('');
 

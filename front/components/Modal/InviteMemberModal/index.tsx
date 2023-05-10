@@ -1,18 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
 
+import { useParams } from 'react-router';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
 import { DFriendData } from '@typing/db';
 import { Button } from '@styles/Button';
-import { ContentBox } from './styles';
 import useModal from '@hooks/useModal';
-import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
 import useUserListByRoom from '@hooks/useUserListByRoom';
-import ModalLayout from '../ModalLayout';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { ContentBox } from './styles';
+import ModalLayout from '../ModalLayout';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 

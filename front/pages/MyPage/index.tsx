@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import useSWR from 'swr';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route, Navigate, useParams } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import AppLayout from '@layouts/AppLayout';
+import { Button } from '@styles/Button';
+import { DeviceCheckContext } from '@pages/ImageRoom';
+import useModal from '@hooks/useModal';
+import useRoomList from '@hooks/useRoomList';
+import useFriendList from '@hooks/useFriendList';
+import { DUserInfo } from '@typing/db';
+import useUserImageData from '@hooks/useUserImgData';
 
 import MyProfile from './Components/MyProfile';
 import MyPictures from './Components/MyPictures';
@@ -20,22 +26,11 @@ import {
   SubMenu,
   WrapperBox,
 } from './styles';
-import { Button } from '@styles/Button';
-import { DeviceCheckContext } from '@pages/ImageRoom';
-import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
-import useRoomList from '@hooks/useRoomList';
-import useFriendList from '@hooks/useFriendList';
-import useAuth from '@hooks/useAuth';
-import { DUserInfo } from '@typing/db';
-import useUserImageData from '@hooks/useUserImgData';
 
 const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
   if (!userId) return null;
 
-  // const { data: userInfo } = useSWR('/user/my');
-  // const { userInfo } = useAuth();
   const { showUploadImgModal } = useModal();
   const { totalFriendCount } = useFriendList();
   const { totalRoomCount } = useRoomList(userId);

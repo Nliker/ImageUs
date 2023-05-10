@@ -1,4 +1,4 @@
-import { DFriendData, DImageData } from '@typing/db';
+import { DFriendData } from '@typing/db';
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { getErrorMessage } from './getErrorMessage';

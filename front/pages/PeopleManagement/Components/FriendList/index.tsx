@@ -1,27 +1,13 @@
-import React, { useCallback } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React from 'react';
 
 import { DFriendData } from '@typing/db';
 import { Button } from '@styles/Button';
-import { Wrapper } from './styles';
-import {
-  getUserFdListFetcher,
-  deleteFriendFetcher,
-} from '@utils/userDataFetcher';
 import useFriendList from '@hooks/useFriendList';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import useModal from '@hooks/useModal';
+import { Wrapper } from './styles';
 
 const FriendList = () => {
-  // const { data: friendListData, mutate: friendListMutate } = useSWR<
-  //   DFriendData[]
-  // >('friendlist', getUserFdListFetcher, {
-  //   revalidateIfStale: false,
-  //   revalidateOnFocus: false,
-  //   revalidateOnReconnect: false,
-  // });
-  // const { trigger } = useSWRMutation('deleteFriend', deleteFriendFetcher);
   const { showAlertModal } = useModal();
   const { friendList, deleteFriend } = useFriendList();
 

@@ -1,14 +1,15 @@
 import React, { memo, useEffect, useRef } from 'react';
 
-import { CImageData } from '@typing/client';
-import { ImageLayout, NotImageData, Wrapper } from './styles';
-import useIntersect from '@hooks/useIntersect';
-import Spinner from '@styles/Spinner';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
-import ImageContent from './ImageContent';
+
+import { CImageData } from '@typing/client';
+import useIntersect from '@hooks/useIntersect';
+import Spinner from '@styles/Spinner';
 import useUserImageData from '@hooks/useUserImgData';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import ImageContent from './ImageContent';
+import { ImageLayout, NotImageData, Wrapper } from './styles';
 
 interface IImageCard {
   data: CImageData;
@@ -85,8 +86,6 @@ const MyPictures = () => {
       />
     ),
   );
-
-  // console.log('업로드 판별기:', uploadImgSensorNum, userImageList);
 
   return (
     <Wrapper>

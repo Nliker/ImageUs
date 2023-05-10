@@ -1,16 +1,18 @@
+import React from 'react';
+
+import { Link } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
+import { TbDoorExit } from 'react-icons/tb';
+import { IconContext } from 'react-icons/lib';
+
 import Spinner from '@styles/Spinner';
 import { DRoomData } from '@typing/db';
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Container, EmptyRoom } from './styles';
-import { IconContext } from 'react-icons/lib';
-import { useMediaQuery } from 'react-responsive';
 import { EmptyRoomlistImg } from '@assets/image';
-import { TbDoorExit } from 'react-icons/tb';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
 import useRoomList from '@hooks/useRoomList';
 import { getErrorMessage } from '@utils/getErrorMessage';
+
+import { Container, EmptyRoom } from './styles';
 
 function Roomlist() {
   const userId = sessionStorage.getItem('user_id');

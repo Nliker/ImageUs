@@ -1,3 +1,5 @@
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { CImageData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
@@ -9,8 +11,6 @@ import {
   getUserImgLenFetcher,
   getUserImgsFetcher,
 } from '@utils/userDataFetcher';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 interface IUserImgInfo {
   readStartNumber: number;
@@ -81,8 +81,6 @@ function useUserImageData(userId: string | null) {
   const uploadUserImage = async (uploadImageFile: FormData) => {
     try {
       await uploadUserImageTrigger({ uploadImageFile });
-
-      // 업로드 개수 변화로 MyPicture 컴포넌트에서 userImageList 최신화 트리거
 
       setUploadImgCount((prevData: number | undefined) => {
         if (!prevData || prevData >= 1000) {

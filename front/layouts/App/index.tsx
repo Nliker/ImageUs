@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo } from 'react';
-import useSWR from 'swr';
+import React, { useMemo } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import loadable from '@loadable/component';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { logInCheckFetcher } from '@utils/logInFetcher';
+import useAuth from '@hooks/useAuth';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
-import Spinner from '@styles/Spinner';
-import useAuth from '@hooks/useAuth';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -18,20 +15,12 @@ const ImageRoom = loadable(() => import('@pages/ImageRoom'));
 const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
 
 const App = () => {
-  // const { data: userInfo, mutate } = useSWR('/user/my');
-
-  // useEffect(() => {
-  //   if (userInfo?.logInState === 'LoggingOut') return;
-  //   mutate(logInCheckFetcher('/user/my'));
-  // }, []);
   const { isAuthenticated, loading, userInfo } = useAuth();
 
   const authData = useMemo(
     () => ({ isAuthenticated, loading }),
     [isAuthenticated, loading],
   );
-
-  console.log('로그인 정보: ', isAuthenticated, loading);
 
   return (
     <Routes>

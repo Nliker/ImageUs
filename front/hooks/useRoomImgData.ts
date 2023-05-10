@@ -8,7 +8,6 @@ import {
   getDefaultImgFetcher,
   getUnreadImgFetcher,
 } from '@utils/imageFetcher';
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -76,8 +75,6 @@ function useRoomImgData(roomId?: string) {
   const loadImage = async (fetchInfo: ILoadImage) => {
     const { readStartNumber, loadImgTypeInfo } = fetchInfo;
     const { filterStartDate, filterEndDate } = loadImgTypeInfo;
-    // const imageLoading =
-    //   (!roomImageList && !roomImgListError) || imgDataListLoading;
 
     if (imgDataListLoading) return false;
 

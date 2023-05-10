@@ -2,6 +2,10 @@ import React, { memo, useState } from 'react';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
+import { DeviceCheckContext } from '@pages/ImageRoom';
+import useModal from '@hooks/useModal';
+import useUserImageData from '@hooks/useUserImgData';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   ContentBox,
   HoverBox,
@@ -9,10 +13,6 @@ import {
   ImageInfo,
   InfoContainer,
 } from './styles';
-import { DeviceCheckContext } from '@pages/ImageRoom';
-import useModal from '@hooks/useModal';
-import useUserImageData from '@hooks/useUserImgData';
-import { getErrorMessage } from '@utils/getErrorMessage';
 
 interface Props {
   data: CImageData;

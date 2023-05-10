@@ -1,22 +1,19 @@
 import React, { FormEvent, useCallback, useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 
 import { VscSearchStop } from 'react-icons/vsc';
 import { IconContext } from 'react-icons/lib';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
 import searchFetcher from '@utils/searchFetcher';
 import { Button } from '@styles/Button';
-import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
-import { addFriendFetcher } from '@utils/userDataFetcher';
 import useFriendList from '@hooks/useFriendList';
-import Scrollbars from 'react-custom-scrollbars-2';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 
 const SearchBox = () => {
-  // const { mutate } = useSWRConfig();
   const [queryParams, setQueryParams] = useState('');
   const [focusSearchBox, setFocusSearchBox] = useState(false);
   const [searchData, setSearchData] = useState<DFriendData>();

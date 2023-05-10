@@ -1,8 +1,4 @@
-import useSWR from 'swr';
-import {
-  changeUserInfoFetcher,
-  getUserImgLenFetcher,
-} from '@utils/userDataFetcher';
+import { changeUserInfoFetcher } from '@utils/userDataFetcher';
 import useSWRMutation from 'swr/mutation';
 import { getErrorMessage } from '@utils/getErrorMessage';
 

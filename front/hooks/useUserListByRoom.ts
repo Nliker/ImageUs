@@ -1,10 +1,10 @@
+import useSWR from 'swr';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getUserListByRmFetcher,
   inviteFriendFetcher,
   deleteMemberFetcher,
 } from '@utils/roomDataFetcher';
-import useSWR from 'swr';
 
 function useUserListByRoom(roomId: string) {
   const { data: userListByRoom, mutate: userListMutate } = useSWR(

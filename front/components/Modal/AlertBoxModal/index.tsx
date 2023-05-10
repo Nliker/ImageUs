@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
-import { Button } from '@styles/Button';
-import { Wrapper } from './styles';
+import React from 'react';
 import useModal from '@hooks/useModal';
+import { Button } from '@styles/Button';
 import { IAertData } from '@typing/client';
+
+import { Wrapper } from './styles';
 import ModalLayout from '../ModalLayout';
 
 const AlertBox = ({ alertData }: { alertData: IAertData }) => {
@@ -10,7 +11,6 @@ const AlertBox = ({ alertData }: { alertData: IAertData }) => {
   if (!userId) return null;
 
   const size = { width: 300, height: 200 };
-  // const alertBoxEl = useRef<HTMLDivElement>(null);
   const { clearModalCache } = useModal();
   const { executeWork } = alertData;
 

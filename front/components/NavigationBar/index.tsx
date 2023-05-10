@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import useSWR from 'swr';
+import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useMediaQuery } from 'react-responsive';
@@ -8,19 +7,15 @@ import { IconContext } from 'react-icons/lib';
 import { CgUserList } from 'react-icons/cg';
 import { HiOutlineHome } from 'react-icons/hi';
 import { MdOutlineManageAccounts } from 'react-icons/md';
-
-import { Container, NavItem, NavList, Wrapper } from './styles';
 import { TbListDetails } from 'react-icons/tb';
+
 import useModal from '@hooks/useModal';
+import { Container, NavItem, NavList, Wrapper } from './styles';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
 
-  // const { data: userInfo, mutate: upadateUserState } = useSWR('/user/my');
   const { showAlertModal } = useModal();
-
-  const [clickLogoutIcon, setClickLogoutIcon] = useState<boolean>(false);
-  const userInfoEl = useRef<HTMLDivElement>(null);
 
   const MobileNav = ({ children }: any) => {
     const isMobile = useMediaQuery({ maxWidth: 1023 });
@@ -36,7 +31,6 @@ const NavigationBar = () => {
     e.stopPropagation();
 
     const executeWork = async () => {
-      // await upadateUserState({ logInState: 'LoggingOut' });
       sessionStorage.clear();
       navigate('/');
     };

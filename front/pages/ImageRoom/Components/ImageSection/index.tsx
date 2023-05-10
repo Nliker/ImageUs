@@ -1,14 +1,15 @@
-import React, { memo, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
-import { CImageData, ILoadImgTypeInfo, SelectTerm } from '@typing/client';
-import ImageContent from './ImageContent';
-import { ImageLayout, NotImageData } from './styles';
+import { CImageData, ILoadImgTypeInfo } from '@typing/client';
 import Spinner from '@styles/Spinner';
 import { useParams } from 'react-router';
 import useIntersect from '@hooks/useIntersect';
 import useRoomImgData from '@hooks/useRoomImgData';
+
+import ImageContent from './ImageContent';
+import { ImageLayout, NotImageData } from './styles';
 
 interface Props {
   loadImgTypeInfo: ILoadImgTypeInfo;
@@ -56,14 +57,11 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
     if (!imgLoadEnd.current) {
       readStartNumber.current += 12;
     }
-
-    console.log('fetchData', imgLoadEnd.current);
   };
 
   useEffect(() => {
     readStartNumber.current = 0;
     imgLoadEnd.current = false;
-    console.log('이펙트 확인', readStartNumber);
 
     fetchData();
 
@@ -87,8 +85,6 @@ const ImageSection = ({ loadImgTypeInfo }: Props) => {
       />
     ),
   );
-
-  console.log('리스트 확인', roomImageList);
 
   return (
     <>

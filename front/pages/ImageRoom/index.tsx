@@ -9,9 +9,24 @@ import { Navigate, useNavigate, useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
 import { SlCloudUpload } from 'react-icons/sl';
+import { TbDoorExit } from 'react-icons/tb';
+import {
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+  MdOutlineSpaceDashboard,
+} from 'react-icons/md';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
+import useModal from '@hooks/useModal';
+import { Button } from '@styles/Button';
+import { SelectTerm } from '@typing/client';
+import SidebarContext from '@utils/SidebarContext';
+import useRoomList from '@hooks/useRoomList';
+import { getErrorMessage } from '@utils/getErrorMessage';
+
+import ImageSection from './Components/ImageSection';
 import {
   LeftHeaderIcon,
   ContentBox,
@@ -19,20 +34,6 @@ import {
   MainContainer,
   UploadButton,
 } from './styles';
-import useModal from '@hooks/useModal';
-import Scrollbars from 'react-custom-scrollbars-2';
-import {
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-  MdOutlineSpaceDashboard,
-} from 'react-icons/md';
-import { TbDoorExit } from 'react-icons/tb';
-import { Button } from '@styles/Button';
-import ImageSection from './Components/ImageSection';
-import { SelectTerm } from '@typing/client';
-import SidebarContext from '@utils/SidebarContext';
-import useRoomList from '@hooks/useRoomList';
-import { getErrorMessage } from '@utils/getErrorMessage';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
 

@@ -1,3 +1,5 @@
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { DFriendData } from '@typing/db';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
@@ -5,8 +7,6 @@ import {
   deleteFriendFetcher,
   getUserFdListFetcher,
 } from '@utils/userDataFetcher';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 function useFriendList() {
   const { data: friendList, mutate: mutateFriendList } = useSWR<DFriendData[]>(

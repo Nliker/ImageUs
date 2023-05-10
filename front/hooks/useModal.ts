@@ -1,5 +1,5 @@
-import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
 import useSWR from 'swr';
+import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
 
 function useModal() {
   const initialValue: IModalData = {

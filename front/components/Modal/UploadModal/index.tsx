@@ -1,32 +1,18 @@
-import React, {
-  DragEvent,
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { DragEvent, useState, useEffect, useRef, useMemo } from 'react';
 
 import { useParams } from 'react-router';
-import { GoPlusSmall } from 'react-icons/go';
-import {
-  BsFilePlus,
-  BsPlusCircleDotted,
-  BsPlusLg,
-  BsPlusSquareDotted,
-} from 'react-icons/bs';
+import { BsFilePlus } from 'react-icons/bs';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 
 import { Button } from '@styles/Button';
-import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
 import useInput from '@hooks/useInput';
 import useModal from '@hooks/useModal';
 import useUserImageData from '@hooks/useUserImgData';
 import useRoomImgData from '@hooks/useRoomImgData';
-import ModalLayout from '../ModalLayout';
-import { MdOutlineImageNotSupported } from 'react-icons/md';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import ModalLayout from '../ModalLayout';
+import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
 
 const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   const userId = sessionStorage.getItem('user_id');

@@ -6,6 +6,11 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
 import { Button } from '@styles/Button';
+import useModal from '@hooks/useModal';
+import useRoomList from '@hooks/useRoomList';
+import useFriendList from '@hooks/useFriendList';
+import { getErrorMessage } from '@utils/getErrorMessage';
+
 import {
   ActionBtn,
   Content,
@@ -13,11 +18,7 @@ import {
   MemeberList,
   RoomNameInput,
 } from './styles';
-import useModal from '@hooks/useModal';
-import useRoomList from '@hooks/useRoomList';
 import ModalLayout from '../ModalLayout';
-import useFriendList from '@hooks/useFriendList';
-import { getErrorMessage } from '@utils/getErrorMessage';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 

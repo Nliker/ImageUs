@@ -1,6 +1,6 @@
-import { socialLoginFetcher } from '@utils/logInFetcher';
-import useSWR from 'swr';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import { socialLoginFetcher } from '@utils/logInFetcher';
 
 interface IProps {
   coperation: string | (string | null)[] | null;

@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useCallback, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { IconContext } from 'react-icons/lib';
@@ -8,11 +6,10 @@ import { RiKakaoTalkFill } from 'react-icons/ri';
 import { SiNaver } from 'react-icons/si';
 
 import UserFormBox from '@components/UserFormBox';
-import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
-import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
 import useAuth from '@hooks/useAuth';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
 
 const LogIn = () => {
   const navigate = useNavigate();
@@ -84,14 +81,6 @@ const LogIn = () => {
       }
     }
   };
-
-  // useEffect(() => {
-  //   if (logInSuccess) {
-  //     navigate('/select-room', { replace: true });
-  //     // mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-  //     // });
-  //   }
-  // }, [logInSuccess]);
 
   return (
     <UserFormBox pageName={'로그인'}>

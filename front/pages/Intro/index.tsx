@@ -1,41 +1,11 @@
-import { useEffect } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-
-import { Scrollbars } from 'react-custom-scrollbars-2';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
 import { BackgroundImg } from '@assets/image';
 import { MainContainer, MainIntroduction } from './styles';
-import Spinner from '@styles/Spinner';
-import SelectRoom from '../SelectRoom';
-import React from 'react';
 
 const Intro = () => {
-  // const {
-  //   data: userInfo,
-  //   mutate: mutateUserState,
-  //   isValidating,
-  // } = useSWR('/user/my');
-
-  // useEffect(() => {
-  //   if (userInfo?.logInState === 'LoggingOut') {
-  //     mutateUserState({ logInState: 'LoggedOut' });
-  //   }
-  //   return;
-  // }, [userInfo]);
-
-  // const MainSection = () => {
-  //   return (
-
-  //   );
-  // };
-
-  // if (!userInfo || userInfo.logInState === 'LoggingOut' || isValidating) {
-  //   return <Spinner />;
-  // }
-
   return (
     <MainContainer>
       <MainIntroduction>

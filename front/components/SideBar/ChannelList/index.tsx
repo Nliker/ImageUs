@@ -1,16 +1,15 @@
 import React, { memo, useState, useContext } from 'react';
+
 import { useNavigate, useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
-import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 import useModal from '@hooks/useModal';
-import useUserData from '@hooks/useUserData';
 import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
 import SidebarContext from '@utils/SidebarContext';
-import Roomlist from '@pages/SelectRoom/Components/Roomlist';
 import useRoomList from '@hooks/useRoomList';
+import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 
 const ChannelList = memo(() => {
   const userId = sessionStorage.getItem('user_id');
@@ -29,8 +28,6 @@ const ChannelList = memo(() => {
     sidebarContext.setSidebarState(false);
     navigate(`/room/${id}`);
   };
-
-  // console.log('확인', refineRoomList, roomList);
 
   if (!roomId) return <Spinner />;
 

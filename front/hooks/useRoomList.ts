@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { useMemo } from 'react';
+
 import { DRoomData } from '@typing/db';
 import { createRoomFetcher, leaveRoomFetcher } from '@utils/roomDataFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';

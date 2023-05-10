@@ -1,10 +1,12 @@
 import React, { memo, useCallback, useEffect, useRef, useContext } from 'react';
-import { useParams } from 'react-router';
 
+import { useParams } from 'react-router';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import ChannelList from './ChannelList';
 import MemberList from './MemberList';
+import SidebarContext from '@utils/SidebarContext';
+import useRoomList from '@hooks/useRoomList';
 import {
   Background,
   ContentTabs,
@@ -12,9 +14,6 @@ import {
   Tab,
   Wrapper,
 } from './styles';
-import useUserData from '@hooks/useUserData';
-import SidebarContext from '@utils/SidebarContext';
-import useRoomList from '@hooks/useRoomList';
 
 interface SidebarProps {
   show: boolean;

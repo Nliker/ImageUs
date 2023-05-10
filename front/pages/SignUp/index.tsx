@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import axios, { AxiosError } from 'axios';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios';
 
 import UserFormBox from '@components/UserFormBox';
 import useInput from '@hooks/useInput';
 import { Button } from '@styles/Button';
+
 import {
   ErrorText,
   InputContainer,
@@ -170,7 +171,7 @@ const SignUp = () => {
       }));
     } catch (err) {
       if (err instanceof AxiosError) {
-        const { message } = err.response?.data;
+        const message = err.response?.data?.message;
         if (err.response?.status === 402) {
           setErrorInfo((prev) => ({
             ...prev,
@@ -217,7 +218,7 @@ const SignUp = () => {
       }
     } catch (err) {
       if (err instanceof AxiosError) {
-        const { message } = err.response?.data;
+        const message = err.response?.data?.message;
         if (err.response?.status === 401) {
           setErrorInfo((prev) => ({
             ...prev,

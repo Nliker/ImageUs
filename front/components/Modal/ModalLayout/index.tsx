@@ -5,9 +5,9 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-import useSWR, { mutate } from 'swr';
 
 import { CgCloseO } from 'react-icons/cg';
+import useModal from '@hooks/useModal';
 import {
   Background,
   CloseBtn,
@@ -16,8 +16,6 @@ import {
   HeaderTitle,
   Wrapper,
 } from './styles';
-import useModal from '@hooks/useModal';
-import Scrollbars from 'react-custom-scrollbars-2';
 
 export interface ISize {
   width: number;
@@ -70,8 +68,6 @@ const ModalLayout = ({ currentModal, size, children }: IProps) => {
     };
   }, []);
 
-  // 화면 크기에 맞추어 모달 사이즈 조절
-  // 모달 크기가 전체 화면의 80% 이상일 때 모달 width를 80%로 설정, height를 비율에 맞춰 설정
   const handleModalSize = useCallback(() => {
     const criterionWidth = window.innerWidth * 0.8;
 

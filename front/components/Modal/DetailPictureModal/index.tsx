@@ -1,17 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { IconContext } from 'react-icons/lib';
 import { BiUserPin } from 'react-icons/bi';
-
-import { ImageSection, Wrapper } from './styles';
 import { AiOutlineDownload } from 'react-icons/ai';
+
 import { IDetailPictureInfo } from '@typing/client';
+import { ImageSection, Wrapper } from './styles';
 import ModalLayout from '../ModalLayout';
 
 interface IImageBoxSize {
@@ -24,38 +18,6 @@ const DetailPictureInfo = ({
 }: {
   imageInfo: IDetailPictureInfo;
 }) => {
-  // const getCurrentModalSize = useCallback(() => {
-  //   const modalHeight = (window.innerHeight * 0.7).toFixed(3);
-  //   const modalWidth = modalHeight;
-
-  //   return {
-  //     modalWidth: parseInt(modalWidth),
-  //     modalHeight: parseInt(modalHeight),
-  //   };
-  // }, [window.innerHeight]);
-  // const [modalSize, setModalSize] = useState(getCurrentModalSize());
-
-  // useEffect(() => {
-  //   let timeout: NodeJS.Timeout;
-  //   const handleResizeModal = () => {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => {
-  //       const { modalWidth, modalHeight } = getCurrentModalSize();
-
-  //       setModalSize({
-  //         modalWidth,
-  //         modalHeight,
-  //       });
-  //     }, 300);
-  //   };
-
-  //   window.addEventListener('resize', handleResizeModal);
-
-  //   return () => {
-  //     window.removeEventListener('resize', handleResizeModal);
-  //   };
-  // }, []);
-
   const size = { width: 412, height: 550 };
   const [imageBoxSize, setImageBoxSize] = useState<IImageBoxSize>({
     modalWidth: 412,
@@ -72,12 +34,8 @@ const DetailPictureInfo = ({
         const boxAspect = parseFloat((size.width / size.height).toFixed(3));
         const imageAspect = imageObj.width / imageObj.height;
         const { modalWidth, modalHeight } = imageBoxSize;
-        // const modalWidth = imageBoxRef.current?.clientWidth ?? size.width;
-        // const modalHeight = imageBoxRef.current?.clientHeight ?? size.height;
 
         if (boxAspect <= imageAspect) {
-          // const modalWidth = size.width;
-
           if (modalWidth > imageObj.width) {
             return {
               width: `${imageObj.width}px`,
@@ -90,8 +48,6 @@ const DetailPictureInfo = ({
             };
           }
         } else {
-          // const modalHeight = size.height;
-
           if (modalHeight > imageObj.height) {
             return {
               width: 'auto',
@@ -110,13 +66,6 @@ const DetailPictureInfo = ({
 
   useEffect(() => {
     if (imageBoxRef.current) {
-      console.log(
-        '정보',
-        imageBoxRef.current,
-        imageBoxRef.current?.clientWidth,
-        imageBoxRef.current?.clientHeight,
-      );
-
       setImageBoxSize({
         modalWidth: imageBoxRef.current?.clientWidth,
         modalHeight: imageBoxRef.current?.clientHeight,
@@ -137,7 +86,7 @@ const DetailPictureInfo = ({
             >
               <BiUserPin />
             </IconContext.Provider>
-            {/* <span className="writer">{imageInfo.data.user_name}</span> */}
+            {}
           </div>
           <div className="date_info">
             <div className="down_btn">

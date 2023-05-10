@@ -2,18 +2,17 @@ import React, { memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { IoMdArrowDropright } from 'react-icons/io';
+
 import ActionButton from '@styles/ActiveButton';
 import Spinner from '@styles/Spinner';
-
-import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 import useModal from '@hooks/useModal';
 import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
 import { Button } from '@styles/Button';
 import { DFriendData } from '@typing/db';
-import useUserData from '@hooks/useUserData';
 import useRoomList from '@hooks/useRoomList';
 import useUserListByRoom from '@hooks/useUserListByRoom';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 
 const preventClickCSS = {
   pointerEvents: 'none' as React.CSSProperties['pointerEvents'],

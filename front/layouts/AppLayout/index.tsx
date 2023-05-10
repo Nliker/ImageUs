@@ -1,13 +1,11 @@
-import React, { createContext, useCallback, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import React, { useState } from 'react';
 
 import NavigationBar from '@components/NavigationBar';
 import SideBar from '@components/SideBar';
 import Modal from '@components/Modal';
-import { OuterContainer, InnerContainer, Wrapper } from './styles';
-import Spinner from '@styles/Spinner';
 import useModal from '@hooks/useModal';
 import SidebarContext from '@utils/SidebarContext';
+import { OuterContainer, InnerContainer, Wrapper } from './styles';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -17,20 +15,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
   const { data: modalData } = useModal();
-  // const { data: userInfo } = useSWR('/user/my');
   const [sidebarState, setSidebarState] = useState<boolean>(false);
-
-  // const toggleSidebar = useCallback(() => {
-  //   setSidebarState((prev) => !prev);
-  // }, []);
-
-  // const value = useMemo(
-  //   () => ({
-  //     setState: setSidebarState,
-  //   }),
-  //   [sidebarState],
-  // );
-  // console.log('사이드바', sidebarState);
 
   return (
     <Wrapper>
