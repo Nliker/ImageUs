@@ -82,6 +82,7 @@ const CreateRoomModal = () => {
     try {
       const selectMemberIdList = checkFriends.map((data) => data.id);
       await createRoom({ selectMemberIdList, roomName });
+      alert(`${roomName}을 생성하였습니다!`);
       clearModalCache();
     } catch (error) {
       const message = getErrorMessage(error);

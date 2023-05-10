@@ -34,6 +34,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
     const executeWork = async () => {
       try {
         await deleteStoreImage(data.id);
+        alert('이미지를 삭제하였습니다!');
       } catch (error) {
         const message = getErrorMessage(error);
         alert(message);

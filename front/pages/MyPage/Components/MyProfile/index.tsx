@@ -29,6 +29,7 @@ const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
       await requestChangeName(nameInput);
       setNameInput('');
       setNameBoxState(false);
+      alert('이름을 변경하였습니다!');
     } catch (error) {
       const message = getErrorMessage(error);
       alert(message);

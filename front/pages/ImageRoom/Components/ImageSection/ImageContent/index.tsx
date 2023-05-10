@@ -34,6 +34,7 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
   const executeWork = async () => {
     try {
       await deleteRoomImage(data.id);
+      alert('방에서 사진을 삭제하였습니다!');
     } catch (error) {
       const message = getErrorMessage(error);
       alert(message);

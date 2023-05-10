@@ -28,6 +28,7 @@ function Roomlist() {
       const executeWork = async () => {
         try {
           await leaveRoom('' + roomData.id);
+          alert(`${roomData.title}에서 성공적으로 나갔습니다!`);
         } catch (error) {
           const message = getErrorMessage(error);
           alert(message);
