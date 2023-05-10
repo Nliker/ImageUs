@@ -7,7 +7,7 @@ const logInCheckFetcher = async (url: string) => {
   try {
     const { token } = await getToken();
     if (!token) {
-      throw new Error();
+      return { isAuthenticated: false, userInfo: null };
     }
 
     const response = await axios.get('/backapi' + url, {
@@ -19,7 +19,7 @@ const logInCheckFetcher = async (url: string) => {
 
     return { isAuthenticated: true, userInfo: user_info };
   } catch (err) {
-    return { isAuthenticated: false, userInfo: null };
+    throw new Error('로그인 요청을 실패했습니다..다시 로그인 해주세요.');
   }
 };
 

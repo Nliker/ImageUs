@@ -15,10 +15,10 @@ const ImageRoom = loadable(() => import('@pages/ImageRoom'));
 const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
 
 const App = () => {
-  const { isAuthenticated, loading, userInfo } = useAuth();
+  const { isAuthenticated, loading, userInfo, error } = useAuth();
 
   const authData = useMemo(
-    () => ({ isAuthenticated, loading }),
+    () => ({ isAuthenticated, loading, error }),
     [isAuthenticated, loading],
   );
 
