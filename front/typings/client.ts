@@ -3,6 +3,7 @@ import { DFriendData, DUserInfo } from './db';
 export interface CAuthData {
   isAuthenticated: boolean;
   loading: boolean;
+  error: Error;
   userInfo?: DUserInfo | null;
 }
 
