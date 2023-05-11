@@ -48,13 +48,13 @@ const ChannelList = memo(() => {
                   <div className="check_label_box">
                     <DataCheckLabel
                       type="radio"
-                      id={`${item.id}`}
+                      id={`channel_${item.id}`}
                       name={`radio-group-channel`}
                       defaultChecked={roomId === '' + item.id}
                       boxName={'channel'}
                     />
                     <DataLabel
-                      htmlFor={`${item.id}`}
+                      htmlFor={`channel_${item.id}`}
                       onClick={onClickDataLabel(item.id)}
                     >
                       <span className="item_text">{item.title}</span>

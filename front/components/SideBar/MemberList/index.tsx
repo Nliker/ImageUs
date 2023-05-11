@@ -79,12 +79,12 @@ const MemberList = memo(() => {
                   <div className="check_label_box" style={preventClickCSS}>
                     <DataCheckLabel
                       type="radio"
-                      id={`${item.id}`}
+                      id={`member_${item.id}`}
                       name={`radio-group-member`}
                       defaultChecked={userId === '' + item.id}
                       boxName={'member'}
                     />
-                    <DataLabel htmlFor={`${item.id}`}>
+                    <DataLabel htmlFor={`member_${item.id}`}>
                       <div className="mark_box">
                         {hostId === item.id && (
                           <span className="room_manager_mark">방장</span>
