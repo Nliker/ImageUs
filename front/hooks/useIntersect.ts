@@ -12,26 +12,20 @@ const useIntersect = (
 ) => {
   const ref = useRef(null);
   const callback = useCallback(
-    throttle(
-      (
-        entries: IntersectionObserverEntry[],
-        observer: IntersectionObserver,
-      ) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) onIntersect(entry, observer);
-        });
-      },
-      500,
-    ),
+    (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) onIntersect(entry, observer);
+      });
+    },
     [onIntersect],
   );
-
   useEffect(() => {
     if (!ref.current) return;
     const observer = new IntersectionObserver(callback, options);
+
     observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [ref, options, callback]);
+  }, [ref.current, options, callback]);
 
   return ref;
 };
