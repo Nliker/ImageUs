@@ -1,7 +1,7 @@
 import { DFriendData, DUserInfo } from './db';
 
 export interface CAuthData {
-  isAuthenticated: boolean;
+  isAuthenticated: string;
   loading: boolean;
   error: Error;
   userInfo?: DUserInfo | null;
@@ -19,13 +19,6 @@ export interface CImageData {
 export interface SelectTerm {
   startDate: string;
   endDate: string;
-}
-
-export interface ILoadImgTypeInfo {
-  isfiltered: boolean;
-  filterState: number;
-  filterStartDate: string;
-  filterEndDate: string;
 }
 
 export interface IDetailPictureInfo {

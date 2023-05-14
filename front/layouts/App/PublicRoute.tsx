@@ -17,9 +17,13 @@ const PublicRoute = ({ authData }: IProps) => {
     return <Navigate to="/login" />;
   }
 
-  if (loading) return <Spinner />;
+  if (loading || isAuthenticated === 'init') return <Spinner />;
 
-  return isAuthenticated ? <Navigate to="/select-room" /> : <Outlet />;
+  return isAuthenticated === 'authorized' ? (
+    <Navigate to="/select-room" />
+  ) : (
+    <Outlet />
+  );
 };
 
 export default PublicRoute;

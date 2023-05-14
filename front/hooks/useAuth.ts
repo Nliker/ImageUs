@@ -10,9 +10,10 @@ function useAuth() {
     error,
     isValidating,
   } = useSWR('/user/my', logInCheckFetcher, {
+    revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    fallbackData: { isAuthenticated: false, userInfo: null },
+    fallbackData: { isAuthenticated: 'init', userInfo: null },
   });
 
   const { trigger: logInTrigger } = useSWRMutation(
@@ -52,6 +53,7 @@ function useAuth() {
     error,
     logInRequest,
     logOut,
+    refreshAuthData: updateLogInData,
   };
 }
 
