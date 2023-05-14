@@ -1,11 +1,11 @@
 import React, {
   createContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
+  useMemo,
 } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
 import { SlCloudUpload } from 'react-icons/sl';
@@ -21,7 +21,7 @@ import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
 import useModal from '@hooks/useModal';
 import { Button } from '@styles/Button';
-import { SelectTerm } from '@typing/client';
+import { CImageData, SelectTerm } from '@typing/client';
 import SidebarContext from '@utils/SidebarContext';
 import useRoomList from '@hooks/useRoomList';
 import { getErrorMessage } from '@utils/getErrorMessage';
@@ -34,6 +34,9 @@ import {
   MainContainer,
   UploadButton,
 } from './styles';
+import useRoomImgData from '@hooks/useRoomImgData';
+import useIntersect from '@hooks/useIntersect';
+import Spinner from '@styles/Spinner';
 
 export const DeviceCheckContext = createContext<boolean | null>(null);
 
@@ -43,9 +46,15 @@ const ImageRoom = () => {
   if (!roomId || !userId) return null;
 
   const navigate = useNavigate();
-  const { showUploadImgModal } = useModal();
-  const { showAlertModal } = useModal();
+  const { showUploadImgModal, showAlertModal } = useModal();
   const { roomList, leaveRoom } = useRoomList(userId);
+  const {
+    initialLoading,
+    roomImageList,
+    roomImgListLoading,
+    loadImage,
+    clearRoomImageList,
+  } = useRoomImgData(roomId);
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [filterTagName, setFilterTagName] = useState('전체 게시물');
@@ -56,6 +65,16 @@ const ImageRoom = () => {
     startDate: '',
     endDate: '',
   });
+  const [readStartNumber, setReadStartNum] = useState(0);
+  const [imageLoadEnd, setImageLoadEnd] = useState(false);
+
+  const imageSectionProps = useMemo(
+    () => ({
+      roomImageList: roomImageList as CImageData[],
+      roomImgListLoading,
+    }),
+    [roomImageList, roomImgListLoading],
+  );
 
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
@@ -68,6 +87,42 @@ const ImageRoom = () => {
       setIsMobile(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadImageFunc();
+
+    return () => {
+      setReadStartNum(0);
+      setImageLoadEnd(false);
+      clearRoomImageList();
+    };
+  }, [filterStateNum, filterSelectTerm, roomId]);
+
+  const observerRef = useIntersect(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
+      if (roomImgListLoading || imageLoadEnd) {
+        return;
+      }
+
+      loadImageFunc();
+    },
+    {
+      threshold: 0.5,
+    },
+  );
+
+  const loadImageFunc = async () => {
+    const loadImageState = await loadImage({
+      isfiltered: filterStateNum !== 0 ? true : false,
+      filterStartDate: filterSelectTerm.startDate,
+      filterEndDate: filterSelectTerm.endDate,
+      readStartNumber,
+    });
+
+    setReadStartNum(loadImageState.readStartNumber);
+    setImageLoadEnd(loadImageState.imageLoadEnd);
+  };
 
   const getDateString = (dateValue: Date) => {
     const selectDate = `${dateValue.getFullYear()}-${
@@ -158,15 +213,11 @@ const ImageRoom = () => {
     showAlertModal({ text: '방에서 나가시겠습니까?', executeWork });
   };
 
-  const loadImgTypeInfo = useMemo(
-    () => ({
-      isfiltered: filterStateNum !== 0 ? true : false,
-      filterState: filterStateNum,
-      filterStartDate: filterSelectTerm.startDate,
-      filterEndDate: filterSelectTerm.endDate,
-    }),
-    [filterSelectTerm, filterStateNum],
-  );
+  const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    showUploadImgModal('room');
+  };
 
   const checkValideRoomId = () => {
     if (!roomList) return false;
@@ -178,21 +229,9 @@ const ImageRoom = () => {
     return isValidRoomId;
   };
 
-  const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
-    showUploadImgModal('room');
-  };
-
-  if (!checkValideRoomId()) {
-    alert('잘못된 접근입니다.');
-    return <Navigate to="/select-room" />;
-  }
-
   return (
     <AppLayout isImageRoom>
       <DeviceCheckContext.Provider value={isMobile}>
-        {}
         <Scrollbars>
           <MainContainer>
             <LeftHeaderIcon>
@@ -288,7 +327,15 @@ const ImageRoom = () => {
                     </span>
                   </div>
                 </div>
-                <ImageSection loadImgTypeInfo={loadImgTypeInfo} />
+                {initialLoading ? (
+                  <Spinner />
+                ) : (
+                  <ImageSection
+                    roomId={roomId}
+                    imageSectionProps={imageSectionProps}
+                    observerRef={observerRef}
+                  />
+                )}
               </div>
             </ContentBox>
           </MainContainer>

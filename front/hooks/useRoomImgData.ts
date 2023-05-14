@@ -1,4 +1,4 @@
-import { CImageData, ILoadImgTypeInfo } from '@typing/client';
+import { CImageData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getImageDataFetcher,
@@ -12,11 +12,13 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 interface ILoadImage {
+  isfiltered: boolean;
+  filterStartDate: string;
+  filterEndDate: string;
   readStartNumber: number;
-  loadImgTypeInfo: ILoadImgTypeInfo;
 }
 
-function useRoomImgData(roomId?: string) {
+function useRoomImgData(roomId: string) {
   const {
     data: roomImageList,
     mutate: mutateRoomImage,
@@ -73,13 +75,11 @@ function useRoomImgData(roomId?: string) {
   };
 
   const loadImage = async (fetchInfo: ILoadImage) => {
-    const { readStartNumber, loadImgTypeInfo } = fetchInfo;
-    const { filterStartDate, filterEndDate } = loadImgTypeInfo;
-
-    if (imgDataListLoading) return false;
+    const { isfiltered, filterStartDate, filterEndDate, readStartNumber } =
+      fetchInfo;
 
     try {
-      if (loadImgTypeInfo.isfiltered) {
+      if (isfiltered) {
         const newData = await getFilterImgFetcher(
           `/room/${roomId}/imagelist/bydate`,
           {
@@ -108,9 +108,15 @@ function useRoomImgData(roomId?: string) {
         );
 
         if (loadCompleted) {
-          return true;
+          return {
+            imageLoadEnd: true,
+            readStartNumber: 0,
+          };
         } else {
-          return false;
+          return {
+            imageLoadEnd: false,
+            readStartNumber: readStartNumber + 12,
+          };
         }
       } else {
         const newData = await getDefaultImgFetcher(
@@ -121,7 +127,6 @@ function useRoomImgData(roomId?: string) {
             },
           },
         );
-
         const { imagelist, loadCompleted } = newData;
 
         const newImageDataList =
@@ -140,9 +145,15 @@ function useRoomImgData(roomId?: string) {
         );
 
         if (loadCompleted) {
-          return true;
+          return {
+            imageLoadEnd: true,
+            readStartNumber: 0,
+          };
         } else {
-          return false;
+          return {
+            imageLoadEnd: false,
+            readStartNumber: readStartNumber + 12,
+          };
         }
       }
     } catch (error) {
@@ -179,11 +190,9 @@ function useRoomImgData(roomId?: string) {
   }
 
   return {
+    initialLoading: !roomImageList && !roomImgListError,
     roomImageList,
-    roomImgListLoading:
-      (!roomImageList && !roomImgListError) ||
-      imgDataListLoading ||
-      roomImgValidating,
+    roomImgListLoading: imgDataListLoading || roomImgValidating,
     uploadRoomImage,
     deleteRoomImage,
     loadImage,

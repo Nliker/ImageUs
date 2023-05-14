@@ -18,11 +18,9 @@ import {
 interface Props {
   data: CImageData;
   index: number;
-  thisArr: CImageData[];
-  observerRef?: React.MutableRefObject<null>;
 }
 
-const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
+const ImageContent = ({ data, index }: Props) => {
   const { roomId } = useParams<{ roomId: string }>();
   if (!roomId) return null;
 
@@ -78,7 +76,6 @@ const ImageContent = ({ data, index, thisArr, observerRef }: Props) => {
       {(isMobile) => (
         <ContentBox
           key={data.id}
-          ref={thisArr.length - 1 === index ? observerRef : undefined}
           onMouseEnter={isMobile ? undefined : () => setIsHover(true)}
           onMouseLeave={isMobile ? undefined : () => setIsHover(false)}
           onClick={isMobile ? undefined : onClickContent}

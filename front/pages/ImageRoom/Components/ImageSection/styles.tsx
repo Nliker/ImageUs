@@ -23,3 +23,5 @@ export const NotImageData = styled.div`
   margin-top: 30px;
   font-size: 1.3rem;
 `;
+
+export const Target = styled.div``;
