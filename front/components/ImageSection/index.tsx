@@ -12,6 +12,7 @@ import { useCheckDeviceContext } from '@utils/CheckDeviceContext';
 interface IImgSectionProps {
   imageList: CImageData[];
   imgListLoading: boolean;
+  deleteImgFunc: (imageId: number) => Promise<void>;
 }
 
 interface IProps {
@@ -21,9 +22,7 @@ interface IProps {
 
 const ImageSection = ({ imageSectionProps, observerRef }: IProps) => {
   const checkDeviceContext = useCheckDeviceContext();
-  const { imageList, imgListLoading } = imageSectionProps;
-
-  console.log('섹션', checkDeviceContext);
+  const { imageList, imgListLoading, deleteImgFunc } = imageSectionProps;
 
   return (
     <>
@@ -35,6 +34,7 @@ const ImageSection = ({ imageSectionProps, observerRef }: IProps) => {
                 key={image.id}
                 data={image}
                 index={index}
+                deleteImgFunc={deleteImgFunc}
                 isMobile={checkDeviceContext.isMobile}
               />
             ))}

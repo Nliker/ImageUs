@@ -1,10 +1,8 @@
 import React, { memo, useState } from 'react';
-import { useParams } from 'react-router';
 
 import { CImageData } from '@typing/client';
 import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
-import useRoomImgData from '@hooks/useRoomImgData';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { CSSProperties } from 'react';
 import {
@@ -20,6 +18,7 @@ interface Props {
   data: CImageData;
   index: number;
   isMobile: boolean;
+  deleteImgFunc: (imageId: number) => Promise<void>;
 }
 
 const blindCSS: CSSProperties = {
@@ -30,19 +29,15 @@ const blindCSS: CSSProperties = {
   overflow: 'hidden',
 };
 
-const ImageContent = ({ data, index, isMobile }: Props) => {
-  const { roomId } = useParams<{ roomId: string }>();
-  if (!roomId) return null;
-
+const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
   const { showAlertModal, showDetailPictureModal } = useModal();
-  const { deleteRoomImage } = useRoomImgData(roomId);
 
   const [isHovered, setIsHovered] = useState(false);
 
   const executeWork = async () => {
     try {
-      await deleteRoomImage(data.id);
-      alert('방에서 사진을 삭제하였습니다!');
+      await deleteImgFunc(data.id);
+      alert('사진을 삭제하였습니다!');
     } catch (error) {
       const message = getErrorMessage(error);
       alert(message);
@@ -104,7 +99,7 @@ const ImageContent = ({ data, index, isMobile }: Props) => {
             <div className="btn_group">
               <Button type="button" onClick={onClickOpenImage}>
                 {`자세히 
-`}
+보기`}
               </Button>
               {data.user_id + '' === sessionStorage.getItem('user_id') && (
                 <Button
@@ -113,7 +108,7 @@ const ImageContent = ({ data, index, isMobile }: Props) => {
                   onClick={onClickShowAlertBox}
                 >
                   {`게시물 
-하기`}
+삭제하기`}
                 </Button>
               )}
             </div>
@@ -133,26 +128,7 @@ const ImageContent = ({ data, index, isMobile }: Props) => {
           </div>
         </ImageInfo>
       </InfoContainer>
-      {/* {isHovered && (
-        <HoverBox>
-          <div className="btn_group">
-            <Button type="button" onClick={onClickOpenImage}>
-              {`자세히 
-`}
-            </Button>
-            {data.user_id + '' === sessionStorage.getItem('user_id') && (
-              <Button
-                type="button"
-                className="error"
-                onClick={onClickShowAlertBox}
-              >
-                {`게시물 
-하기`}
-              </Button>
-            )}
-          </div>
-        </HoverBox>
-      )} */}
+      {}
     </ContentBox>
   );
 };

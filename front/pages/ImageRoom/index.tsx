@@ -45,6 +45,7 @@ const ImageRoom = () => {
     roomImageList,
     roomImgLoading,
     loadImage,
+    deleteRoomImage,
     clearRoomImageList,
   } = useRoomImgData(roomId);
 
@@ -63,6 +64,7 @@ const ImageRoom = () => {
     () => ({
       imageList: roomImageList as CImageData[],
       imgListLoading: roomImgLoading,
+      deleteImgFunc: deleteRoomImage,
     }),
     [roomImageList, roomImgLoading],
   );

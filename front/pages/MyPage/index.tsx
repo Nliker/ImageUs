@@ -43,6 +43,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
     userImgLoading,
     totalImageCount,
     loadImage,
+    deleteStoreImage,
     clearUserImageList,
   } = useUserImageData(userId);
 
@@ -53,6 +54,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
     () => ({
       imageList: userImageList as CImageData[],
       imgListLoading: userImgLoading,
+      deleteImgFunc: deleteStoreImage,
     }),
     [userImageList, userImgLoading],
   );
