@@ -101,3 +101,10 @@ export const ProfileInfo = styled.div`
     }
   }
 `;
+
+export const ImageContainer = styled.div`
+  position: relative;
+  width: 85%;
+  margin: auto;
+  font-size: 1.2rem;
+`;

@@ -1,41 +1,46 @@
-import React, { memo, useEffect, useMemo, useRef } from 'react';
+import React, { memo } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
-import { CImageData, SelectTerm } from '@typing/client';
+import { CImageData } from '@typing/client';
 import Spinner from '@styles/Spinner';
-import { useParams } from 'react-router';
-import useIntersect from '@hooks/useIntersect';
-import useRoomImgData from '@hooks/useRoomImgData';
 
 import ImageContent from './ImageContent';
 import { ImageLayout, NotImageData, Target } from './styles';
+import { useCheckDeviceContext } from '@utils/CheckDeviceContext';
 
 interface IImgSectionProps {
-  roomImageList: CImageData[];
-  roomImgListLoading: boolean;
+  imageList: CImageData[];
+  imgListLoading: boolean;
 }
 
 interface IProps {
-  roomId: string;
   imageSectionProps: IImgSectionProps;
   observerRef: React.MutableRefObject<null> | null;
 }
 
 const ImageSection = ({ imageSectionProps, observerRef }: IProps) => {
-  const { roomImageList, roomImgListLoading } = imageSectionProps;
+  const checkDeviceContext = useCheckDeviceContext();
+  const { imageList, imgListLoading } = imageSectionProps;
+
+  console.log('섹션', checkDeviceContext);
 
   return (
     <>
-      {roomImageList.length !== 0 ? (
+      {imageList.length !== 0 ? (
         <>
           <ImageLayout>
-            {roomImageList.map((image: CImageData, index: number) => (
-              <ImageContent key={image.id} data={image} index={index} />
+            {imageList.map((image: CImageData, index: number) => (
+              <ImageContent
+                key={image.id}
+                data={image}
+                index={index}
+                isMobile={checkDeviceContext.isMobile}
+              />
             ))}
           </ImageLayout>
           <Target ref={observerRef} />
-          {roomImgListLoading && <Spinner />}
+          {imgListLoading && <Spinner />}
         </>
       ) : (
         <NotImageData>

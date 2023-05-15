@@ -36,11 +36,19 @@ export const InfoContainer = styled.div`
   background-color: whitesmoke;
 `;
 
+export const Cover = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+`;
+
 export const HoverBox = styled.div`
+  position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  position: absolute;
   right: 0;
   top: 0;
   bottom: 0;
@@ -69,6 +77,24 @@ export const HoverBox = styled.div`
       }
     }
   }
+
+  /* @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      left: 0;
+
+      clip-path: none;
+      width: auto;
+      height: auto;
+
+      background: rgba(0, 0, 0, 0.3);
+    }
+  } */
 `;
 
 export const ImageInfo = styled.div`

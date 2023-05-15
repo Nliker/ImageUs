@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { NavLink } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router';
@@ -8,7 +8,6 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
-import { DeviceCheckContext } from '@pages/ImageRoom';
 import useModal from '@hooks/useModal';
 import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
@@ -16,16 +15,20 @@ import { DUserInfo } from '@typing/db';
 import useUserImageData from '@hooks/useUserImgData';
 
 import MyProfile from './Components/MyProfile';
-import MyPictures from './Components/MyPictures';
 import {
   ContentBox,
   EachRoomPictureList,
+  ImageContainer,
   ProfileBox,
   ProfileImage,
   ProfileInfo,
   SubMenu,
   WrapperBox,
 } from './styles';
+import useIntersect from '@hooks/useIntersect';
+import Spinner from '@styles/Spinner';
+import ImageSection from '@components/ImageSection';
+import { CImageData } from '@typing/client';
 
 const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const userId = sessionStorage.getItem('user_id');
@@ -34,25 +37,65 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const { showUploadImgModal } = useModal();
   const { totalFriendCount } = useFriendList();
   const { totalRoomCount } = useRoomList(userId);
-  const { totalImageCount } = useUserImageData(userId);
+  const {
+    initialLoading,
+    userImageList,
+    userImgLoading,
+    totalImageCount,
+    loadImage,
+    clearUserImageList,
+  } = useUserImageData(userId);
 
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [readStartNumber, setReadStartNum] = useState(0);
+  const [imageLoadEnd, setImageLoadEnd] = useState(false);
 
-  useEffect(() => {
-    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const imageSectionProps = useMemo(
+    () => ({
+      imageList: userImageList as CImageData[],
+      imgListLoading: userImgLoading,
+    }),
+    [userImageList, userImgLoading],
+  );
 
-    if (isMobileValue) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
-  }, []);
+  const observerRef = useIntersect(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
+
+      if (userImgLoading || imageLoadEnd) {
+        return;
+      }
+
+      loadImageFunc();
+    },
+    {
+      threshold: 0.5,
+    },
+  );
+
+  const loadImageFunc = async () => {
+    const loadImageState = await loadImage({
+      readStartNumber,
+    });
+
+    setReadStartNum(loadImageState.readStartNumber);
+    setImageLoadEnd(loadImageState.imageLoadEnd);
+  };
 
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     showUploadImgModal('user');
   };
+
+  useEffect(() => {
+    loadImageFunc();
+
+    return () => {
+      setReadStartNum(0);
+      setImageLoadEnd(false);
+      clearUserImageList();
+    };
+  }, []);
 
   return (
     <AppLayout>
@@ -117,9 +160,16 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
                 <Route
                   index
                   element={
-                    <DeviceCheckContext.Provider value={isMobile}>
-                      <MyPictures />
-                    </DeviceCheckContext.Provider>
+                    <ImageContainer>
+                      {initialLoading ? (
+                        <Spinner />
+                      ) : (
+                        <ImageSection
+                          imageSectionProps={imageSectionProps}
+                          observerRef={observerRef}
+                        />
+                      )}
+                    </ImageContainer>
                   }
                 />
                 <Route
