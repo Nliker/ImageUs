@@ -79,25 +79,6 @@ const ImageRoom = () => {
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobileValue) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadImageFunc();
-
-    return () => {
-      setReadStartNum(0);
-      setImageLoadEnd(false);
-      clearRoomImageList();
-    };
-  }, [filterStateNum, filterSelectTerm, roomId]);
-
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
@@ -219,15 +200,38 @@ const ImageRoom = () => {
     showUploadImgModal('room');
   };
 
-  const checkValideRoomId = () => {
-    if (!roomList) return false;
-
-    const isValidRoomId = roomList.some((roomInfo: DRoomData) => {
+  const checkInvalideRoomId = (roomListProps: DRoomData[]) => {
+    const isValidRoomId = roomListProps.some((roomInfo: DRoomData) => {
       return '' + roomInfo.id === roomId;
     });
 
-    return isValidRoomId;
+    return !isValidRoomId;
   };
+
+  if (!roomList) {
+    return <div>Loading...</div>;
+  } else if (checkInvalideRoomId(roomList)) {
+    return <div>Error 페이지...</div>;
+  }
+
+  useEffect(() => {
+    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobileValue) {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadImageFunc();
+
+    return () => {
+      setReadStartNum(0);
+      setImageLoadEnd(false);
+      clearRoomImageList();
+    };
+  }, [filterStateNum, filterSelectTerm, roomId]);
 
   return (
     <AppLayout isImageRoom>
