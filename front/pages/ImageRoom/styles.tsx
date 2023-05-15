@@ -221,6 +221,7 @@ export const UploadButton = styled.div`
   top: 65%;
   right: 6%;
   text-align: center;
+  z-index: 1;
 
   width: 40px;
   padding: 7px;
