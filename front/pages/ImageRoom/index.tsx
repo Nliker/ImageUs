@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
@@ -26,7 +20,7 @@ import SidebarContext from '@utils/SidebarContext';
 import useRoomList from '@hooks/useRoomList';
 import { getErrorMessage } from '@utils/getErrorMessage';
 
-import ImageSection from './Components/ImageSection';
+import ImageSection from '@components/ImageSection';
 import {
   LeftHeaderIcon,
   ContentBox,
@@ -37,8 +31,6 @@ import {
 import useRoomImgData from '@hooks/useRoomImgData';
 import useIntersect from '@hooks/useIntersect';
 import Spinner from '@styles/Spinner';
-
-export const DeviceCheckContext = createContext<boolean | null>(null);
 
 const ImageRoom = () => {
   const userId = sessionStorage.getItem('user_id');
@@ -56,7 +48,6 @@ const ImageRoom = () => {
     clearRoomImageList,
   } = useRoomImgData(roomId);
 
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [filterTagName, setFilterTagName] = useState('전체 게시물');
   const [filterStateNum, setFilterStateNum] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
@@ -215,15 +206,6 @@ const ImageRoom = () => {
   }
 
   useEffect(() => {
-    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobileValue) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
-  }, []);
-
-  useEffect(() => {
     loadImageFunc();
 
     return () => {
@@ -235,116 +217,113 @@ const ImageRoom = () => {
 
   return (
     <AppLayout isImageRoom>
-      <DeviceCheckContext.Provider value={isMobile}>
-        <Scrollbars>
-          <MainContainer>
-            <LeftHeaderIcon>
-              <div className="active_icon_box">
-                <SidebarContext.Consumer>
-                  {({ setSidebarState }) => (
-                    <div
-                      className="sidebar_icon"
-                      onClick={() => setSidebarState((prev) => !prev)}
-                    >
-                      <IconContext.Provider
-                        value={{
-                          size: '30px',
-                          style: { display: 'inline-block' },
-                        }}
-                      >
-                        <MdOutlineSpaceDashboard />
-                      </IconContext.Provider>
-                    </div>
-                  )}
-                </SidebarContext.Consumer>
-                <div className="leave_icon" onClick={onClickLeaveRoom}>
-                  <IconContext.Provider
-                    value={{
-                      size: '30px',
-                      style: { display: 'inline-block' },
-                    }}
+      <Scrollbars>
+        <MainContainer>
+          <LeftHeaderIcon>
+            <div className="active_icon_box">
+              <SidebarContext.Consumer>
+                {({ setSidebarState }) => (
+                  <div
+                    className="sidebar_icon"
+                    onClick={() => setSidebarState((prev) => !prev)}
                   >
-                    <TbDoorExit />
-                  </IconContext.Provider>
-                </div>
+                    <IconContext.Provider
+                      value={{
+                        size: '30px',
+                        style: { display: 'inline-block' },
+                      }}
+                    >
+                      <MdOutlineSpaceDashboard />
+                    </IconContext.Provider>
+                  </div>
+                )}
+              </SidebarContext.Consumer>
+              <div className="leave_icon" onClick={onClickLeaveRoom}>
+                <IconContext.Provider
+                  value={{
+                    size: '30px',
+                    style: { display: 'inline-block' },
+                  }}
+                >
+                  <TbDoorExit />
+                </IconContext.Provider>
               </div>
-            </LeftHeaderIcon>
+            </div>
+          </LeftHeaderIcon>
 
-            <ContentBox>
-              <div className="content_box_pos">
-                <FilteringOption onClick={onClickFilteringItem}>
-                  <input type="checkbox" id="options-view-button" />
-                  <div id="select-button">
-                    <div className="selected-value">
-                      <span>{filterTagName}</span>
-                    </div>
-                    <div id="chevrons">
-                      <MdKeyboardArrowUp />
-                      <MdKeyboardArrowDown />
-                    </div>
+          <ContentBox>
+            <div className="content_box_pos">
+              <FilteringOption onClick={onClickFilteringItem}>
+                <input type="checkbox" id="options-view-button" />
+                <div id="select-button">
+                  <div className="selected-value">
+                    <span>{filterTagName}</span>
                   </div>
-                  {filterBoxState && (
-                    <div className="options">
-                      <div className="option" id="today">
-                        <span>오늘 날짜</span>
-                      </div>
-                      <div className="option" id="yesterday">
-                        <span>어제 날짜</span>
-                      </div>
-                      <div className="option" id="selectDay">
-                        <span>날짜 선택</span>
-                      </div>
-                      <div className="option" id="default">
-                        <span>전체 게시물</span>
-                      </div>
-                    </div>
-                  )}
-                </FilteringOption>
-                {showSelectDateForm && (
-                  <div className="select_box">
-                    <div className="select_date">
-                      <div className="select_date_c">
-                        <label>시작날</label>
-                        <input type="date" ref={filterStartDateInputRef} />
-                      </div>
-                      <div className="select_date_c">
-                        <label>마지막날</label>
-                        <input type="date" ref={filterEndDateInputRef} />
-                      </div>
-                      <div className="select_data_btn">
-                        <Button
-                          type="button"
-                          onClick={onClickCertainPeriodFilterBtn}
-                        >
-                          확인
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div>
-                  <div className="tag">
-                    <span>
-                      {filterStateNum === 3
-                        ? `${filterSelectTerm.startDate} ~ ${filterSelectTerm.endDate}`
-                        : filterTagName}
-                    </span>
+                  <div id="chevrons">
+                    <MdKeyboardArrowUp />
+                    <MdKeyboardArrowDown />
                   </div>
                 </div>
-                {initialLoading ? (
-                  <Spinner />
-                ) : (
-                  <ImageSection
-                    roomId={roomId}
-                    imageSectionProps={imageSectionProps}
-                    observerRef={observerRef}
-                  />
+                {filterBoxState && (
+                  <div className="options">
+                    <div className="option" id="today">
+                      <span>오늘 날짜</span>
+                    </div>
+                    <div className="option" id="yesterday">
+                      <span>어제 날짜</span>
+                    </div>
+                    <div className="option" id="selectDay">
+                      <span>날짜 선택</span>
+                    </div>
+                    <div className="option" id="default">
+                      <span>전체 게시물</span>
+                    </div>
+                  </div>
                 )}
+              </FilteringOption>
+              {showSelectDateForm && (
+                <div className="select_box">
+                  <div className="select_date">
+                    <div className="select_date_c">
+                      <label>시작날</label>
+                      <input type="date" ref={filterStartDateInputRef} />
+                    </div>
+                    <div className="select_date_c">
+                      <label>마지막날</label>
+                      <input type="date" ref={filterEndDateInputRef} />
+                    </div>
+                    <div className="select_data_btn">
+                      <Button
+                        type="button"
+                        onClick={onClickCertainPeriodFilterBtn}
+                      >
+                        확인
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div>
+                <div className="tag">
+                  <span>
+                    {filterStateNum === 3
+                      ? `${filterSelectTerm.startDate} ~ ${filterSelectTerm.endDate}`
+                      : filterTagName}
+                  </span>
+                </div>
               </div>
-            </ContentBox>
-          </MainContainer>
-        </Scrollbars>
-      </DeviceCheckContext.Provider>
+              {initialLoading ? (
+                <Spinner />
+              ) : (
+                <ImageSection
+                  imageSectionProps={imageSectionProps}
+                  observerRef={observerRef}
+                />
+              )}
+            </div>
+          </ContentBox>
+        </MainContainer>
+      </Scrollbars>
       <UploadButton onClick={onClickUploadModal}>
         <IconContext.Provider
           value={{
