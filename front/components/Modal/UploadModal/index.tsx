@@ -16,7 +16,9 @@ import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
 
 const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
   const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string | undefined }>();
+  const { roomId } = useParams<{ roomId: string }>();
+
+  if (!roomId || !userId) return null;
 
   const { clearModalCache } = useModal();
   const { uploadUserImage } = useUserImageData(userId);

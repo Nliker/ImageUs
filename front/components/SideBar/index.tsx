@@ -21,10 +21,8 @@ interface SidebarProps {
 
 const SideBar = memo(({ show }: SidebarProps) => {
   const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
-  if (!roomId || !userId) return null;
+  if (!userId) return null;
 
-  const { roomList } = useRoomList(userId);
   const sidebarContext = useContext(SidebarContext);
 
   const sideBarEl = useRef<HTMLDivElement>(null);
@@ -48,8 +46,6 @@ const SideBar = memo(({ show }: SidebarProps) => {
     },
     [show],
   );
-
-  if (!roomList) return <div>로딩중...</div>;
 
   return (
     <>
