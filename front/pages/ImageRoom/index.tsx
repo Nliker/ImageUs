@@ -51,7 +51,7 @@ const ImageRoom = () => {
   const {
     initialLoading,
     roomImageList,
-    roomImgListLoading,
+    roomImgLoading,
     loadImage,
     clearRoomImageList,
   } = useRoomImgData(roomId);
@@ -70,10 +70,10 @@ const ImageRoom = () => {
 
   const imageSectionProps = useMemo(
     () => ({
-      roomImageList: roomImageList as CImageData[],
-      roomImgListLoading,
+      imageList: roomImageList as CImageData[],
+      imgListLoading: roomImgLoading,
     }),
-    [roomImageList, roomImgListLoading],
+    [roomImageList, roomImgLoading],
   );
 
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +82,7 @@ const ImageRoom = () => {
   const observerRef = useIntersect(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (roomImgListLoading || imageLoadEnd) {
+      if (roomImgLoading || imageLoadEnd) {
         return;
       }
 

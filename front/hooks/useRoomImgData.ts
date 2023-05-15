@@ -192,7 +192,7 @@ function useRoomImgData(roomId: string) {
   return {
     initialLoading: !roomImageList && !roomImgListError,
     roomImageList,
-    roomImgListLoading: imgDataListLoading || roomImgValidating,
+    roomImgLoading: imgDataListLoading || roomImgValidating,
     uploadRoomImage,
     deleteRoomImage,
     loadImage,
