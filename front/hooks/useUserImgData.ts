@@ -12,13 +12,17 @@ import {
   getUserImgsFetcher,
 } from '@utils/userDataFetcher';
 
-interface IUserImgInfo {
+interface ILoadImage {
   readStartNumber: number;
 }
 
 function useUserImageData(userId: string | null) {
-  const { data: userImageList, mutate: mutateUserImgList } =
-    useSWR<CImageData[]>('/user/imagelist');
+  const {
+    data: userImageList,
+    mutate: mutateUserImgList,
+    isValidating: userImgValidating,
+    error: userImgListError,
+  } = useSWR<CImageData[]>('/user/imagelist');
   const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
     '/user/uploadImgCount',
   );
@@ -41,11 +45,8 @@ function useUserImageData(userId: string | null) {
     uploadUserImageFetcher,
   );
 
-  const loadUserImage = async (fetchInfo: IUserImgInfo) => {
+  const loadImage = async (fetchInfo: ILoadImage) => {
     const { readStartNumber } = fetchInfo;
-    const imageLoading = imgDataListLoading;
-
-    if (imageLoading) return false;
 
     try {
       const newData = await getUserImgsFetcher(`/user/${userId}/imagelist`, {
@@ -68,9 +69,15 @@ function useUserImageData(userId: string | null) {
       );
 
       if (loadCompleted) {
-        return true;
+        return {
+          imageLoadEnd: true,
+          readStartNumber: 0,
+        };
       } else {
-        return false;
+        return {
+          imageLoadEnd: false,
+          readStartNumber: readStartNumber + 12,
+        };
       }
     } catch (error) {
       const message = getErrorMessage(error);
@@ -117,11 +124,12 @@ function useUserImageData(userId: string | null) {
   };
 
   return {
+    initialLoading: !userImageList && !userImgListError,
     userImageList,
-    userImgLoading: imgDataListLoading || !userImageList,
+    userImgLoading: imgDataListLoading || userImgValidating,
     uploadImgSensorNum: uploadImgCount,
     totalImageCount,
-    loadUserImage,
+    loadImage,
     uploadUserImage,
     deleteStoreImage,
     clearUserImageList,
