@@ -31,12 +31,14 @@ export interface IAertData {
   executeWork: () => void;
 }
 
+export type IUploadImgFunc = (uploadImageFile: FormData) => Promise<void>;
+
 export interface IModalData {
   state: string;
   currentModal?: string;
-  uploadImageLocate?: string;
   alertData?: IAertData;
   detailPictureInfo?: IDetailPictureInfo;
+  uploadExecuteFunc?: (uploadImageFile: FormData) => Promise<void>;
 }
 
 export interface IRefineRoomData {
