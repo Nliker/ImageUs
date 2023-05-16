@@ -201,12 +201,6 @@ const ImageRoom = () => {
     return !isValidRoomId;
   };
 
-  if (!roomList) {
-    return <div>Loading...</div>;
-  } else if (checkInvalideRoomId(roomList)) {
-    return <div>Error 페이지...</div>;
-  }
-
   useEffect(() => {
     loadImageFunc();
 
@@ -216,6 +210,12 @@ const ImageRoom = () => {
       clearRoomImageList();
     };
   }, [filterStateNum, filterSelectTerm, roomId]);
+
+  if (!roomList) {
+    return <div>Loading...</div>;
+  } else if (checkInvalideRoomId(roomList)) {
+    return <div>Error 페이지...</div>;
+  }
 
   return (
     <AppLayout isImageRoom>
