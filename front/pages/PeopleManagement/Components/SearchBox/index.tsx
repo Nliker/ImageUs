@@ -101,7 +101,7 @@ const SearchBox = () => {
             <Scrollbars>
               {prevSearchDataList && prevSearchDataList?.length !== 0 ? (
                 prevSearchDataList.map((data: DFriendData) => (
-                  <ul>
+                  <ul key={data.id}>
                     <li
                       key={data.id}
                       className={'preview_li'}
