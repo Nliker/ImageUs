@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { CImageData } from '@typing/client';
@@ -17,6 +18,8 @@ interface ILoadImage {
 }
 
 function useUserImageData(userId: string | null) {
+  const [imageLoadEnd, setImageLoadEnd] = useState(false);
+
   const {
     data: userImageList,
     mutate: mutateUserImgList,
@@ -54,6 +57,8 @@ function useUserImageData(userId: string | null) {
       });
       const { imagelist, loadCompleted } = newData;
 
+      if (loadCompleted) setImageLoadEnd(true);
+
       const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
       mutateUserImgList(
         (prevData: CImageData[] | undefined) => {
@@ -70,12 +75,10 @@ function useUserImageData(userId: string | null) {
 
       if (loadCompleted) {
         return {
-          imageLoadEnd: true,
           readStartNumber: 0,
         };
       } else {
         return {
-          imageLoadEnd: false,
           readStartNumber: readStartNumber + 12,
         };
       }
@@ -120,6 +123,7 @@ function useUserImageData(userId: string | null) {
   };
 
   const clearUserImageList = () => {
+    setImageLoadEnd(false);
     mutateUserImgList(undefined, false);
   };
 
@@ -129,6 +133,7 @@ function useUserImageData(userId: string | null) {
     userImgLoading: imgDataListLoading || userImgValidating,
     uploadImgSensorNum: uploadImgCount,
     totalImageCount,
+    imageLoadEnd,
     loadImage,
     uploadUserImage,
     deleteStoreImage,

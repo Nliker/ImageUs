@@ -8,6 +8,7 @@ import {
   getDefaultImgFetcher,
   getUnreadImgFetcher,
 } from '@utils/imageFetcher';
+import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -19,6 +20,8 @@ interface ILoadImage {
 }
 
 function useRoomImgData(roomId: string) {
+  const [imageLoadEnd, setImageLoadEnd] = useState(false);
+
   const {
     data: roomImageList,
     mutate: mutateRoomImage,
@@ -92,6 +95,8 @@ function useRoomImgData(roomId: string) {
         );
         const { imagelist, loadCompleted } = newData;
 
+        if (loadCompleted) setImageLoadEnd(true);
+
         const newImageDataList =
           (await imgDataListTrigger([...imagelist])) ?? [];
         mutateRoomImage(
@@ -109,12 +114,10 @@ function useRoomImgData(roomId: string) {
 
         if (loadCompleted) {
           return {
-            imageLoadEnd: true,
             readStartNumber: 0,
           };
         } else {
           return {
-            imageLoadEnd: false,
             readStartNumber: readStartNumber + 12,
           };
         }
@@ -129,6 +132,8 @@ function useRoomImgData(roomId: string) {
         );
         const { imagelist, loadCompleted } = newData;
 
+        if (loadCompleted) setImageLoadEnd(true);
+
         const newImageDataList =
           (await imgDataListTrigger([...imagelist])) ?? [];
         mutateRoomImage(
@@ -146,12 +151,10 @@ function useRoomImgData(roomId: string) {
 
         if (loadCompleted) {
           return {
-            imageLoadEnd: true,
             readStartNumber: 0,
           };
         } else {
           return {
-            imageLoadEnd: false,
             readStartNumber: readStartNumber + 12,
           };
         }
@@ -163,6 +166,7 @@ function useRoomImgData(roomId: string) {
   };
 
   const clearRoomImageList = () => {
+    setImageLoadEnd(false);
     mutateRoomImage(undefined, false);
   };
 
@@ -193,6 +197,7 @@ function useRoomImgData(roomId: string) {
     initialLoading: !roomImageList && !roomImgListError,
     roomImageList,
     roomImgLoading: imgDataListLoading || roomImgValidating,
+    imageLoadEnd,
     uploadRoomImage,
     deleteRoomImage,
     loadImage,

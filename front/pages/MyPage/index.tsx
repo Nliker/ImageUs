@@ -42,13 +42,13 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
     userImageList,
     userImgLoading,
     totalImageCount,
+    imageLoadEnd,
     loadImage,
     deleteStoreImage,
     clearUserImageList,
   } = useUserImageData(userId);
 
   const [readStartNumber, setReadStartNum] = useState(0);
-  const [imageLoadEnd, setImageLoadEnd] = useState(false);
 
   const imageSectionProps = useMemo(
     () => ({
@@ -80,7 +80,6 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
     });
 
     setReadStartNum(loadImageState.readStartNumber);
-    setImageLoadEnd(loadImageState.imageLoadEnd);
   };
 
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -94,7 +93,6 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
 
     return () => {
       setReadStartNum(0);
-      setImageLoadEnd(false);
       clearUserImageList();
     };
   }, []);

@@ -44,6 +44,7 @@ const ImageRoom = () => {
     initialLoading,
     roomImageList,
     roomImgLoading,
+    imageLoadEnd,
     loadImage,
     deleteRoomImage,
     clearRoomImageList,
@@ -58,7 +59,6 @@ const ImageRoom = () => {
     endDate: '',
   });
   const [readStartNumber, setReadStartNum] = useState(0);
-  const [imageLoadEnd, setImageLoadEnd] = useState(false);
 
   const imageSectionProps = useMemo(
     () => ({
@@ -78,7 +78,6 @@ const ImageRoom = () => {
       if (roomImgLoading || imageLoadEnd) {
         return;
       }
-
       loadImageFunc();
     },
     {
@@ -95,7 +94,6 @@ const ImageRoom = () => {
     });
 
     setReadStartNum(loadImageState.readStartNumber);
-    setImageLoadEnd(loadImageState.imageLoadEnd);
   };
 
   const getDateString = (dateValue: Date) => {
@@ -206,7 +204,6 @@ const ImageRoom = () => {
 
     return () => {
       setReadStartNum(0);
-      setImageLoadEnd(false);
       clearRoomImageList();
     };
   }, [filterStateNum, filterSelectTerm, roomId]);
