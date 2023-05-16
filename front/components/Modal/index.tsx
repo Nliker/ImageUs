@@ -1,6 +1,11 @@
 import React from 'react';
 
-import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
+import {
+  IAertData,
+  IDetailPictureInfo,
+  IModalData,
+  IUploadImgFunc,
+} from '@typing/client';
 import AlertBox from './AlertBoxModal';
 import CreateRoomModal from './CreateRoomModal';
 import DetailPictureInfo from './DetailPictureModal';
@@ -23,7 +28,7 @@ const Modal = ({ modalData }: { modalData: IModalData }) => {
         <AlertBox alertData={modalData.alertData as IAertData} />
       ) : currentModal === 'upload' ? (
         <UploadModal
-          uploadImageLocate={modalData.uploadImageLocate as string}
+          executeFunc={modalData.uploadExecuteFunc as IUploadImgFunc}
         />
       ) : currentModal === 'createRoom' ? (
         <CreateRoomModal />

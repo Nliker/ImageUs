@@ -47,6 +47,7 @@ const ImageRoom = () => {
     imageLoadEnd,
     loadImage,
     deleteRoomImage,
+    uploadRoomImage,
     clearRoomImageList,
   } = useRoomImgData(roomId);
 
@@ -188,7 +189,7 @@ const ImageRoom = () => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    showUploadImgModal('room');
+    showUploadImgModal({ executeFunc: uploadRoomImage });
   };
 
   const checkInvalideRoomId = (roomListProps: DRoomData[]) => {

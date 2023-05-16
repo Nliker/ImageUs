@@ -45,6 +45,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
     imageLoadEnd,
     loadImage,
     deleteStoreImage,
+    uploadUserImage,
     clearUserImageList,
   } = useUserImageData(userId);
 
@@ -85,7 +86,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    showUploadImgModal('user');
+    showUploadImgModal({ executeFunc: uploadUserImage });
   };
 
   useEffect(() => {

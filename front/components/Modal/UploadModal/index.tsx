@@ -1,6 +1,5 @@
 import React, { DragEvent, useState, useEffect, useRef, useMemo } from 'react';
 
-import { useParams } from 'react-router';
 import { BsFilePlus } from 'react-icons/bs';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
@@ -8,21 +7,13 @@ import { IconContext } from 'react-icons/lib';
 import { Button } from '@styles/Button';
 import useInput from '@hooks/useInput';
 import useModal from '@hooks/useModal';
-import useUserImageData from '@hooks/useUserImgData';
-import useRoomImgData from '@hooks/useRoomImgData';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import ModalLayout from '../ModalLayout';
 import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
+import { IUploadImgFunc } from '@typing/client';
 
-const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
-  const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
-
-  if (!roomId || !userId) return null;
-
+const UploadModal = ({ executeFunc }: { executeFunc: IUploadImgFunc }) => {
   const { clearModalCache } = useModal();
-  const { uploadUserImage } = useUserImageData(userId);
-  const { uploadRoomImage } = useRoomImgData(roomId);
 
   const size = { width: 412, height: 550 };
 
@@ -63,10 +54,9 @@ const UploadModal = ({ uploadImageLocate }: { uploadImageLocate: string }) => {
         throw new Error('이미지를 등록해주세요');
       }
 
-      if (uploadImageLocate === 'room') {
-        await uploadRoomImage(uploadImageFile);
-      } else if (uploadImageLocate === 'user') {
-        await uploadUserImage(uploadImageFile);
+      await executeFunc(uploadImageFile);
+      if (window.location.pathname === '/my_page') {
+        window.location.reload();
       }
       alert('사진을 업로드하였습니다!');
       clearModalCache();

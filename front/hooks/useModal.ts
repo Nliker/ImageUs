@@ -1,5 +1,10 @@
 import useSWR from 'swr';
-import { IAertData, IDetailPictureInfo, IModalData } from '@typing/client';
+import {
+  IAertData,
+  IDetailPictureInfo,
+  IModalData,
+  IUploadImgFunc,
+} from '@typing/client';
 
 function useModal() {
   const initialValue: IModalData = {
@@ -35,14 +40,18 @@ function useModal() {
     });
   };
 
-  const showUploadImgModal = (uploadImageLocate: string) => {
+  const showUploadImgModal = ({
+    executeFunc,
+  }: {
+    executeFunc: IUploadImgFunc;
+  }) => {
     if (!data) return;
 
     modalMutate({
       ...data,
       state: 'on',
       currentModal: 'upload',
-      uploadImageLocate,
+      uploadExecuteFunc: executeFunc,
     });
   };
 
