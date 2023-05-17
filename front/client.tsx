@@ -1,7 +1,6 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import axios from 'axios';
-import { BrowserRouter } from 'react-router-dom';
 
 import App from '@layouts/App';
 
@@ -17,9 +16,7 @@ if (!container) throw new Error('Failed to find the root element');
 const root = ReactDOMClient.createRoot(container);
 
 root.render(
-  <BrowserRouter>
-    <Suspense fallback={<div>Loading...</div>}>
-      <App />
-    </Suspense>
-  </BrowserRouter>,
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
 );
