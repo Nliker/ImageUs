@@ -39,7 +39,7 @@ const ImageRoom = () => {
 
   const navigate = useNavigate();
   const { showUploadImgModal, showAlertModal } = useModal();
-  const { roomList, leaveRoom } = useRoomList(userId);
+  const { leaveRoom } = useRoomList(userId);
   const {
     initialLoading,
     roomImageList,
@@ -209,10 +209,8 @@ const ImageRoom = () => {
     };
   }, [filterStateNum, filterSelectTerm, roomId]);
 
-  if (!roomList) {
+  if (initialLoading) {
     return <div>Loading...</div>;
-  } else if (checkInvalideRoomId(roomList)) {
-    return <div>Error 페이지...</div>;
   }
 
   return (
