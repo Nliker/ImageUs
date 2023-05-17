@@ -1,5 +1,4 @@
 import { CImageData } from '@typing/client';
-import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getImageDataFetcher,
   deleteRoomImgFetcher,
@@ -11,6 +10,7 @@ import {
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { useThrowAsyncError } from './useThrowAsyncError';
 
 interface ILoadImage {
   isfiltered: boolean;
@@ -21,6 +21,7 @@ interface ILoadImage {
 
 function useRoomImgData(roomId: string) {
   const [imageLoadEnd, setImageLoadEnd] = useState(false);
+  const throwAsyncError = useThrowAsyncError();
 
   const {
     data: roomImageList,
@@ -59,8 +60,9 @@ function useRoomImgData(roomId: string) {
       await uploadRoomImageTrigger({ uploadImageFile });
       await mutateRealTimeImage();
     } catch (error) {
-      const message = getErrorMessage(error);
-      throw new Error(message);
+      // const message = getErrorMessage(error);
+      // throw new Error(message);
+      throwAsyncError(error);
     }
   };
 
@@ -72,8 +74,9 @@ function useRoomImgData(roomId: string) {
       const filterImgList = roomImageList.filter((data) => data.id !== imageId);
       mutateRoomImage([...filterImgList], false);
     } catch (error) {
-      const message = getErrorMessage(error);
-      throw new Error(message);
+      // const message = getErrorMessage(error);
+      // throw new Error(message);
+      throwAsyncError(error);
     }
   };
 
@@ -160,8 +163,12 @@ function useRoomImgData(roomId: string) {
         }
       }
     } catch (error) {
-      const message = getErrorMessage(error);
-      throw new Error(message);
+      throwAsyncError(error);
+      return {
+        readStartNumber: 0,
+      };
+      // const message = getErrorMessage(error);
+      // throw new Error(message);
     }
   };
 
@@ -188,8 +195,9 @@ function useRoomImgData(roomId: string) {
         },
       );
     } catch (error) {
-      const message = getErrorMessage(error);
-      throw new Error(message);
+      // const message = getErrorMessage(error);
+      // throw new Error(message);
+      throwAsyncError(error);
     }
   }
 
