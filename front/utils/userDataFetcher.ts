@@ -139,7 +139,7 @@ const getUserRoomListFetcher = async (url: string) => {
 
     const { roomlist } = response.data;
 
-    return roomlist;
+    return [...roomlist];
   } catch (err) {
     if (err instanceof AxiosError) {
       throw new Error('방의 목록을 불러오는데 실패했습니다..새로고침 하세요..');
