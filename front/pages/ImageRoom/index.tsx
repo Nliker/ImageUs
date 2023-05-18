@@ -70,6 +70,7 @@ const ImageRoom = () => {
     [roomImageList, roomImgLoading],
   );
 
+  const effectRan = useRef(false);
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
 
@@ -201,11 +202,16 @@ const ImageRoom = () => {
   };
 
   useEffect(() => {
-    loadImageFunc();
+    // if (roomImgLoading) return;
+    if (effectRan.current === false) {
+      console.log('이미지 로드', roomId, roomImageList);
+      loadImageFunc();
+    }
 
     return () => {
       setReadStartNum(0);
       clearRoomImageList();
+      effectRan.current = true;
     };
   }, [filterStateNum, filterSelectTerm, roomId]);
 
