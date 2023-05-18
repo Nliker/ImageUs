@@ -10,7 +10,6 @@ function useAuth() {
     error,
     isValidating,
   } = useSWR('/user/my', logInCheckFetcher, {
-    revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     fallbackData: { isAuthenticated: 'init', userInfo: null },
