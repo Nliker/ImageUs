@@ -11,7 +11,6 @@ import {
 } from 'react-icons/md';
 import Scrollbars from 'react-custom-scrollbars-2';
 
-import { DRoomData } from '@typing/db';
 import AppLayout from '@layouts/AppLayout';
 import useModal from '@hooks/useModal';
 import { Button } from '@styles/Button';
@@ -193,14 +192,6 @@ const ImageRoom = () => {
     showUploadImgModal({ executeFunc: uploadRoomImage });
   };
 
-  const checkInvalideRoomId = (roomListProps: DRoomData[]) => {
-    const isValidRoomId = roomListProps.some((roomInfo: DRoomData) => {
-      return '' + roomInfo.id === roomId;
-    });
-
-    return !isValidRoomId;
-  };
-
   useEffect(() => {
     // if (roomImgLoading) return;
     if (effectRan.current === false) {
@@ -220,7 +211,7 @@ const ImageRoom = () => {
   }
 
   return (
-    <AppLayout isImageRoom>
+    <>
       <Scrollbars>
         <MainContainer>
           <LeftHeaderIcon>
@@ -339,7 +330,7 @@ const ImageRoom = () => {
         </IconContext.Provider>
         <span>업로드</span>
       </UploadButton>
-    </AppLayout>
+    </>
   );
 };
 

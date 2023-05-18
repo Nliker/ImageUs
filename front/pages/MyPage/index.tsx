@@ -99,91 +99,89 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   }, []);
 
   return (
-    <AppLayout>
-      <WrapperBox>
-        <Scrollbars>
-          <ContentBox>
-            <ProfileBox>
-              <ProfileImage>
-                <IconContext.Provider
-                  value={{ size: '100%', style: { display: 'inline-block' } }}
-                >
-                  <BiUserCircle />
-                </IconContext.Provider>
-              </ProfileImage>
-              <ProfileInfo>
-                <div>
-                  <h2 className="user_name">{userInfo?.name ?? 'USER'}</h2>
-                </div>
-                <ul>
-                  <li>
-                    <div>
-                      게시물 <span>{totalImageCount ?? 0}</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div>
-                      등록된 방 <span>{totalRoomCount ?? 0}</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div>
-                      친구수 <span>{totalFriendCount ?? 0}</span>
-                    </div>
-                  </li>
-                </ul>
-              </ProfileInfo>
-            </ProfileBox>
-            <div className="upload_image">
-              <Button onClick={onClickUploadModal}>이미지 업로드하기</Button>
-            </div>
-            <EachRoomPictureList>
-              <SubMenu>
-                <NavLink
-                  to={`/my_page`}
-                  className={({ isActive }) =>
-                    isActive ? 'menu_active' : undefined
-                  }
-                  end
-                >
-                  <div>사진첩</div>
-                </NavLink>
-                <NavLink
-                  to={`/my_page/my_profile`}
-                  className={({ isActive }) =>
-                    isActive ? 'menu_active' : undefined
-                  }
-                >
-                  <div>프로필</div>
-                </NavLink>
-              </SubMenu>
-              <Routes>
-                <Route
-                  index
-                  element={
-                    <ImageContainer>
-                      {initialLoading ? (
-                        <Spinner />
-                      ) : (
-                        <ImageSection
-                          imageSectionProps={imageSectionProps}
-                          observerRef={observerRef}
-                        />
-                      )}
-                    </ImageContainer>
-                  }
-                />
-                <Route
-                  path="my_profile"
-                  element={<MyProfile userInfo={userInfo} />}
-                />
-                <Route path="*" element={<Navigate to="/my_page" />} />
-              </Routes>
-            </EachRoomPictureList>
-          </ContentBox>
-        </Scrollbars>
-      </WrapperBox>
-    </AppLayout>
+    <WrapperBox>
+      <Scrollbars>
+        <ContentBox>
+          <ProfileBox>
+            <ProfileImage>
+              <IconContext.Provider
+                value={{ size: '100%', style: { display: 'inline-block' } }}
+              >
+                <BiUserCircle />
+              </IconContext.Provider>
+            </ProfileImage>
+            <ProfileInfo>
+              <div>
+                <h2 className="user_name">{userInfo?.name ?? 'USER'}</h2>
+              </div>
+              <ul>
+                <li>
+                  <div>
+                    게시물 <span>{totalImageCount ?? 0}</span>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    등록된 방 <span>{totalRoomCount ?? 0}</span>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    친구수 <span>{totalFriendCount ?? 0}</span>
+                  </div>
+                </li>
+              </ul>
+            </ProfileInfo>
+          </ProfileBox>
+          <div className="upload_image">
+            <Button onClick={onClickUploadModal}>이미지 업로드하기</Button>
+          </div>
+          <EachRoomPictureList>
+            <SubMenu>
+              <NavLink
+                to={`/my_page`}
+                className={({ isActive }) =>
+                  isActive ? 'menu_active' : undefined
+                }
+                end
+              >
+                <div>사진첩</div>
+              </NavLink>
+              <NavLink
+                to={`/my_page/my_profile`}
+                className={({ isActive }) =>
+                  isActive ? 'menu_active' : undefined
+                }
+              >
+                <div>프로필</div>
+              </NavLink>
+            </SubMenu>
+            <Routes>
+              <Route
+                index
+                element={
+                  <ImageContainer>
+                    {initialLoading ? (
+                      <Spinner />
+                    ) : (
+                      <ImageSection
+                        imageSectionProps={imageSectionProps}
+                        observerRef={observerRef}
+                      />
+                    )}
+                  </ImageContainer>
+                }
+              />
+              <Route
+                path="my_profile"
+                element={<MyProfile userInfo={userInfo} />}
+              />
+              <Route path="*" element={<Navigate to="/my_page" />} />
+            </Routes>
+          </EachRoomPictureList>
+        </ContentBox>
+      </Scrollbars>
+    </WrapperBox>
   );
 };
 
