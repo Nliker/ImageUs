@@ -10,6 +10,7 @@ import useAuth from '@hooks/useAuth';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
+import NotFound from '@components/NotFound';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -48,7 +49,7 @@ function App() {
           </Route>
           <Route path="people_management/*" element={<PeopleManagement />} />
         </Route>
-        <Route path="*" element={<div>404 페이지</div>} />
+        <Route path="*" element={<NotFound />} />
       </Route>,
     ),
   );
