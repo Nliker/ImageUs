@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { NavLink } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router';
@@ -6,7 +6,6 @@ import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import AppLayout from '@layouts/AppLayout';
 import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
 import useRoomList from '@hooks/useRoomList';
@@ -50,6 +49,7 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   } = useUserImageData(userId);
 
   const [readStartNumber, setReadStartNum] = useState(0);
+  const effectRan = useRef(false);
 
   const imageSectionProps = useMemo(
     () => ({
@@ -90,11 +90,14 @@ const MyPage = ({ userInfo }: { userInfo: DUserInfo | null }) => {
   };
 
   useEffect(() => {
-    loadImageFunc();
+    if (effectRan.current === false) {
+      loadImageFunc();
+    }
 
     return () => {
       setReadStartNum(0);
       clearUserImageList();
+      effectRan.current = true;
     };
   }, []);
 
