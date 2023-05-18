@@ -5,6 +5,8 @@ export const Wrapper = styled.div`
 
   overflow: hidden;
   user-select: none;
+
+  font-family: 'Dongle', 'Nanum Gothic', sans-serif;
 `;
 
 export const OuterContainer = styled.div<{
