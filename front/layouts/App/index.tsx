@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Route,
   RouterProvider,
@@ -9,8 +9,7 @@ import loadable from '@loadable/component';
 import useAuth from '@hooks/useAuth';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
-import useRoomList from '@hooks/useRoomList';
-import { DRoomData } from '@typing/db';
+import CheckRoomId from './CheckRoomId';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -30,9 +29,7 @@ function App() {
     [isAuthenticated, loading, error],
   );
 
-  useEffect(() => {
-    refreshAuthData();
-  }, []);
+  console.log('app 확인', isAuthenticated, loading);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -46,27 +43,9 @@ function App() {
         <Route element={<PrivateRoute authData={authData} />}>
           <Route path="select-room" element={<SelectRoom />} />
           <Route path="my_page/*" element={<MyPage userInfo={userInfo} />} />
-          <Route
-            path="room/:roomId"
-            loader={async ({ params }) => {
-              console.log('loader');
-              const userId = sessionStorage.getItem('user_id');
-              const { roomId } = params;
-              if (!userId)
-                throw new Error('유저의 정보가 없습니다.. 다시로그인하세요');
-
-              const { roomList } = useRoomList(userId);
-              const isValidRoomId = roomList?.some((roomInfo: DRoomData) => {
-                return '' + roomInfo.id === roomId;
-              });
-
-              console.log('방 존재', roomList, isValidRoomId);
-              if (!isValidRoomId)
-                throw new Error('존재하지 않는 방입니다..다른 방에 접속하세요');
-            }}
-            errorElement={<div>not found</div>}
-            element={<ImageRoom />}
-          />
+          <Route path="room/:roomId" element={<CheckRoomId />}>
+            <Route index element={<ImageRoom />} />
+          </Route>
           <Route path="people_management/*" element={<PeopleManagement />} />
         </Route>
         <Route path="*" element={<div>404 페이지</div>} />
