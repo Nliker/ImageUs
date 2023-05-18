@@ -81,6 +81,7 @@ function useRoomList(userId: string) {
     roomList,
     refineRoomList,
     totalRoomCount: roomList?.length,
+    loading: !roomList && !roomListError,
     fetchRoomList: roomListMutate,
     getHostIdByRoom,
     createRoom,
