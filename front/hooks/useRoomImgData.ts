@@ -10,7 +10,8 @@ import {
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { useThrowAsyncError } from './useThrowAsyncError';
+import { getErrorMessage } from '@utils/getErrorMessage';
+import { toast } from 'react-toastify';
 
 interface ILoadImage {
   isfiltered: boolean;
@@ -21,7 +22,6 @@ interface ILoadImage {
 
 function useRoomImgData(roomId: string) {
   const [imageLoadEnd, setImageLoadEnd] = useState(false);
-  const throwAsyncError = useThrowAsyncError();
 
   const {
     data: roomImageList,
@@ -60,9 +60,10 @@ function useRoomImgData(roomId: string) {
       await uploadRoomImageTrigger({ uploadImageFile });
       await mutateRealTimeImage();
     } catch (error) {
-      // const message = getErrorMessage(error);
-      // throw new Error(message);
-      throwAsyncError(error);
+      const message = getErrorMessage(error);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -74,9 +75,10 @@ function useRoomImgData(roomId: string) {
       const filterImgList = roomImageList.filter((data) => data.id !== imageId);
       mutateRoomImage([...filterImgList], false);
     } catch (error) {
-      // const message = getErrorMessage(error);
-      // throw new Error(message);
-      throwAsyncError(error);
+      const message = getErrorMessage(error);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -139,6 +141,7 @@ function useRoomImgData(roomId: string) {
 
         const newImageDataList =
           (await imgDataListTrigger([...imagelist])) ?? [];
+
         mutateRoomImage(
           (prevData: CImageData[] | undefined) => {
             if (!prevData) {
@@ -163,18 +166,15 @@ function useRoomImgData(roomId: string) {
         }
       }
     } catch (error) {
-      throwAsyncError(error);
+      const message = getErrorMessage(error);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
+
       return {
         readStartNumber: 0,
       };
-      // const message = getErrorMessage(error);
-      // throw new Error(message);
     }
-  };
-
-  const clearRoomImageList = () => {
-    setImageLoadEnd(false);
-    mutateRoomImage(undefined, false);
   };
 
   async function updateImageList() {
@@ -182,7 +182,6 @@ function useRoomImgData(roomId: string) {
       const newData = await getUnreadImgFetcher(
         `/room/${roomId}/unread-imagelist`,
       );
-
       await mutateRoomImage(
         async () => await imgDataListTrigger([...newData]),
         {
@@ -195,14 +194,21 @@ function useRoomImgData(roomId: string) {
         },
       );
     } catch (error) {
-      // const message = getErrorMessage(error);
-      // throw new Error(message);
-      throwAsyncError(error);
+      const message = getErrorMessage(error);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   }
 
+  const clearRoomImageList = () => {
+    setImageLoadEnd(false);
+    mutateRoomImage(undefined, false);
+  };
+
   return {
     initialLoading: !roomImageList && !roomImgListError,
+    roomImgListError,
     roomImageList,
     roomImgLoading: imgDataListLoading || roomImgValidating,
     imageLoadEnd,
