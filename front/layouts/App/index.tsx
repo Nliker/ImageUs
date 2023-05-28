@@ -1,16 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import {
   Route,
+  Router,
   RouterProvider,
+  Routes,
   createBrowserRouter,
   createRoutesFromElements,
+  useLocation,
 } from 'react-router-dom';
 import loadable from '@loadable/component';
 import useAuth from '@hooks/useAuth';
+import { NotFoundPage } from '@components/ErrorComponent';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
-import NotFound from '@components/NotFound';
+import { GlobalErrorBoundary } from '@components/ErrorBoundary';
+import { DUserInfo } from '@typing/db';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -22,13 +27,24 @@ const ImageRoom = loadable(() => import('@pages/ImageRoom'));
 const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
 
 function App() {
+  const effectRun = useRef(false);
   const { isAuthenticated, loading, userInfo, error, refreshAuthData } =
     useAuth();
 
   const authData = useMemo(
-    () => ({ isAuthenticated, loading, error }),
-    [isAuthenticated, loading, error],
+    () => ({ isAuthenticated, loading, error, userInfo }),
+    [isAuthenticated, loading, error, userInfo],
   );
+
+  useEffect(() => {
+    if (effectRun.current === false) {
+      refreshAuthData();
+    }
+
+    return () => {
+      effectRun.current = true;
+    };
+  }, []);
 
   console.log('app 확인', isAuthenticated, loading);
 
@@ -41,15 +57,21 @@ function App() {
           <Route path="signup" element={<SignUp />} />
           <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
         </Route>
-        <Route element={<PrivateRoute authData={authData} />}>
+        <Route
+          element={
+            <GlobalErrorBoundary>
+              <PrivateRoute authData={authData} />
+            </GlobalErrorBoundary>
+          }
+        >
           <Route path="select-room" element={<SelectRoom />} />
-          <Route path="my_page/*" element={<MyPage userInfo={userInfo} />} />
-          <Route path="room/:roomId" element={<CheckRoomId />}>
-            <Route index element={<ImageRoom />} />
+          <Route path="my_page/*" element={<MyPage />} />
+          <Route element={<CheckRoomId />}>
+            <Route path="room/:roomId" element={<ImageRoom />} />
           </Route>
           <Route path="people_management/*" element={<PeopleManagement />} />
         </Route>
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>,
     ),
   );
