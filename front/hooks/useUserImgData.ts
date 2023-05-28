@@ -12,12 +12,13 @@ import {
   getUserImgLenFetcher,
   getUserImgsFetcher,
 } from '@utils/userDataFetcher';
+import { toast } from 'react-toastify';
 
 interface ILoadImage {
   readStartNumber: number;
 }
 
-function useUserImageData(userId: string | null) {
+function useUserImageData(userId: number) {
   const [imageLoadEnd, setImageLoadEnd] = useState(false);
 
   const {
@@ -84,7 +85,9 @@ function useUserImageData(userId: string | null) {
       }
     } catch (error) {
       const message = getErrorMessage(error);
-      throw new Error(message);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -103,7 +106,9 @@ function useUserImageData(userId: string | null) {
       await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
-      throw new Error(message);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -118,7 +123,9 @@ function useUserImageData(userId: string | null) {
       await refreshTotalImgCount();
     } catch (error) {
       const message = getErrorMessage(error);
-      throw new Error(message);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 

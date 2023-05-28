@@ -6,13 +6,14 @@ import { DRoomData } from '@typing/db';
 import { createRoomFetcher, leaveRoomFetcher } from '@utils/roomDataFetcher';
 import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import { getErrorMessage } from '@utils/getErrorMessage';
+import { toast } from 'react-toastify';
 
 interface ICreateRoomParam {
   selectMemberIdList: number[];
   roomName: string;
 }
 
-function useRoomList(userId: string) {
+function useRoomList(userId: number) {
   const {
     data: roomList,
     mutate: roomListMutate,
@@ -63,7 +64,9 @@ function useRoomList(userId: string) {
       await roomListMutate();
     } catch (error) {
       const message = getErrorMessage(error);
-      throw new Error(message);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -73,7 +76,9 @@ function useRoomList(userId: string) {
       await roomListMutate();
     } catch (error) {
       const message = getErrorMessage(error);
-      throw new Error(message);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
