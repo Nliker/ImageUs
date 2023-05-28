@@ -1,7 +1,14 @@
+import { useState } from 'react';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { DUserInfo } from '@typing/db';
+
+interface ILoginData {
+  isAuthenticated: string;
+  userInfo?: DUserInfo;
+}
 
 function useAuth() {
   const {
@@ -9,10 +16,12 @@ function useAuth() {
     mutate: updateLogInData,
     error,
     isValidating,
-  } = useSWR('/user/my', logInCheckFetcher, {
+  } = useSWR<ILoginData>('/user/my', logInCheckFetcher, {
+    revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    fallbackData: { isAuthenticated: 'init', userInfo: null },
+    revalidateOnMount: false,
+    fallbackData: { isAuthenticated: 'init' },
   });
 
   const { trigger: logInTrigger } = useSWRMutation(
@@ -46,8 +55,8 @@ function useAuth() {
   };
 
   return {
-    isAuthenticated: logInData.isAuthenticated,
-    userInfo: logInData.userInfo,
+    isAuthenticated: logInData?.isAuthenticated ?? 'unauthorized',
+    userInfo: logInData?.userInfo,
     loading: (!logInData && !error) || isValidating,
     error,
     logInRequest,
