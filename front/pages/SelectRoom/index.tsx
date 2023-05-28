@@ -9,6 +9,9 @@ import useModal from '@hooks/useModal';
 
 import Roomlist from './Components/Roomlist';
 import { MainContainer } from './styles';
+import { useOutletContext } from 'react-router';
+import { PrivateChildProps } from '@typing/client';
+import withErrorBoundary from '@layouts/ErrorBoundary';
 
 const SelectRoom = () => {
   const { showCreateRoomModal } = useModal();
@@ -20,23 +23,23 @@ const SelectRoom = () => {
   };
 
   return (
-    <MainContainer>
-      <div className="list_box">
-        <header>
-          <h1>
-            방 목록
-            <div className="create_btn" onClick={handleCreateRoom}>
-              <IconContext.Provider value={{ size: '30px' }}>
-                <AiOutlinePlus />
-              </IconContext.Provider>
-            </div>
-          </h1>
-        </header>
-        <Scrollbars>
+    <AppLayout>
+      <MainContainer>
+        <div className="list_box">
+          <header>
+            <h1>
+              방 목록
+              <div className="create_btn" onClick={handleCreateRoom}>
+                <IconContext.Provider value={{ size: '30px' }}>
+                  <AiOutlinePlus />
+                </IconContext.Provider>
+              </div>
+            </h1>
+          </header>
           <Roomlist />
-        </Scrollbars>
-      </div>
-    </MainContainer>
+        </div>
+      </MainContainer>
+    </AppLayout>
   );
 };
 
