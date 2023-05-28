@@ -4,7 +4,7 @@ export interface CAuthData {
   isAuthenticated: string;
   loading: boolean;
   error: Error;
-  userInfo?: DUserInfo | null;
+  userInfo?: DUserInfo;
 }
 
 export interface CImageData {
@@ -49,4 +49,9 @@ export interface IRefineRoomData {
 export interface IUserListByRoom {
   hostId: number;
   userList: DFriendData[];
+}
+
+export interface PrivateChildProps {
+  userInfo: DUserInfo;
+  roomId: string;
 }
