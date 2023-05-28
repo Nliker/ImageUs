@@ -8,10 +8,6 @@ import { getErrorMessage } from '@utils/getErrorMessage';
 import { InfoSection, InfoTable } from './styles';
 
 const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
-  const userId = sessionStorage.getItem('user_id');
-
-  if (!userId) return null;
-
   const { requestChangeName } = useUserData();
   const [nameInput, setNameInput, handleNameInput] = useInput('');
 

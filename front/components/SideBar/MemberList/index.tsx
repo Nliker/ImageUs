@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
+import { useOutletContext, useParams } from 'react-router';
 
 import { IoMdArrowDropright } from 'react-icons/io';
 
@@ -13,6 +13,7 @@ import useRoomList from '@hooks/useRoomList';
 import useUserListByRoom from '@hooks/useUserListByRoom';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
+import { PrivateChildProps } from '@typing/client';
 
 const preventClickCSS = {
   pointerEvents: 'none' as React.CSSProperties['pointerEvents'],
@@ -23,12 +24,13 @@ const labelMarginCSS = {
 };
 
 const MemberList = memo(() => {
-  const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
-  if (!roomId || !userId) return null;
+  // const userId = sessionStorage.getItem('user_id');
+  const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
+  // const { roomId } = useParams<{ roomId: string }>();
+  // if (!roomId) return null;
 
   const { showAlertModal, showInviteMemberModal } = useModal();
-  const { roomList, getHostIdByRoom } = useRoomList(userId);
+  const { roomList, getHostIdByRoom } = useRoomList(userInfo.id);
   const { userListByRoom, kickOutMember } = useUserListByRoom(roomId);
   const [memberCollapse, setMemberCollapse] = useState<boolean>(true);
   const hostId = useMemo(() => {
@@ -81,7 +83,7 @@ const MemberList = memo(() => {
                       type="radio"
                       id={`member_${item.id}`}
                       name={`radio-group-member`}
-                      defaultChecked={userId === '' + item.id}
+                      defaultChecked={userInfo.id === item.id}
                       boxName={'member'}
                     />
                     <DataLabel htmlFor={`member_${item.id}`}>
@@ -89,14 +91,14 @@ const MemberList = memo(() => {
                         {hostId === item.id && (
                           <span className="room_manager_mark">방장</span>
                         )}
-                        {userId === '' + item.id && (
+                        {userInfo.id === item.id && (
                           <span className="onself_mark">나</span>
                         )}
                       </div>
                       <span
                         className="item_text"
                         style={
-                          userId === '' + item.id || hostId === item.id
+                          userInfo.id === item.id || hostId === item.id
                             ? labelMarginCSS
                             : undefined
                         }
@@ -105,7 +107,7 @@ const MemberList = memo(() => {
                       </span>
                     </DataLabel>
                   </div>
-                  {userId === '' + hostId && hostId !== item.id && (
+                  {userInfo.id === hostId && hostId !== item.id && (
                     <Button className="error" onClick={onClickKickOut(item)}>
                       강퇴
                     </Button>

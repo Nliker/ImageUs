@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 
-import { CImageData } from '@typing/client';
+import { CImageData, PrivateChildProps } from '@typing/client';
 import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
 import { getErrorMessage } from '@utils/getErrorMessage';
@@ -13,6 +13,7 @@ import {
   ImageInfo,
   InfoContainer,
 } from './styles';
+import { useOutletContext } from 'react-router';
 
 interface Props {
   data: CImageData;
@@ -30,6 +31,7 @@ const blindCSS: CSSProperties = {
 };
 
 const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
+  const { userInfo } = useOutletContext<PrivateChildProps>();
   const { showAlertModal, showDetailPictureModal } = useModal();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -73,7 +75,7 @@ const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
                 {`자세히 
 `}
               </Button>
-              {data.user_id + '' === sessionStorage.getItem('user_id') && (
+              {data.user_id === userInfo.id && (
                 <Button
                   type="button"
                   className="error"
@@ -101,7 +103,7 @@ const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
                 {`자세히 
 보기`}
               </Button>
-              {data.user_id + '' === sessionStorage.getItem('user_id') && (
+              {data.user_id === userInfo.id && (
                 <Button
                   type="button"
                   className="error"

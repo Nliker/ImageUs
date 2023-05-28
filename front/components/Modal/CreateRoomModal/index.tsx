@@ -19,15 +19,18 @@ import {
   RoomNameInput,
 } from './styles';
 import ModalLayout from '../ModalLayout';
+import { PrivateChildProps } from '@typing/client';
+import { useOutletContext } from 'react-router';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
 const CreateRoomModal = () => {
-  const userId = sessionStorage.getItem('user_id');
-  if (!userId) return null;
+  const { userInfo } = useOutletContext<PrivateChildProps>();
+  // const userId = sessionStorage.getItem('user_id');
+  // if (!userId) return null;
 
   const { clearModalCache } = useModal();
-  const { createRoom } = useRoomList(userId);
+  const { createRoom } = useRoomList(userInfo.id);
   const { friendList } = useFriendList();
 
   const size = { width: 412, height: 550 };
@@ -158,7 +161,7 @@ const CreateRoomModal = () => {
                         })}
                       </ul>
                     ) : (
-                      <p>등록된 친구가 없습니다.</p>
+                      <p className="no_friends">등록된 친구가 없습니다.</p>
                     )}
                   </Scrollbars>
                 </div>

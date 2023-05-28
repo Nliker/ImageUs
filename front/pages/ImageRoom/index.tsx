@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
 import { SlCloudUpload } from 'react-icons/sl';
@@ -11,15 +11,15 @@ import {
 } from 'react-icons/md';
 import Scrollbars from 'react-custom-scrollbars-2';
 
-import AppLayout from '@layouts/AppLayout';
-import useModal from '@hooks/useModal';
-import { Button } from '@styles/Button';
-import { CImageData, SelectTerm } from '@typing/client';
-import SidebarContext from '@utils/SidebarContext';
-import useRoomList from '@hooks/useRoomList';
-import { getErrorMessage } from '@utils/getErrorMessage';
-
 import ImageSection from '@components/ImageSection';
+import useModal from '@hooks/useModal';
+import useRoomImgData from '@hooks/useRoomImgData';
+import useIntersect from '@hooks/useIntersect';
+import useRoomList from '@hooks/useRoomList';
+import SidebarContext from '@utils/SidebarContext';
+import { getErrorMessage } from '@utils/getErrorMessage';
+import { CImageData, PrivateChildProps, SelectTerm } from '@typing/client';
+
 import {
   LeftHeaderIcon,
   ContentBox,
@@ -27,23 +27,26 @@ import {
   MainContainer,
   UploadButton,
 } from './styles';
-import useRoomImgData from '@hooks/useRoomImgData';
-import useIntersect from '@hooks/useIntersect';
+import { Button } from '@styles/Button';
 import Spinner from '@styles/Spinner';
+import AppLayout from '@layouts/AppLayout';
 
 const ImageRoom = () => {
-  const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
-  if (!roomId || !userId) return null;
+  // const userId = sessionStorage.getItem('user_id');
+  const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
+  // const { roomId } = useParams<{ roomId: string }>();
+  // if (!roomId) return null;
 
   const navigate = useNavigate();
+
   const { showUploadImgModal, showAlertModal } = useModal();
-  const { leaveRoom } = useRoomList(userId);
+  const { leaveRoom } = useRoomList(userInfo.id);
   const {
     initialLoading,
     roomImageList,
     roomImgLoading,
     imageLoadEnd,
+    roomImgListError,
     loadImage,
     deleteRoomImage,
     uploadRoomImage,
@@ -70,6 +73,7 @@ const ImageRoom = () => {
   );
 
   const effectRan = useRef(false);
+  const isFirstRan = useRef(true);
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
 
@@ -95,6 +99,8 @@ const ImageRoom = () => {
     });
 
     setReadStartNum(loadImageState.readStartNumber);
+
+    isFirstRan.current = false;
   };
 
   const getDateString = (dateValue: Date) => {
@@ -193,8 +199,7 @@ const ImageRoom = () => {
   };
 
   useEffect(() => {
-    // if (roomImgLoading) return;
-    if (effectRan.current === false) {
+    if (isFirstRan.current === false) {
       console.log('이미지 로드', roomId, roomImageList);
       loadImageFunc();
     }
@@ -202,16 +207,31 @@ const ImageRoom = () => {
     return () => {
       setReadStartNum(0);
       clearRoomImageList();
-      effectRan.current = true;
     };
   }, [filterStateNum, filterSelectTerm, roomId]);
+
+  useEffect(() => {
+    if (effectRan.current === false) {
+      console.log('첫 이미지 로드', roomId, roomImageList);
+      loadImageFunc();
+    }
+
+    return () => {
+      effectRan.current = true;
+    };
+  }, []);
 
   if (initialLoading) {
     return <div>Loading...</div>;
   }
 
+  if (roomImgListError) {
+    roomImgListError.name = 'InfoRequestError';
+    throw roomImgListError;
+  }
+
   return (
-    <>
+    <AppLayout>
       <Scrollbars>
         <MainContainer>
           <LeftHeaderIcon>
@@ -330,8 +350,8 @@ const ImageRoom = () => {
         </IconContext.Provider>
         <span>업로드</span>
       </UploadButton>
-    </>
+    </AppLayout>
   );
 };
 
-export default ImageRoom;
+export default memo(ImageRoom);

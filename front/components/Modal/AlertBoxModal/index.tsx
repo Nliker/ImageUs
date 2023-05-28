@@ -7,9 +7,6 @@ import { Wrapper } from './styles';
 import ModalLayout from '../ModalLayout';
 
 const AlertBox = ({ alertData }: { alertData: IAertData }) => {
-  const userId = sessionStorage.getItem('user_id');
-  if (!userId) return null;
-
   const size = { width: 300, height: 200 };
   const { clearModalCache } = useModal();
   const { executeWork } = alertData;

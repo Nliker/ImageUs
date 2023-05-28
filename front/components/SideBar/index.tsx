@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef, useContext } from 'react';
 
-import { useParams } from 'react-router';
+import { useOutletContext, useParams } from 'react-router';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import ChannelList from './ChannelList';
@@ -14,15 +14,13 @@ import {
   Tab,
   Wrapper,
 } from './styles';
+import { PrivateChildProps } from '@typing/client';
 
 interface SidebarProps {
   show: boolean;
 }
 
 const SideBar = memo(({ show }: SidebarProps) => {
-  const userId = sessionStorage.getItem('user_id');
-  if (!userId) return null;
-
   const sidebarContext = useContext(SidebarContext);
 
   const sideBarEl = useRef<HTMLDivElement>(null);

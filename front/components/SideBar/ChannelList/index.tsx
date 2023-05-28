@@ -1,6 +1,6 @@
 import React, { memo, useState, useContext } from 'react';
 
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useOutletContext, useParams } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 
 import ActionButton from '@styles/ActiveButton';
@@ -10,18 +10,20 @@ import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
 import SidebarContext from '@utils/SidebarContext';
 import useRoomList from '@hooks/useRoomList';
 import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
+import { PrivateChildProps } from '@typing/client';
 
 const ChannelList = memo(() => {
-  const userId = sessionStorage.getItem('user_id');
-  const { roomId } = useParams<{ roomId: string }>();
-  if (!roomId || !userId) return null;
+  // const userId = sessionStorage.getItem('user_id');
+  const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
+  // const { roomId } = useParams<{ roomId: string }>();
+  // if (!roomId) return null;
 
   const navigate = useNavigate();
   const sidebarContext = useContext(SidebarContext);
   const [channelCollapse, setChannelCollapse] = useState<boolean>(true);
 
   const { showCreateRoomModal } = useModal();
-  const { refineRoomList } = useRoomList(userId);
+  const { refineRoomList } = useRoomList(userInfo.id);
 
   const toggleChannelCollapse = () => setChannelCollapse((prev) => !prev);
   const onClickDataLabel = (id: number) => () => {
