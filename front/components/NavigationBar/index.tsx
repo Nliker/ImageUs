@@ -2,11 +2,11 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useMediaQuery } from 'react-responsive';
-import { RiShutDownLine } from 'react-icons/ri';
+import { RiCameraLensLine, RiShutDownLine } from 'react-icons/ri';
 import { IconContext } from 'react-icons/lib';
 import { CgUserList } from 'react-icons/cg';
 import { HiOutlineHome } from 'react-icons/hi';
-import { MdOutlineManageAccounts } from 'react-icons/md';
+import { MdOutlineManageAccounts, MdPhotoCameraBack } from 'react-icons/md';
 import { TbListDetails } from 'react-icons/tb';
 
 import useModal from '@hooks/useModal';
@@ -84,13 +84,13 @@ const NavigationBar = () => {
               <span className="nav_icon">
                 <IconContext.Provider
                   value={{
-                    size: '25px',
+                    size: '35px',
                   }}
                 >
-                  <HiOutlineHome />
+                  <RiCameraLensLine />
                 </IconContext.Provider>
               </span>
-              <span>ImageUs</span>
+              {/* <span>ImageUs</span> */}
             </NavItem>
             <NavItem className="link_item">
               <NavLink to={'/people_management'} className="nav_link" />
@@ -118,7 +118,6 @@ const NavigationBar = () => {
               </div>
             </NavItem>
           </NavList>
-          {}
         </MobileNav>
         <DeskTopNav>
           <div className="home">
@@ -127,7 +126,7 @@ const NavigationBar = () => {
                 size: '2.5rem',
               }}
             >
-              <HiOutlineHome />
+              <RiCameraLensLine />
             </IconContext.Provider>
             <span>ImageUs</span>
           </div>

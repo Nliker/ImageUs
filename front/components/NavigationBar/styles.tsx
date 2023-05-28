@@ -8,7 +8,6 @@ export const Wrapper = styled.nav`
 
   width: 100%;
   min-width: 330px;
-  font-size: 1.1rem;
 
   h1 {
     margin: 0;
@@ -75,11 +74,13 @@ export const NavList = styled.ul`
   height: 100%;
   margin: 0;
   padding: 0;
+  font-size: 1.25rem;
 
   @media screen and (min-width: 1024px) {
     justify-content: start;
-    gap: 4rem;
-    margin-left: 1.5rem;
+    gap: 3rem;
+    margin-left: 3rem;
+    font-size: 1.3rem;
   }
 `;
 
@@ -89,15 +90,24 @@ export const NavItem = styled.li`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex: 0 80px;
 
-  width: 72px;
   height: 100%;
 
   list-style: none;
   box-sizing: border-box;
 
+  .nav_link {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 1;
+  }
+
   &.link_item:hover {
     color: #0d6efd;
+    background-color: #d4d3d596;
   }
 
   .nav_icon svg,
@@ -106,14 +116,6 @@ export const NavItem = styled.li`
 
     height: auto;
     margin: 0 auto 3px;
-  }
-
-  .nav_link {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    z-index: 1;
   }
 
   .logout_icon {
@@ -129,11 +131,8 @@ export const NavItem = styled.li`
 
     &:hover {
       color: #f5642d;
+      background-color: #d4d3d596;
     }
-  }
-
-  @media screen and (min-width: 1024px) {
-    font-size: 1.3rem;
   }
 `;
 
