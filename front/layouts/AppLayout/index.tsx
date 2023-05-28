@@ -7,15 +7,19 @@ import useModal from '@hooks/useModal';
 import SidebarContext from '@utils/SidebarContext';
 import { OuterContainer, InnerContainer, Wrapper } from './styles';
 import CheckDeviceContext from '@utils/CheckDeviceContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
-  roomId?: string;
-  isImageRoom?: boolean;
 }
 
-const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
+const AppLayout = ({ children }: AppLayoutProps) => {
   const { data: modalData } = useModal();
+  const location = useLocation();
+  const isImageRoom = location.pathname.split('/')[1] === 'room';
+
   const [sidebarState, setSidebarState] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -42,6 +46,7 @@ const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
         </CheckDeviceContext.Provider>
       </OuterContainer>
       <Modal modalData={modalData} />
+      <ToastContainer />
     </Wrapper>
   );
 };
