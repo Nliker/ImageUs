@@ -26,7 +26,7 @@ import {
 import useIntersect from '@hooks/useIntersect';
 import Spinner from '@styles/Spinner';
 import ImageSection from '@components/ImageSection';
-import { CImageData, PrivateChildProps } from '@typing/client';
+import { IImageData, PrivateChildProps } from '@typing/client';
 import AppLayout from '@layouts/AppLayout';
 
 const MyPage = () => {
@@ -51,7 +51,7 @@ const MyPage = () => {
 
   const imageSectionProps = useMemo(
     () => ({
-      imageList: userImageList as CImageData[],
+      imageList: userImageList as IImageData[],
       imgListLoading: userImgLoading,
       deleteImgFunc: deleteStoreImage,
     }),

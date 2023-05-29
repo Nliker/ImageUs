@@ -1,4 +1,4 @@
-import { CImageData } from '@typing/client';
+import { IImageData } from '@typing/client';
 import {
   getImageDataFetcher,
   deleteRoomImgFetcher,
@@ -28,7 +28,7 @@ function useRoomImgData(roomId: string) {
     mutate: mutateRoomImage,
     isValidating: roomImgValidating,
     error: roomImgListError,
-  } = useSWR<CImageData[]>('/room/imagelist');
+  } = useSWR<IImageData[]>('/room/imagelist');
 
   const { data: realTimeImageList, mutate: mutateRealTimeImage } = useSWR(
     '/room/imageUpdate',
@@ -105,7 +105,7 @@ function useRoomImgData(roomId: string) {
         const newImageDataList =
           (await imgDataListTrigger([...imagelist])) ?? [];
         mutateRoomImage(
-          (prevData: CImageData[] | undefined) => {
+          (prevData: IImageData[] | undefined) => {
             if (!prevData) {
               return [...newImageDataList];
             } else {
@@ -143,7 +143,7 @@ function useRoomImgData(roomId: string) {
           (await imgDataListTrigger([...imagelist])) ?? [];
 
         mutateRoomImage(
-          (prevData: CImageData[] | undefined) => {
+          (prevData: IImageData[] | undefined) => {
             if (!prevData) {
               return [...newImageDataList];
             } else {

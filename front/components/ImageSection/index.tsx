@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
-import { CImageData } from '@typing/client';
+import { IImageData } from '@typing/client';
 import Spinner from '@styles/Spinner';
 
 import ImageContent from './ImageContent';
@@ -10,7 +10,7 @@ import { ImageLayout, NotImageData, Target } from './styles';
 import { useCheckDeviceContext } from '@utils/CheckDeviceContext';
 
 interface IImgSectionProps {
-  imageList: CImageData[];
+  imageList: IImageData[];
   imgListLoading: boolean;
   deleteImgFunc: (imageId: number) => Promise<void>;
 }
@@ -29,7 +29,7 @@ const ImageSection = ({ imageSectionProps, observerRef }: IProps) => {
       {imageList.length !== 0 ? (
         <>
           <ImageLayout>
-            {imageList.map((image: CImageData, index: number) => (
+            {imageList.map((image: IImageData, index: number) => (
               <ImageContent
                 key={image.id}
                 data={image}

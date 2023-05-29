@@ -18,7 +18,7 @@ import useIntersect from '@hooks/useIntersect';
 import useRoomList from '@hooks/useRoomList';
 import SidebarContext from '@utils/SidebarContext';
 import { getErrorMessage } from '@utils/getErrorMessage';
-import { CImageData, PrivateChildProps, ISelectTerm } from '@typing/client';
+import { IImageData, PrivateChildProps, ISelectTerm } from '@typing/client';
 
 import {
   LeftHeaderIcon,
@@ -62,7 +62,7 @@ const ImageRoom = () => {
 
   const imageSectionProps = useMemo(
     () => ({
-      imageList: roomImageList as CImageData[],
+      imageList: roomImageList as IImageData[],
       imgListLoading: roomImgLoading,
       deleteImgFunc: deleteRoomImage,
     }),

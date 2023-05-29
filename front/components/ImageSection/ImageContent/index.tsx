@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 
-import { CImageData, PrivateChildProps } from '@typing/client';
+import { IImageData, PrivateChildProps } from '@typing/client';
 import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
 import { getErrorMessage } from '@utils/getErrorMessage';
@@ -16,7 +16,7 @@ import {
 import { useOutletContext } from 'react-router';
 
 interface Props {
-  data: CImageData;
+  data: IImageData;
   index: number;
   isMobile: boolean;
   deleteImgFunc: (imageId: number) => Promise<void>;

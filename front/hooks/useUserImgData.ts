@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { CImageData } from '@typing/client';
+import { IImageData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
   getImageDataFetcher,
@@ -26,7 +26,7 @@ function useUserImageData(userId: number) {
     mutate: mutateUserImgList,
     isValidating: userImgValidating,
     error: userImgListError,
-  } = useSWR<CImageData[]>('/user/imagelist');
+  } = useSWR<IImageData[]>('/user/imagelist');
   const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
     '/user/uploadImgCount',
   );
@@ -62,7 +62,7 @@ function useUserImageData(userId: number) {
 
       const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
       mutateUserImgList(
-        (prevData: CImageData[] | undefined) => {
+        (prevData: IImageData[] | undefined) => {
           if (!prevData) {
             return [...newImageDataList];
           } else {

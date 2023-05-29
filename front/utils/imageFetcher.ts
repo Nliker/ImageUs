@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { CImageData } from '@typing/client';
+import { IImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
 import { getToken } from './getToken';
 import { getErrorMessage } from './getErrorMessage';
@@ -77,7 +77,7 @@ const getImageDataFetcher = async (
     }
 
     if (imageList.length === 0) return [];
-    const imgDataList: CImageData[] = [];
+    const imgDataList: IImageData[] = [];
 
     const MAX_RETRY_COUNT = 2;
     const axiosObj = axios.create();

@@ -12,7 +12,7 @@ export interface ILoginData {
   userInfo: DUserInfo | null;
 }
 
-export interface CImageData {
+export interface IImageData {
   id: number;
   user_id: number | null;
   link: string;
@@ -28,7 +28,7 @@ export interface ISelectTerm {
 
 export interface IDetailPictureInfo {
   index: number;
-  data: CImageData;
+  data: IImageData;
 }
 
 export interface IAertData {
