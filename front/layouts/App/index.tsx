@@ -14,8 +14,8 @@ import { NotFoundPage } from '@components/ErrorComponent';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
-import { GlobalErrorBoundary } from '@components/ErrorBoundary';
 import { DUserInfo } from '@typing/db';
+import ErrorBoundary from '@components/ErrorBoundary';
 
 const LogIn = loadable(() => import('@pages/LogIn'));
 const SignUp = loadable(() => import('@pages/SignUp'));
@@ -50,20 +50,14 @@ function App() {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/">
+      <Route path="/" errorElement={<ErrorBoundary />}>
         <Route element={<PublicRoute authData={authData} />}>
           <Route index element={<Intro />} />
           <Route path="login" element={<LogIn />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
         </Route>
-        <Route
-          element={
-            <GlobalErrorBoundary>
-              <PrivateRoute authData={authData} />
-            </GlobalErrorBoundary>
-          }
-        >
+        <Route element={<PrivateRoute authData={authData} />}>
           <Route path="select-room" element={<SelectRoom />} />
           <Route path="my_page/*" element={<MyPage />} />
           <Route element={<CheckRoomId />}>
