@@ -4,7 +4,7 @@ import { useOutletContext } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 
 import ActionButton from '@styles/ActiveButton';
-import Spinner from '@styles/Spinner';
+import { Spinner } from '@styles/Spinner';
 import useModal from '@hooks/useModal';
 import { DataCheckLabel, DataLabel } from '@styles/DataCheckLabel/styles';
 import { Button } from '@styles/Button';

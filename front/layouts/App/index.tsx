@@ -12,15 +12,32 @@ import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
 import ErrorBoundary from '@components/ErrorBoundary';
+import { Spinner } from '@styles/Spinner';
 
-const LogIn = loadable(() => import('@pages/LogIn'));
-const SignUp = loadable(() => import('@pages/SignUp'));
-const Intro = loadable(() => import('@pages/Intro'));
-const SelectRoom = loadable(() => import('@pages/SelectRoom'));
-const MyPage = loadable(() => import('@pages/MyPage'));
-const PeopleManagement = loadable(() => import('@pages/PeopleManagement'));
-const ImageRoom = loadable(() => import('@pages/ImageRoom'));
-const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
+const LogIn = loadable(() => import('@pages/LogIn'), {
+  fallback: <Spinner />,
+});
+const SignUp = loadable(() => import('@pages/SignUp'), {
+  fallback: <div>Loading...</div>,
+});
+const Intro = loadable(() => import('@pages/Intro'), {
+  fallback: <div>Loading...</div>,
+});
+const SelectRoom = loadable(() => import('@pages/SelectRoom'), {
+  fallback: <div>Loading...</div>,
+});
+const MyPage = loadable(() => import('@pages/MyPage'), {
+  fallback: <div>Loading...</div>,
+});
+const PeopleManagement = loadable(() => import('@pages/PeopleManagement'), {
+  fallback: <div>Loading...</div>,
+});
+const ImageRoom = loadable(() => import('@pages/ImageRoom'), {
+  fallback: <div>Loading...</div>,
+});
+const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'), {
+  fallback: <div>Loading...</div>,
+});
 
 function App() {
   const effectRun = useRef(false);

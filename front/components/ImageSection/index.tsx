@@ -3,7 +3,7 @@ import { IconContext } from 'react-icons/lib';
 import { FcRemoveImage } from 'react-icons/fc';
 
 import { IImageData } from '@typing/client';
-import Spinner from '@styles/Spinner';
+import { Spinner } from '@styles/Spinner';
 
 import ImageContent from './ImageContent';
 import { ImageLayout, NotImageData, Target } from './styles';

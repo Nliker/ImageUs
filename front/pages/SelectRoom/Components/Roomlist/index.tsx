@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import { TbDoorExit } from 'react-icons/tb';
 import { IconContext } from 'react-icons/lib';
 
-import Spinner from '@styles/Spinner';
+import { Spinner } from '@styles/Spinner';
 import { DRoomData } from '@typing/db';
 import { EmptyRoomlistImg } from '@assets/image';
 import useModal from '@hooks/useModal';

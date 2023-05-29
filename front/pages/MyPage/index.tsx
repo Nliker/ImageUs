@@ -24,7 +24,7 @@ import {
   WrapperBox,
 } from './styles';
 import useIntersect from '@hooks/useIntersect';
-import Spinner from '@styles/Spinner';
+import { Spinner } from '@styles/Spinner';
 import ImageSection from '@components/ImageSection';
 import { IImageData, PrivateChildProps } from '@typing/client';
 import AppLayout from '@layouts/AppLayout';

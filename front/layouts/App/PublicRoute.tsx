@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import Spinner from '@styles/Spinner';
+import { Spinner } from '@styles/Spinner';
 import { IAuthData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 
