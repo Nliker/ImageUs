@@ -23,6 +23,7 @@ export const ContentSectionWrapper = styled.div`
 
 export const MainContainer = styled.main`
   position: relative;
+  height: 100%;
 
   .tag {
     position: relative;
@@ -165,12 +166,14 @@ export const ContentBox = styled.div`
   top: 120px;
 
   width: 100%;
+  height: calc(100% - 120px);
   padding-bottom: 40px;
 
   .content_box_pos {
     position: relative;
 
     width: 85%;
+    height: 100%;
     margin: auto;
 
     font-size: 1.2rem;
@@ -232,4 +235,9 @@ export const UploadButton = styled.div`
   background-color: ghostwhite;
   box-shadow: 0px 1px 1px 2px #e0e6e6b3;
   cursor: pointer;
+`;
+
+export const ImageLoadingContainer = styled.div`
+  position: relative;
+  top: 30%;
 `;

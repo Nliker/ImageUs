@@ -26,6 +26,7 @@ import {
   FilteringOption,
   MainContainer,
   UploadButton,
+  ImageLoadingContainer,
 } from './styles';
 import { Button } from '@styles/Button';
 import { PageLoading, Spinner } from '@styles/Spinner';
@@ -216,10 +217,6 @@ const ImageRoom = () => {
     };
   }, []);
 
-  if (initialLoading) {
-    return <PageLoading />;
-  }
-
   if (roomImgListError) {
     roomImgListError.name = 'InfoRequestError';
     throw roomImgListError;
@@ -323,7 +320,9 @@ const ImageRoom = () => {
                 </div>
               </div>
               {initialLoading ? (
-                <Spinner />
+                <ImageLoadingContainer>
+                  <Spinner />
+                </ImageLoadingContainer>
               ) : (
                 <ImageSection
                   imageSectionProps={imageSectionProps}
