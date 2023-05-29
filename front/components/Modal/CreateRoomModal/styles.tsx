@@ -80,6 +80,10 @@ export const CreateRoomInfo = styled.div`
         list-style: circle;
       }
     }
+
+    .no_friends {
+      text-align: center;
+    }
   }
 `;
 
