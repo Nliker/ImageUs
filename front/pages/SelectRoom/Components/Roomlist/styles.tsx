@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 export const Container = styled.section`
   display: flex;
   flex: 1 0 auto;
+  align-items: center;
   justify-content: center;
 
   padding: 30px 0;
@@ -104,7 +105,9 @@ export const EmptyRoom = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
+  height: 100%;
   gap: 2.5rem;
 
   .text {
