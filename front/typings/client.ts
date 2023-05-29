@@ -1,6 +1,6 @@
 import { DFriendData, DUserInfo } from './db';
 
-export interface CAuthData {
+export interface IAuthData {
   isAuthenticated: string;
   loading: boolean;
   error: Error;

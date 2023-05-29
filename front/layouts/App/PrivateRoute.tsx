@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { CAuthData } from '@typing/client';
+import { IAuthData } from '@typing/client';
 import Spinner from '@styles/Spinner';
 
 interface IProps {
-  authData: CAuthData;
+  authData: IAuthData;
 }
 
 const PrivateRoute = ({ authData }: IProps) => {
