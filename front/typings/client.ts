@@ -21,7 +21,7 @@ export interface CImageData {
   user_name?: string | null;
 }
 
-export interface SelectTerm {
+export interface ISelectTerm {
   startDate: string;
   endDate: string;
 }

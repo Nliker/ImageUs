@@ -18,7 +18,7 @@ import useIntersect from '@hooks/useIntersect';
 import useRoomList from '@hooks/useRoomList';
 import SidebarContext from '@utils/SidebarContext';
 import { getErrorMessage } from '@utils/getErrorMessage';
-import { CImageData, PrivateChildProps, SelectTerm } from '@typing/client';
+import { CImageData, PrivateChildProps, ISelectTerm } from '@typing/client';
 
 import {
   LeftHeaderIcon,
@@ -54,7 +54,7 @@ const ImageRoom = () => {
   const [filterStateNum, setFilterStateNum] = useState(0);
   const [filterBoxState, setFilterBoxState] = useState(false);
   const [showSelectDateForm, setShowSelectDateForm] = useState(false);
-  const [filterSelectTerm, setFilterSelectTerm] = useState<SelectTerm>({
+  const [filterSelectTerm, setFilterSelectTerm] = useState<ISelectTerm>({
     startDate: '',
     endDate: '',
   });
