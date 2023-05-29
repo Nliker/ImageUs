@@ -3,10 +3,17 @@ import queryString from 'query-string';
 import { useNavigate } from 'react-router';
 
 import useSocialAuth from '@hooks/useSocialAuth';
-import { getErrorMessage } from '@utils/getErrorMessage';
 
 const SocialLogInAuth = () => {
   const { coperation, code } = queryString.parse(window.location.search);
+
+  if (!coperation || !code) {
+    const error = new Error(
+      '잘못된 경로로 접근하셨습니다.. 다시 로그인하세요.',
+    );
+    error.name = 'AuthError';
+    throw error;
+  }
 
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSocialAuth({
@@ -21,9 +28,8 @@ const SocialLogInAuth = () => {
       alert('인증되었습니다.');
       navigate('/select-room', { replace: true });
     } else {
-      const message = getErrorMessage(error);
-      alert(message);
-      navigate('/login');
+      error.name = 'AuthError';
+      throw error;
     }
   }, [isAuthenticated]);
 
