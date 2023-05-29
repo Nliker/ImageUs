@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import { getErrorMessage } from './getErrorMessage';
 
 export const getToken = async () => {
   try {
@@ -14,9 +13,6 @@ export const getToken = async () => {
     );
 
     if (!accessTokenExpireTime || !refreshTokenExpireTime || !accessToken) {
-      // const error = new Error('로그인 정보가 없습니다.. 다시 로그인해주세요!');
-      // error.name = 'AuthError';
-      // throw error;
       return { token: null };
     }
 
@@ -45,17 +41,11 @@ export const getToken = async () => {
 
       return { token: access_token };
     } else {
-      // sessionStorage.clear();
-      // return {
-      //   token: null,
-      //   message: '장시간 요청이 없어서 로그아웃되었습니다..',
-      // };
       const error = new Error('장시간 요청이 없어서 로그아웃되었습니다..');
       error.name = 'AuthError';
       throw error;
     }
   } catch (err) {
-    // return { token: null, message: '로그인 갱신에 실패했습니다..' };
     if (err instanceof AxiosError) {
       throw new Error('로그인 요청을 실패했습니다..다시 로그인 해주세요.');
     } else {

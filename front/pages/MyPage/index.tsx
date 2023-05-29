@@ -10,7 +10,6 @@ import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
 import useRoomList from '@hooks/useRoomList';
 import useFriendList from '@hooks/useFriendList';
-import { DUserInfo } from '@typing/db';
 import useUserImageData from '@hooks/useUserImgData';
 
 import MyProfile from './Components/MyProfile';
@@ -31,8 +30,6 @@ import { CImageData, PrivateChildProps } from '@typing/client';
 import AppLayout from '@layouts/AppLayout';
 
 const MyPage = () => {
-  // const userId = sessionStorage.getItem('user_id');
-  // if (!userId) return null;
   const { userInfo } = useOutletContext<PrivateChildProps>();
   const { showUploadImgModal } = useModal();
   const { totalFriendCount } = useFriendList();

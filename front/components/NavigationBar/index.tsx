@@ -5,8 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import { RiCameraLensLine, RiShutDownLine } from 'react-icons/ri';
 import { IconContext } from 'react-icons/lib';
 import { CgUserList } from 'react-icons/cg';
-import { HiOutlineHome } from 'react-icons/hi';
-import { MdOutlineManageAccounts, MdPhotoCameraBack } from 'react-icons/md';
+import { MdOutlineManageAccounts } from 'react-icons/md';
 import { TbListDetails } from 'react-icons/tb';
 
 import useModal from '@hooks/useModal';
@@ -90,7 +89,7 @@ const NavigationBar = () => {
                   <RiCameraLensLine />
                 </IconContext.Provider>
               </span>
-              {/* <span>ImageUs</span> */}
+              {}
             </NavItem>
             <NavItem className="link_item">
               <NavLink to={'/people_management'} className="nav_link" />

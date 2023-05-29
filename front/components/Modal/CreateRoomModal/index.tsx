@@ -26,8 +26,6 @@ type AddCheckFriendData = DFriendData & { check: boolean };
 
 const CreateRoomModal = () => {
   const { userInfo } = useOutletContext<PrivateChildProps>();
-  // const userId = sessionStorage.getItem('user_id');
-  // if (!userId) return null;
 
   const { clearModalCache } = useModal();
   const { createRoom } = useRoomList(userInfo.id);

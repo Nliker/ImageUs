@@ -1,12 +1,9 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import {
   Route,
-  Router,
   RouterProvider,
-  Routes,
   createBrowserRouter,
   createRoutesFromElements,
-  useLocation,
 } from 'react-router-dom';
 import loadable from '@loadable/component';
 import useAuth from '@hooks/useAuth';
@@ -14,7 +11,6 @@ import { NotFoundPage } from '@components/ErrorComponent';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
-import { DUserInfo } from '@typing/db';
 import ErrorBoundary from '@components/ErrorBoundary';
 
 const LogIn = loadable(() => import('@pages/LogIn'));

@@ -17,14 +17,8 @@ import Scrollbars from 'react-custom-scrollbars-2';
 import { PrivateChildProps } from '@typing/client';
 
 function Roomlist() {
-  // const userId = sessionStorage.getItem('user_id');
-
-  // if (!userId) return null;
-
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
   const { userInfo } = useOutletContext<PrivateChildProps>();
-
-  // if (!userInfo) throw new Error('로그인 정보가 없습니다..');
 
   const { showAlertModal } = useModal();
   const { roomList, leaveRoom } = useRoomList(userInfo.id);

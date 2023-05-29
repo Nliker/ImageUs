@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { DUserInfo } from '@typing/db';
 import { ILoginData } from '@typing/client';
 
 function useAuth() {

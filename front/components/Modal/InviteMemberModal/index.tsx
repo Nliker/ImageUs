@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { useOutletContext, useParams } from 'react-router';
+import { useOutletContext } from 'react-router';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
@@ -17,9 +17,6 @@ import { PrivateChildProps } from '@typing/client';
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
 const InviteMemberModal = () => {
-  // const userId = sessionStorage.getItem('user_id');
-  // const { roomId } = useParams<{ roomId: string }>();
-  // if (!roomId) return null;
   const { roomId } = useOutletContext<PrivateChildProps>();
 
   const { clearModalCache } = useModal();

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { CAuthData, ILoginData } from '@typing/client';
-import { getErrorMessage } from '@utils/getErrorMessage';
+import { CAuthData } from '@typing/client';
 import Spinner from '@styles/Spinner';
 
 interface IProps {

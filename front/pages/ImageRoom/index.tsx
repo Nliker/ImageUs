@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
-import { useNavigate, useOutletContext, useParams } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
 import { SlCloudUpload } from 'react-icons/sl';
@@ -32,10 +32,7 @@ import Spinner from '@styles/Spinner';
 import AppLayout from '@layouts/AppLayout';
 
 const ImageRoom = () => {
-  // const userId = sessionStorage.getItem('user_id');
   const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
-  // const { roomId } = useParams<{ roomId: string }>();
-  // if (!roomId) return null;
 
   const navigate = useNavigate();
 

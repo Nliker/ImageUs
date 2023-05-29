@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import throttle from './throttle';
 
 type IntersectHandler = (
   entry: IntersectionObserverEntry,

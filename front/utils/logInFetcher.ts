@@ -2,8 +2,6 @@ import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { DUserInfo } from '@typing/db';
 import { getErrorMessage } from './getErrorMessage';
-import { PrivateChildProps } from '@typing/client';
-import { useOutletContext } from 'react-router';
 
 const logInCheckFetcher = async (url: string) => {
   try {

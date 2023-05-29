@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from 'react';
-import { useOutletContext, useParams } from 'react-router';
+import { useOutletContext } from 'react-router';
 
 import { IoMdArrowDropright } from 'react-icons/io';
 
@@ -24,10 +24,7 @@ const labelMarginCSS = {
 };
 
 const MemberList = memo(() => {
-  // const userId = sessionStorage.getItem('user_id');
   const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
-  // const { roomId } = useParams<{ roomId: string }>();
-  // if (!roomId) return null;
 
   const { showAlertModal, showInviteMemberModal } = useModal();
   const { roomList, getHostIdByRoom } = useRoomList(userInfo.id);

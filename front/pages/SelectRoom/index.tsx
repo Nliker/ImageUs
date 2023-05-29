@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Scrollbars from 'react-custom-scrollbars-2';
 import { IconContext } from 'react-icons/lib';
 import { AiOutlinePlus } from 'react-icons/ai';
 
@@ -9,9 +8,6 @@ import useModal from '@hooks/useModal';
 
 import Roomlist from './Components/Roomlist';
 import { MainContainer } from './styles';
-import { useOutletContext } from 'react-router';
-import { PrivateChildProps } from '@typing/client';
-import withErrorBoundary from '@layouts/ErrorBoundary';
 
 const SelectRoom = () => {
   const { showCreateRoomModal } = useModal();

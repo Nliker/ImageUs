@@ -1,6 +1,6 @@
 import React, { memo, useState, useContext } from 'react';
 
-import { useNavigate, useOutletContext, useParams } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 import { IoMdArrowDropright } from 'react-icons/io';
 
 import ActionButton from '@styles/ActiveButton';
@@ -13,10 +13,7 @@ import { Collapse, Container, CreateBtnBox, Subtitle, Wrapper } from './styles';
 import { PrivateChildProps } from '@typing/client';
 
 const ChannelList = memo(() => {
-  // const userId = sessionStorage.getItem('user_id');
   const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
-  // const { roomId } = useParams<{ roomId: string }>();
-  // if (!roomId) return null;
 
   const navigate = useNavigate();
   const sidebarContext = useContext(SidebarContext);
