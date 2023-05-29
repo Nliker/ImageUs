@@ -1,14 +1,13 @@
 import React, { CSSProperties } from 'react';
-import { SyncLoader, HashLoader } from 'react-spinners';
+import { SyncLoader, FadeLoader } from 'react-spinners';
 
 const PageLoading = () => {
   const spinnerCSS: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    top: '50%',
+    left: '50%',
   };
 
-  return <HashLoader color="rgb(54, 215, 183)" cssOverride={spinnerCSS} />;
+  return <FadeLoader color="rgb(54, 215, 183)" cssOverride={spinnerCSS} />;
 };
 
 const Spinner = () => {
@@ -18,7 +17,7 @@ const Spinner = () => {
     textAlign: 'center',
   };
 
-  return <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />;
+  return <SyncLoader color="rgb(54, 215, 183)" cssOverride={spinnerCSS} />;
 };
 
 export { Spinner, PageLoading };
