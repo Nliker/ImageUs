@@ -33,15 +33,17 @@ const getUserImgsFetcher = async (
   url: string,
   { arg: start }: { arg: number },
 ) => {
-  const userId = sessionStorage.getItem('user_id');
-  const { token } = await getToken();
-
-  if (!token) {
-    throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
-  }
-
-  const limit = 12;
   try {
+    const userId = sessionStorage.getItem('user_id');
+    const { token } = await getToken();
+
+    if (!token) {
+      const error = new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+      error.name = 'AuthError';
+      throw error;
+    }
+
+    const limit = 12;
     const response = await axios.get(
       '/backapi' + `/user/${userId}/imagelist?start=${start}&limit=${limit}`,
       {
@@ -59,10 +61,11 @@ const getUserImgsFetcher = async (
     };
   } catch (err) {
     if (err instanceof AxiosError) {
-      throw new Error('이미지정보를 받아오지 못했습니다..');
+      const error = new Error('이미지정보를 받아오지 못했습니다..');
+      error.name = 'InfoRequestError';
+      throw error;
     } else {
-      const message = getErrorMessage(err);
-      throw new Error(message);
+      throw err;
     }
   }
 };
