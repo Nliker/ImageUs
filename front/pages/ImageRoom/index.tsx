@@ -28,7 +28,7 @@ import {
   UploadButton,
 } from './styles';
 import { Button } from '@styles/Button';
-import { Spinner } from '@styles/Spinner';
+import { PageLoading, Spinner } from '@styles/Spinner';
 import AppLayout from '@layouts/AppLayout';
 
 const ImageRoom = () => {
@@ -217,7 +217,7 @@ const ImageRoom = () => {
   }, []);
 
   if (initialLoading) {
-    return <div>Loading...</div>;
+    return <PageLoading />;
   }
 
   if (roomImgListError) {
