@@ -3,8 +3,8 @@ import useSWR from 'swr';
 import { socialLoginFetcher } from '@utils/logInFetcher';
 
 interface IProps {
-  coperation: string | (string | null)[] | null;
-  code: string | (string | null)[] | null;
+  coperation: string | (string | null)[];
+  code: string | (string | null)[];
 }
 
 interface ISocialParam {
@@ -33,19 +33,15 @@ function useSocialAuth(props: IProps) {
   );
 
   useEffect(() => {
-    if (props?.code && props?.coperation) {
-      const code = Array.isArray(props.code) ? props.code[0] : props.code;
-      const coperation = Array.isArray(props.coperation)
-        ? props.coperation[0]
-        : props.coperation;
-      setParamData((prev) => ({
-        ...prev,
-        copertaion: coperation as string,
-        code: code as string,
-      }));
-    } else {
-      throw new Error('유효한 요청이 아닙니다..');
-    }
+    const code = Array.isArray(props.code) ? props.code[0] : props.code;
+    const coperation = Array.isArray(props.coperation)
+      ? props.coperation[0]
+      : props.coperation;
+    setParamData((prev) => ({
+      ...prev,
+      copertaion: coperation as string,
+      code: code as string,
+    }));
   }, [props]);
 
   return {
