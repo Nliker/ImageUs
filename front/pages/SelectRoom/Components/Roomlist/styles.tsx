@@ -120,3 +120,10 @@ export const EmptyRoom = styled.div`
     }
   }
 `;
+
+export const LoadingContainer = styled.div`
+  flex: 1 0 auto;
+  display: flex;
+  position: relative;
+  top: 40%;
+`;

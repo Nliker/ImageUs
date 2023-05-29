@@ -12,7 +12,7 @@ import useModal from '@hooks/useModal';
 import useRoomList from '@hooks/useRoomList';
 import { getErrorMessage } from '@utils/getErrorMessage';
 
-import { Container, EmptyRoom } from './styles';
+import { Container, EmptyRoom, LoadingContainer } from './styles';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { PrivateChildProps } from '@typing/client';
 
@@ -43,7 +43,12 @@ function Roomlist() {
       });
     };
 
-  if (!roomList) return <Spinner />;
+  if (!roomList)
+    return (
+      <LoadingContainer>
+        <Spinner />
+      </LoadingContainer>
+    );
 
   return (
     <Container>
