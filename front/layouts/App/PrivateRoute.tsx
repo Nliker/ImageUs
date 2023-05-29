@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { IAuthData } from '@typing/client';
-import { Spinner } from '@styles/Spinner';
+import { PageLoading } from '@styles/Spinner';
 
 interface IProps {
   authData: IAuthData;
@@ -15,7 +15,7 @@ const PrivateRoute = ({ authData }: IProps) => {
     throw error;
   }
 
-  if (loading || isAuthenticated === 'init') return <Spinner />;
+  if (loading || isAuthenticated === 'init') return <PageLoading />;
 
   if (isAuthenticated === 'unauthorized') {
     alert('..로그인이 필요합니다. 확인');

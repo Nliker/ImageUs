@@ -12,31 +12,31 @@ import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import CheckRoomId from './CheckRoomId';
 import ErrorBoundary from '@components/ErrorBoundary';
-import { Spinner } from '@styles/Spinner';
+import { PageLoading } from '@styles/Spinner';
 
 const LogIn = loadable(() => import('@pages/LogIn'), {
-  fallback: <Spinner />,
+  fallback: <PageLoading />,
 });
 const SignUp = loadable(() => import('@pages/SignUp'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const Intro = loadable(() => import('@pages/Intro'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const SelectRoom = loadable(() => import('@pages/SelectRoom'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const MyPage = loadable(() => import('@pages/MyPage'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const PeopleManagement = loadable(() => import('@pages/PeopleManagement'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const ImageRoom = loadable(() => import('@pages/ImageRoom'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'), {
-  fallback: <div>Loading...</div>,
+  fallback: <PageLoading />,
 });
 
 function App() {

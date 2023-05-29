@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { Spinner } from '@styles/Spinner';
+import { PageLoading } from '@styles/Spinner';
 import { IAuthData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 
@@ -18,7 +18,7 @@ const PublicRoute = ({ authData }: IProps) => {
     return <Navigate to="/login" />;
   }
 
-  if (loading || isAuthenticated === 'init') return <Spinner />;
+  if (loading || isAuthenticated === 'init') return <PageLoading />;
 
   return isAuthenticated === 'authorized' ? (
     <Navigate to="/select-room" />
