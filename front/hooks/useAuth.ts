@@ -4,15 +4,13 @@ import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { DUserInfo } from '@typing/db';
-
-interface ILoginData {
-  isAuthenticated: string;
-  userInfo?: DUserInfo;
-}
+import { ILoginData } from '@typing/client';
 
 function useAuth() {
+  const initialData = { isAuthenticated: 'init', userInfo: null };
+
   const {
-    data: logInData,
+    data: loginData,
     mutate: updateLogInData,
     error,
     isValidating,
@@ -21,7 +19,7 @@ function useAuth() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     revalidateOnMount: false,
-    fallbackData: { isAuthenticated: 'init' },
+    fallbackData: initialData,
   });
 
   const { trigger: logInTrigger } = useSWRMutation(
@@ -55,9 +53,9 @@ function useAuth() {
   };
 
   return {
-    isAuthenticated: logInData?.isAuthenticated ?? 'unauthorized',
-    userInfo: logInData?.userInfo,
-    loading: (!logInData && !error) || isValidating,
+    isAuthenticated: loginData?.isAuthenticated ?? 'unauthorized',
+    userInfo: loginData?.userInfo,
+    loading: (!loginData && !error) || isValidating,
     error,
     logInRequest,
     logOut,

@@ -4,7 +4,12 @@ export interface CAuthData {
   isAuthenticated: string;
   loading: boolean;
   error: Error;
-  userInfo?: DUserInfo;
+  userInfo?: DUserInfo | null;
+}
+
+export interface ILoginData {
+  isAuthenticated: string;
+  userInfo: DUserInfo | null;
 }
 
 export interface CImageData {
