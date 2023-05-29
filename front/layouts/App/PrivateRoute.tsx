@@ -10,8 +10,6 @@ interface IProps {
 const PrivateRoute = ({ authData }: IProps) => {
   const { isAuthenticated, loading, error, userInfo } = authData;
 
-  console.log('private', isAuthenticated, loading, error);
-
   if (error) {
     error.name = 'AuthError';
     throw error;

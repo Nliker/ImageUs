@@ -31,11 +31,8 @@ export default function ErrorBoundary() {
 
   if (!errorState) return null;
 
-  console.log('에러 확인', error);
-
   if (error instanceof Error) {
     if (error?.name === 'AuthError') {
-      console.log('auth 에러발생!');
       sessionStorage.clear();
       alert(error.message);
       window.location.replace('/login');

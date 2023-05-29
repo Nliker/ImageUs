@@ -197,7 +197,6 @@ const ImageRoom = () => {
 
   useEffect(() => {
     if (isFirstRan.current === false) {
-      console.log('이미지 로드', roomId, roomImageList);
       loadImageFunc();
     }
 
@@ -209,7 +208,6 @@ const ImageRoom = () => {
 
   useEffect(() => {
     if (effectRan.current === false) {
-      console.log('첫 이미지 로드', roomId, roomImageList);
       loadImageFunc();
     }
 

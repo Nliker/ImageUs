@@ -42,8 +42,6 @@ function App() {
     };
   }, []);
 
-  console.log('app 확인', isAuthenticated, loading);
-
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" errorElement={<ErrorBoundary />}>

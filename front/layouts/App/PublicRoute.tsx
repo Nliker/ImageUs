@@ -11,8 +11,6 @@ interface IProps {
 const PublicRoute = ({ authData }: IProps) => {
   const { isAuthenticated, loading, error } = authData;
 
-  console.log('public', isAuthenticated, loading);
-
   if (error) {
     const message = getErrorMessage(error);
     alert(message);
