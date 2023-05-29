@@ -45,6 +45,7 @@ export const EachRoomPictureList = styled.div`
   flex-direction: column;
   align-items: center;
 
+  gap: 1rem;
   margin-bottom: 40px;
 
   a {
