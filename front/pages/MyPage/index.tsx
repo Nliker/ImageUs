@@ -43,7 +43,6 @@ const MyPage = () => {
     userImgLoading,
     totalImageCount,
     imageLoadEnd,
-    error: userImgError,
     loadImage,
     deleteStoreImage,
     uploadUserImage,
@@ -102,12 +101,6 @@ const MyPage = () => {
       effectRan.current = true;
     };
   }, []);
-
-  if (userImgError) {
-    console.log('마이페이지 에러확인');
-    throw userImgError;
-    // return <div>유저이미지 에러발생</div>;
-  }
 
   return (
     <AppLayout>
