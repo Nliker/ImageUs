@@ -1,6 +1,6 @@
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { CImageData } from '@typing/client';
 import { DImageData } from '@typing/db';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { getToken } from './getToken';
 import { getErrorMessage } from './getErrorMessage';
 
@@ -132,7 +132,7 @@ const getImageDataFetcher = async (
   } catch (err) {
     if (err instanceof AxiosError) {
       throw new Error(
-        '친구 목록에서 삭제하지 못하였습니다..다시 시도해주세요..',
+        '이미지를 정상적으로 로드하지 못하였습니다..새로고침해주세요!',
       );
     } else {
       const message = getErrorMessage(err);
