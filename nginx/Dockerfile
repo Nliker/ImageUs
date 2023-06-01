@@ -5,6 +5,8 @@ COPY ./dist /usr/share/nginx/html/dist
 
 COPY ./assets /usr/share/nginx/html/assets
 
+COPY ./styles /usr/share/nginx/html/styles
+
 RUN rm /usr/share/nginx/html/index.html
 
 COPY index.html /usr/share/nginx/html/index.html
