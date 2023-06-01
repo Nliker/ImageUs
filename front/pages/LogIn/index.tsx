@@ -10,8 +10,11 @@ import { Button } from '@styles/Button';
 import useAuth from '@hooks/useAuth';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
+import queryString from 'query-string';
 
 const LogIn = () => {
+  const queryData = queryString.parse(location.search);
+
   const navigate = useNavigate();
   const { logInRequest } = useAuth();
 
@@ -81,6 +84,20 @@ const LogIn = () => {
       }
     }
   };
+
+  if ('email' in queryData && 'password' in queryData) {
+    const email = queryData?.email as string;
+    const password = queryData?.password as string;
+
+    logInRequest({ email, password })
+      .then(() => {
+        navigate('/select-room', { replace: true });
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error);
+        alert(message);
+      });
+  }
 
   return (
     <UserFormBox pageName={'로그인'}>
