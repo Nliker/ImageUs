@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 export const InfoSection = styled.section`
   margin: auto;
   max-width: 800px;
-  margin-top: 40px;
 `;
 
 export const InfoTable = styled.table`
