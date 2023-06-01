@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { socialLoginFetcher } from '@utils/logInFetcher';
 
@@ -7,23 +6,13 @@ interface IProps {
   code: string | (string | null)[];
 }
 
-interface ISocialParam {
-  coperation: string;
-  code: string;
-}
-
 function useSocialAuth(props: IProps) {
-  const [paramData, setParamData] = useState<ISocialParam>({
-    coperation: '',
-    code: '',
-  });
-
   const {
     data: isAuthenticated,
     isValidating,
     error,
   } = useSWR(
-    ['/oauth-login/callback', paramData.coperation, paramData.code],
+    ['/oauth-login/callback', props.coperation, props.code],
     socialLoginFetcher,
     {
       revalidateIfStale: false,
@@ -31,18 +20,6 @@ function useSocialAuth(props: IProps) {
       revalidateOnReconnect: false,
     },
   );
-
-  useEffect(() => {
-    const code = Array.isArray(props.code) ? props.code[0] : props.code;
-    const coperation = Array.isArray(props.coperation)
-      ? props.coperation[0]
-      : props.coperation;
-    setParamData((prev) => ({
-      ...prev,
-      copertaion: coperation as string,
-      code: code as string,
-    }));
-  }, [props]);
 
   return {
     isAuthenticated,
