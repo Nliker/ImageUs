@@ -73,7 +73,7 @@ const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
             <div className="btn_group">
               <Button type="button" onClick={onClickOpenImage}>
                 {`자세히 
-`}
+보기`}
               </Button>
               {data.user_id === userInfo.id && (
                 <Button
@@ -82,7 +82,7 @@ const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
                   onClick={onClickShowAlertBox}
                 >
                   {`게시물 
-하기`}
+삭제하기`}
                 </Button>
               )}
             </div>
