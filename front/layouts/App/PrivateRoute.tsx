@@ -18,7 +18,7 @@ const PrivateRoute = ({ authData }: IProps) => {
   if (loading || isAuthenticated === 'init') return <PageLoading />;
 
   if (isAuthenticated === 'unauthorized') {
-    alert('..로그인이 필요합니다. 확인');
+    alert('로그인이 필요합니다...');
     return <Navigate to="/login" />;
   } else {
     return <Outlet context={{ userInfo }} />;
