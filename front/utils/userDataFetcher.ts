@@ -212,7 +212,7 @@ const addFriendFetcher = async (
     ) {
       throw new Error(err.response?.data.message);
     } else {
-      throw new Error('친구를 추가하지 못했습니다..다시 시도해주세요.');
+      throw err;
     }
   }
 };
