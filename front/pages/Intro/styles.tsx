@@ -1,27 +1,5 @@
 import styled from '@emotion/styled';
 
-// export const Wrappper = styled.div`
-//   min-width: 370px;
-//   height: 100%;
-//   font-size: 0.85rem;
-
-//   overflow: hidden;
-// `;
-
-// export const ContentWrappper = styled.div`
-//   height: 100%;
-
-//   main {
-//     display: flex;
-
-//     height: 100%;
-
-//     section {
-//       height: 100%;
-//     }
-//   }
-// `;
-
 export const MainContainer = styled.main`
   height: 100%;
 
@@ -39,16 +17,23 @@ export const MainIntroduction = styled.section`
 
     width: 100%;
     height: 100%;
-    gap: 5rem;
+    gap: 3.5rem;
 
     color: white;
-    background-color: #080609;
+    background-color: #dbf2ff;
 
     img {
-      position: absolute;
-      right: 0;
+      height: 25%;
+      max-height: 300px;
+    }
 
-      height: 70%;
+    .main_logo {
+      position: relative;
+      right: 20px;
+      display: flex;
+      align-items: center;
+
+      gap: 1rem;
     }
 
     .btn_group {
@@ -69,7 +54,9 @@ export const MainIntroduction = styled.section`
     text-align: center;
 
     margin: 0;
-    font-size: 2.75rem;
+    font-family: 'ShoCardCaps';
+    font-size: 14vmin;
+    color: #a5b8ce;
 
     .brand_logo {
       color: #ecb22e;
