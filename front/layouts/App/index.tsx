@@ -66,7 +66,10 @@ function App() {
           <Route index element={<Intro />} />
           <Route path="login" element={<LogIn />} />
           <Route path="signup" element={<SignUp />} />
-          <Route path="callback/oauth-login" element={<SocialLogInAuth />} />
+          <Route
+            path="callback/oauth-login"
+            element={<SocialLogInAuth refreshAuthData={refreshAuthData} />}
+          />
         </Route>
         <Route element={<PrivateRoute authData={authData} />}>
           <Route path="select-room" element={<SelectRoom />} />
