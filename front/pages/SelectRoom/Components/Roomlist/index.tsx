@@ -63,7 +63,11 @@ function Roomlist() {
                       <p style={{ fontSize: '1.6rem' }}>{roomData.title}</p>
                       <p style={{ color: '#999999' }}>
                         멤버:{' '}
-                        {roomData.userlist.map((data) => data.name).join(' ')}
+                        {roomData.userlist
+                          .slice(0, 3)
+                          .map((data) => data.name)
+                          .join(' ')}
+                        ...
                       </p>
                     </div>
                   </Link>

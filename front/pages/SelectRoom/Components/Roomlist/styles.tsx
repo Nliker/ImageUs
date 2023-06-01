@@ -6,7 +6,6 @@ export const Container = styled.section`
   align-items: center;
   justify-content: center;
 
-  padding: 30px 0;
   font-size: 1.5rem;
 
   a {
@@ -23,6 +22,7 @@ export const Container = styled.section`
 
     width: 100%;
     padding: 0;
+    padding: 30px 0;
     margin: 0;
     gap: 1.5rem;
 
