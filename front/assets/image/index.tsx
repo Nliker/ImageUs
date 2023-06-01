@@ -1,7 +1,7 @@
 import React from 'react';
 
-export const BackgroundImg = () => (
-  <img src="assets/main_background_img.png" alt="배경 이미지" />
+export const IntroCloudIcon = () => (
+  <img src="assets/cloud_img2.png" alt="배경 이미지" />
 );
 
 export const EmptyRoomlistImg = ({ style }: { style: React.CSSProperties }) => (
