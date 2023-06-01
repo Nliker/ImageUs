@@ -1,93 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import useSWR, { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { NavLink } from 'react-router-dom';
-import { Routes, Route, useLocation, Navigate } from 'react-router';
+import { Routes, Route, Navigate, useOutletContext } from 'react-router';
 import { BiUserCircle } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { CImageData } from '@typing/client';
-import useIntersect from '@hooks/useIntersect';
-import AppLayout from '@layouts/AppLayout';
-import {
-  getUserFriendList,
-  getUserImageLen,
-  getUserImageList,
-  getUserRoomListFetcher,
-} from '@utils/userDataFetcher';
+import { Button } from '@styles/Button';
+import useModal from '@hooks/useModal';
+import useRoomList from '@hooks/useRoomList';
+import useFriendList from '@hooks/useFriendList';
+import useUserImageData from '@hooks/useUserImgData';
 
 import MyProfile from './Components/MyProfile';
-import MyPictures from './Components/MyPictures';
 import {
   ContentBox,
   EachRoomPictureList,
+  ImageContainer,
   ProfileBox,
   ProfileImage,
   ProfileInfo,
   SubMenu,
   WrapperBox,
 } from './styles';
-import { getImageData } from '@utils/imageFetcher';
-import { Button } from '@styles/Button';
-import { DeviceCheckContext } from '@pages/ImageRoom';
+import useIntersect from '@hooks/useIntersect';
+import { Spinner } from '@styles/Spinner';
+import ImageSection from '@components/ImageSection';
+import { IImageData, PrivateChildProps } from '@typing/client';
+import AppLayout from '@layouts/AppLayout';
 
 const MyPage = () => {
-  const { pathname } = useLocation();
-  const userId = sessionStorage.getItem('user_id');
+  const { userInfo } = useOutletContext<PrivateChildProps>();
+  const { showUploadImgModal } = useModal();
+  const { totalFriendCount } = useFriendList();
+  const { totalRoomCount } = useRoomList(userInfo.id);
+  const {
+    initialLoading,
+    userImageList,
+    userImgLoading,
+    totalImageCount,
+    imageLoadEnd,
+    loadImage,
+    deleteStoreImage,
+    uploadUserImage,
+    clearUserImageList,
+  } = useUserImageData(userInfo.id);
 
-  /*
+  const [readStartNumber, setReadStartNum] = useState(0);
+  const effectRan = useRef(false);
 
-  유저의 프로필, 이미지, 친구 정보를 받아오는 hook
-
-*/
-
-  const { data: userInfo } = useSWR('/user/my');
-  const { data: roomlist } = useSWR(
-    `/user/${userId}/roomlist`,
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
-  const { data: friendList } = useSWR('friendlist', getUserFriendList, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-  const { data: allImageLen } = useSWR(
-    `/user/${userId}/imagelist-len`,
-    getUserImageLen,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
+  const imageSectionProps = useMemo(
+    () => ({
+      imageList: userImageList as IImageData[],
+      imgListLoading: userImgLoading,
+      deleteImgFunc: deleteStoreImage,
+    }),
+    [userImageList, userImgLoading],
   );
 
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const observerRef = useIntersect(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
 
-  useEffect(() => {
-    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (userImgLoading || imageLoadEnd) {
+        return;
+      }
 
-    if (isMobileValue) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
-  }, []);
+      loadImageFunc();
+    },
+    {
+      threshold: 0.5,
+    },
+  );
+
+  const loadImageFunc = async () => {
+    const loadImageState = await loadImage({
+      readStartNumber,
+    });
+
+    if (loadImageState) setReadStartNum(loadImageState.readStartNumber);
+  };
 
   const onClickUploadModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    mutate('modalState', {
-      currentModalState: 'upload',
-      uploadLocation: 'user',
-    });
+    showUploadImgModal({ executeFunc: uploadUserImage });
   };
+
+  useEffect(() => {
+    if (effectRan.current === false) {
+      loadImageFunc();
+    }
+
+    return () => {
+      setReadStartNum(0);
+      clearUserImageList();
+      effectRan.current = true;
+    };
+  }, []);
 
   return (
     <AppLayout>
@@ -104,22 +114,22 @@ const MyPage = () => {
               </ProfileImage>
               <ProfileInfo>
                 <div>
-                  <h2>{userInfo?.userInfo?.name ?? 'USER'}</h2>
+                  <h2 className="user_name">{userInfo?.name ?? 'USER'}</h2>
                 </div>
                 <ul>
                   <li>
                     <div>
-                      게시물 <span>{allImageLen?.imagelist_len ?? 0}</span>
+                      게시물 <span>{totalImageCount ?? 0}</span>
                     </div>
                   </li>
                   <li>
                     <div>
-                      등록된 방 <span>{roomlist?.length ?? 0}</span>
+                      등록된 방 <span>{totalRoomCount ?? 0}</span>
                     </div>
                   </li>
                   <li>
                     <div>
-                      친구수 <span>{friendList?.length ?? 0}</span>
+                      친구수 <span>{totalFriendCount ?? 0}</span>
                     </div>
                   </li>
                 </ul>
@@ -150,14 +160,24 @@ const MyPage = () => {
               </SubMenu>
               <Routes>
                 <Route
-                  path="/"
+                  index
                   element={
-                    <DeviceCheckContext.Provider value={isMobile}>
-                      <MyPictures />
-                    </DeviceCheckContext.Provider>
+                    <ImageContainer>
+                      {initialLoading ? (
+                        <Spinner />
+                      ) : (
+                        <ImageSection
+                          imageSectionProps={imageSectionProps}
+                          observerRef={observerRef}
+                        />
+                      )}
+                    </ImageContainer>
                   }
                 />
-                <Route path="my_profile" element={<MyProfile />} />
+                <Route
+                  path="my_profile"
+                  element={<MyProfile userInfo={userInfo} />}
+                />
                 <Route path="*" element={<Navigate to="/my_page" />} />
               </Routes>
             </EachRoomPictureList>

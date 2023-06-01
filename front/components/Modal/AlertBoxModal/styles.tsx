@@ -5,18 +5,15 @@ export const Wrapper = styled.div`
   flex-direction: column;
   justify-content: space-around;
 
-  width: 300px;
-  height: 200px;
-  border-radius: 12px;
-  padding: 40px 30px;
-
+  height: 100%;
+  padding: 20px;
   box-sizing: border-box;
+
+  font-size: 1.5rem;
   background-color: white;
-  box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%);
 
   & > p {
     margin: 0;
-    font-size: 18px;
 
     text-align: center;
   }

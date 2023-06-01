@@ -1,58 +1,52 @@
-import React, { createContext, useCallback, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import React, { useEffect, useState } from 'react';
 
 import NavigationBar from '@components/NavigationBar';
 import SideBar from '@components/SideBar';
 import Modal from '@components/Modal';
+import useModal from '@hooks/useModal';
+import SidebarContext from '@utils/SidebarContext';
 import { OuterContainer, InnerContainer, Wrapper } from './styles';
-import Spinner from '@styles/Spinner';
+import CheckDeviceContext from '@utils/CheckDeviceContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
-  roomId?: string;
-  isImageRoom?: boolean;
 }
 
-interface ISidebarContext {
-  setSidebarState: React.Dispatch<React.SetStateAction<boolean>>;
-}
+const AppLayout = ({ children }: AppLayoutProps) => {
+  const { data: modalData } = useModal();
+  const location = useLocation();
+  const isImageRoom = location.pathname.split('/')[1] === 'room';
 
-export const SidebarContext = createContext<ISidebarContext>({
-  setSidebarState: () => {},
-});
-
-const AppLayout = ({ children, isImageRoom }: AppLayoutProps) => {
-  const { data: userInfo } = useSWR('/user/my');
-  const { data: modalStateData } = useSWR('modalState');
-
-  const currentModalState = modalStateData?.currentModalState;
   const [sidebarState, setSidebarState] = useState<boolean>(false);
-  const value = useMemo(() => ({ setSidebarState }), [setSidebarState]);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  const closeSidebar = useCallback(() => {
-    setSidebarState(false);
-  }, [sidebarState]);
-
-  if (!userInfo || userInfo.logInState === 'LoggingOut') return <Spinner />;
+  useEffect(() => {
+    const isMobileValue = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobileValue) {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
+    }
+  }, []);
 
   return (
     <Wrapper>
-      <OuterContainer showModal={currentModalState}>
-        {userInfo?.logInState === 'LoggedIn' && <NavigationBar />}
-        <InnerContainer
-          style={
-            userInfo?.logInState === 'LoggedIn'
-              ? { height: 'calc(100% - 66px)' }
-              : undefined
-          }
-        >
-          {isImageRoom && <SideBar show={sidebarState} close={closeSidebar} />}
-          <SidebarContext.Provider value={value}>
-            {children}
-          </SidebarContext.Provider>
-        </InnerContainer>
+      <OuterContainer showModal={modalData?.currentModal}>
+        <NavigationBar />
+        <CheckDeviceContext.Provider value={{ isMobile: isMobile }}>
+          <InnerContainer>
+            <SidebarContext.Provider value={{ setSidebarState }}>
+              {isImageRoom && <SideBar show={sidebarState} />}
+              {children}
+            </SidebarContext.Provider>
+          </InnerContainer>
+        </CheckDeviceContext.Provider>
       </OuterContainer>
-      <Modal modalName={currentModalState} />
+      <Modal modalData={modalData} />
+      <ToastContainer />
     </Wrapper>
   );
 };

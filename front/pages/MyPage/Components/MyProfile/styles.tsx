@@ -3,14 +3,13 @@ import styled from '@emotion/styled';
 export const InfoSection = styled.section`
   margin: auto;
   max-width: 800px;
-  margin-top: 40px;
 `;
 
 export const InfoTable = styled.table`
   table-layout: fixed;
 
   width: 100%;
-  font-size: 14px;
+  font-size: 1.3rem;
   border-radius: 15px;
   box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
 
@@ -18,6 +17,7 @@ export const InfoTable = styled.table`
   border-collapse: collapse;
   background-color: white;
   overflow: hidden;
+  user-select: text;
 
   tbody {
     tr td,

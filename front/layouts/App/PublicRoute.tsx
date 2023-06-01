@@ -1,15 +1,30 @@
-import Spinner from '@styles/Spinner';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import useSWR from 'swr';
+import { PageLoading } from '@styles/Spinner';
+import { IAuthData } from '@typing/client';
+import { getErrorMessage } from '@utils/getErrorMessage';
 
-const PublicRoute = () => {
-  const { data: userInfo } = useSWR('/user/my');
-  const loginState = userInfo?.logInState;
+interface IProps {
+  authData: IAuthData;
+}
 
-  if (!loginState) return <Spinner />;
+const PublicRoute = ({ authData }: IProps) => {
+  const { isAuthenticated, loading, error } = authData;
 
-  return loginState === 'LoggedIn' ? <Navigate to="/" /> : <Outlet />;
+  if (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    sessionStorage.clear();
+    return <Navigate to="/login" />;
+  }
+
+  if (loading || isAuthenticated === 'init') return <PageLoading />;
+
+  return isAuthenticated === 'authorized' ? (
+    <Navigate to="/select-room" />
+  ) : (
+    <Outlet />
+  );
 };
 
 export default PublicRoute;

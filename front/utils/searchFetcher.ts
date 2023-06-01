@@ -9,8 +9,8 @@ const searchFetcher = async (url: string) => {
 
       return [...searchData];
     })
-    .catch((err) => {
-      console.error(err);
+    .catch(() => {
+      throw new Error('검색에 실패했습니다..');
     });
 };
 

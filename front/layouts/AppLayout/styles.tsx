@@ -5,10 +5,12 @@ export const Wrapper = styled.div`
 
   overflow: hidden;
   user-select: none;
+
+  font-family: 'Dongle', 'Nanum Gothic', sans-serif;
 `;
 
 export const OuterContainer = styled.div<{
-  showModal: string | undefined;
+  showModal?: string | null;
 }>`
   height: 100%;
   width: 100%;
@@ -22,7 +24,7 @@ export const OuterContainer = styled.div<{
 
 export const InnerContainer = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100% - 66px);
 
   background-color: rgb(255, 255, 255);
 `;

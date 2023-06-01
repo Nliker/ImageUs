@@ -1,43 +1,27 @@
-import React, { useCallback, useState } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useState } from 'react';
 
 import useInput from '@hooks/useInput';
-import { postUserInfoFetcher } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
+import useUserData from '@hooks/useUserData';
+import { DUserInfo } from '@typing/db';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import { InfoSection, InfoTable } from './styles';
-import { logInCheckFetcher } from '@utils/logInFetcher';
 
-const MyProfile = () => {
-  const { data: userInfo, mutate: updateUserInfo } = useSWR('/user/my');
-  const { trigger: postUserInfoTrigger } = useSWRMutation(
-    '/user/my',
-    postUserInfoFetcher,
-  );
-
-  const [profileState, setProfileState] = useState({
-    intro: false,
-    name: false,
-  });
+const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
+  const { requestChangeName } = useUserData();
   const [nameInput, setNameInput, handleNameInput] = useInput('');
 
-  const changeNameBox = useCallback(() => {
-    setProfileState((prev) => {
-      return {
-        ...prev,
-        name: true,
-      };
-    });
-  }, [profileState]);
+  const [nameBoxState, setNameBoxState] = useState(false);
 
-  const onClickPostIntro = (postTitle: string) => () => {
-    if (postTitle === 'name') {
-      postUserInfoTrigger({ [postTitle]: nameInput }).then(() => {
-        setProfileState((prev) => ({ ...prev, name: false }));
-        updateUserInfo(logInCheckFetcher('/user/my'));
-      });
-    } else {
-      alert('잘못된 요청입니다.');
+  const onClickChangeName = async () => {
+    try {
+      await requestChangeName(nameInput);
+      setNameInput('');
+      setNameBoxState(false);
+      alert('이름을 변경하였습니다!');
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
     }
   };
 
@@ -53,25 +37,25 @@ const MyProfile = () => {
           <tr>
             <th>이메일</th>
             <td colSpan={2}>
-              <strong>{userInfo?.userInfo?.email}</strong>
+              <strong>{userInfo?.email}</strong>
             </td>
           </tr>
           <tr>
             <th>가입 유형</th>
             <td>
-              <div>{userInfo?.userInfo?.user_type}</div>
+              <div>{userInfo?.user_type}</div>
             </td>
           </tr>
           <tr>
             <th>이름</th>
-            {!profileState.name ? (
+            {!nameBoxState ? (
               <>
                 <td>
-                  <div>{userInfo?.userInfo?.name}</div>
+                  <div>{userInfo?.name}</div>
                 </td>
                 <td>
                   <div className="btn_group">
-                    <Button type="button" onClick={changeNameBox}>
+                    <Button type="button" onClick={() => setNameBoxState(true)}>
                       이름 변경
                     </Button>
                   </div>
@@ -91,20 +75,13 @@ const MyProfile = () => {
                 </td>
                 <td>
                   <div className="btn_group">
-                    <Button type="button" onClick={onClickPostIntro('name')}>
+                    <Button type="button" onClick={onClickChangeName}>
                       완료
                     </Button>
                     <Button
                       type="button"
                       className="cancel_btn"
-                      onClick={() =>
-                        setProfileState((prev) => {
-                          return {
-                            ...prev,
-                            name: false,
-                          };
-                        })
-                      }
+                      onClick={() => setNameBoxState(false)}
                     >
                       취소
                     </Button>
@@ -118,9 +95,6 @@ const MyProfile = () => {
             <td>
               <strong>********</strong>
             </td>
-            {/* <td className="btn_group">
-              <Button type="button">비밀번호 변경</Button>
-            </td> */}
           </tr>
         </tbody>
       </InfoTable>

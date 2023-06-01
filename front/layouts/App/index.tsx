@@ -1,53 +1,90 @@
-import React, { useEffect } from 'react';
-import useSWR from 'swr';
+import React, { useMemo, useEffect, useRef } from 'react';
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
 import loadable from '@loadable/component';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { logInCheckFetcher } from '@utils/logInFetcher';
+import useAuth from '@hooks/useAuth';
+import { NotFoundPage } from '@components/ErrorComponent';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
-import Spinner from '@styles/Spinner';
+import CheckRoomId from './CheckRoomId';
+import ErrorBoundary from '@components/ErrorBoundary';
+import { PageLoading } from '@styles/Spinner';
 
-const LogIn = loadable(() => import('@pages/LogIn'));
-const SignUp = loadable(() => import('@pages/SignUp'));
-const MainPage = loadable(() => import('@pages/MainPage'));
-const MyPage = loadable(() => import('@pages/MyPage'));
-const PeopleManagement = loadable(() => import('@pages/PeopleManagement'));
-const ImageRoom = loadable(() => import('@pages/ImageRoom'));
-const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'));
+const LogIn = loadable(() => import('@pages/LogIn'), {
+  fallback: <PageLoading />,
+});
+const SignUp = loadable(() => import('@pages/SignUp'), {
+  fallback: <PageLoading />,
+});
+const Intro = loadable(() => import('@pages/Intro'), {
+  fallback: <PageLoading />,
+});
+const SelectRoom = loadable(() => import('@pages/SelectRoom'), {
+  fallback: <PageLoading />,
+});
+const MyPage = loadable(() => import('@pages/MyPage'), {
+  fallback: <PageLoading />,
+});
+const PeopleManagement = loadable(() => import('@pages/PeopleManagement'), {
+  fallback: <PageLoading />,
+});
+const ImageRoom = loadable(() => import('@pages/ImageRoom'), {
+  fallback: <PageLoading />,
+});
+const SocialLogInAuth = loadable(() => import('@pages/SocialLogInAuth'), {
+  fallback: <PageLoading />,
+});
 
-const App = () => {
-  const { data: userInfo, mutate } = useSWR('/user/my');
+function App() {
+  const effectRun = useRef(false);
+  const { isAuthenticated, loading, userInfo, error, refreshAuthData } =
+    useAuth();
+
+  const authData = useMemo(
+    () => ({ isAuthenticated, loading, error, userInfo }),
+    [isAuthenticated, loading, error, userInfo],
+  );
 
   useEffect(() => {
-    if (userInfo?.logInState === 'LoggingOut') return;
-    mutate(logInCheckFetcher('/user/my'));
+    if (effectRun.current === false) {
+      refreshAuthData();
+    }
+
+    return () => {
+      effectRun.current = true;
+    };
   }, []);
 
-  return (
-    <Routes>
-      <Route index element={<MainPage fallback={<Spinner />} />} />
-      <Route element={<PublicRoute />}>
-        <Route path="login" element={<LogIn fallback={<Spinner />} />} />
-        <Route path="signup" element={<SignUp fallback={<Spinner />} />} />
-        <Route
-          path="callback/oauth-login"
-          element={<SocialLogInAuth fallback={<Spinner />} />}
-        />
-      </Route>
-      <Route element={<PrivateRoute />}>
-        <Route path="my_page/*" element={<MyPage fallback={<Spinner />} />} />
-        <Route
-          path="room/:roomId"
-          element={<ImageRoom fallback={<Spinner />} />}
-        />
-        <Route
-          path="people_management/*"
-          element={<PeopleManagement fallback={<Spinner />} />}
-        />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" errorElement={<ErrorBoundary />}>
+        <Route element={<PublicRoute authData={authData} />}>
+          <Route index element={<Intro />} />
+          <Route path="login" element={<LogIn />} />
+          <Route path="signup" element={<SignUp />} />
+          <Route
+            path="callback/oauth-login"
+            element={<SocialLogInAuth refreshAuthData={refreshAuthData} />}
+          />
+        </Route>
+        <Route element={<PrivateRoute authData={authData} />}>
+          <Route path="select-room" element={<SelectRoom />} />
+          <Route path="my_page/*" element={<MyPage />} />
+          <Route element={<CheckRoomId />}>
+            <Route path="room/:roomId" element={<ImageRoom />} />
+          </Route>
+          <Route path="people_management/*" element={<PeopleManagement />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>,
+    ),
   );
-};
+
+  return <RouterProvider router={router} />;
+}
 
 export default App;

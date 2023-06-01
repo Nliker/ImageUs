@@ -30,10 +30,6 @@ export const ContentBox = styled.main`
     text-align: center;
     margin-bottom: 50px;
   }
-
-  @media screen and (min-width: 700px) {
-    padding: 0 5rem;
-  }
 `;
 
 export const ProfileBox = styled.div`
@@ -49,6 +45,7 @@ export const EachRoomPictureList = styled.div`
   flex-direction: column;
   align-items: center;
 
+  gap: 1rem;
   margin-bottom: 40px;
 
   a {
@@ -64,7 +61,7 @@ export const SubMenu = styled.div`
   display: flex;
 
   gap: 1rem;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 
   a.menu_active {
     border-top: 1px solid rgb(38, 38, 38);
@@ -85,9 +82,14 @@ export const ProfileInfo = styled.div`
 
   gap: 1rem;
 
+  h2.user_name {
+    font-size: 2rem;
+  }
+
   ul {
     display: flex;
     gap: 1rem;
+    font-size: 1.2rem;
   }
 
   @media screen and (max-width: 600px) {
@@ -95,4 +97,11 @@ export const ProfileInfo = styled.div`
       flex-direction: column;
     }
   }
+`;
+
+export const ImageContainer = styled.div`
+  position: relative;
+  width: 85%;
+  margin: auto;
+  font-size: 1.2rem;
 `;

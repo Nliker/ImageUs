@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { useCallback, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { IconContext } from 'react-icons/lib';
@@ -8,17 +6,17 @@ import { RiKakaoTalkFill } from 'react-icons/ri';
 import { SiNaver } from 'react-icons/si';
 
 import UserFormBox from '@components/UserFormBox';
-import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { Button } from '@styles/Button';
+import useAuth from '@hooks/useAuth';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import { ErrorMessage, InputBox, SocialLoginBox, SubmitBox } from './styled';
+import queryString from 'query-string';
 
 const LogIn = () => {
-  const navigate = useNavigate();
+  const queryData = queryString.parse(location.search);
 
-  const { data: logInSuccess, trigger } = useSWRMutation(
-    '/user/login',
-    logInRequestFetcher,
-  );
+  const navigate = useNavigate();
+  const { logInRequest } = useAuth();
 
   const [emailValue, setEmailValue] = useState<string>('');
   const [passwordValue, setPwValue] = useState<string>('');
@@ -77,17 +75,29 @@ const LogIn = () => {
     } else if (!pwCheck) {
       alert('비밀번호를 다시 확인해주세요.');
     } else {
-      await trigger({ email: emailValue, password: passwordValue });
+      try {
+        await logInRequest({ email: emailValue, password: passwordValue });
+        navigate('/select-room', { replace: true });
+      } catch (error) {
+        const message = getErrorMessage(error);
+        alert(message);
+      }
     }
   };
 
-  useEffect(() => {
-    if (logInSuccess) {
-      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-        navigate('/', { replace: true });
+  if ('email' in queryData && 'password' in queryData) {
+    const email = queryData?.email as string;
+    const password = queryData?.password as string;
+
+    logInRequest({ email, password })
+      .then(() => {
+        navigate('/select-room', { replace: true });
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error);
+        alert(message);
       });
-    }
-  }, [logInSuccess]);
+  }
 
   return (
     <UserFormBox pageName={'로그인'}>

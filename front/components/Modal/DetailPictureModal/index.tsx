@@ -1,46 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { IconContext } from 'react-icons/lib';
 import { BiUserPin } from 'react-icons/bi';
-
-import { ImageSection, Wrapper } from './styles';
 import { AiOutlineDownload } from 'react-icons/ai';
 
-const DetailPictureInfo = () => {
-  const { data: imageInfo } = useSWR('detailImageInfo');
+import { IDetailPictureInfo } from '@typing/client';
+import { ImageSection, Wrapper } from './styles';
+import ModalLayout from '../ModalLayout';
 
-  const getCurrentModalSize = useCallback(() => {
-    const modalHeight = (window.innerHeight * 0.7).toFixed(3);
-    const modalWidth = modalHeight;
+interface IImageBoxSize {
+  modalWidth: number;
+  modalHeight: number;
+}
 
-    return {
-      modalWidth: parseInt(modalWidth),
-      modalHeight: parseInt(modalHeight),
-    };
-  }, [window.innerHeight]);
-  const [modalSize, setModalSize] = useState(getCurrentModalSize());
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    const handleResizeModal = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        const { modalWidth, modalHeight } = getCurrentModalSize();
-
-        setModalSize({
-          modalWidth,
-          modalHeight,
-        });
-      }, 300);
-    };
-
-    window.addEventListener('resize', handleResizeModal);
-
-    return () => {
-      window.removeEventListener('resize', handleResizeModal);
-    };
-  }, []);
+const DetailPictureInfo = ({
+  imageInfo,
+}: {
+  imageInfo: IDetailPictureInfo;
+}) => {
+  const size = { width: 412, height: 550 };
+  const [imageBoxSize, setImageBoxSize] = useState<IImageBoxSize>({
+    modalWidth: 412,
+    modalHeight: 550,
+  });
+  const imageBoxRef = useRef<HTMLDivElement>(null);
 
   const imageSizeCSS = useMemo(
     () =>
@@ -48,13 +31,11 @@ const DetailPictureInfo = () => {
         const imageObj = new Image();
         imageObj.src = imageLink;
 
-        const boxAspect = window.innerWidth < 600 ? 0.9375 : 1.25;
+        const boxAspect = parseFloat((size.width / size.height).toFixed(3));
         const imageAspect = imageObj.width / imageObj.height;
+        const { modalWidth, modalHeight } = imageBoxSize;
 
         if (boxAspect <= imageAspect) {
-          const modalWidth =
-            window.innerWidth < 600 ? 300 : modalSize.modalWidth;
-
           if (modalWidth > imageObj.width) {
             return {
               width: `${imageObj.width}px`,
@@ -67,9 +48,6 @@ const DetailPictureInfo = () => {
             };
           }
         } else {
-          const modalHeight =
-            window.innerWidth < 600 ? 400 : modalSize.modalHeight;
-
           if (modalHeight > imageObj.height) {
             return {
               width: 'auto',
@@ -83,52 +61,58 @@ const DetailPictureInfo = () => {
           }
         }
       },
-    [imageInfo],
+    [imageInfo, imageBoxSize],
   );
 
-  if (!imageInfo.data) {
-    alert('잘못된 이미지 정보입니다.');
-    return null;
-  }
+  useEffect(() => {
+    if (imageBoxRef.current) {
+      setImageBoxSize({
+        modalWidth: imageBoxRef.current?.clientWidth,
+        modalHeight: imageBoxRef.current?.clientHeight,
+      });
+    }
+  }, []);
 
   return (
-    <Wrapper modalSize={modalSize}>
-      <div className="head_info">
-        <div className="name_info">
-          <IconContext.Provider
-            value={{
-              size: '30px',
-              style: { display: 'inline-block' },
-            }}
-          >
-            <BiUserPin />
-          </IconContext.Provider>
-          <span className="writer">{imageInfo.data.user_name}</span>
-        </div>
-        <div className="date_info">
-          <div className="down_btn">
-            <a href={imageInfo?.data.link} download={imageInfo?.data.fileName}>
-              <IconContext.Provider
-                value={{
-                  size: '100%',
-                  style: { display: 'inline-block', color: 'black' },
-                }}
-              >
-                <AiOutlineDownload />
-              </IconContext.Provider>
-            </a>
+    <ModalLayout currentModal="detailPicture" size={size}>
+      <Wrapper>
+        <div className="head_info">
+          <div className="name_info">
+            <IconContext.Provider
+              value={{
+                size: '30px',
+                style: { display: 'inline-block' },
+              }}
+            >
+              <BiUserPin />
+            </IconContext.Provider>
+            {}
           </div>
-          <span>일시: {imageInfo.data.created_at}</span>
+          <div className="date_info">
+            <div className="down_btn">
+              <a href={imageInfo.data.link} download={imageInfo.data.fileName}>
+                <IconContext.Provider
+                  value={{
+                    size: '100%',
+                    style: { display: 'inline-block', color: 'black' },
+                  }}
+                >
+                  <AiOutlineDownload />
+                </IconContext.Provider>
+              </a>
+            </div>
+            <span>일시: {imageInfo.data.created_at}</span>
+          </div>
         </div>
-      </div>
-      <ImageSection>
-        <img
-          src={imageInfo.data.link}
-          style={imageSizeCSS(imageInfo.data.link)}
-          alt={`${imageInfo.index}번째 이미지`}
-        />
-      </ImageSection>
-    </Wrapper>
+        <ImageSection ref={imageBoxRef}>
+          <img
+            src={imageInfo.data.link}
+            style={imageSizeCSS(imageInfo.data.link)}
+            alt={`${imageInfo.index}번째 이미지`}
+          />
+        </ImageSection>
+      </Wrapper>
+    </ModalLayout>
   );
 };
 

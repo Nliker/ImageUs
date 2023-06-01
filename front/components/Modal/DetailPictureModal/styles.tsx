@@ -1,19 +1,13 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div<{
-  modalSize: {
-    modalWidth: number;
-    modalHeight: number;
-  };
-}>`
+export const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
 
-  width: ${(props) => props.modalSize.modalWidth}px;
-  height: ${(props) => props.modalSize.modalHeight}px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%);
+  height: 100%;
+  /* border-radius: 12px; */
+  /* box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%); */
 
   overflow: hidden;
   background-color: white;
@@ -24,12 +18,12 @@ export const Wrapper = styled.div<{
     align-items: center;
 
     padding: 15px 30px;
-    width: 100%;
     font-size: 80%;
 
     box-sizing: border-box;
     text-align: center;
     white-space: nowrap;
+    box-shadow: 0px 1px 2px -1px rgb(0 0 0 / 40%);
 
     & > span {
       color: black;
@@ -51,8 +45,9 @@ export const Wrapper = styled.div<{
       display: flex;
       align-items: center;
 
-      height: 100%;
       gap: 1rem;
+
+      font-size: 1.2rem;
 
       .down_btn {
         width: 30px;
@@ -67,8 +62,8 @@ export const Wrapper = styled.div<{
   }
 
   @media screen and (max-width: 600px) {
-    width: 300px;
-    height: 400px;
+    /* width: 300px;
+    height: 400px; */
 
     .head_info {
       .writer {
@@ -82,12 +77,14 @@ export const Wrapper = styled.div<{
 `;
 
 export const ImageSection = styled.div`
+  flex: 1 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 
-  width: 100%;
-  height: 80%;
+  height: calc(100% - 60px);
+  padding: 1.2rem;
 `;
 
 export const InfoSection = styled.div`

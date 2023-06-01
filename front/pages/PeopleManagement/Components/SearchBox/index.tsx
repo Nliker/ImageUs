@@ -1,21 +1,25 @@
 import React, { FormEvent, useCallback, useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 
 import { VscSearchStop } from 'react-icons/vsc';
 import { IconContext } from 'react-icons/lib';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 import { DFriendData } from '@typing/db';
 import useInput from '@hooks/useInput';
 import searchFetcher from '@utils/searchFetcher';
-import { postNewFriend } from '@utils/userDataFetcher';
 import { Button } from '@styles/Button';
+import useFriendList from '@hooks/useFriendList';
+import { getErrorMessage } from '@utils/getErrorMessage';
 import { InputBox, PreviewBox, SearchResult, Wrapper } from './styles';
 
 const SearchBox = () => {
-  const { mutate } = useSWRConfig();
   const [queryParams, setQueryParams] = useState('');
+  const [focusSearchBox, setFocusSearchBox] = useState(false);
+  const [searchData, setSearchData] = useState<DFriendData>();
+  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
 
+  const { registerFriend } = useFriendList();
   const { data: prevSearchDataList } = useSWR(
     `/user/search?email=${queryParams}`,
     searchFetcher,
@@ -26,14 +30,6 @@ const SearchBox = () => {
       keepPreviousData: true,
     },
   );
-  const { trigger: registerFriendTrigger } = useSWRMutation(
-    '/user/friend',
-    postNewFriend,
-  );
-
-  const [focusSearchBox, setFocusSearchBox] = useState(false);
-  const [searchData, setSearchData] = useState<DFriendData>();
-  const [tmpInputData, setTmpInputData, handleTmpInputData] = useInput('');
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -68,12 +64,15 @@ const SearchBox = () => {
     [prevSearchDataList],
   );
 
-  const onClickAddFriend = useCallback(
-    (friendId?: number) => () => {
-      mutate('friendlist', registerFriendTrigger(friendId));
-    },
-    [searchData],
-  );
+  const onClickAddFriend = (friendId: number) => async () => {
+    try {
+      await registerFriend(friendId);
+      alert('친구 목록에 추가하였습니다!');
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+    }
+  };
 
   return (
     <Wrapper>
@@ -99,29 +98,29 @@ const SearchBox = () => {
         </form>
         {focusSearchBox && (
           <PreviewBox>
-            <ul>
+            <Scrollbars>
               {prevSearchDataList && prevSearchDataList?.length !== 0 ? (
                 prevSearchDataList.map((data: DFriendData) => (
-                  <li
-                    key={data.id}
-                    className={'preview_li'}
-                    onMouseDown={onClickPreviewItem(data)}
-                  >
-                    <div className="search_result_space">
-                      <span>이메일: {data.email}</span>
-                      <span>이름: {data.name}</span>
-                      <span>가입유형: {data.user_type}</span>
-                    </div>
-                  </li>
+                  <ul key={data.id}>
+                    <li
+                      key={data.id}
+                      className={'preview_li'}
+                      onMouseDown={onClickPreviewItem(data)}
+                    >
+                      <div className="search_result_space">
+                        <span>이름: {data.name}</span>
+                        <span>이메일: {data.email}</span>
+                        <span>가입유형: {data.user_type}</span>
+                      </div>
+                    </li>
+                  </ul>
                 ))
               ) : (
-                <li>
-                  <div>
-                    <span>검색 결과가 없습니다.</span>
-                  </div>
-                </li>
+                <div className="no_data">
+                  <p>검색 결과가 없습니다.</p>
+                </div>
               )}
-            </ul>
+            </Scrollbars>
           </PreviewBox>
         )}
       </InputBox>

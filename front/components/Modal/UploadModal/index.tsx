@@ -1,44 +1,27 @@
-import React, { DragEvent, useState, useEffect, useRef } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { DragEvent, useState, useEffect, useRef, useMemo } from 'react';
 
-import { useParams } from 'react-router';
+import { BsFilePlus } from 'react-icons/bs';
 import { BiImageAdd } from 'react-icons/bi';
 import { IconContext } from 'react-icons/lib';
 
-import { postUploadRoomImage, postUploadUserImage } from '@utils/imageFetcher';
 import { Button } from '@styles/Button';
-import {
-  HeaderContainer,
-  ImageCover,
-  ImageDiv,
-  Modal,
-  ModalContainer,
-  ModalHeader,
-  ModalHeaderWrapper,
-  ModalImageBox,
-  ModalTitle,
-} from './styles';
 import useInput from '@hooks/useInput';
+import useModal from '@hooks/useModal';
+import { getErrorMessage } from '@utils/getErrorMessage';
+import ModalLayout from '../ModalLayout';
+import { ImageCover, ImageDiv, ImageBox, ContentBox } from './styles';
+import { IUploadImgFunc } from '@typing/client';
 
-const UploadModal = () => {
-  const { roomId } = useParams<{ roomId: string | undefined }>();
-  const { mutate } = useSWRConfig();
+const UploadModal = ({ executeFunc }: { executeFunc: IUploadImgFunc }) => {
+  const { clearModalCache } = useModal();
 
-  const { data: modalInfo } = useSWR('modalState');
-  const { trigger: uploadRoomImageTrigger } = useSWRMutation(
-    `/room/${roomId}/image`,
-    postUploadRoomImage,
-  );
-  const { trigger: uploadUserImageTrigger } = useSWRMutation(
-    `/image`,
-    postUploadUserImage,
-  );
+  const size = { width: 412, height: 550 };
 
   const [tmpImageData, setTmpImageData] = useState<HTMLImageElement | null>(
     null,
   );
   const [imageData, setImageData] = useState<HTMLImageElement | null>(null);
+  const [showImageCover, setShowImageCover] = useState(false);
   const [uploadFileName, setUploadFileName, handleUploadFileName] =
     useInput('');
   const [uploadImageFile, setUploadImageFile] = useState<FormData | null>(null);
@@ -65,26 +48,27 @@ const UploadModal = () => {
     return () => clearTimeout(debounce);
   }, [tmpImageData]);
 
-  const onClickUpload = () => {
-    if (!uploadImageFile) {
-      alert('이미지를 등록해주세요');
-      return;
-    }
-    if (modalInfo?.uploadLocation === 'room') {
-      uploadRoomImageTrigger({ uploadImageFile }).then(() => {
-        mutate(`/room/${roomId}/unread-imagelist`);
-        mutate('modalState', { currentModalState: '' });
-      });
-    } else {
-      uploadUserImageTrigger({ uploadImageFile }).then(() => {
-        mutate('modalState', { currentModalState: '' });
+  const onClickUpload = async () => {
+    try {
+      if (!uploadImageFile) {
+        throw new Error('이미지를 등록해주세요');
+      }
+
+      await executeFunc(uploadImageFile);
+      if (window.location.pathname === '/my_page') {
         window.location.reload();
-      });
+      }
+      alert('사진을 업로드하였습니다!');
+      clearModalCache();
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
     }
   };
 
   const onDropData = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setShowImageCover(false);
     const formData: any = new FormData();
 
     if (e.dataTransfer.items) {
@@ -111,14 +95,25 @@ const UploadModal = () => {
       }
     }
     const image = new Image();
-    image.src = URL.createObjectURL(formData.get('image'));
+    const imageData = formData.get('image');
+    image.src = URL.createObjectURL(imageData);
 
+    setUploadFileName(imageData.name);
     setTmpImageData(image);
     setUploadImageFile(formData);
   };
 
-  const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useMemo(
+    () => (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setShowImageCover(true);
+    },
+    [setShowImageCover],
+  );
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setShowImageCover(false);
   };
 
   const handleInputFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,63 +139,71 @@ const UploadModal = () => {
   };
 
   return (
-    <ModalContainer>
-      <Modal>
-        <HeaderContainer>
-          <ModalHeaderWrapper>
-            <ModalHeader>
-              <ModalTitle>
-                <h2>
-                  {modalInfo?.uploadLocation === 'room'
-                    ? '방에 사진 업로드'
-                    : '개인 저장소에 사진 업로드'}
-                </h2>
-              </ModalTitle>
-            </ModalHeader>
-          </ModalHeaderWrapper>
-        </HeaderContainer>
-        <div className={'content_box'}>
-          <ModalImageBox onDrop={onDropData} onDragOver={onDragOver}>
-            <ImageDiv image={imageData}>
-              {!imageData && (
-                <div className="default_image">
-                  <IconContext.Provider
-                    value={{
-                      size: '50%',
-                      style: { display: 'inline-block' },
-                    }}
-                  >
-                    <BiImageAdd />
-                  </IconContext.Provider>
-                </div>
-              )}
-            </ImageDiv>
-            <div className="select_box">
-              <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
-              <div className="filebox">
-                <input
-                  className="upload-name"
-                  value={uploadFileName}
-                  readOnly
-                  placeholder="첨부파일"
-                />
-                <label htmlFor="file">파일찾기</label>
-                <input
-                  type="file"
-                  id="file"
-                  ref={inputFileRef}
-                  onChange={handleInputFile}
-                />
-              </div>
+    <ModalLayout currentModal="upload" size={size}>
+      <ContentBox>
+        <ImageBox onDrop={onDropData} onDragOver={handleDragOver}>
+          {!imageData ? (
+            <div className="default_image">
+              <IconContext.Provider
+                value={{
+                  size: '30%',
+                  style: { display: 'inline-block' },
+                }}
+              >
+                <BiImageAdd />
+              </IconContext.Provider>
             </div>
-            <ImageCover />
-          </ModalImageBox>
-        </div>
+          ) : (
+            <ImageDiv image={imageData} />
+          )}
+          <div className="select_box">
+            <p>이미지를 끌어 놓거나 파일 선택을 하세요</p>
+            <div className="filebox">
+              <input
+                className="upload-name"
+                value={uploadFileName}
+                readOnly
+                placeholder="첨부파일"
+              />
+              <label htmlFor="file">파일찾기</label>
+              <input
+                type="file"
+                id="file"
+                ref={inputFileRef}
+                onChange={handleInputFile}
+              />
+            </div>
+          </div>
+          {showImageCover && (
+            <ImageCover onDragLeave={handleDragLeave}>
+              <IconContext.Provider
+                value={{
+                  size: '30%',
+                  style: {
+                    display: 'inline-block',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: '#4d4d4d',
+                    pointerEvents: 'none',
+                  },
+                }}
+              >
+                <BsFilePlus
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                  }}
+                />
+              </IconContext.Provider>
+            </ImageCover>
+          )}
+        </ImageBox>
         <div className={'upload_btn'}>
           <Button onClick={onClickUpload}>업로드</Button>
         </div>
-      </Modal>
-    </ModalContainer>
+      </ContentBox>
+    </ModalLayout>
   );
 };
 

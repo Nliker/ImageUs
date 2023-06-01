@@ -34,6 +34,55 @@ export const Collapse = styled.span<{ collapse: boolean }>`
   }
 `;
 
+export const Container = styled.div`
+  position: relative;
+
+  padding: 10px 25px;
+  background: white;
+
+  .check_box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & > button {
+      width: 50px;
+      height: 25px;
+      padding: 0px;
+      font-size: 15px;
+    }
+  }
+
+  & .check_label_box {
+    display: inline-flex;
+    align-items: center;
+
+    height: 35px;
+
+    cursor: pointer;
+
+    .mark_box {
+      display: flex;
+      position: absolute;
+      left: 0px;
+
+      gap: 5px;
+
+      span {
+        border-radius: 5px;
+      }
+
+      .room_manager_mark {
+        background-color: antiquewhite;
+      }
+
+      .onself_mark {
+        background-color: lavender;
+      }
+    }
+  }
+`;
+
 export const CreateBtnBox = styled.div`
   padding: 1rem;
   text-align: center;

@@ -1,21 +1,22 @@
-import { CImageData } from '@typing/client';
-import { DImageData } from '@typing/db';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { IImageData } from '@typing/client';
+import { DImageData } from '@typing/db';
 import { getToken } from './getToken';
+import { getErrorMessage } from './getErrorMessage';
 
 interface AxiosCustomRequestConfig extends AxiosRequestConfig {
   retryCount: number;
 }
 
-const postUploadRoomImage = async (
-  url: string,
+const uploadRoomImgFetcher = async (
+  [url, type]: [string, string],
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
   try {
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     await axios.post('/backapi' + url, arg.uploadImageFile, {
@@ -25,20 +26,23 @@ const postUploadRoomImage = async (
       },
     });
   } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 404) {
-      alert('파일이 존재하지 않습니다.');
-    } else if (err instanceof Error) {
-      alert('이미지를 업로드하지 못하였습니다..');
+    if (err instanceof AxiosError) {
+      throw new Error('이미지를 업로드하지 못하였습니다..다시 시도해주세요..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
     }
-    return;
   }
 };
 
-const deleteUserImage = async (
+const deleteUserImageFetcher = async (
   url: string,
-  { arg: imageId }: { arg: number },
+  { arg: imageId }: { arg?: number },
 ) => {
   try {
+    if (!imageId)
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+
     const { token } = await getToken();
 
     if (!token) {
@@ -50,15 +54,18 @@ const deleteUserImage = async (
       data: { delete_image_id: imageId },
     });
 
-    alert('이미지를 삭제하였습니다!');
     return imageId;
   } catch (err) {
-    alert('이미지 삭제요청에 실패했습니다..');
-    return;
+    if (err instanceof AxiosError) {
+      throw new Error('이미지 삭제요청에 실패했습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
-const getImageData = async (
+const getImageDataFetcher = async (
   url: string,
   { arg: imageList }: { arg: DImageData[] },
 ) => {
@@ -66,11 +73,11 @@ const getImageData = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
     if (imageList.length === 0) return [];
-    const imgDataList: CImageData[] = [];
+    const imgDataList: IImageData[] = [];
 
     const MAX_RETRY_COUNT = 2;
     const axiosObj = axios.create();
@@ -123,12 +130,18 @@ const getImageData = async (
 
     return [...imgDataList];
   } catch (err) {
-    alert('이미지를 받아오지 못했습니다..');
-    return [];
+    if (err instanceof AxiosError) {
+      throw new Error(
+        '이미지를 정상적으로 로드하지 못하였습니다..새로고침해주세요!',
+      );
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
-const postUploadUserImage = async (
+const uploadUserImageFetcher = async (
   url: string,
   { arg }: { arg: { uploadImageFile: FormData } },
 ) => {
@@ -136,28 +149,171 @@ const postUploadUserImage = async (
     const { token } = await getToken();
 
     if (!token) {
-      throw new Error();
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
     }
 
-    await axios.post('/backapi' + url, arg.uploadImageFile, {
+    const response = await axios.post('/backapi' + url, arg.uploadImageFile, {
       headers: {
         Authorization: token,
         'Content-Type': 'multipart/form-data',
       },
     });
+    const { image_info }: { image_info: DImageData } = response.data;
+
+    return { image_info };
   } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 404) {
-      alert('파일이 존재하지 않습니다.');
-    } else if (err instanceof Error) {
-      alert('이미지를 업로드하지 못하였습니다..');
+    if (err instanceof AxiosError) {
+      throw new Error('이미지를 업로드하지 못하였습니다..다시시도 해주세요.');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
     }
-    return;
+  }
+};
+
+const getDefaultImgFetcher = async (
+  url: string,
+  {
+    arg,
+  }: {
+    arg: {
+      start: number;
+    };
+  },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+    }
+
+    const { start } = arg;
+    const loadNumber = 12;
+
+    const response = await axios.get(
+      '/backapi' + `${url}?start=${start}&limit=${loadNumber}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
+
+    return {
+      imagelist: newDataList,
+      loadCompleted: imagelist.length < 12 ? true : false,
+    };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw new Error('이미지정보를 받아오지 못했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
+  }
+};
+
+const getFilterImgFetcher = async (
+  url: string,
+  { arg }: { arg: { start: number; start_date?: string; end_date?: string } },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+    }
+
+    const { start, start_date, end_date } = arg;
+    const limit = 12;
+
+    const response = await axios.get(
+      '/backapi' +
+        `${url}?start=${start}&limit=${limit}&start_date=${start_date}&end_date=${end_date}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    const { imagelist } = response.data;
+    const newDataList = imagelist.filter((data: DImageData) => data.link);
+
+    return {
+      imagelist: newDataList,
+      loadCompleted: imagelist.length < 12 ? true : false,
+    };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw new Error('이미지정보를 받아오지 못했습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
+  }
+};
+
+const getUnreadImgFetcher = async (url: string) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+    }
+    const response = await axios.get('/backapi' + url, {
+      headers: { Authorization: token },
+    });
+    return response.data.imagelist;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw new Error('실시간 이미지를 업데이트하지 못하였습니다..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
+  }
+};
+
+const deleteRoomImgFetcher = async (
+  [url, type]: [string, string],
+  { arg: imageId }: { arg: number },
+) => {
+  try {
+    const { token } = await getToken();
+
+    if (!token) {
+      throw new Error('로그인 정보가 없습니다..다시 로그인 해주세요');
+    }
+
+    await axios.delete('/backapi' + url, {
+      headers: { Authorization: token },
+      data: {
+        delete_room_image_id: imageId,
+      },
+    });
+    return imageId;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw new Error('이미지를 삭제하지 못하였습니다..다시 시도해주세요..');
+    } else {
+      const message = getErrorMessage(err);
+      throw new Error(message);
+    }
   }
 };
 
 export {
-  postUploadRoomImage,
-  postUploadUserImage,
-  deleteUserImage,
-  getImageData,
+  getImageDataFetcher,
+  getDefaultImgFetcher,
+  getFilterImgFetcher,
+  uploadRoomImgFetcher,
+  deleteRoomImgFetcher,
+  uploadUserImageFetcher,
+  deleteUserImageFetcher,
+  getUnreadImgFetcher,
 };

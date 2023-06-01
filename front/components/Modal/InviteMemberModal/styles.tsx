@@ -1,73 +1,36 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div`
+export const ContentBox = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-
-  border-radius: 12px;
-  background-color: white;
-`;
-
-export const Container = styled.div`
-  flex: 1;
-`;
-
-export const Title = styled.div`
-  font-size: 18px;
-  padding: 1rem 0;
+  justify-content: space-around;
+  align-items: center;
   text-align: center;
 
-  box-shadow: 0 2px 4px hsla(0, 0%, 81.2%, 0.5);
-
-  h2 {
-    margin: 0;
-  }
-
-  span {
-    display: inline-block;
-  }
-`;
-
-export const Content = styled.div`
-  width: 100%;
   height: 100%;
-  padding-bottom: 20px;
 
-  box-sizing: border-box;
-  overflow: auto;
-
-  .content_box {
-    position: relative;
+  .friend_list {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
+    flex: 8;
 
-    margin: 0 40px;
-    gap: 1rem;
+    width: 100%;
 
-    .content_list_box {
-      width: 100%;
+    .ul_container {
+      flex: 1 0 auto;
 
-      .content_list {
-        position: relative;
-        height: 150px;
-      }
-
-      .content_list_ul {
-        display: table;
+      ul {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
         margin: auto;
-        padding: 0;
-        min-width: 150px;
-        border-spacing: 20px;
+        padding: 0 1rem;
+        gap: 0.7rem;
 
         li {
-          display: table-row;
-
+          border-radius: 6px;
           vertical-align: middle;
           list-style: none;
           cursor: pointer;
@@ -78,6 +41,8 @@ export const Content = styled.div`
 
           .list_layout {
             display: flex;
+            justify-content: center;
+
             gap: 1rem;
           }
 
@@ -88,41 +53,39 @@ export const Content = styled.div`
 
           .list_info > p {
             margin: 0;
-
-            &:first-of-type {
-              margin-bottom: 0.5rem;
-            }
-          }
-        }
-      }
-    }
-
-    .selected_list_box {
-      width: 100%;
-      text-align: center;
-
-      .selected_list {
-        height: 100px;
-
-        .selected_list_ul {
-          display: inline-block;
-
-          min-width: 100px;
-          margin: 0;
-
-          li {
-            list-style: circle;
-          }
-
-          & > li:not(& > li:last-child) {
-            margin-bottom: 0.5rem;
+            text-align: left;
           }
         }
       }
     }
   }
 
-  .content_subname {
-    text-align: center;
+  .selected_list {
+    display: flex;
+    flex-direction: column;
+    flex: 8;
+
+    width: 100%;
+
+    .ul_container {
+      flex: 1 0 auto;
+
+      ul {
+        display: grid;
+        justify-content: center;
+
+        margin: auto;
+        padding: 0 1rem;
+        gap: 0.7rem;
+
+        li {
+          list-style: circle;
+        }
+      }
+    }
+  }
+
+  .content_btn {
+    flex: 2;
   }
 `;

@@ -19,6 +19,7 @@ export const Wrapper = styled.div<{ show: boolean }>`
   height: 100%;
   z-index: 100;
   box-sizing: border-box;
+  font-size: 1.3rem;
 
   background-color: transparent;
   box-shadow: rgb(0 0 0 / 8%) 2px 0px 2px;

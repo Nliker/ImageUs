@@ -1,36 +1,55 @@
 import React, { useEffect } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router';
 
-import { logInCheckFetcher, socialLoginFetcher } from '@utils/logInFetcher';
+import useSocialAuth from '@hooks/useSocialAuth';
+import { ILoginData } from '@typing/client';
+import { KeyedMutator } from 'swr';
 
-const SocialLogInAuth = () => {
-  const navigate = useNavigate();
-  const { mutate } = useSWRConfig();
+interface Props {
+  refreshAuthData: KeyedMutator<ILoginData>;
+}
+
+const SocialLogInAuth = ({ refreshAuthData }: Props) => {
   const { coperation, code } = queryString.parse(window.location.search);
 
-  const { data: socialLoginRequest } = useSWR(
-    ['/oauth-login/callback', coperation, code],
-    socialLoginFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  if (!coperation || !code) {
+    const error = new Error(
+      '잘못된 경로로 접근하셨습니다.. 다시 로그인하세요.',
+    );
+    error.name = 'AuthError';
+    throw error;
+  }
+
+  const navigate = useNavigate();
+  const { isAuthenticated, loading, error } = useSocialAuth({
+    coperation,
+    code,
+  });
 
   useEffect(() => {
-    if (!socialLoginRequest) return;
+    try {
+      if (loading) return;
 
-    if (socialLoginRequest.result === 'success') {
-      mutate('/user/my', logInCheckFetcher('/user/my')).then(() => {
-        navigate('/', { replace: true });
-      });
-    } else {
-      navigate('/login');
+      if (isAuthenticated) {
+        alert('인증되었습니다.');
+        refreshAuthData().then(() => {
+          navigate('/select-room', { replace: true });
+        });
+      }
+    } catch (e) {
+      const error = new Error(
+        '로그인 요청을 실패하였습니다.. 다시 시도해주세요.',
+      );
+      error.name = 'AuthError';
+      throw error;
     }
-  }, [socialLoginRequest]);
+  }, [isAuthenticated]);
+
+  if (error) {
+    error.name = 'AuthError';
+    throw error;
+  }
 
   return <div>로그인 요청 처리중..</div>;
 };

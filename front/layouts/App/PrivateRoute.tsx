@@ -1,21 +1,28 @@
-import Spinner from '@styles/Spinner';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
-import useSWR from 'swr';
+import { IAuthData } from '@typing/client';
+import { PageLoading } from '@styles/Spinner';
 
-const PrivateRoute = () => {
-  const { data: userInfo } = useSWR('/user/my');
-  const loginState = userInfo?.logInState;
+interface IProps {
+  authData: IAuthData;
+}
 
-  if (!loginState || loginState === 'LoggingOut') {
-    return <Spinner />;
+const PrivateRoute = ({ authData }: IProps) => {
+  const { isAuthenticated, loading, error, userInfo } = authData;
+
+  if (error) {
+    error.name = 'AuthError';
+    throw error;
   }
 
-  if (loginState === 'LoggedOut') {
-    alert('로그인이 필요합니다.');
-  }
+  if (loading || isAuthenticated === 'init') return <PageLoading />;
 
-  return loginState === 'LoggedIn' ? <Outlet /> : <Navigate to="/login" />;
+  if (isAuthenticated === 'unauthorized') {
+    alert('로그인이 필요합니다...');
+    return <Navigate to="/login" />;
+  } else {
+    return <Outlet context={{ userInfo }} />;
+  }
 };
 
 export default PrivateRoute;

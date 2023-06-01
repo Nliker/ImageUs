@@ -1,5 +1,14 @@
 import React, { CSSProperties } from 'react';
-import { SyncLoader } from 'react-spinners';
+import { SyncLoader, FadeLoader } from 'react-spinners';
+
+const PageLoading = () => {
+  const spinnerCSS: CSSProperties = {
+    top: '50%',
+    left: '50%',
+  };
+
+  return <FadeLoader color="rgb(54, 215, 183)" cssOverride={spinnerCSS} />;
+};
 
 const Spinner = () => {
   const spinnerCSS: CSSProperties = {
@@ -8,7 +17,7 @@ const Spinner = () => {
     textAlign: 'center',
   };
 
-  return <SyncLoader color="cornflowerblue" cssOverride={spinnerCSS} />;
+  return <SyncLoader color="rgb(54, 215, 183)" cssOverride={spinnerCSS} />;
 };
 
-export default Spinner;
+export { Spinner, PageLoading };

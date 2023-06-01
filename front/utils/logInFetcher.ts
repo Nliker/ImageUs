@@ -1,11 +1,14 @@
 import axios, { AxiosError } from 'axios';
 import { getToken } from './getToken';
+import { DUserInfo } from '@typing/db';
+import { getErrorMessage } from './getErrorMessage';
 
 const logInCheckFetcher = async (url: string) => {
   try {
     const { token } = await getToken();
+
     if (!token) {
-      throw new Error();
+      return { isAuthenticated: 'unauthorized', userInfo: null };
     }
 
     const response = await axios.get('/backapi' + url, {
@@ -13,11 +16,21 @@ const logInCheckFetcher = async (url: string) => {
         Authorization: token,
       },
     });
-    const { user_info } = response.data;
+    const { user_info }: { user_info: DUserInfo } = response.data;
 
-    return { logInState: 'LoggedIn', userInfo: user_info };
+    return { isAuthenticated: 'authorized', userInfo: user_info };
   } catch (err) {
-    return { logInState: 'LoggedOut' };
+    const error = new Error();
+    error.name = 'AuthError';
+
+    if (err instanceof AxiosError) {
+      error.message = '로그인 요청을 실패했습니다..다시 로그인 해주세요.';
+    } else {
+      const message = getErrorMessage(err);
+      error.message = message;
+    }
+
+    throw error;
   }
 };
 
@@ -41,18 +54,21 @@ const logInRequestFetcher = async (
       response.data.refresh_token_expire_time,
     );
     sessionStorage.setItem('user_id', response.data.user_id);
-
-    return true;
+    return response.data.user_id;
   } catch (err) {
+    const error = new Error();
+    error.name = 'AuthError';
+
     if (
       err instanceof AxiosError &&
       (err.response?.status === 404 || err.response?.status === 401)
     ) {
-      alert(err.response.data.message);
+      error.message = err.response.data.message;
     } else {
-      alert('로그인 요청에 실패했습니다..');
+      error.message = '로그인 요청에 실패하였습니다..';
     }
-    return false;
+
+    throw error;
   }
 };
 
@@ -79,10 +95,11 @@ const socialLoginFetcher = async ([url, coperation, code]: [
     );
     sessionStorage.setItem('user_id', user_id);
 
-    return { result: 'success' };
+    return true;
   } catch (err) {
-    alert('로그인 요청에 실패했습니다..');
-    return { result: 'fail' };
+    const error = new Error('로그인 요청에 실패했습니다..');
+    error.name = 'AuthError';
+    throw error;
   }
 };
 

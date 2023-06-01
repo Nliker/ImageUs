@@ -1,13 +1,10 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import useSWR from 'swr';
-import { useParams } from 'react-router';
+import React, { memo, useCallback, useEffect, useRef, useContext } from 'react';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { DRoomData } from '@typing/db';
-import { getUserRoomListFetcher } from '@utils/userDataFetcher';
 import ChannelList from './ChannelList';
 import MemberList from './MemberList';
+import SidebarContext from '@utils/SidebarContext';
 import {
   Background,
   ContentTabs,
@@ -18,22 +15,10 @@ import {
 
 interface SidebarProps {
   show: boolean;
-  close: () => void;
 }
 
-const SideBar = memo(({ show, close }: SidebarProps) => {
-  const { roomId } = useParams<{ roomId: string }>();
-  const userId = sessionStorage.getItem('user_id');
-
-  const { data: roomListInfo } = useSWR(
-    `/user/${userId}/roomlist`,
-    getUserRoomListFetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+const SideBar = memo(({ show }: SidebarProps) => {
+  const sidebarContext = useContext(SidebarContext);
 
   const sideBarEl = useRef<HTMLDivElement>(null);
   const backgroundEl = useRef<HTMLDivElement>(null);
@@ -43,7 +28,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
     return () => {
       backgroundEl.current?.removeEventListener('click', handleCloseSidebar);
     };
-  }, [backgroundEl.current, show]);
+  }, [show]);
 
   const handleCloseSidebar = useCallback(
     (e: MouseEvent) => {
@@ -51,33 +36,11 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
         e.target instanceof HTMLElement &&
         !sideBarEl.current?.contains(e.target)
       ) {
-        close();
+        sidebarContext.setSidebarState(false);
       }
     },
     [show],
   );
-
-  const extractRoomList = useMemo(() => {
-    if (!roomListInfo) return;
-
-    const roomListData = roomListInfo.map((data: DRoomData) => {
-      return {
-        id: data.id,
-        data: data.title,
-      };
-    });
-
-    return [...roomListData];
-  }, [roomListInfo]);
-
-  const extractCurrentUserList = useMemo(() => {
-    if (!roomListInfo) return;
-
-    const currentRoomData = roomListInfo.find(
-      (data: DRoomData) => '' + data.id === roomId,
-    );
-    return { ...currentRoomData };
-  }, [roomId, roomListInfo]);
 
   return (
     <>
@@ -97,10 +60,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               </label>
               <div className="tab_content">
                 <Scrollbars>
-                  <ChannelList
-                    roomlist={extractRoomList}
-                    closeSidebar={close}
-                  />
+                  <ChannelList />
                 </Scrollbars>
               </div>
             </Tab>
@@ -111,7 +71,7 @@ const SideBar = memo(({ show, close }: SidebarProps) => {
               </label>
               <div className="tab_content">
                 <Scrollbars>
-                  <MemberList currentRoomInfo={extractCurrentUserList} />
+                  <MemberList />
                 </Scrollbars>
               </div>
             </Tab>

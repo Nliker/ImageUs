@@ -1,42 +1,41 @@
 import React from 'react';
-
+import {
+  IAertData,
+  IDetailPictureInfo,
+  IModalData,
+  IUploadImgFunc,
+} from '@typing/client';
 import AlertBox from './AlertBoxModal';
 import CreateRoomModal from './CreateRoomModal';
 import DetailPictureInfo from './DetailPictureModal';
 import InviteMemberModal from './InviteMemberModal';
 import UploadModal from './UploadModal';
-import ModalLayout from './ModalLayout';
 
-interface IModalProps {
-  modalName: string;
-}
+const Modal = ({ modalData }: { modalData: IModalData }) => {
+  const { state } = modalData;
+  const currentModal = modalData?.currentModal;
 
-const Modal = ({ modalName }: IModalProps) => {
-  const currentModalComponent = () => {
-    switch (modalName) {
-      case 'detailPicture':
-        return <DetailPictureInfo />;
+  if (state === 'off' || !currentModal) return null;
 
-      case 'alert':
-        return <AlertBox />;
-
-      case 'upload':
-        return <UploadModal />;
-
-      case 'creatRoom':
-        return <CreateRoomModal />;
-
-      case 'inviteMember':
-        return <InviteMemberModal />;
-
-      default:
-        break;
-    }
-  };
-
-  if (!modalName) return null;
-
-  return <ModalLayout>{currentModalComponent()}</ModalLayout>;
+  return (
+    <>
+      {currentModal === 'detailPicture' ? (
+        <DetailPictureInfo
+          imageInfo={modalData.detailPictureInfo as IDetailPictureInfo}
+        />
+      ) : currentModal === 'alert' ? (
+        <AlertBox alertData={modalData.alertData as IAertData} />
+      ) : currentModal === 'upload' ? (
+        <UploadModal
+          executeFunc={modalData.uploadExecuteFunc as IUploadImgFunc}
+        />
+      ) : currentModal === 'createRoom' ? (
+        <CreateRoomModal />
+      ) : currentModal === 'inviteMember' ? (
+        <InviteMemberModal />
+      ) : null}
+    </>
+  );
 };
 
 export default Modal;
