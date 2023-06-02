@@ -13,6 +13,7 @@
 </h4>
 
 <br>
+<br>
 
 > ## Requirements
 
@@ -20,6 +21,7 @@
 
 - [Node.js](https://nodejs.org)
 
+<br>
 <br>
 
 > ## Installation
@@ -62,8 +64,11 @@ $ npm run dev
 ---
 
 <br>
+<br>
 
 > ## 주요 기능
+
+<br>
 
 - #### &nbsp;&nbsp; 개인 저장소에 이미지 파일 저장 기능
 
@@ -74,6 +79,7 @@ $ npm run dev
 - #### &nbsp;&nbsp; 선택한 이미지 다운로드 기능
 
 <br>
+<br>
 
 > ## 디렉토리 구조
 
@@ -81,69 +87,43 @@ $ npm run dev
 
 ```bash
 📦front
- ┣ 📂assets                : 이미지 관련 폴더
- ┃   ┗ 📂image
- ┣ 📂components            : 공통적으로 쓰이는 컴포넌트 폴더
+ ┣ 📂assets                 : 이미지 관련 폴더
+ ┃   ┣ 📂image
+ ┣ 📂components             : 공통적으로 쓰이는 컴포넌트 폴더
+ ┃   ┣ 📂ErrorBoundary
+ ┃   ┣ 📂ErrorComponent
+ ┃   ┣ 📂ImageSection
  ┃   ┣ 📂Modal
- ┃   ┃   ┣ 📂AlertBoxModal
- ┃   ┃   ┣ 📂CreateRoomModal
- ┃   ┃   ┣ 📂DetailPictureModal
- ┃   ┃   ┣ 📂InviteMemberModal
- ┃   ┃   ┣ 📂ModalLayout
- ┃   ┃   ┗ 📂UploadModal
  ┃   ┣ 📂NavigationBar
  ┃   ┣ 📂SideBar
- ┃   ┃   ┣ 📂ChannelList
- ┃   ┃   ┣ 📂CollapseListBox
- ┃   ┃   ┗ 📂MemberList
  ┃   ┗ 📂UserFormBox
- ┣ 📂hooks
- ┃    ┣ 📜throttle.ts
- ┃    ┣ 📜useInput.ts
- ┃    ┗ 📜useIntersect.ts
+ ┣ 📂hooks                      : 커스텀 훅 관련 폴더
  ┣ 📂layouts
- ┃   ┣ 📂App                : 라우팅 관련 폴더
- ┃   ┃   ┣ 📜index.tsx
- ┃   ┃   ┣ 📜PrivateRoute.tsx
- ┃   ┃   ┗ 📜PublicRoute.tsx
+ ┃   ┣ 📂App                    : 라우팅 관련 폴더
  ┃   ┗ 📂AppLayout
- ┣ 📂pages                  : 페이지 컴포넌트 폴더
+ ┣ 📂pages                      : 페이지 컴포넌트 폴더
  ┃   ┣ 📂ImageRoom
- ┃   ┃   ┗ 📂Components
- ┃   ┃     ┣ 📂ContentSection
- ┃   ┃     ┣ 📂ImageContent
- ┃   ┃     ┗ 📂ImageContentList
+ ┃   ┣ 📂Intro
  ┃   ┣ 📂LogIn
- ┃   ┣ 📂MainPage
  ┃   ┣ 📂MyPage
- ┃   ┃   ┗ 📂Components
- ┃   ┃       ┣ 📂MyPictures
- ┃   ┃       ┗ 📂MyProfile
  ┃   ┣ 📂PeopleManagement
- ┃   ┃   ┗ 📂Components
- ┃   ┃       ┣ 📂FriendList
- ┃   ┃       ┗ 📂SearchBox
+ ┃   ┣ 📂SelectRoom
  ┃   ┣ 📂SignUp
  ┃   ┗ 📂SocialLogInAuth
- ┣ 📂styles                : 공통으로 사용되는 UI 컴포넌트
+ ┣ 📂styles                     : 공통으로 사용되는 UI 컴포넌트
  ┃   ┣ 📂ActiveButton
  ┃   ┣ 📂Button
+ ┃   ┣ 📂DataCheckLabel
  ┃   ┗ 📂Spinner
- ┣ 📂typings               : 타입 폴더
+ ┣ 📂typings                    : 타입 폴더
  ┃   ┣ 📜client.ts
  ┃   ┗ 📜db.ts
- ┣ 📂utils                 : swr fetcher 파일 폴더
- ┃   ┣ 📜getToken.ts
- ┃   ┣ 📜imageFetcher.ts
- ┃   ┣ 📜logInFetcher.ts
- ┃   ┣ 📜roomDataFetcher.ts
- ┃   ┣ 📜searchFetcher.ts
- ┃   ┗ 📜userDataFetcher.ts
+ ┣ 📂utils                      : fetcher 파일, context 파일
  ┣ 📜.eslintrc
  ┣ 📜.gitignore
  ┣ 📜.prettierrc
- ┣ 📜client.tsx            : 개발, 배포 모드에 따라 app.js를 index.html에 보여줌
- ┣ 📜index.html            : 모든 페이지가 렌더링되며 보여질 html 파일
+ ┣ 📜client.tsx                 : 루트 App을 index.html app에 렌더링하는 파일
+ ┣ 📜index.html                 : 화면에 보여질 html 파일
  ┣ 📜package-lock.json
  ┣ 📜package.json
  ┣ 📜README.md
