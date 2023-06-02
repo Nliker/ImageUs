@@ -166,14 +166,12 @@ export const ContentBox = styled.div`
   top: 120px;
 
   width: 100%;
-  height: calc(100% - 120px);
   padding-bottom: 40px;
 
   .content_box_pos {
     position: relative;
 
     width: 85%;
-    height: 100%;
     margin: auto;
 
     font-size: 1.2rem;
