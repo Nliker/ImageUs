@@ -171,6 +171,9 @@ const ImageRoom = () => {
       return;
     }
 
+    setReadStartNum(0);
+    clearRoomImageList();
+
     setFilterStateNum(3);
     setFilterSelectTerm((prev) => ({ ...prev, startDate, endDate }));
     setShowSelectDateForm(false);
