@@ -28,11 +28,9 @@ export const ImageCard = styled.div`
 export const InfoContainer = styled.div`
   display: flex;
   align-items: center;
-  flex: 1;
 
-  font-size: 1.1rem;
   text-align: center;
-
+  font-size: calc(0.5vw + 0.7em);
   background-color: whitesmoke;
 `;
 
@@ -77,24 +75,6 @@ export const HoverBox = styled.div`
       }
     }
   }
-
-  /* @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      left: 0;
-
-      clip-path: none;
-      width: auto;
-      height: auto;
-
-      background: rgba(0, 0, 0, 0.3);
-    }
-  } */
 `;
 
 export const ImageInfo = styled.div`

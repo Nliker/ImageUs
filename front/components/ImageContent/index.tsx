@@ -1,10 +1,11 @@
 import React, { memo, useState } from 'react';
 
-import { IImageData, PrivateChildProps } from '@typing/client';
+import { CSSProperties } from 'react';
+
+import { IImageData } from '@typing/client';
 import { Button } from '@styles/Button';
 import useModal from '@hooks/useModal';
-import { getErrorMessage } from '@utils/getErrorMessage';
-import { CSSProperties } from 'react';
+import { useUserInfo } from '@hooks/useUserInfo';
 import {
   ContentBox,
   Cover,
@@ -13,7 +14,6 @@ import {
   ImageInfo,
   InfoContainer,
 } from './styles';
-import { useOutletContext } from 'react-router';
 
 interface Props {
   data: IImageData;
@@ -31,27 +31,17 @@ const blindCSS: CSSProperties = {
 };
 
 const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
-  const { userInfo } = useOutletContext<PrivateChildProps>();
+  const { userInfo } = useUserInfo();
   const { showAlertModal, showDetailPictureModal } = useModal();
 
   const [isHovered, setIsHovered] = useState(false);
-
-  const executeWork = async () => {
-    try {
-      await deleteImgFunc(data.id);
-      alert('사진을 삭제하였습니다!');
-    } catch (error) {
-      const message = getErrorMessage(error);
-      alert(message);
-    }
-  };
 
   const onClickShowAlertBox = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     showAlertModal({
       text: '이미지를 삭제하시겠습니까?',
-      executeWork,
+      executeWork: () => deleteImgFunc(data.id),
     });
   };
 
@@ -122,9 +112,11 @@ const ImageContent = ({ data, index, deleteImgFunc, isMobile }: Props) => {
       </ImageCard>
       <InfoContainer>
         <ImageInfo>
-          <div>
-            <span>작성자: {data.user_name}</span>
-          </div>
+          {data?.user_name && (
+            <div>
+              <span>작성자: {data.user_name}</span>
+            </div>
+          )}
           <div>
             <span>작성일: {data.created_at}</span>
           </div>
