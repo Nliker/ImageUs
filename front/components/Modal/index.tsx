@@ -12,8 +12,7 @@ import InviteMemberModal from './InviteMemberModal';
 import UploadModal from './UploadModal';
 
 const Modal = ({ modalData }: { modalData: IModalData }) => {
-  const { state } = modalData;
-  const currentModal = modalData?.currentModal;
+  const { state, currentModal } = modalData;
 
   if (state === 'off' || !currentModal) return null;
 
