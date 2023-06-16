@@ -59,7 +59,6 @@ export const HeaderTitle = styled.div`
 
   color: white;
   background-color: #18456b;
-  font-size: 1.8rem;
   box-shadow: 0 2px 4px hsla(0, 0%, 81.2%, 0.5);
 `;
 
@@ -74,7 +73,6 @@ export const Container = styled.div<IContainerProps>`
   height: ${({ size }) => size.height + 'px'};
   min-width: 320px;
 
-  font-size: 1.3rem;
   outline: 0;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 6px;

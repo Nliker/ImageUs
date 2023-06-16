@@ -111,7 +111,9 @@ const ModalLayout = ({ currentModal, size, children }: IProps) => {
         </>
       )}
       <Container ref={modalEl} size={responsiveSize}>
-        <HeaderTitle>{headerTitleList[currentModal]}</HeaderTitle>
+        <HeaderTitle>
+          <h3>{headerTitleList[currentModal]}</h3>
+        </HeaderTitle>
         <Content>{children}</Content>
       </Container>
     </Wrapper>

@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useOutletContext } from 'react-router';
+import { useParams } from 'react-router';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
@@ -12,30 +12,31 @@ import useUserListByRoom from '@hooks/useUserListByRoom';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import { ContentBox } from './styles';
 import ModalLayout from '../ModalLayout';
-import { PrivateChildProps } from '@typing/client';
 
 type AppendCheckFriendData = DFriendData & { check: boolean };
 
 const InviteMemberModal = () => {
-  const { roomId } = useOutletContext<PrivateChildProps>();
+  const { roomId } = useParams<{ roomId: string }>();
+
+  if (!roomId) return null;
 
   const { clearModalCache } = useModal();
   const { friendList } = useFriendList();
   const { userListByRoom, inviteMemberToRoom } = useUserListByRoom(roomId);
 
-  const size = { width: 412, height: 550 };
-
+  const effectRan = useRef(false);
   const [canInviteFriends, setCanInviteFriends] = useState<
     AppendCheckFriendData[]
   >([]);
-
   const checkFriends = useMemo<AppendCheckFriendData[]>(() => {
     const checkList = canInviteFriends.filter((data) => data.check);
     return [...checkList];
   }, [canInviteFriends]);
 
+  const size = { width: 412, height: 550 };
+
   useEffect(() => {
-    if (!friendList || !userListByRoom) return;
+    if (!friendList || !userListByRoom || effectRan.current) return;
 
     setCanInviteFriends((prev) => {
       const newList = friendList.filter((friend: DFriendData) => {
@@ -51,7 +52,11 @@ const InviteMemberModal = () => {
 
       return [...prev, ...appendCheckList];
     });
-  }, [friendList, userListByRoom]);
+
+    return () => {
+      effectRan.current = true;
+    };
+  }, []);
 
   const onClickFriendList = (clickId: number) => () => {
     setCanInviteFriends((prevData: AppendCheckFriendData[]) => {

@@ -55,9 +55,6 @@ const UploadModal = ({ executeFunc }: { executeFunc: IUploadImgFunc }) => {
       }
 
       await executeFunc(uploadImageFile);
-      if (window.location.pathname === '/my_page') {
-        window.location.reload();
-      }
       alert('사진을 업로드하였습니다!');
       clearModalCache();
     } catch (error) {

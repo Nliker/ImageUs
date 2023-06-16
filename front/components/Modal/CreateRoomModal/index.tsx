@@ -19,13 +19,12 @@ import {
   RoomNameInput,
 } from './styles';
 import ModalLayout from '../ModalLayout';
-import { PrivateChildProps } from '@typing/client';
-import { useOutletContext } from 'react-router';
+import { useUserInfo } from '@hooks/useUserInfo';
 
 type AddCheckFriendData = DFriendData & { check: boolean };
 
 const CreateRoomModal = () => {
-  const { userInfo } = useOutletContext<PrivateChildProps>();
+  const { userInfo } = useUserInfo();
 
   const { clearModalCache } = useModal();
   const { createRoom } = useRoomList(userInfo.id);
