@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 
 interface ICheckDeviceContext {
   isMobile: boolean;
@@ -9,5 +9,3 @@ const CheckDeviceContext = createContext<ICheckDeviceContext>({
 });
 
 export default CheckDeviceContext;
-
-export const useCheckDeviceContext = () => useContext(CheckDeviceContext);
