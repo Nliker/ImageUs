@@ -3,17 +3,16 @@ import styled from '@emotion/styled';
 export const Wrapper = styled.div`
   height: 100%;
 
-  overflow: hidden;
   user-select: none;
-
-  font-family: 'Dongle', 'Nanum Gothic', sans-serif;
 `;
 
 export const OuterContainer = styled.div<{
   showModal?: string | null;
 }>`
-  height: 100%;
+  display: flex;
+
   width: 100%;
+  height: 100%;
 
   ${({ showModal }) =>
     showModal &&
@@ -23,8 +22,7 @@ export const OuterContainer = styled.div<{
 `;
 
 export const InnerContainer = styled.div`
-  width: 100%;
-  height: calc(100% - 66px);
+  flex: 1 0 auto;
 
   background-color: rgb(255, 255, 255);
 `;

@@ -21,7 +21,7 @@ const PublicRoute = ({ authData }: IProps) => {
   if (loading || isAuthenticated === 'init') return <PageLoading />;
 
   return isAuthenticated === 'authorized' ? (
-    <Navigate to="/select-room" />
+    <Navigate to="/room" />
   ) : (
     <Outlet />
   );
