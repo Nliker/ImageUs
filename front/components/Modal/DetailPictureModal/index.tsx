@@ -86,7 +86,6 @@ const DetailPictureInfo = ({
             >
               <BiUserPin />
             </IconContext.Provider>
-            {}
           </div>
           <div className="date_info">
             <div className="down_btn">

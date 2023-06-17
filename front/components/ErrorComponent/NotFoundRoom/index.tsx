@@ -15,10 +15,10 @@ function NotFoundRoom() {
       <div className="btn_group">
         <Button
           onClick={() => {
-            window.location.href = '/select-room';
+            window.location.href = '/room';
           }}
         >
-          방 목록으로 이동하기
+          홈으로 돌아가기
         </Button>
       </div>
     </NotFoundLayout>

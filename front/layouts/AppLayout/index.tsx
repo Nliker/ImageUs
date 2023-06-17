@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-import NavigationBar from '@components/NavigationBar';
-import SideBar from '@components/SideBar';
 import Modal from '@components/Modal';
 import useModal from '@hooks/useModal';
-import SidebarContext from '@utils/SidebarContext';
-import { OuterContainer, InnerContainer, Wrapper } from './styles';
-import CheckDeviceContext from '@utils/CheckDeviceContext';
+import CheckDeviceContext from '@hooks/CheckDeviceContext';
 import { ToastContainer } from 'react-toastify';
+import SidebarContext from '@hooks/SidebarContext';
+import LeftNavMenu from '@components/LeftNavMenu';
 import 'react-toastify/dist/ReactToastify.css';
-import { useLocation } from 'react-router';
+import { OuterContainer, Wrapper } from './styles';
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -17,10 +15,9 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { data: modalData } = useModal();
-  const location = useLocation();
-  const isImageRoom = location.pathname.split('/')[1] === 'room';
 
-  const [sidebarState, setSidebarState] = useState<boolean>(false);
+  const [rightBarState, setRightbarState] = useState<boolean>(false);
+  const [leftBarState, setLeftbarState] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
@@ -34,17 +31,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <Wrapper>
-      <OuterContainer showModal={modalData?.currentModal}>
-        <NavigationBar />
-        <CheckDeviceContext.Provider value={{ isMobile: isMobile }}>
-          <InnerContainer>
-            <SidebarContext.Provider value={{ setSidebarState }}>
-              {isImageRoom && <SideBar show={sidebarState} />}
-              {children}
-            </SidebarContext.Provider>
-          </InnerContainer>
-        </CheckDeviceContext.Provider>
-      </OuterContainer>
+      <CheckDeviceContext.Provider value={{ isMobile: isMobile }}>
+        <SidebarContext.Provider
+          value={{
+            rightBarState,
+            leftBarState,
+            setLeftbarState,
+            setRightbarState,
+          }}
+        >
+          <OuterContainer showModal={modalData?.currentModal}>
+            <LeftNavMenu />
+            {children}
+          </OuterContainer>
+        </SidebarContext.Provider>
+      </CheckDeviceContext.Provider>
       <Modal modalData={modalData} />
       <ToastContainer />
     </Wrapper>

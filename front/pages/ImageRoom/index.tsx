@@ -1,55 +1,24 @@
-import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
-import { useNavigate, useOutletContext } from 'react-router';
+import React, { useRef, useState, memo } from 'react';
+import { useParams } from 'react-router';
 
 import { IconContext } from 'react-icons/lib';
-import { SlCloudUpload } from 'react-icons/sl';
-import { TbDoorExit } from 'react-icons/tb';
-import {
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-  MdOutlineSpaceDashboard,
-} from 'react-icons/md';
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
+import { AiOutlineMenuUnfold } from 'react-icons/ai';
 import Scrollbars from 'react-custom-scrollbars-2';
 
-import ImageSection from '@components/ImageSection';
-import useModal from '@hooks/useModal';
-import useRoomImgData from '@hooks/useRoomImgData';
-import useIntersect from '@hooks/useIntersect';
-import useRoomList from '@hooks/useRoomList';
-import SidebarContext from '@utils/SidebarContext';
-import { getErrorMessage } from '@utils/getErrorMessage';
-import { IImageData, PrivateChildProps, ISelectTerm } from '@typing/client';
-
-import {
-  LeftHeaderIcon,
-  ContentBox,
-  FilteringOption,
-  MainContainer,
-  UploadButton,
-  ImageLoadingContainer,
-} from './styles';
 import { Button } from '@styles/Button';
-import { PageLoading, Spinner } from '@styles/Spinner';
-import AppLayout from '@layouts/AppLayout';
+import RightSidebar from '@components/RightSidebar';
+import ImageSection from '@pages/ImageRoom/Component/ImageSection';
+import { useSidebar } from '@hooks/useSidebar';
+import { ISelectTerm } from '@typing/client';
+
+import { FilteringOption, MainContainer } from './styles';
 
 const ImageRoom = () => {
-  const { userInfo, roomId } = useOutletContext<PrivateChildProps>();
+  const { roomId } = useParams<{ roomId?: string }>();
+  if (!roomId) return null;
 
-  const navigate = useNavigate();
-
-  const { showUploadImgModal, showAlertModal } = useModal();
-  const { leaveRoom } = useRoomList(userInfo.id);
-  const {
-    initialLoading,
-    roomImageList,
-    roomImgLoading,
-    imageLoadEnd,
-    roomImgListError,
-    loadImage,
-    deleteRoomImage,
-    uploadRoomImage,
-    clearRoomImageList,
-  } = useRoomImgData(roomId);
+  const { leftBarState, rightBarState, setLeftbarState } = useSidebar();
 
   const [filterTagName, setFilterTagName] = useState('전체 게시물');
   const [filterStateNum, setFilterStateNum] = useState(0);
@@ -59,47 +28,9 @@ const ImageRoom = () => {
     startDate: '',
     endDate: '',
   });
-  const [readStartNumber, setReadStartNum] = useState(0);
 
-  const imageSectionProps = useMemo(
-    () => ({
-      imageList: roomImageList as IImageData[],
-      imgListLoading: roomImgLoading,
-      deleteImgFunc: deleteRoomImage,
-    }),
-    [roomImageList, roomImgLoading],
-  );
-
-  const effectRan = useRef(false);
-  const isFirstRan = useRef(true);
   const filterStartDateInputRef = useRef<HTMLInputElement>(null);
   const filterEndDateInputRef = useRef<HTMLInputElement>(null);
-
-  const observerRef = useIntersect(
-    async (entry, observer) => {
-      observer.unobserve(entry.target);
-      if (roomImgLoading || imageLoadEnd) {
-        return;
-      }
-      loadImageFunc();
-    },
-    {
-      threshold: 0.5,
-    },
-  );
-
-  const loadImageFunc = async () => {
-    const loadImageState = await loadImage({
-      isfiltered: filterStateNum !== 0 ? true : false,
-      filterStartDate: filterSelectTerm.startDate,
-      filterEndDate: filterSelectTerm.endDate,
-      readStartNumber,
-    });
-
-    setReadStartNum(loadImageState.readStartNumber);
-
-    isFirstRan.current = false;
-  };
 
   const getDateString = (dateValue: Date) => {
     const selectDate = `${dateValue.getFullYear()}-${
@@ -171,98 +102,29 @@ const ImageRoom = () => {
       return;
     }
 
-    setReadStartNum(0);
-    clearRoomImageList();
-
     setFilterStateNum(3);
     setFilterSelectTerm((prev) => ({ ...prev, startDate, endDate }));
     setShowSelectDateForm(false);
   };
 
-  const onClickLeaveRoom = () => {
-    const executeWork = async () => {
-      try {
-        await leaveRoom(roomId);
-        navigate('/select-room', { replace: true });
-      } catch (error) {
-        const message = getErrorMessage(error);
-        alert(message);
-      }
-    };
-
-    showAlertModal({ text: '방에서 나가시겠습니까?', executeWork });
-  };
-
-  const onClickUploadModal = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
-    showUploadImgModal({ executeFunc: uploadRoomImage });
-  };
-
-  useEffect(() => {
-    if (isFirstRan.current === false) {
-      loadImageFunc();
-    }
-
-    return () => {
-      setReadStartNum(0);
-      clearRoomImageList();
-    };
-  }, [filterStateNum, filterSelectTerm, roomId]);
-
-  useEffect(() => {
-    if (effectRan.current === false) {
-      loadImageFunc();
-    }
-
-    return () => {
-      effectRan.current = true;
-    };
-  }, []);
-
-  if (roomImgListError) {
-    roomImgListError.name = 'InfoRequestError';
-    throw roomImgListError;
-  }
-
   return (
-    <AppLayout>
-      <Scrollbars>
-        <MainContainer>
-          <LeftHeaderIcon>
-            <div className="active_icon_box">
-              <SidebarContext.Consumer>
-                {({ setSidebarState }) => (
-                  <div
-                    className="sidebar_icon"
-                    onClick={() => setSidebarState((prev) => !prev)}
-                  >
-                    <IconContext.Provider
-                      value={{
-                        size: '30px',
-                        style: { display: 'inline-block' },
-                      }}
-                    >
-                      <MdOutlineSpaceDashboard />
-                    </IconContext.Provider>
-                  </div>
-                )}
-              </SidebarContext.Consumer>
-              <div className="leave_icon" onClick={onClickLeaveRoom}>
-                <IconContext.Provider
-                  value={{
-                    size: '30px',
-                    style: { display: 'inline-block' },
-                  }}
-                >
-                  <TbDoorExit />
-                </IconContext.Provider>
-              </div>
-            </div>
-          </LeftHeaderIcon>
-
-          <ContentBox>
-            <div className="content_box_pos">
+    <>
+      <MainContainer>
+        {!leftBarState && (
+          <div className="nav_icon" onClick={() => setLeftbarState(true)}>
+            <IconContext.Provider
+              value={{
+                size: '30px',
+                style: { color: 'rgba(0, 0, 0, 0.7)' },
+              }}
+            >
+              <AiOutlineMenuUnfold />
+            </IconContext.Provider>
+          </div>
+        )}
+        <Scrollbars>
+          <div className="inner_container">
+            <div className="tool_box">
               <FilteringOption onClick={onClickFilteringItem}>
                 <input type="checkbox" id="options-view-button" />
                 <div id="select-button">
@@ -292,62 +154,46 @@ const ImageRoom = () => {
                 )}
               </FilteringOption>
               {showSelectDateForm && (
-                <div className="select_box">
-                  <div className="select_date">
-                    <div className="select_date_c">
+                <div className="select_date">
+                  <div>
+                    <div className="date_box">
                       <label>시작날</label>
                       <input type="date" ref={filterStartDateInputRef} />
                     </div>
-                    <div className="select_date_c">
+                    <div className="date_box">
                       <label>마지막날</label>
                       <input type="date" ref={filterEndDateInputRef} />
                     </div>
-                    <div className="select_data_btn">
-                      <Button
-                        type="button"
-                        onClick={onClickCertainPeriodFilterBtn}
-                      >
-                        확인
-                      </Button>
-                    </div>
                   </div>
+                  <Button type="button" onClick={onClickCertainPeriodFilterBtn}>
+                    확인
+                  </Button>
                 </div>
-              )}
-              <div>
-                <div className="tag">
-                  <span>
-                    {filterStateNum === 3
-                      ? `${filterSelectTerm.startDate} ~ ${filterSelectTerm.endDate}`
-                      : filterTagName}
-                  </span>
-                </div>
-              </div>
-              {initialLoading ? (
-                <ImageLoadingContainer>
-                  <Spinner />
-                </ImageLoadingContainer>
-              ) : (
-                <ImageSection
-                  imageSectionProps={imageSectionProps}
-                  observerRef={observerRef}
-                />
               )}
             </div>
-          </ContentBox>
-        </MainContainer>
-      </Scrollbars>
-      <UploadButton onClick={onClickUploadModal}>
-        <IconContext.Provider
-          value={{
-            size: '100%',
-            style: { display: 'inline-block' },
-          }}
-        >
-          <SlCloudUpload />
-        </IconContext.Provider>
-        <span>업로드</span>
-      </UploadButton>
-    </AppLayout>
+            <div className="tag">
+              <div className="tag_item">
+                <span>
+                  {filterStateNum === 3
+                    ? `${filterSelectTerm.startDate} ~ ${filterSelectTerm.endDate}`
+                    : filterTagName}
+                </span>
+              </div>
+            </div>
+            <div className="content_box">
+              <ImageSection
+                roomId={roomId}
+                filteringData={{
+                  isFilterMode: filterStateNum !== 0,
+                  filterSelectTerm,
+                }}
+              />
+            </div>
+          </div>
+        </Scrollbars>
+      </MainContainer>
+      <RightSidebar show={rightBarState} />
+    </>
   );
 };
 

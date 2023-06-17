@@ -1,34 +1,91 @@
-import { IImageData } from '@typing/client';
-import {
-  getImageDataFetcher,
-  deleteRoomImgFetcher,
-  uploadRoomImgFetcher,
-  getFilterImgFetcher,
-  getDefaultImgFetcher,
-  getUnreadImgFetcher,
-} from '@utils/imageFetcher';
-import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { getErrorMessage } from '@utils/getErrorMessage';
+
 import { toast } from 'react-toastify';
 
-interface ILoadImage {
-  isfiltered: boolean;
-  filterStartDate: string;
-  filterEndDate: string;
-  readStartNumber: number;
+import { IImageData, ISelectTerm } from '@typing/client';
+import {
+  deleteRoomImgFetcher,
+  uploadRoomImgFetcher,
+  getUnreadImgFetcher,
+  getRoomImgsFetcher,
+} from '@utils/imageFetcher';
+import { getErrorMessage } from '@utils/getErrorMessage';
+
+export interface IFilteringData {
+  isFilterMode: boolean;
+  filterSelectTerm: ISelectTerm;
 }
 
-function useRoomImgData(roomId: string) {
-  const [imageLoadEnd, setImageLoadEnd] = useState(false);
+interface IRoomImageObj {
+  imageList: IImageData[];
+  loadCompleted: boolean;
+  loadRoomId: string;
+}
+
+function useRoomImgData(roomId: string, filteringData: IFilteringData) {
+  const useSWRKey = `/room/${roomId}/imagelist`;
 
   const {
-    data: roomImageList,
-    mutate: mutateRoomImage,
+    data: roomImageData,
+    mutate: roomImageMutator,
     isValidating: roomImgValidating,
     error: roomImgListError,
-  } = useSWR<IImageData[]>('/room/imagelist');
+  } = useSWR<IRoomImageObj | null, Error>(useSWRKey);
+
+  const { trigger: getImageDataTrigger, isMutating: roomImgMutating } =
+    useSWRMutation(useSWRKey, getRoomImgsFetcher);
+
+  const { trigger: deleteRoomImgTrigger } = useSWRMutation(
+    [`/room/${roomId}/image`, 'delete'],
+    deleteRoomImgFetcher,
+  );
+
+  const { trigger: uploadRoomImageTrigger } = useSWRMutation(
+    [`/room/${roomId}/image`, 'upload'],
+    uploadRoomImgFetcher,
+  );
+
+  const loadImage = async (loadStartNum: number) => {
+    try {
+      await roomImageMutator(
+        await getImageDataTrigger({
+          loadStartNum,
+          filteringData,
+          roomId,
+        }),
+        {
+          populateCache: (updateData: IRoomImageObj, currentData) => {
+            if (currentData) {
+              const { imageList, loadRoomId } = currentData;
+              if (loadRoomId !== roomId) {
+                return {
+                  ...updateData,
+                  imageList: [...updateData.imageList],
+                };
+              } else {
+                return {
+                  ...updateData,
+                  imageList: [...imageList, ...updateData.imageList],
+                };
+              }
+            } else {
+              return {
+                ...updateData,
+                imageList: [...updateData.imageList],
+              };
+            }
+          },
+          revalidate: false,
+        },
+      );
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    }
+  };
 
   const { data: realTimeImageList, mutate: mutateRealTimeImage } = useSWR(
     '/room/imageUpdate',
@@ -42,23 +99,24 @@ function useRoomImgData(roomId: string) {
     },
   );
 
-  const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
-    useSWRMutation('/room/imageData', getImageDataFetcher);
-
-  const { trigger: deleteRoomImgTrigger } = useSWRMutation(
-    [`/room/${roomId}/image`, 'delete'],
-    deleteRoomImgFetcher,
-  );
-
-  const { trigger: uploadRoomImageTrigger } = useSWRMutation(
-    [`/room/${roomId}/image`, 'upload'],
-    uploadRoomImgFetcher,
-  );
-
   const uploadRoomImage = async (uploadImageFile: FormData) => {
     try {
-      await uploadRoomImageTrigger({ uploadImageFile });
-      await mutateRealTimeImage();
+      if (!roomImageData) {
+        throw new Error('예기치 못한 오류가 발생하였습니다..다시시도 해주세요');
+      }
+
+      const newData = (await uploadRoomImageTrigger({
+        uploadImageFile,
+      })) as IImageData;
+
+      const addImgList = [newData, ...roomImageData.imageList];
+
+      roomImageMutator((currentData) => {
+        if (!currentData) {
+          return;
+        }
+        return { ...currentData, imageList: [...addImgList] };
+      }, false);
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message, {
@@ -69,130 +127,42 @@ function useRoomImgData(roomId: string) {
 
   const deleteRoomImage = async (imageId: number) => {
     try {
-      if (!roomImageList) return;
+      if (!roomImageData) return;
 
       await deleteRoomImgTrigger(imageId);
-      const filterImgList = roomImageList.filter((data) => data.id !== imageId);
-      mutateRoomImage([...filterImgList], false);
+      const filterImgList = roomImageData.imageList.filter(
+        (data) => data.id !== imageId,
+      );
+      roomImageMutator((currentData) => {
+        if (!currentData) {
+          return;
+        }
+        return { ...currentData, imageList: [...filterImgList] };
+      }, false);
+      alert('이미지를 삭제하였습니다!');
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message, {
         position: toast.POSITION.TOP_CENTER,
       });
-    }
-  };
-
-  const loadImage = async (fetchInfo: ILoadImage) => {
-    const { isfiltered, filterStartDate, filterEndDate, readStartNumber } =
-      fetchInfo;
-
-    try {
-      if (isfiltered) {
-        const newData = await getFilterImgFetcher(
-          `/room/${roomId}/imagelist/bydate`,
-          {
-            arg: {
-              start: readStartNumber,
-              start_date: filterStartDate,
-              end_date: filterEndDate,
-            },
-          },
-        );
-        const { imagelist, loadCompleted } = newData;
-
-        if (loadCompleted) setImageLoadEnd(true);
-
-        const newImageDataList =
-          (await imgDataListTrigger([...imagelist])) ?? [];
-        mutateRoomImage(
-          (prevData: IImageData[] | undefined) => {
-            if (!prevData) {
-              return [...newImageDataList];
-            } else {
-              return [...prevData, ...newImageDataList];
-            }
-          },
-          {
-            revalidate: false,
-          },
-        );
-
-        if (loadCompleted) {
-          return {
-            readStartNumber: 0,
-          };
-        } else {
-          return {
-            readStartNumber: readStartNumber + 12,
-          };
-        }
-      } else {
-        const newData = await getDefaultImgFetcher(
-          `/room/${roomId}/imagelist`,
-          {
-            arg: {
-              start: readStartNumber,
-            },
-          },
-        );
-        const { imagelist, loadCompleted } = newData;
-
-        if (loadCompleted) setImageLoadEnd(true);
-
-        const newImageDataList =
-          (await imgDataListTrigger([...imagelist])) ?? [];
-
-        mutateRoomImage(
-          (prevData: IImageData[] | undefined) => {
-            if (!prevData) {
-              return [...newImageDataList];
-            } else {
-              return [...prevData, ...newImageDataList];
-            }
-          },
-          {
-            revalidate: false,
-          },
-        );
-
-        if (loadCompleted) {
-          return {
-            readStartNumber: 0,
-          };
-        } else {
-          return {
-            readStartNumber: readStartNumber + 12,
-          };
-        }
-      }
-    } catch (error) {
-      const message = getErrorMessage(error);
-      toast.error(message, {
-        position: toast.POSITION.TOP_CENTER,
-      });
-
-      return {
-        readStartNumber: 0,
-      };
     }
   };
 
   async function updateImageList() {
     try {
-      const newData = await getUnreadImgFetcher(
+      const newData: IImageData[] = await getUnreadImgFetcher(
         `/room/${roomId}/unread-imagelist`,
       );
-      await mutateRoomImage(
-        async () => await imgDataListTrigger([...newData]),
-        {
-          populateCache: (newData, currentData) => {
-            if (!currentData) return [];
-            if (!newData) return [...currentData];
-            return [...newData, ...currentData];
-          },
-          revalidate: false,
-        },
-      );
+
+      await roomImageMutator((currentData) => {
+        if (!currentData) {
+          return;
+        }
+        return {
+          ...currentData,
+          imageList: [...newData, ...currentData.imageList],
+        };
+      }, false);
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message, {
@@ -201,21 +171,20 @@ function useRoomImgData(roomId: string) {
     }
   }
 
-  const clearRoomImageList = () => {
-    setImageLoadEnd(false);
-    mutateRoomImage(undefined, false);
+  const clearRoomImageData = () => {
+    roomImageMutator(null, false);
   };
 
   return {
-    initialLoading: !roomImageList && !roomImgListError,
+    initialLoading: !roomImageData && !roomImgListError,
+    roomImageList: roomImageData?.imageList as IImageData[],
+    imageLoadEnd: roomImageData?.loadCompleted as boolean,
+    roomImgLoading: roomImgMutating || roomImgValidating,
     roomImgListError,
-    roomImageList,
-    roomImgLoading: imgDataListLoading || roomImgValidating,
-    imageLoadEnd,
+    loadImage,
     uploadRoomImage,
     deleteRoomImage,
-    loadImage,
-    clearRoomImageList,
+    clearRoomImageData,
   };
 }
 

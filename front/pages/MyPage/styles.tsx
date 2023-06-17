@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 export const WrapperBox = styled.section`
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 
@@ -8,12 +9,36 @@ export const WrapperBox = styled.section`
   box-sizing: border-box;
 
   overflow-x: hidden;
+
+  .nav_box {
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+
+    width: 100%;
+    padding: 0.5rem 9rem;
+    box-sizing: border-box;
+
+    .goback_room_btn {
+      display: flex;
+      align-items: center;
+
+      gap: 0.5rem;
+
+      border: 1px solid black;
+      border-radius: 6px;
+      background-color: darkgray;
+      text-decoration: none;
+    }
+  }
 `;
 
-export const ContentBox = styled.main`
+export const ContentBox = styled.div`
   box-sizing: border-box;
 
-  padding: 0 2rem;
+  height: 100%;
 
   overflow: hidden;
 
@@ -26,73 +51,60 @@ export const ContentBox = styled.main`
     list-style: none;
   }
 
+  .nav_icon {
+    position: absolute;
+    left: 1.5rem;
+    top: 0.5rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 20px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(212, 211, 213, 0.59);
+    }
+  }
+
   .upload_image {
     text-align: center;
     margin-bottom: 50px;
   }
-`;
 
-export const ProfileBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding: 2rem 0;
-`;
-
-export const EachRoomPictureList = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 1rem;
-  margin-bottom: 40px;
-
-  a {
-    text-decoration: none;
-    color: black;
-    &:active {
-      color: black;
-    }
+  .content {
+    margin-top: 2rem;
   }
-`;
-
-export const SubMenu = styled.div`
-  display: flex;
-
-  gap: 1rem;
-  font-size: 1.5rem;
-
-  a.menu_active {
-    border-top: 1px solid rgb(38, 38, 38);
-  }
-`;
-
-export const ProfileImage = styled.div`
-  width: 50px;
-  height: 50px;
-  margin-right: 30px;
 `;
 
 export const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  flex-basis: 50%;
+  justify-content: center;
 
+  height: 150px;
+  padding-left: 5rem;
+  margin-top: 3rem;
   gap: 1rem;
 
-  h2.user_name {
+  .user_name {
     font-size: 2rem;
+    font-weight: bolder;
   }
 
   ul {
     display: flex;
     gap: 1rem;
-    font-size: 1.2rem;
   }
 
   @media screen and (max-width: 600px) {
+    align-items: center;
+
+    padding: 0;
+
     ul {
       flex-direction: column;
     }
@@ -101,7 +113,7 @@ export const ProfileInfo = styled.div`
 
 export const ImageContainer = styled.div`
   position: relative;
-  width: 85%;
-  margin: auto;
-  font-size: 1.2rem;
+
+  margin: 3rem 0;
+  padding: 0 2rem;
 `;

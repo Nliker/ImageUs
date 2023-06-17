@@ -1,48 +1,46 @@
 import styled from '@emotion/styled';
 
 export const InfoSection = styled.section`
-  margin: auto;
-  max-width: 800px;
+  min-width: 370px;
+
+  h2 {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  @media screen and (min-width: 450px) {
+    margin: 0 2rem;
+  }
 `;
 
 export const InfoTable = styled.table`
-  table-layout: fixed;
-
   width: 100%;
-  font-size: 1.3rem;
-  border-radius: 15px;
-  box-shadow: -2px 2px 2px 2px rgb(0 0 0 / 40%);
+  table-layout: fixed;
 
   text-align: center;
   border-collapse: collapse;
-  background-color: white;
   overflow: hidden;
   user-select: text;
 
   tbody {
+    border-top: 3px solid #000000;
+
     tr td,
     tr th {
-      padding: 15px 0;
+      padding: 15px;
     }
 
     tr {
       height: 5rem;
 
-      .btn_group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        gap: 0.5rem;
-
-        button {
-          font-size: 0.65rem;
-        }
-      }
+      text-align: left;
+      border-bottom: 1px solid #f1f1f1;
 
       .change_name {
-        p {
+        display: flex;
+        align-items: center;
+
+        .notice {
           margin: 0;
           margin-bottom: 5px;
         }
@@ -50,27 +48,26 @@ export const InfoTable = styled.table`
         input {
           width: 130px;
         }
-      }
-    }
 
-    th {
-      border-right: 1px solid #a39485;
+        .btn_group {
+          display: flex;
+          flex-direction: column;
+          align-items: start;
+          justify-content: center;
+
+          margin-left: auto;
+          gap: 1rem;
+        }
+      }
     }
   }
 
   @media screen and (min-width: 600px) {
     tbody {
       tr {
-        .btn_group {
-          flex-direction: row;
-          button {
-            font-size: 1rem;
-          }
-        }
-
         .change_name {
-          input {
-            width: 180px;
+          .btn_group {
+            flex-direction: row;
           }
         }
       }

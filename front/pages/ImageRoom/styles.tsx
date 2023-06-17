@@ -1,98 +1,127 @@
 import styled from '@emotion/styled';
 
-export const ContentSectionWrapper = styled.div`
+export const Wrapper = styled.div`
+  display: flex;
+
   height: 100%;
-
-  .upload_icon {
-    position: fixed;
-    top: 65%;
-    right: 6%;
-    text-align: center;
-
-    width: 40px;
-    padding: 7px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-
-    color: #6296de;
-    background-color: ghostwhite;
-    box-shadow: 0px 1px 1px 2px #e0e6e6b3;
-    cursor: pointer;
-  }
 `;
 
 export const MainContainer = styled.main`
+  flex: 1 0 auto;
   position: relative;
-  height: 100%;
+
+  .nav_icon {
+    position: absolute;
+    left: 1.5rem;
+    top: 0.5rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 20px;
+    background-color: #a3cfcd;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(212, 211, 213, 0.59);
+    }
+  }
+
+  .inner_container {
+    padding: 2rem;
+  }
+
+  .tool_box {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 3rem;
+
+    .sidebar {
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 450px) {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
 
   .tag {
-    position: relative;
-    display: inline-block;
+    padding-top: 3rem;
 
-    font-size: 1.3rem;
-    height: 2rem;
-    padding: 0 20px 0 23px;
-    margin: 0 20px 20px 0;
-    border-radius: 3px 0 0 3px;
-    line-height: 2rem;
+    .tag_item {
+      position: relative;
+      display: inline-block;
 
-    color: white;
-    background: #5b7cfa;
-    text-decoration: none;
+      height: 2rem;
+      padding: 0 20px 0 23px;
+      border-radius: 3px 0 0 3px;
+      line-height: 2rem;
+
+      color: white;
+      background: #868aa6;
+      text-decoration: none;
+
+      &::before {
+        position: absolute;
+        top: 13px;
+        left: 10px;
+
+        width: 6px;
+        height: 6px;
+        border-radius: 10px;
+
+        background: #fff;
+        box-shadow: inset 0 1px rgb(0 0 0 / 25%);
+        content: '';
+      }
+
+      &::after {
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        content: '';
+        background: #fff;
+        border-bottom: 18px solid transparent;
+        border-left: 13px solid #868aa6;
+        border-top: 15px solid transparent;
+      }
+    }
   }
 
-  .tag::before {
-    position: absolute;
-    top: 13px;
-    left: 10px;
-
-    width: 6px;
-    height: 6px;
-    border-radius: 10px;
-
-    background: #fff;
-    box-shadow: inset 0 1px rgb(0 0 0 / 25%);
-    content: '';
-  }
-
-  .tag::after {
-    position: absolute;
-    right: 0;
-    top: 0;
-
-    content: '';
-    background: #fff;
-    border-bottom: 18px solid transparent;
-    border-left: 13px solid #5b7cfa;
-    border-top: 15px solid transparent;
-  }
-`;
-
-export const LeftHeaderIcon = styled.div`
-  position: relative;
-
-  .active_icon_box {
-    position: absolute;
-    top: 20px;
-    left: 50px;
+  .select_date {
     display: flex;
+    flex-direction: column;
 
+    width: 200px;
     gap: 1rem;
+    margin-right: 1rem;
 
-    .sidebar_icon {
-      cursor: pointer;
-    }
+    .date_box {
+      display: flex;
+      justify-content: space-between;
 
-    .leave_icon {
-      cursor: pointer;
+      &:first-of-type {
+        margin-bottom: 0.5rem;
+      }
     }
+  }
+
+  .content_box {
+    position: relative;
+
+    padding: 3rem 0;
   }
 `;
 
 export const FilteringOption = styled.div`
-  position: absolute;
-  top: -65px;
-  right: 0px;
+  position: relative;
 
   width: 120px;
   height: 20px;
@@ -161,75 +190,18 @@ export const FilteringOption = styled.div`
   }
 `;
 
-export const ContentBox = styled.div`
-  position: absolute;
-  top: 120px;
-
-  width: 100%;
-  padding-bottom: 40px;
-
-  .content_box_pos {
-    position: relative;
-
-    width: 85%;
-    margin: auto;
-
-    font-size: 1.2rem;
-
-    .select_box::after {
-      content: '';
-      display: block;
-      clear: both;
-    }
-
-    .select_date {
-      display: flex;
-      flex-direction: column;
-      float: right;
-
-      margin-bottom: 30px;
-      gap: 0.5rem;
-
-      .select_date_c {
-        display: inline-flex;
-        justify-content: end;
-
-        label {
-          margin-right: 8px;
-        }
-      }
-
-      .select_data_btn {
-        display: flex;
-        justify-content: right;
-        button {
-          font-size: 0.75rem;
-        }
-      }
-
-      @media screen and (min-width: 510px) {
-        flex-direction: row;
-        align-items: center;
-
-        gap: 1rem;
-      }
-    }
-  }
-`;
-
 export const UploadButton = styled.div`
   position: fixed;
   top: 65%;
-  right: 6%;
+  right: 3%;
   text-align: center;
   z-index: 1;
 
-  width: 40px;
+  width: 50px;
   padding: 7px;
   border-radius: 5px;
-  font-size: 1.2rem;
 
-  color: #6296de;
+  color: #868aa6;
   background-color: ghostwhite;
   box-shadow: 0px 1px 1px 2px #e0e6e6b3;
   cursor: pointer;

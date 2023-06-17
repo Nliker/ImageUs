@@ -69,7 +69,6 @@ export const ImageBox = styled.div`
         height: 15px;
         padding: 9px 18px;
         margin-left: 25px;
-        font-size: 1.2rem;
         line-height: 16px;
         border-radius: 5px;
 

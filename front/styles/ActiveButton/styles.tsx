@@ -60,7 +60,6 @@ export const CreateBtn = styled.button`
     grid-row: 2;
 
     color: white;
-    font-size: 1.1rem;
     background-color: #888888;
     text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
     -webkit-background-clip: text;

@@ -69,14 +69,14 @@ const check02Animate = keyframes`
 const fireworkAnimate = keyframes`
   0% {
     opacity: 1;
-    box-shadow: 0 0 0 -2px #4F29F0, 0 0 0 -2px #4F29F0, 0 0 0 -2px #4F29F0, 0 0 0 -2px #4F29F0, 0 0 0 -2px #4F29F0, 0 0 0 -2px #4F29F0;
+    box-shadow: 0 0 0 -2px #0058AA, 0 0 0 -2px #0058AA, 0 0 0 -2px #0058AA, 0 0 0 -2px #0058AA, 0 0 0 -2px #0058AA, 0 0 0 -2px #0058AA;
   }
   30% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    box-shadow: 0 -15px 0 0px #4F29F0, 14px -8px 0 0px #4F29F0, 14px 8px 0 0px #4F29F0, 0 15px 0 0px #4F29F0, -14px 8px 0 0px #4F29F0, -14px -8px 0 0px #4F29F0;
+    box-shadow: 0 -15px 0 0px #0058AA, 14px -8px 0 0px #0058AA, 14px 8px 0 0px #0058AA, 0 15px 0 0px #0058AA, -14px 8px 0 0px #0058AA, -14px -8px 0 0px #0058AA;
   }
   `;
 
@@ -85,11 +85,11 @@ export const DataCheckLabel = styled.input<{ boxName: string }>`
   align-items: center;
   position: relative;
 
-  height: 15px;
-  width: 15px;
+  height: 20px;
+  width: 20px;
   border: 0;
-  margin: 0 6px 0 0;
 
+  border-radius: 5px;
   background: #fff;
   outline: none;
   appearance: none;
@@ -105,17 +105,14 @@ export const DataCheckLabel = styled.input<{ boxName: string }>`
 
   &:checked ~ label {
     font-weight: bolder;
+
+    .item_text {
+      color: rgb(0, 0, 0, 0.5);
+    }
   }
 
   &:checked ~ label::before {
-    animation: ${(props) =>
-      props.boxName === 'member'
-        ? ''
-        : css`
-            ${sliceAnimate} 0.4s ease forwards
-          `};
-    width: ${(props) => (props.boxName === 'member' ? '0' : '')};
-    /* animation: ${sliceAnimate} 0.4s ease forwards; */
+    width: 0px;
   }
 
   &:checked ~ label::after {
@@ -140,8 +137,10 @@ export const DataCheckLabel = styled.input<{ boxName: string }>`
     position: absolute;
     height: 2px;
     top: auto;
-    background: #4f29f0;
+
+    margin-top: 3px;
     border-radius: 2px;
+    background: #0058aa;
   }
 `;
 
@@ -153,31 +152,31 @@ export const DataLabel = styled.label`
 
   width: fit-content;
 
+  transition: color 0.3s ease;
   color: #414856;
   cursor: pointer;
-  transition: color 0.3s ease;
-
-  &::before {
-    height: 2px;
-    width: 8px;
-    left: -18px;
-    border-radius: 2px;
-
-    background: #4f29f0;
-    transition: background 0.3s ease;
-  }
-
-  &::after {
-    height: 4px;
-    width: 4px;
-    top: 8px;
-    left: -25px;
-    border-radius: 50%;
-  }
 
   &::before,
   &::after {
     content: '';
     position: absolute;
+  }
+
+  &::before {
+    height: 2px;
+    top: 10px;
+    left: -32.5px;
+    border-radius: 2px;
+
+    background: #0058aa;
+    transition: background 0.3s ease;
+  }
+
+  &::after {
+    width: 4px;
+    height: 4px;
+    top: 10px;
+    left: -32.5px;
+    border-radius: 50%;
   }
 `;

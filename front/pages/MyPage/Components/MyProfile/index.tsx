@@ -27,53 +27,41 @@ const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
 
   return (
     <InfoSection>
+      <h2>기본 회원정보</h2>
       <InfoTable>
         <colgroup>
-          <col width={'20%'} />
-          <col width={'50%'} />
           <col width={'30%'} />
+          <col width={'70%'} />
         </colgroup>
         <tbody>
           <tr>
-            <th>이메일</th>
-            <td colSpan={2}>
-              <strong>{userInfo?.email}</strong>
-            </td>
-          </tr>
-          <tr>
-            <th>가입 유형</th>
-            <td>
-              <div>{userInfo?.user_type}</div>
-            </td>
-          </tr>
-          <tr>
             <th>이름</th>
             {!nameBoxState ? (
-              <>
-                <td>
-                  <div>{userInfo?.name}</div>
-                </td>
-                <td>
+              <td>
+                <div className="change_name">
+                  <div>
+                    <strong>{userInfo?.name}</strong>
+                  </div>
                   <div className="btn_group">
                     <Button type="button" onClick={() => setNameBoxState(true)}>
                       이름 변경
                     </Button>
                   </div>
-                </td>
-              </>
+                </div>
+              </td>
             ) : (
-              <>
-                <td className="change_name">
-                  <p>새로운 이름 입력</p>
-                  <input
-                    type="text"
-                    id="name_label"
-                    onChange={handleNameInput}
-                    value={nameInput}
-                    placeholder="이름 입력"
-                  />
-                </td>
-                <td>
+              <td>
+                <div className="change_name">
+                  <div>
+                    <p className="notice">새로운 이름 입력</p>
+                    <input
+                      type="text"
+                      id="name_label"
+                      onChange={handleNameInput}
+                      value={nameInput}
+                      placeholder="이름 입력"
+                    />
+                  </div>
                   <div className="btn_group">
                     <Button type="button" onClick={onClickChangeName}>
                       완료
@@ -86,14 +74,20 @@ const MyProfile = ({ userInfo }: { userInfo: DUserInfo | null }) => {
                       취소
                     </Button>
                   </div>
-                </td>
-              </>
+                </div>
+              </td>
             )}
           </tr>
           <tr>
-            <th>비밀번호</th>
+            <th>이메일</th>
             <td>
-              <strong>********</strong>
+              <strong>{userInfo?.email}</strong>
+            </td>
+          </tr>
+          <tr>
+            <th>가입 유형</th>
+            <td>
+              <div>{userInfo?.user_type}</div>
             </td>
           </tr>
         </tbody>

@@ -92,10 +92,10 @@ $ npm run dev
  ┣ 📂components             : 공통적으로 쓰이는 컴포넌트 폴더
  ┃   ┣ 📂ErrorBoundary
  ┃   ┣ 📂ErrorComponent
- ┃   ┣ 📂ImageSection
+ ┃   ┣ 📂ImageContent
  ┃   ┣ 📂Modal
- ┃   ┣ 📂NavigationBar
- ┃   ┣ 📂SideBar
+ ┃   ┣ 📂LeftNavMenu
+ ┃   ┣ 📂RightSidebar
  ┃   ┗ 📂UserFormBox
  ┣ 📂hooks                      : 커스텀 훅 관련 폴더
  ┣ 📂layouts
@@ -104,10 +104,9 @@ $ npm run dev
  ┣ 📂pages                      : 페이지 컴포넌트 폴더
  ┃   ┣ 📂ImageRoom
  ┃   ┣ 📂Intro
+ ┃   ┣ 📂IntroRoom
  ┃   ┣ 📂LogIn
  ┃   ┣ 📂MyPage
- ┃   ┣ 📂PeopleManagement
- ┃   ┣ 📂SelectRoom
  ┃   ┣ 📂SignUp
  ┃   ┗ 📂SocialLogInAuth
  ┣ 📂styles                     : 공통으로 사용되는 UI 컴포넌트

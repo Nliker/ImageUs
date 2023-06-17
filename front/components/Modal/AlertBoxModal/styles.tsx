@@ -9,13 +9,13 @@ export const Wrapper = styled.div`
   padding: 20px;
   box-sizing: border-box;
 
-  font-size: 1.5rem;
   background-color: white;
 
   & > p {
     margin: 0;
 
     text-align: center;
+    white-space: nowrap;
   }
 
   .btn_group {

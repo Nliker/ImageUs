@@ -6,8 +6,6 @@ export const Wrapper = styled.div`
   flex-direction: column;
 
   height: 100%;
-  /* border-radius: 12px; */
-  /* box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%); */
 
   overflow: hidden;
   background-color: white;
@@ -18,7 +16,6 @@ export const Wrapper = styled.div`
     align-items: center;
 
     padding: 15px 30px;
-    font-size: 80%;
 
     box-sizing: border-box;
     text-align: center;
@@ -30,7 +27,6 @@ export const Wrapper = styled.div`
     }
 
     .writer {
-      font-size: 1.3rem;
       font-weight: bolder;
     }
 
@@ -46,8 +42,6 @@ export const Wrapper = styled.div`
       align-items: center;
 
       gap: 1rem;
-
-      font-size: 1.2rem;
 
       .down_btn {
         width: 30px;
@@ -66,9 +60,6 @@ export const Wrapper = styled.div`
     height: 400px; */
 
     .head_info {
-      .writer {
-        font-size: 1.2rem;
-      }
       .name_info {
         gap: 0.2rem;
       }
