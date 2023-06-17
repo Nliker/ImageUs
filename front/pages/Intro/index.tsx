@@ -1,32 +1,23 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Button } from '@styles/Button';
+import Scrollbars from 'react-custom-scrollbars-2';
 
-import { MainContainer, MainIntroduction } from './styles';
-import { RiCameraLensLine } from 'react-icons/ri';
-import { IconContext } from 'react-icons/lib';
-import { IntroCloudIcon } from '@assets/image';
+import { Button } from '@styles/Button';
+import { IntroPageCamera } from '@assets/image';
+import { MainContainer } from './styles';
 
 const Intro = () => {
   return (
     <MainContainer>
-      <MainIntroduction>
+      <Scrollbars>
         <div className="main_background">
-          <div className="main_logo">
-            <IconContext.Provider
-              value={{
-                size: '14vmin',
-                color: '#A5B8CE',
-              }}
-            >
-              <RiCameraLensLine />
-            </IconContext.Provider>
-            <article className="main_page_article">
-              <h1 className="main_page_intro">ImageUs</h1>
-            </article>
-          </div>
-          <IntroCloudIcon />
+          <IntroPageCamera
+            style={{
+              height: '130px',
+            }}
+          />
+          <h1 className="logo_text">ImageUs</h1>
           <div className="btn_group">
             <NavLink to={'/login'}>
               <Button style={{ backgroundColor: '#00A3EC' }}>
@@ -40,7 +31,7 @@ const Intro = () => {
             </NavLink>
           </div>
         </div>
-      </MainIntroduction>
+      </Scrollbars>
     </MainContainer>
   );
 };

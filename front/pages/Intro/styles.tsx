@@ -3,12 +3,6 @@ import styled from '@emotion/styled';
 export const MainContainer = styled.main`
   height: 100%;
 
-  box-sizing: border-box;
-`;
-
-export const MainIntroduction = styled.section`
-  height: 100%;
-
   .main_background {
     display: flex;
     flex-direction: column;
@@ -17,49 +11,22 @@ export const MainIntroduction = styled.section`
 
     width: 100%;
     height: 100%;
-    gap: 3.5rem;
+    min-width: 350px;
+    min-height: 450px;
 
-    color: white;
-    background-color: #dbf2ff;
+    background-color: #fff;
 
-    img {
-      height: 25%;
-      max-height: 300px;
-    }
-
-    .main_logo {
-      position: relative;
-      right: 20px;
-      display: flex;
-      align-items: center;
-
-      gap: 1rem;
+    .logo_text {
+      font-family: 'Lobster';
+      font-size: 3.5rem;
+      margin: 0;
     }
 
     .btn_group {
       display: flex;
-      position: relative;
-      z-index: 1;
 
+      margin-top: 8rem;
       gap: 5rem;
-    }
-  }
-
-  .main_page_article {
-    position: relative;
-    z-index: 1;
-  }
-
-  .main_page_intro {
-    text-align: center;
-
-    margin: 0;
-    font-family: 'ShoCardCaps';
-    font-size: 14vmin;
-    color: #a5b8ce;
-
-    .brand_logo {
-      color: #ecb22e;
     }
   }
 `;
