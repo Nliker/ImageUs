@@ -77,7 +77,7 @@ const LogIn = () => {
     } else {
       try {
         await logInRequest({ email: emailValue, password: passwordValue });
-        navigate('/select-room', { replace: true });
+        navigate('/room', { replace: true });
       } catch (error) {
         const message = getErrorMessage(error);
         alert(message);
@@ -91,7 +91,7 @@ const LogIn = () => {
 
     logInRequest({ email, password })
       .then(() => {
-        navigate('/select-room', { replace: true });
+        navigate('/room', { replace: true });
       })
       .catch((error) => {
         const message = getErrorMessage(error);
