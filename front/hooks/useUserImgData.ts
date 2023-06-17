@@ -1,35 +1,30 @@
-import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { toast } from 'react-toastify';
 import { IImageData } from '@typing/client';
 import { getErrorMessage } from '@utils/getErrorMessage';
 import {
-  getImageDataFetcher,
   deleteUserImageFetcher,
   uploadUserImageFetcher,
-} from '@utils/imageFetcher';
-import {
-  getUserImgLenFetcher,
   getUserImgsFetcher,
-} from '@utils/userDataFetcher';
-import { toast } from 'react-toastify';
+} from '@utils/imageFetcher';
+import { getUserImgLenFetcher } from '@utils/userDataFetcher';
 
-interface ILoadImage {
-  readStartNumber: number;
+interface IRoomImageObj {
+  imageList: IImageData[];
+  loadCompleted: boolean;
 }
 
 function useUserImageData(userId: number) {
-  const [imageLoadEnd, setImageLoadEnd] = useState(false);
+  const imageSwrKey = `/user/${userId}/imagelist`;
 
   const {
-    data: userImageList,
-    mutate: mutateUserImgList,
+    data: userImageData,
+    mutate: userImageMutator,
     isValidating: userImgValidating,
     error: userImgListError,
-  } = useSWR<IImageData[]>('/user/imagelist');
-  const { data: uploadImgCount, mutate: setUploadImgCount } = useSWR(
-    '/user/uploadImgCount',
-  );
+  } = useSWR<IRoomImageObj | null, Error>(imageSwrKey);
+
   const { data: totalImageCount, mutate: refreshTotalImgCount } =
     useSWR<number>(`/user/${userId}/imagelist-len`, getUserImgLenFetcher, {
       revalidateIfStale: false,
@@ -37,8 +32,8 @@ function useUserImageData(userId: number) {
       revalidateOnReconnect: false,
     });
 
-  const { trigger: imgDataListTrigger, isMutating: imgDataListLoading } =
-    useSWRMutation('/user/image-download', getImageDataFetcher);
+  const { trigger: getImageDataTrigger, isMutating: userImgMutating } =
+    useSWRMutation(imageSwrKey, getUserImgsFetcher);
 
   const { trigger: deleteUserImgTrigger } = useSWRMutation(
     '/image',
@@ -49,40 +44,25 @@ function useUserImageData(userId: number) {
     uploadUserImageFetcher,
   );
 
-  const loadImage = async (fetchInfo: ILoadImage) => {
-    const { readStartNumber } = fetchInfo;
-
+  const loadImage = async (loadStartNum: number) => {
     try {
-      const newData = await getUserImgsFetcher(`/user/${userId}/imagelist`, {
-        arg: readStartNumber,
-      });
-      const { imagelist, loadCompleted } = newData;
-
-      if (loadCompleted) setImageLoadEnd(true);
-
-      const newImageDataList = (await imgDataListTrigger([...imagelist])) ?? [];
-      mutateUserImgList(
-        (prevData: IImageData[] | undefined) => {
-          if (!prevData) {
-            return [...newImageDataList];
+      await userImageMutator(await getImageDataTrigger({ loadStartNum }), {
+        populateCache: (updateData: IRoomImageObj, currentData) => {
+          if (currentData) {
+            const { imageList } = currentData;
+            return {
+              imageList: [...imageList, ...updateData.imageList],
+              loadCompleted: updateData.loadCompleted,
+            };
           } else {
-            return [...prevData, ...newImageDataList];
+            return {
+              imageList: [...updateData.imageList],
+              loadCompleted: updateData.loadCompleted,
+            };
           }
         },
-        {
-          revalidate: false,
-        },
-      );
-
-      if (loadCompleted) {
-        return {
-          readStartNumber: 0,
-        };
-      } else {
-        return {
-          readStartNumber: readStartNumber + 12,
-        };
-      }
+        revalidate: false,
+      });
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message, {
@@ -93,14 +73,21 @@ function useUserImageData(userId: number) {
 
   const uploadUserImage = async (uploadImageFile: FormData) => {
     try {
-      await uploadUserImageTrigger({ uploadImageFile });
+      if (!userImageData) {
+        throw new Error('예기치 못한 오류가 발생하였습니다..다시시도 해주세요');
+      }
 
-      setUploadImgCount((prevData: number | undefined) => {
-        if (!prevData || prevData >= 1000) {
-          return 1;
-        } else {
-          return prevData + 1;
+      const newData = (await uploadUserImageTrigger({
+        uploadImageFile,
+      })) as IImageData;
+
+      const addImgList = [newData, ...userImageData.imageList];
+
+      userImageMutator((currentData) => {
+        if (!currentData) {
+          return;
         }
+        return { ...currentData, imageList: [...addImgList] };
       }, false);
 
       await refreshTotalImgCount();
@@ -112,15 +99,24 @@ function useUserImageData(userId: number) {
     }
   };
 
-  const deleteStoreImage = async (imageId: number) => {
+  const deleteUserImage = async (imageId: number) => {
     try {
-      if (!userImageList) return;
+      if (!userImageData) {
+        throw new Error('예기치 못한 오류가 발생하였습니다..다시시도 해주세요');
+      }
 
       await deleteUserImgTrigger(imageId);
-
-      const filterImgList = userImageList.filter((data) => data.id !== imageId);
-      mutateUserImgList([...filterImgList], false);
+      const filterImgList = userImageData.imageList.filter(
+        (data) => data.id !== imageId,
+      );
+      userImageMutator((currentData) => {
+        if (!currentData) {
+          return;
+        }
+        return { ...currentData, imageList: [...filterImgList] };
+      }, false);
       await refreshTotalImgCount();
+      alert('이미지를 삭제하였습니다!');
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message, {
@@ -130,20 +126,20 @@ function useUserImageData(userId: number) {
   };
 
   const clearUserImageList = () => {
-    setImageLoadEnd(false);
-    mutateUserImgList(undefined, false);
+    userImageMutator(null, false);
   };
 
   return {
-    initialLoading: !userImageList && !userImgListError,
-    userImageList,
-    userImgLoading: imgDataListLoading || userImgValidating,
-    uploadImgSensorNum: uploadImgCount,
+    initialLoading: !userImageData && !userImgListError,
+    userImageList: userImageData?.imageList as IImageData[],
+    imageLoadEnd: userImageData?.loadCompleted as boolean,
+    userImgLoading: userImgMutating || userImgValidating,
+    userImgListError,
     totalImageCount,
-    imageLoadEnd,
+    userImageMutator,
     loadImage,
     uploadUserImage,
-    deleteStoreImage,
+    deleteUserImage,
     clearUserImageList,
   };
 }
