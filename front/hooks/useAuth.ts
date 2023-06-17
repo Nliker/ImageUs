@@ -1,7 +1,7 @@
-import { getErrorMessage } from '@utils/getErrorMessage';
-import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { getErrorMessage } from '@utils/getErrorMessage';
+import { logInCheckFetcher, logInRequestFetcher } from '@utils/logInFetcher';
 import { ILoginData } from '@typing/client';
 
 function useAuth() {
@@ -53,7 +53,10 @@ function useAuth() {
   return {
     isAuthenticated: loginData?.isAuthenticated ?? 'unauthorized',
     userInfo: loginData?.userInfo,
-    loading: (!loginData && !error) || isValidating,
+    loading:
+      (!loginData && !error) ||
+      isValidating ||
+      loginData?.isAuthenticated === 'init',
     error,
     logInRequest,
     logOut,

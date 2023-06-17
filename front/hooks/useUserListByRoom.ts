@@ -19,7 +19,9 @@ function useUserListByRoom(roomId: string) {
 
   const inviteMemberToRoom = async (selectIdList: number[]) => {
     try {
-      await inviteFriendFetcher(`/room/${roomId}/user`, { arg: selectIdList });
+      await inviteFriendFetcher(`/room/${roomId}/user`, {
+        arg: [...selectIdList],
+      });
       await userListMutate();
     } catch (error) {
       const message = getErrorMessage(error);
