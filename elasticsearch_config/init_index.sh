@@ -75,7 +75,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/4' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test4@test.com",
@@ -84,7 +84,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/5' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test5@test.com",
@@ -93,7 +93,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/6' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test6@test.com",
@@ -102,7 +102,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/7' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test7@test.com",
@@ -111,7 +111,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/8' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test8@test.com",
@@ -120,7 +120,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/9' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test9@test.com",
@@ -129,7 +129,7 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "user_type":"image_us"
 }'
 
-curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/10' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "email": "test10@test.com",
