@@ -74,3 +74,66 @@ curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
   "name":"test3",
   "user_type":"image_us"
 }'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test4@test.com",
+  "id": 4,
+  "name":"test4",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test5@test.com",
+  "id": 5,
+  "name":"test5",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test6@test.com",
+  "id": 6,
+  "name":"test6",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test7@test.com",
+  "id": 7,
+  "name":"test7",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test8@test.com",
+  "id": 8,
+  "name":"test8",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test9@test.com",
+  "id": 9,
+  "name":"test9",
+  "user_type":"image_us"
+}'
+
+curl --location --request PUT 'http://elasticsearch:9200/image_us/_doc/3' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "test10@test.com",
+  "id": 10,
+  "name":"test10",
+  "user_type":"image_us"
+}'
