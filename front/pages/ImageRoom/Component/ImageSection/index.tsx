@@ -39,8 +39,7 @@ const ImageSection = ({ roomId, filteringData }: IProps) => {
   } = useRoomImgData(roomId, filteringData);
 
   const loadStartNum = useRef(0);
-  const effectRan = useRef<boolean>(false);
-  const currentProps = useRef<IProps>({ roomId, filteringData });
+  const effectRan = useRef(false);
 
   const observerRef = useIntersect(
     async (entry, observer) => {
@@ -66,18 +65,13 @@ const ImageSection = ({ roomId, filteringData }: IProps) => {
     await deleteRoomImage(imageId);
 
   useEffect(() => {
-    if (
-      effectRan.current === false ||
-      currentProps.current.roomId !== roomId ||
-      currentProps.current.filteringData !== filteringData
-    ) {
+    if (effectRan.current) {
       loadImage(loadStartNum.current);
       loadStartNum.current += 12;
-      currentProps.current = { roomId, filteringData };
     }
 
     return () => {
-      if (effectRan.current) loadStartNum.current = 0;
+      loadStartNum.current = 0;
       effectRan.current = true;
       clearRoomImageData();
     };
