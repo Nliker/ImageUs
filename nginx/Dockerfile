@@ -9,8 +9,6 @@ COPY ./styles /usr/share/nginx/html/styles
 
 RUN rm /usr/share/nginx/html/index.html
 
-COPY index.html /usr/share/nginx/html/index.html
-
 RUN rm /etc/nginx/nginx.conf
 
 COPY nginx.conf /etc/nginx
